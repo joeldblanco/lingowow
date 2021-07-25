@@ -18,11 +18,12 @@ class TeachersCarousel extends Component
     public function save($product_id, $product_name, $product_qty, $product_price)
     {
         Cart::add($product_id, $product_name, $product_qty, $product_price)->associate('App\Models\Product');
-        // redirect()->route('dashboard');
+        // redirect()->route('cart');
+        redirect()->route('checkout');
     }
 
     public function render()
     {
-        return view('livewire.teachers-carousel', ['available_teachers' => $this->available_teachers]);
+        return view('livewire.teachers-carousel');
     }
 }
