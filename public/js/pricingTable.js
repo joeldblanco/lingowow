@@ -1,28 +1,11 @@
-function selectedLog(plan){
-    
-    var cells = $(".selected");
+function savePricingTableItem(route,product_id){
 
-    if(cells.length == plan){
-        for (var i=0; i<cells.length; i++){
-            cells[i] = cells[i].id.split("-");
-        }
-    
-        var data = [];
-    
-        for (let i=0; i<cells.length; i++){
-            data[i] = cells[i];
-        }
+    // var data = product_id;
 
-        console.log(data);
-
-        post('schedule', {
-            data: data,
-            "_token": $("meta[name='csrf-token']").attr("content")
-        });
-
-    }else{
-        console.log("Necesita seleccionar " + plan + " bloques en total. Solo " + cells.length + " han sido seleccionados.")
-    }
+    post(route, {
+        data: product_id,
+        "_token": $("meta[name='csrf-token']").attr("content")
+    });
 
 }
 

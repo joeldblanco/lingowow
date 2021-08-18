@@ -1,11 +1,71 @@
 <div>
 
+  <style>
+    /* #feedback { font-size: 1.4em; } */
+    .selectable .ui-selecting { background: #FECA40; }
+    .selectable .ui-selected, .selected { background: #F39814; color: white; }
+    .selectable { list-style-type: none; margin: 0; padding: 0; }
+    .selectable div, .cell { float: left; width: 100px; height: 25px; text-align: center; }
+  </style>
+
+  <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+  <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+
+  <script>
+    // $( function() {
+
+    //   var selectedCells = 0;
+    //   var selectingCells = 0;
+    //   var nOfClasses = 4;
+
+    //   $(".selectable").selectable({
+    //     selected: function( event, ui ) {
+    //       selectedCells = $('.ui-selected').length;
+    //       ui.selected.classList.replace("unselected","selected");
+    //       console.log(selectedCells);
+    //       if(selectedCells >= nOfClasses){
+    //         $(".selectable").selectable( "option", "cancel", ".unselected" );
+    //       }else{
+    //         $(".selectable").selectable( "option", "cancel", "" );
+    //       }
+    //     },
+    //     unselected: function( event, ui ){
+    //       selectedCells = $(".ui-selected").length;
+    //       ui.unselected.classList.replace("selected","unselected");
+    //       console.log(selectedCells);
+    //     }
+    //   });
+    // });
+
+    {{$nOfClasses = $plan}}
+
+    $( function() {
+
+      var selectedCells = 0;
+      var nOfClasses = {{$plan}};
+
+      $(".block").click(function(){
+        if($(this).hasClass("selected")){
+          $(this).removeClass("selected");
+        }else{
+          if(selectedCells < nOfClasses){
+            $(this).addClass("selected");
+          }
+        }
+        
+        selectedCells = $(".selected").length;
+        // console.log(selectedCells);
+      });
+
+    });
+
+  </script>
+
   @php
     if(isset($schedule)){
       $schedule = json_decode($schedule);
     
       for($i=0; $i<count($schedule); $i++){
-        // $schedule[$i] = explode(" ",$schedule[$i]);
 
         switch ($schedule[$i][1]){
             
@@ -35,28 +95,46 @@
     
   @endphp
 
-  <div class="container mx-auto mt-10">
+  <div class="container mx-auto">
     <div class="wrapper bg-white rounded shadow w-full">
 
-      {{-- <div id="boundary" class="border border-indigo-300 p-10 bg-indigo-50 rounded-md">
-        @for ($i = 0; $i < 17; $i++)
-          <div class="flex flex-row">
-            @for ($e = 0; $e < 8; $e++)
-              <div class="border border-indigo-300 m-1 w-20 h-10 rounded-sm @if(in_array([$i+6,$e],$schedule)) selected @else unselected @endif overflow-auto transition cursor-pointer duration-500 ease hover:bg-gray-300" @if ($e!=0) name="scheduleBlock" @endif id="{{$i+6}}-{{$e}}">
-                <div class="flex mx-auto overflow-hidden">
-                  <div class="top px-4 py-1">
-                    @if ($e == 0)
-                        <span class="text-gray-500">{{ $i + 6 }}:00</span>
-                    @endif
-                  </div>
-                </div>
-              </div>
-            @endfor
+      <h3 class="text-4xl font-bold text-gray-800">Select your schedule</h3>
+      <h4 class="text-2xl font-bold text-gray-400 mb-8">Please, select {{$nOfClasses}} blocks to continue</h4>
+
+      @php
+          $days = ['SUNDAY','MONDAY','TUESDAY', 'WEDNESDAY','THURSDAY','FRIDAY','SATURDAY'];
+      @endphp
+    
+    <div class="w-full flex flex-row">
+      <div class="flex flex-col">
+        <div class="cell border font-bold">
+          LIMA TIME
+        </div>
+        @for ($i = 0; $i < 16; $i++)
+          <div class="cell border">
+            {{$i + 6}}:00
           </div>
         @endfor
-      </div> --}}
+      </div>
+      <div class="w-full">
+        @foreach ($days as $day)
+          <div class="cell border font-bold" style="width: 14.28%">
+            {{$day}}
+          </div>
+        @endforeach
+        <div class="w-full flex flex-row">
+          <div class="selectable w-full">
+            @for ($i = 0; $i < 16; $i++)
+              @for ($e = 0; $e < 7; $e++)
+                <div class="w-32 h-10 border block" style="width: 14.28%" id="{{$i+6}}-{{$e}}"></div>
+              @endfor
+            @endfor
+          </div>
+        </div>
+      </div>
+    </div>      
 
-      <table class="w-full">
+      {{-- <table class="w-full">
         <thead>
           <tr>
             <th class="p-2 border h-10 lg:w-30 md:w-30 sm:w-20 w-10 xl:text-sm text-xs">
@@ -93,26 +171,7 @@
             </th>
           </tr>
         </thead>
-        
-        @if($mode == 0)
-          <tbody id="scheduleTable">
-              @for ($i = 0; $i < 17; $i++)
-                <tr class="text-center">
-                  @for ($e = 0; $e < 8; $e++)
-                    <td class="border p-0 lg:w-30 md:w-30 @if(isset($schedule) and in_array([$i+6,$e],$schedule)) selected @endif sm:w-20 w-10 overflow-auto transition cursor-pointer duration-500 ease hover:bg-gray-300" @if ($e!=0) name="scheduleBlock" @endif id="{{$i+6}}-{{$e}}">
-                      <div class="flex flex-col mx-auto lg:w-30 md:w-30 sm:w-full w-10 overflow-hidden">
-                        <div class="top w-full px-6 py-4">
-                          @if ($e == 0)
-                              <span class="text-gray-500">{{ $i + 6 }}:00</span>
-                          @endif
-                        </div>
-                      </div>
-                    </td>
-                  @endfor
-                </tr>
-              @endfor
-          </tbody>
-        @endif
+
         @if($mode == 1)
           <tbody id="scheduleTable">
             @for ($i = 0; $i < 17; $i++)
@@ -132,12 +191,14 @@
             @endfor
           </tbody>
         @endif
-      </table>     
+      </table>      --}}
     </div>
-    <button class="bg-green-500 rounded-lg text-white font-bold px-6 py-1 my-3 shadow-md" onclick="selectedLog()">Save</button>
+    <button class="bg-green-500 rounded-lg text-white font-bold px-6 py-1 my-3 shadow-md" onclick="selectedLog({{$plan}})">Save</button>
     <button class="bg-blue-500 rounded-lg text-white font-bold px-6 py-1 my-3 shadow-md" wire:model="$mode = 0">Edit</button>
   </div>
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  
+  {{-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script> --}}
   <script type="text/javascript" src="{{ asset('js/scheduleSelection.js') }}" defer></script>
-  <script src="https://cdn.jsdelivr.net/npm/@simonwep/selection-js/lib/selection.min.js"></script>
+  {{-- <script src="https://cdn.jsdelivr.net/npm/@simonwep/selection-js/lib/selection.min.js"></script> --}}
+  
 </div>

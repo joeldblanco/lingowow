@@ -28,13 +28,13 @@
             'name' => 'Cart',
             'route' => route('cart'),
             'status' => request()->routeIs('cart'),
-            'parent_link' => request()->routeIs('shop')
+            'parent_link' => request()->is('shop','shop/*')
         ],
         [
             'name' => 'Invoices',
             'route' => route('invoices'),
             'status' => request()->routeIs('invoices'),
-            'parent_link' => request()->routeIs('shop')
+            'parent_link' => request()->is('shop','shop/*')
         ],
     ]
 @endphp

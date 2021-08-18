@@ -15,11 +15,12 @@ class TeachersCarousel extends Component
         $this->available_teachers = $teachers;
     }
 
-    public function save($product_id, $product_name, $product_qty, $product_price)
+    public function save($product_id, $product_name, $product_qty, $product_price, $teacher_id)
     {
+        Cart::destroy();
         Cart::add($product_id, $product_name, $product_qty, $product_price)->associate('App\Models\Product');
-        // redirect()->route('cart');
-        redirect()->route('checkout');
+        session(['selected_teacher' => $teacher_id]);
+        redirect()->route('cart');
     }
 
     public function render()

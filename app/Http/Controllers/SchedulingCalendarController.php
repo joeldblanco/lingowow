@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\User;
+use Illuminate\Contracts\Session\Session;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class SchedulingCalendarController extends Controller
@@ -76,9 +78,19 @@ class SchedulingCalendarController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request)
     {
-        //
+        $result = session('plan');
+
+        if($result == "simple"){
+            $plan = 2;
+        }elseif($result == "regular"){
+            $plan = 3;
+        }elseif($result == "intensivo"){
+            $plan = 4;
+        }
+        
+        return view('calendar-selection', compact('plan'));
     }
 
     /**
@@ -103,6 +115,8 @@ class SchedulingCalendarController extends Controller
         $request->data = explode(',', $request->data);
         $cells = array_chunk($request->data,2);
 
+        session(['user_schedule' => json_encode($cells)]);
+
         $teachers = DB::table('users')
                     ->join('model_has_roles',function($join){
                         $join->on('users.id','=','model_has_roles.model_id')
@@ -111,9 +125,9 @@ class SchedulingCalendarController extends Controller
                     ->get();
 
         $available_teachers = [];
-        
+
         foreach($teachers as $teacher){
-            $teacher_schedule = json_decode($teacher->schedule);
+            $teacher_schedule = json_decode($teacher->available_schedule);
             $matched_blocks = 0;
             foreach($cells as $cell){
                 if(in_array($cell,$teacher_schedule)){
@@ -126,10 +140,7 @@ class SchedulingCalendarController extends Controller
             }
         }
 
-        if (count($available_teachers) > 0){
-            return view('teachers-selection',['available_teachers' => $available_teachers]);
-        }else{
-            echo "There are no available teachers.";
-        }
+        return view('teachers-selection',['available_teachers' => $available_teachers]);
+        
     }
 }

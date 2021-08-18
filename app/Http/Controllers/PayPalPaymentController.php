@@ -11,6 +11,7 @@ use Srmklive\PayPal\Services\AdaptivePayments;
 use Srmklive\PayPal\Services\ExpressCheckout;
 use App\Models\Product;
 use App\Models\User;
+use Illuminate\Support\Facades\DB;
 
 class PayPalPaymentController extends Controller
 {
@@ -97,10 +98,12 @@ class PayPalPaymentController extends Controller
 
             $invoice = $this->createInvoice($cart, $status);
 
+            $invoice_id = $invoice->id;
+
             if ($invoice->paid) {
                 // session()->put(['code' => 'success', 'message' => "Order $invoice->id has been paid successfully!"]);
-                $users = User::all();
-                $items = Item::all();
+                // $users = User::all();
+                // $items = Item::all();
 
                 foreach(Cart::content() as $item){
                     if($item->name === "Enrolment"){
@@ -110,7 +113,29 @@ class PayPalPaymentController extends Controller
                     }
                 }
 
-                return view('invoice',compact('invoice','users','items'));
+                $student = User::find(auth()->id());
+                DB::table('scheduled_classes')->insert([
+                    'student_id' => auth()->id(),
+                    'teacher_id' => session('selected_teacher')
+                ]);
+                $teacher_schedule = DB::table('users')->select('available_schedule')->where('id',session('selected_teacher'))->get();
+                $teacher_schedule = json_decode($teacher_schedule[0]->available_schedule);
+                $student_schedule = json_decode(session('user_schedule'));
+
+                foreach($teacher_schedule as $t_schedule){
+                    foreach($student_schedule as $s_schedule){
+                        if($s_schedule == $t_schedule){
+                            \array_splice($teacher_schedule, array_search($t_schedule,$teacher_schedule), 1);
+                        }
+                    }
+                }
+                $teacher_schedule = json_encode($teacher_schedule);
+                DB::table('users')->where('id',session('selected_teacher'))->update(['available_schedule' => $teacher_schedule]);
+                $student->selected_schedule = session('user_schedule');
+                $student->save();
+
+                return redirect()->route('invoice.show',['id' => $invoice_id]);
+
             } else {
                 session()->put(['code' => 'danger', 'message' => "Error processing PayPal payment for Order $invoice->id!"]);
             }
@@ -210,7 +235,7 @@ class PayPalPaymentController extends Controller
         }
 
         $data['invoice_id'] = config('paypal.invoice_prefix').'_'.$order_id;
-        $data['invoice_description'] = "Order #$order_id Invoice";
+        $data['invoice_description'] = "Invoice #$order_id";
         $data['cancel_url'] = url('/');
 
         $total = 0;

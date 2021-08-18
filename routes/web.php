@@ -32,7 +32,7 @@ Route::middleware(['auth:sanctum', 'verified'])->get('/dashboard', function () {
     return view('dashboard');
 })->name('dashboard');
 
-Route::middleware(['auth:sanctum', 'verified', 'role:guest'])->get('/courses', function () {
+Route::middleware(['auth:sanctum', 'verified', 'role:student|teacher|admin'])->get('/courses', function () {
     return view('courses');
 })->name('courses');
 
@@ -40,22 +40,26 @@ Route::middleware(['auth:sanctum', 'verified'])->get('/pages', function () {
     return view('pages');
 })->name('pages');
 
-Route::middleware(['auth:sanctum', 'verified'])->get('/shop', [PayPalPaymentController::class,'getIndex'])->name('shop');
+Route::middleware(['auth:sanctum', 'verified', 'role:guest|student|admin'])->get('/shop', [PayPalPaymentController::class,'getIndex'])->name('shop');
 
-Route::middleware(['auth:sanctum', 'verified'])->get('/cart', function(){
+Route::middleware(['auth:sanctum', 'verified','role:guest|student|admin'])->get('/shop/cart', function(){
     return view('cart');
 })->name("cart");
 
-Route::middleware(['auth:sanctum', 'verified'])->get('/invoices', function(){
-    $invoices = Invoice::all()->where('user_id',auth()->id());
+Route::middleware(['auth:sanctum', 'verified','role:guest|student|admin'])->get('/shop/invoices', function(){
+    $invoices = Invoice::all()->where('user_id',auth()->id())->reverse();
     return view('components.invoices-component',compact('invoices'));
 })->name("invoices");
+
+Route::middleware(['auth:sanctum', 'verified'])->get('/invoice/{id}', [Invoice::class,'show'])->name('invoice.show');
 
 Route::middleware(['auth:sanctum', 'verified'])->post('/schedule', [SchedulingCalendarController::class,'checkForTeachers'])->name("schedule.check");
 
 Route::get('/profile', function () {
     // Only verified users may access this route...
 })->middleware('verified');
+
+Route::middleware(['auth:sanctum', 'verified'])->get('/schedule-selection', [SchedulingCalendarController::class,'update'])->name("schedule.update");
 
 
 //ROUTES FOR EMAIL VERIFICATION//
