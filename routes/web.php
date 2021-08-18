@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\SchedulingCalendarController;
 use App\Http\Livewire\CartComponent;
 use App\Invoice;
+use App\Http\Controllers\CoursesController;
 
 /*
 |--------------------------------------------------------------------------
@@ -32,9 +33,15 @@ Route::middleware(['auth:sanctum', 'verified'])->get('/dashboard', function () {
     return view('dashboard');
 })->name('dashboard');
 
-Route::middleware(['auth:sanctum', 'verified', 'role:guest'])->get('/courses', function () {
-    return view('courses');
-})->name('courses');
+// Route::middleware(['auth:sanctum', 'verified', 'role:guest'])->get('/courses', function () {
+//     return view('courses');
+// })->name('courses');
+
+Route::middleware(['auth:sanctum', 'verified'])->get('/courses/{num}/{num2}', [CoursesController::class, "show_units"])->name('courses');
+Route::middleware(['auth:sanctum', 'verified'])->get('/courses/{num}', [CoursesController::class, "show_modules"])->name('courses');
+Route::middleware(['auth:sanctum', 'verified'])->get('/courses', [CoursesController::class, "index"])->name('courses');
+
+
 
 Route::middleware(['auth:sanctum', 'verified'])->get('/pages', function () {
     return view('pages');
