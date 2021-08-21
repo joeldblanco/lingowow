@@ -1,14 +1,14 @@
 <?php
 
-namespace App\View\Components;
+namespace App\Http\Livewire;
 
+use Livewire\Component;
 use App\Models\User;
-use Illuminate\View\Component;
 
 class ScheduledCalendar extends Component
 {
-
     public $schedule;
+    public $mode = 0;
     /**
      * Create a new component instance.
      *
@@ -21,8 +21,8 @@ class ScheduledCalendar extends Component
         $this->schedule = $user->selected_schedule;
     }
 
-    public function edit(){
-        
+    public function edit($mode){
+        $this->mode = $mode;
     }
 
     /**
@@ -33,6 +33,7 @@ class ScheduledCalendar extends Component
     public function render()
     {
         $schedule = $this->schedule;
-        return view('components.scheduled-calendar',compact('schedule'));
+        $mode = $this->mode;
+        return view('livewire.scheduled-calendar',compact('schedule','mode'));
     }
 }

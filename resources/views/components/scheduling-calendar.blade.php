@@ -37,7 +37,7 @@
     //   });
     // });
 
-    {{$nOfClasses = $plan}}
+    // {{$nOfClasses = $plan}}
 
     $( function() {
 
@@ -99,7 +99,7 @@
     <div class="wrapper bg-white rounded shadow w-full">
 
       <h3 class="text-4xl font-bold text-gray-800">Select your schedule</h3>
-      <h4 class="text-2xl font-bold text-gray-400 mb-8">Please, select {{$nOfClasses}} blocks to continue</h4>
+      <h4 class="text-2xl font-bold text-gray-400 mb-8">Please, select {{$plan}} blocks to continue</h4>
 
       @php
           $days = ['SUNDAY','MONDAY','TUESDAY', 'WEDNESDAY','THURSDAY','FRIDAY','SATURDAY'];
@@ -194,7 +194,7 @@
       </table>      --}}
     </div>
     <button class="bg-green-500 rounded-lg text-white font-bold px-6 py-1 my-3 shadow-md" onclick="selectedLog({{$plan}})">Save</button>
-    <button class="bg-blue-500 rounded-lg text-white font-bold px-6 py-1 my-3 shadow-md" wire:model="$mode = 0">Edit</button>
+    {{-- <button class="bg-blue-500 rounded-lg text-white font-bold px-6 py-1 my-3 shadow-md" wire:model="$mode = 0">Edit</button> --}}
   </div>
   
   {{-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script> --}}

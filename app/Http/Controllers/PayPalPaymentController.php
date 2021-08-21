@@ -131,8 +131,10 @@ class PayPalPaymentController extends Controller
                 }
                 $teacher_schedule = json_encode($teacher_schedule);
                 DB::table('users')->where('id',session('selected_teacher'))->update(['available_schedule' => $teacher_schedule]);
-                $student->selected_schedule = session('user_schedule');
+                $student->selected_schedule = json_decode(session('user_schedule'));
                 $student->save();
+
+                Cart::destroy();
 
                 return redirect()->route('invoice.show',['id' => $invoice_id]);
 

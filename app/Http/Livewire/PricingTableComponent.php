@@ -5,6 +5,7 @@ namespace App\Http\Livewire;
 use App\Models\Product;
 use Livewire\Component;
 use Cart;
+use Illuminate\Support\Facades\DB;
 
 class PricingTableComponent extends Component
 {
@@ -25,7 +26,14 @@ class PricingTableComponent extends Component
 
     public function render()
     {
-        $products = Product::where('id',$this->selectedProduct)->get();
-        return view('livewire.pricing-table-component')->with(compact('products'));
+        $product = Product::where('id',$this->selectedProduct)->get();
+        $plans =  DB::table('plans')
+            ->join('plansproducts',function($join) use (&$product){
+                $join->on('plans.id','=','plansproducts.plan_id')
+                    ->where('plansproducts.product_id','=',$product[0]->id);
+            })
+            ->get();
+
+        return view('livewire.pricing-table-component')->with(compact('product','plans'));
     }
 }

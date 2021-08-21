@@ -25,9 +25,21 @@ class SchedulingCalendarController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
+    public function create(Request $request)
     {
-        //
+        $plan = session('plan');
+
+        // dd($request);
+
+        // if($result == "simple"){
+        //     $plan = 2;
+        // }elseif($result == "regular"){
+        //     $plan = 3;
+        // }elseif($result == "intensivo"){
+        //     $plan = 4;
+        // }
+        
+        return view('calendar-selection', compact('plan'));
     }
 
     /**
@@ -80,17 +92,7 @@ class SchedulingCalendarController extends Controller
      */
     public function update(Request $request)
     {
-        $result = session('plan');
-
-        if($result == "simple"){
-            $plan = 2;
-        }elseif($result == "regular"){
-            $plan = 3;
-        }elseif($result == "intensivo"){
-            $plan = 4;
-        }
-        
-        return view('calendar-selection', compact('plan'));
+        //
     }
 
     /**
@@ -130,6 +132,7 @@ class SchedulingCalendarController extends Controller
             $teacher_schedule = json_decode($teacher->available_schedule);
             $matched_blocks = 0;
             foreach($cells as $cell){
+                // dd($teacher_schedule);
                 if(in_array($cell,$teacher_schedule)){
                     $matched_blocks++;
                 }
@@ -141,6 +144,5 @@ class SchedulingCalendarController extends Controller
         }
 
         return view('teachers-selection',['available_teachers' => $available_teachers]);
-        
     }
 }

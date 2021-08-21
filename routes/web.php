@@ -59,7 +59,7 @@ Route::get('/profile', function () {
     // Only verified users may access this route...
 })->middleware('verified');
 
-Route::middleware(['auth:sanctum', 'verified'])->get('/schedule-selection', [SchedulingCalendarController::class,'update'])->name("schedule.update");
+Route::middleware(['auth:sanctum', 'verified'])->get('/schedule-selection', [SchedulingCalendarController::class,'create'])->name("schedule.update");
 
 
 //ROUTES FOR EMAIL VERIFICATION//

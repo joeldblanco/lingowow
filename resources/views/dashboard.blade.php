@@ -12,7 +12,7 @@
                     </div>
                 @endif
 
-                <x-scheduled-calendar />
+                <livewire:scheduled-calendar />
             </div>
         </div>
     </div>

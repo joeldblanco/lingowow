@@ -1,7 +1,7 @@
 <div>
 
-  <button onclick="" class="inline-block bg-green-800 text-white px-6 py-4 mt-5 rounded hover:bg-green-900 hover:text-white hover:no-underline">Free Schedule</button>
-
+  <button wire:click="edit(1)" class="inline-block bg-green-800 text-white px-6 py-4 mt-5 rounded hover:bg-green-900 hover:text-white hover:no-underline">Free Schedule</button>
+  
   <style>
     /* #feedback { font-size: 1.4em; } */
     .selectable .ui-selecting { background: #FECA40; }
@@ -16,7 +16,6 @@
   
   @php
     if(isset($schedule)){
-      // dd($schedule);
       $schedule = json_decode($schedule);
       // var_dump($schedule);
     }
@@ -37,7 +36,7 @@
     }
 
   @endphp
-  
+    
   <div class="container mx-auto mt-10">
     <div class="wrapper bg-white rounded shadow w-full">
 
@@ -73,7 +72,7 @@
               <div class="selectable w-full">
                   @for ($i = 0; $i < 16; $i++)
                       @for ($e = 0; $e < 7; $e++)
-                      <div class="w-32 h-10 border @if(in_array([$i+6,$e],$student_schedule)) taken @elseif(in_array([$i+6,$e],$schedule)) selected  @endif" style="width: 14.28%" id="{{$i+6}}-{{$e}}"></div>
+                      <div class="w-32 h-10 border @if($mode == 1) block @endif @if(in_array([$i+6,$e],$student_schedule)) taken @elseif(in_array([$i+6,$e],$schedule)) selected  @endif" style="width: 14.28%" id="{{$i+6}}-{{$e}}"></div>
                       @endfor
                   @endfor
               </div>
@@ -83,7 +82,29 @@
     </div>
     </div>
   </div>
-    
+      
   <script type="text/javascript" src="{{ asset('js/scheduleSelection.js') }}" defer></script>
-    
+  <script>
+
+    $( function() {
+
+      var selectedCells = 0;
+      var nOfClasses = {{count($schedule)}};
+
+      $(".block").click(function(){
+        if($(this).hasClass("selected")){
+          $(this).removeClass("selected");
+        }else{
+          if(selectedCells < nOfClasses){
+            $(this).addClass("selected");
+          }
+        }
+        
+        selectedCells = $(".selected").length;
+        // console.log(selectedCells);
+      });
+
+    });
+
+  </script>
 </div>

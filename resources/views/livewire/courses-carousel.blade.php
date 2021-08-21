@@ -54,7 +54,7 @@
                         </div>
                     </div>
                 </div>
-                <button onclick="selectProduct({{$course->course_id}})" class="inline-block bg-green-600 text-white px-6 py-2 mt-4 rounded-lg hover:bg-green-700">Select</button>
+                <a href="#plans"><button onclick="selectProduct({{$course->course_id}})" class="inline-block bg-green-600 text-white px-6 py-2 mt-4 rounded-lg hover:bg-green-700">Select</button></a>
             </div>
         </div>
         @endforeach
