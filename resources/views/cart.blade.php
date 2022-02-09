@@ -1,6 +1,6 @@
 <x-app-layout>
     
-    <div class="py-12 bg-white font-sans">
+    <div class="bg-white font-sans">
         
         <livewire:cart-component />
         

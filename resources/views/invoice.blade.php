@@ -14,7 +14,8 @@
   <header>
   <div class="row align-items-center">
     <div class="col-sm-7 text-center text-sm-left mb-3 mb-sm-0">
-      <img id="logo" src="images/logo.png" title="The Utterers' Corner" alt="The Utterers' Corner" />
+      <img id="logo" src="{{Storage::url('images/logo_circular_azul.png')}}" title="The Utterers' Corner" alt="The Utterers' Corner" class="w-16 mb-3"/>
+      <p class="font-bold">The Utterers' Corner</p>
     </div>
     <div class="col-sm-5 text-center text-sm-right">
       <h4 class="text-7 mb-0">Invoice</h4>
@@ -27,12 +28,12 @@
   <main>
   <div class="row">
     @php
-      $date = explode(" ",$invoice[0]->created_at);
-      $user = DB::table('users')->where('id',$invoice[0]->user_id)->get();
-      $items = DB::table('items')->where('invoice_id',$invoice[0]->id)->get();
+      $date = explode(" ",$invoice->created_at);
+      $user = App\Models\User::where('id',$invoice->user_id)->get();
+      $items = DB::table('items')->where('invoice_id',$invoice->id)->get();
     @endphp
     <div class="col-sm-6"><strong>Date:</strong> {{$date[0]}}</div>
-    <div class="col-sm-6 text-sm-right"> <strong>Invoice No:</strong> {{$invoice[0]->id}}</div>
+    <div class="col-sm-6 text-sm-right"> <strong>Invoice No:</strong> {{$invoice->id}}</div>
 	  
   </div>
   <hr>
@@ -47,56 +48,49 @@
     </div>
     <div class="col-sm-6 order-sm-0"> <strong>Invoiced To:</strong>
         <address>
-          {{$user[0]->name}}<br />
+          {{$user[0]->first_name}} {{$user[0]->last_name}}<br />
           15 Hodges Mews, High Wycombe<br />
           HP12 3JL<br />
           United Kingdom
         </address>
     </div>
   </div>
-	
-  <div class="card">
-    <div class="card-body p-0">
-      <div class="table-responsive">
-        <table class="table mb-0">
-		<thead class="card-header">
-          <tr>
-            <td class="col-3 border-0"><strong>Service</strong></td>
-			<td class="col-4 border-0"><strong>Description</strong></td>
-            <td class="col-2 text-center border-0"><strong>Rate</strong></td>
-			<td class="col-1 text-center border-0"><strong>QTY</strong></td>
-            <td class="col-2 text-right border-0"><strong>Amount</strong></td>
-          </tr>
-        </thead>
-          <tbody>
-            @foreach ($items as $item)
+      <table class="table mb-0">
+        <thead class="card-header">
               <tr>
-                <td class="col-3 border-0">{{$item->item_name}}</td>
-                <td class="col-4 text-1 border-0">Description</td>
-                <td class="col-2 text-center border-0">${{$item->item_price}}</td>
-                <td class="col-1 text-center border-0">{{$item->item_qty}}</td>
-                <td class="col-2 text-right border-0">${{$item->item_price * $item->item_qty}}</td>
+                <td class="col-3 border-0"><strong>Service</strong></td>
+                <td class="col-4 border-0"><strong>Description</strong></td>
+                <td class="col-2 text-center border-0"><strong>Rate</strong></td>
+                <td class="col-1 text-center border-0"><strong>QTY</strong></td>
+                <td class="col-2 text-right border-0"><strong>Amount</strong></td>
               </tr>
-            @endforeach
-          </tbody>
-		  <tfoot class="card-footer">
-			<tr>
-              <td colspan="4" class="text-right"><strong>Sub Total:</strong></td>
-              <td class="text-right">${{$invoice[0]->price}}</td>
-            </tr>
+            </thead>
+            <tbody>
+              @foreach ($items as $item)
+                <tr>
+                  <td class="col-3 border-0">{{$item->item_name}}</td>
+                  <td class="col-4 text-1 border-0">Description</td>
+                  <td class="col-2 text-center border-0">${{$item->item_price}}</td>
+                  <td class="col-1 text-center border-0">{{$item->item_qty}}</td>
+                  <td class="col-2 text-right border-0">${{$item->item_price * $item->item_qty}}</td>
+                </tr>
+              @endforeach
+            </tbody>
+            <tfoot class="card-footer">
             <tr>
-              <td colspan="4" class="text-right"><strong>Tax:</strong></td>
-              <td class="text-right">$0</td>
+              <td colspan="4" class="text-right"><strong>Sub Total:</strong></td>
+              <td class="text-right">${{$invoice->price}}</td>
             </tr>
-			<tr>
+              <tr>
+                <td colspan="4" class="text-right"><strong>Tax:</strong></td>
+                <td class="text-right">$0</td>
+              </tr>
+            <tr>
               <td colspan="4" class="text-right"><strong>Total:</strong></td>
-              <td class="text-right">${{$invoice[0]->price}}</td>
+              <td class="text-right">${{$invoice->price}}</td>
             </tr>
-		  </tfoot>
-        </table>
-      </div>
-    </div>
-  </div>
+            </tfoot>
+      </table>
   </main>
   <!-- Footer -->
   <footer class="text-center mt-4">

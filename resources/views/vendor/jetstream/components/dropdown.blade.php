@@ -22,10 +22,14 @@ switch ($width) {
     case '48':
         $width = 'w-48';
         break;
+
+    case '80':
+    $width = 'w-80';
+    break;
 }
 @endphp
 
-<div class="relative" x-data="{ open: false }" @click.away="open = false" @close.stop="open = false">
+<div class="relative" x-data="{ open: false }" @click.outside="open = false" @close.stop="open = false">
     <div @click="open = ! open">
         {{ $trigger }}
     </div>

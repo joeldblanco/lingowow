@@ -2,17 +2,6 @@
 
   <button onclick="" class="inline-block bg-green-800 text-white px-6 py-4 mt-5 rounded hover:bg-green-900 hover:text-white hover:no-underline">Free Schedule</button>
 
-  <style>
-    /* #feedback { font-size: 1.4em; } */
-    .selectable .ui-selecting { background: #FECA40; }
-    .selectable .ui-selected, .selected { background: #F39814; color: white; }
-    .selectable { list-style-type: none; margin: 0; padding: 0; }
-    .selectable div, .cell { float: left; width: 100px; height: 25px; text-align: center; }
-    .taken { background: #fc4a1e; }
-  </style>
-  
-  <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
-  <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
   
   @php
     if(isset($schedule)){
@@ -21,12 +10,12 @@
       // var_dump($schedule);
     }
     $scheduled_classes = DB::table('scheduled_classes')->select('student_id')->where('teacher_id',auth()->id())->get();
-    // dd($scheduled_classes);
+    dd($scheduled_classes);
     $temp_student_schedule = [];
     $student_schedule = [];
 
     foreach ($scheduled_classes as $classes){
-      array_push($temp_student_schedule,DB::table('users')->select('selected_schedule')->where('id',$classes->student_id)->get());
+      array_push($temp_student_schedule, Schedule::select('selected_schedule')->where('user_id',$classes->student_id)->get());
       array_push($student_schedule,json_decode($temp_student_schedule[0][0]->selected_schedule));
     }
 

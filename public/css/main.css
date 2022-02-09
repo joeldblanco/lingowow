@@ -1,0 +1,65 @@
+.selection-area {
+    background: rgba(46, 115, 252, 0.11);
+    border: 2px solid rgba(98, 155, 255, 0.81);
+    border-radius: 0.1em;
+}
+
+.selected {
+  background: hsl(200, 80%, 65%);
+  border: 2px solid rgba(0, 0, 0, 0.075);
+}
+
+.separatortittle-b {
+  height: 20px;
+  width: 100%;
+  background-image: radial-gradient(
+    farthest-side at 50% -50%,
+    hsla(0, 0%, 0%, 0.5),
+    hsla(0, 0%, 0%, 0));
+  position: relative;
+}
+
+.separatortittle-t {
+  height: 20px;
+  width: 100%;
+  background-image: radial-gradient(
+    farthest-side at -50% 50%,
+    hsla(0, 0%, 0%, 0.5),
+    hsla(0, 0%, 0%, 0));
+  /* position: relative; */
+}
+
+.titulounit {
+    font-size: 1.640625rem;
+    letter-spacing: .1em;
+    color: #5ccecd;
+    font-weight: 700;
+    text-align: center;
+}
+
+.titulomodule {
+    font-size: 1;
+    letter-spacing: .05em;
+    color: #5ccecd;
+    font-weight: 700;
+}
+
+[x-cloak] {
+    display: none !important;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+@media screen and (prefers-reduced-motion: reduce) {
+	html {
+		scroll-behavior: auto;
+	}
+}
+
+.selectable .ui-selecting { background: #FECA40; }
+.selectable .ui-selected, .selected { background: #F39814; color: white; }
+.selectable { list-style-type: none; margin: 0; padding: 0; }
+.selectable div, .cell { float: left; width: 100px; height: 25px; text-align: center; }
+.taken { background: #fc4a1e; }

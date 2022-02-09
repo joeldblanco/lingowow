@@ -1,8 +1,9 @@
-function selectedLog(plan){
+function saveSchedule(plan,routeTo,role = 2){
     
-    var cells = $(".selected");
+    var cells = $(".selected, .selectable .ui-selected");
+    var error = false;
 
-    if(cells.length == plan){
+    if(role == 2){
         for (var i=0; i<cells.length; i++){
             cells[i] = cells[i].id.split("-");
         }
@@ -13,15 +14,53 @@ function selectedLog(plan){
             data[i] = cells[i];
         }
 
-        console.log(data);
+        
+        let count = 1;
+        loop1:
+        for (let i = 0; i < (data.length-1); i++) {
+            for (let e = i+1; e < data.length; e++) {
+                if(data[i][1] == data[e][1]){
+                    error = "same_day";
+                    console.log('same_day');
+                    break loop1;
+                }
+            }
+            count++;
+        }
 
-        post('schedule', {
+        if(data.length < plan){
+            error = "not_enough_days";
+        }
+
+        if(data.length > plan){
+            error = "too_much_days";
+        }
+
+        post(route(routeTo), {
             data: data,
+            error: error,
+            "_token": $("meta[name='csrf-token']").attr("content")
+        });
+        
+
+    }else{
+
+        for (var i=0; i<cells.length; i++){
+            cells[i] = cells[i].id.split("-");
+        }
+    
+        var data = [];
+    
+        for (let i=0; i<cells.length; i++){
+            data[i] = cells[i];
+        }
+
+        post(route(routeTo), {
+            data: data,
+            error: error,
             "_token": $("meta[name='csrf-token']").attr("content")
         });
 
-    }else{
-        console.log("Necesita seleccionar " + plan + " bloques en total. Solo " + cells.length + " han sido seleccionados.")
     }
 
 }

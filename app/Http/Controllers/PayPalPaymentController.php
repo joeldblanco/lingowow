@@ -40,6 +40,8 @@ class PayPalPaymentController extends Controller
 
         $products = Product::all();
 
+        session(['selected_course' => 1]);
+
         return view('shop', compact('response', 'products'));
     }
 
@@ -55,7 +57,6 @@ class PayPalPaymentController extends Controller
 
         try {
             $response = $this->provider->setExpressCheckout($cart, $recurring);
-            
             return redirect($response['paypal_link']);
         } catch (\Exception $e) {
             $invoice = $this->createInvoice($cart, 'Invalid');
@@ -113,26 +114,10 @@ class PayPalPaymentController extends Controller
                     }
                 }
 
-                $student = User::find(auth()->id());
-                DB::table('scheduled_classes')->insert([
-                    'student_id' => auth()->id(),
-                    'teacher_id' => session('selected_teacher')
-                ]);
-                $teacher_schedule = DB::table('users')->select('available_schedule')->where('id',session('selected_teacher'))->get();
-                $teacher_schedule = json_decode($teacher_schedule[0]->available_schedule);
-                $student_schedule = json_decode(session('user_schedule'));
+                // $schedule = new SchedulingCalendarController;
+                // $schedule->store();
 
-                foreach($teacher_schedule as $t_schedule){
-                    foreach($student_schedule as $s_schedule){
-                        if($s_schedule == $t_schedule){
-                            \array_splice($teacher_schedule, array_search($t_schedule,$teacher_schedule), 1);
-                        }
-                    }
-                }
-                $teacher_schedule = json_encode($teacher_schedule);
-                DB::table('users')->where('id',session('selected_teacher'))->update(['available_schedule' => $teacher_schedule]);
-                $student->selected_schedule = json_decode(session('user_schedule'));
-                $student->save();
+                SchedulingCalendarController::store();
 
                 Cart::destroy();
 

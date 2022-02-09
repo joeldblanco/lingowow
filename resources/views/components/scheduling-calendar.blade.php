@@ -1,16 +1,5 @@
 <div>
-
-  <style>
-    /* #feedback { font-size: 1.4em; } */
-    .selectable .ui-selecting { background: #FECA40; }
-    .selectable .ui-selected, .selected { background: #F39814; color: white; }
-    .selectable { list-style-type: none; margin: 0; padding: 0; }
-    .selectable div, .cell { float: left; width: 100px; height: 25px; text-align: center; }
-  </style>
-
-  <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
-  <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
-
+  
   <script>
     // $( function() {
 
@@ -44,7 +33,7 @@
       var selectedCells = 0;
       var nOfClasses = {{$plan}};
 
-      $(".block").click(function(){
+      $(".cell_block").click(function(){
         if($(this).hasClass("selected")){
           $(this).removeClass("selected");
         }else{
@@ -61,9 +50,9 @@
 
   </script>
 
-  @php
+  {{-- @php
     if(isset($schedule)){
-      $schedule = json_decode($schedule);
+      // $schedule = json_decode($schedule);
     
       for($i=0; $i<count($schedule); $i++){
 
@@ -93,7 +82,7 @@
       }
     }
     
-  @endphp
+  @endphp --}}
 
   <div class="container mx-auto">
     <div class="wrapper bg-white rounded shadow w-full">
@@ -126,7 +115,7 @@
           <div class="selectable w-full">
             @for ($i = 0; $i < 16; $i++)
               @for ($e = 0; $e < 7; $e++)
-                <div class="w-32 h-10 border block" style="width: 14.28%" id="{{$i+6}}-{{$e}}"></div>
+                <div class="w-32 h-10 border cell_block @if(in_array([$i+6,$e],$schedule)) cursor-pointer bg-blue-300 available @endif" style="width: 14.28%" id="{{$i+6}}-{{$e}}">@if(in_array([$i+6,$e],$schedule)) Available @endif</div>
               @endfor
             @endfor
           </div>
@@ -193,7 +182,7 @@
         @endif
       </table>      --}}
     </div>
-    <button class="bg-green-500 rounded-lg text-white font-bold px-6 py-1 my-3 shadow-md" onclick="selectedLog({{$plan}})">Save</button>
+    <button class="bg-green-500 rounded-lg text-white font-bold px-6 py-1 my-3 shadow-md" onclick="saveSchedule({{$plan}},'schedule.check')">Save</button>
     {{-- <button class="bg-blue-500 rounded-lg text-white font-bold px-6 py-1 my-3 shadow-md" wire:model="$mode = 0">Edit</button> --}}
   </div>
   

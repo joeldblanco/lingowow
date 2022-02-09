@@ -5,8 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class unit extends Model
+class Unit extends Model
 {
-    protected $table = 'unit';
     use HasFactory;
+
+    public function exams()
+    {
+        return $this->hasMany(Exam::class);
+    }
 }

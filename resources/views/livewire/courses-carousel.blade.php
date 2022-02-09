@@ -1,9 +1,6 @@
-<div class="mt-10 mb-20">
+<div class="mt-10 mb-20" x-data="{loadingState: @entangle('loadingState') }">
     <h3 class="text-4xl font-bold my-10 text-gray-800">Courses</h3>
     <div class="gallery js-flickity" data-flickity-options='{ "wrapAround": true }' wire:ignore>
-        @php
-            $courses = DB::table('courses')->get();
-        @endphp
         @foreach ($courses as $course)
         {{-- NEWS-CARD --}}
         <div class="gallery-cell">
@@ -54,7 +51,7 @@
                         </div>
                     </div>
                 </div>
-                <a href="#plans"><button onclick="selectProduct({{$course->course_id}})" class="inline-block bg-green-600 text-white px-6 py-2 mt-4 rounded-lg hover:bg-green-700">Select</button></a>
+                <button onclick="selectProduct({{$course->course_id}})" class="inline-block bg-green-600 text-white px-6 py-2 mt-4 rounded-lg hover:bg-green-700">Select</button>
             </div>
         </div>
         @endforeach
@@ -191,12 +188,15 @@
             </div>
         </div> --}}
     </div>
+    @include('components.loading-state')
     <script>
 
-        function selectProduct(object){
+        async function selectProduct(object){
             // console.log(object);
             @this.selectProduct(object);
+            await new Promise(r => setTimeout(r, 1000));
+            window.location = '#plans';
         }
         
     </script>
- </div>
+</div>

@@ -1,10 +1,10 @@
 <x-app-layout>
 
-    <div class="py-12 bg-white font-sans">
+    <div class="bg-white font-sans">
         
         <div class="max-w-lg mx-auto sm:px-6 lg:px-8">
             @if(!empty($response['code']))
-                <div x-show.transition.duration.200ms="open" x-data="open" x-init="setTimeout(() => open = false, 3000)" class="py-4 px-4 text-white font-semibold rounded-lg text-center @if($response['code'] == 'success') bg-green-500 @else bg-red-500 @endif">
+                <div x-show="open" x-transition.duration.200ms x-data="open" x-init="setTimeout(() => open = false, 3000)" class="py-4 px-4 text-white font-semibold rounded-lg text-center @if($response['code'] == 'success') bg-green-500 @else bg-red-500 @endif">
                     <span class="font-bold">{{$response['message']}}</span>
                 </div>
             @endif

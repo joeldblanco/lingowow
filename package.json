@@ -12,16 +12,19 @@
     "devDependencies": {
         "@tailwindcss/forms": "^0.2.1",
         "@tailwindcss/typography": "^0.3.0",
-        "alpinejs": "^2.7.3",
+        "alpinejs": "^3.3.3",
         "axios": "^0.21",
         "laravel-mix": "^6.0.27",
         "lodash": "^4.17.19",
-        "postcss": "^8.1.14",
+        "postcss": "^8.3.1",
         "postcss-import": "^12.0.1",
         "tailwindcss": "^2.2.7"
     },
     "dependencies": {
         "@fortawesome/fontawesome-free": "^5.15.3",
-        "@zoomus/websdk": "^1.9.7"
+        "@zoomus/websdk": "^1.9.7",
+        "autosize": "^5.0.1",
+        "laravel-echo": "^1.11.2",
+        "pusher-js": "^7.0.3"
     }
 }
