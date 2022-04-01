@@ -43,21 +43,27 @@
             'parent_link' => request()->is('admin','admin/*')
         ],
         [
+            'name' => 'Classes',
+            'route' => route('admin.classes.index'),
+            'status' => request()->routeIs('admin.classes.index'),
+            'parent_link' => request()->is('admin','admin/*')
+        ],
+        [
             'name' => 'Invoices',
             'route' => route('admin.invoices'),
             'status' => request()->is('admin.invoices'),
             'parent_link' => request()->is('admin','admin/*')
         ],
         [
-            'name' => 'Marketing',
-            'route' => route('coupons.index'),
-            'status' => request()->routeIs('coupons.index'),
-            'parent_link' => request()->is('admin','admin/*')
-        ],
-        [
             'name' => 'Exams',
             'route' => route('exam.index'),
             'status' => request()->is('admin/exam','admin/exam/*'),
+            'parent_link' => request()->is('admin','admin/*')
+        ],
+        [
+            'name' => 'Marketing',
+            'route' => route('coupons.index'),
+            'status' => request()->routeIs('coupons.index'),
             'parent_link' => request()->is('admin','admin/*')
         ],
     ];

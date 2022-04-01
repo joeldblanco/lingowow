@@ -8,11 +8,12 @@
                 <table class="text-left w-full border-collapse">
                     <thead>
                         <tr>
-                        <th class="py-4 px-6 bg-gray-100 font-bold uppercase text-sm text-gray-600 border-b border-gray-400">ID</th>
-                        <th class="py-4 px-6 bg-gray-100 font-bold uppercase text-sm text-gray-600 border-b border-gray-400 text-center">Unit</th>
-                        <th class="py-4 px-6 bg-gray-100 font-bold uppercase text-sm text-gray-600 border-b border-gray-400 text-center">Status</th>
-                        <th class="py-4 px-6 bg-gray-100 font-bold uppercase text-sm text-gray-600 border-b border-gray-400 text-center">Created at</th>
-                        <th class="py-4 px-6 bg-gray-100 font-bold uppercase text-sm text-gray-600 border-b border-gray-400"></th>
+                            <th class="py-4 px-6 bg-gray-100 font-bold uppercase text-sm text-gray-600 border-b border-gray-400">ID</th>
+                            <th class="py-4 px-6 bg-gray-100 font-bold uppercase text-sm text-gray-600 border-b border-gray-400 text-center">Unit</th>
+                            <th class="py-4 px-6 bg-gray-100 font-bold uppercase text-sm text-gray-600 border-b border-gray-400 text-center">Status</th>
+                            <th class="py-4 px-6 bg-gray-100 font-bold uppercase text-sm text-gray-600 border-b border-gray-400 text-center">Created at</th>
+                            <th class="py-4 px-6 bg-gray-100 font-bold uppercase text-sm text-gray-600 border-b border-gray-400"></th>
+                            <th class="py-4 px-6 bg-gray-100 font-bold uppercase text-sm text-gray-600 border-b border-gray-400"></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -24,10 +25,10 @@
                                 <td class="py-4 px-6 border-b border-gray-400 text-center">@if($exam->deleted_at == NULL) Active @else Inactive @endif</td>
                                 <td class="py-4 px-6 border-b border-gray-400 text-center">{{$exam->created_at->isoFormat('L')}}</td>
                                 <td class="py-4 px-6 border-b border-gray-400 text-center">
-                                    <a href="{{route('exam.show',$exam->id)}}" class="text-gray-600 font-bold py-1 px-3 rounded text-xs bg-blue-100 hover:bg-blue-500 hover:text-white">View</a>
+                                    <a href="{{route('exam.display',$exam->id)}}" class="text-gray-600 font-bold py-1 px-3 rounded text-xs bg-blue-100 hover:bg-blue-500 hover:text-white">View</a>
                                 </td>
                                 <td class="py-4 px-6 border-b border-gray-400 text-center">
-                                    <a href="{{route('exam.edit',$exam->id)}}" class="text-gray-600 font-bold py-1 px-3 rounded text-xs bg-blue-100 hover:bg-blue-500 hover:text-white">Edit</a>
+                                    <a href="{{route('exam.show',$exam->id)}}" class="text-gray-600 font-bold py-1 px-3 rounded text-xs bg-blue-100 hover:bg-blue-500 hover:text-white">Edit</a>
                                 </td>
                             </tr>
                         @endforeach

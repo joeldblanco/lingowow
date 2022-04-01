@@ -4,33 +4,31 @@ namespace App\Http\Livewire;
 
 use App\Models\Classes;
 use App\Models\Comment;
+use App\Models\Enrolment;
 use App\Models\User;
 use Livewire\Component;
 
 class ClassesComponent extends Component
 {
-    public $classes, $teachers, $students, $studentClassCheck = "", $teacherClassCheck = "", $loadingState = false, $comment = "", $current_class, $comments = "";
+    public $classes, $teachers, $students, $studentClassCheck = "", $teacherClassCheck = "", $comment = "", $current_class, $comments = "", $enrolment;
 
     protected $rules = [
         'comment' => 'required|string|max:500',
     ];
-
+    
     public function studentClassCheck($class_id)
     {
-
         if(auth()->user()->roles[0]->name == "student" || auth()->user()->roles[0]->name == "admin")
         {
-            $this->loadingState = true;
-            
             $student_check = Classes::select('student_check')->where('id',$class_id)->first()->student_check;
             $student_check = intval(!$student_check);
             try {
-                Classes::select('student_check')->where('id',$class_id)->update(['student_check' => $student_check]);
+                $class = Classes::find($class_id);
+                $class->student_check = $student_check;
+                $class->save();
             } catch (\Throwable $th) {
                 dd($th->getCode());
             }
-
-            $this->loadingState = false;
         }
     }
 
@@ -38,17 +36,13 @@ class ClassesComponent extends Component
     {
         if(auth()->user()->roles[0]->name == "teacher" || auth()->user()->roles[0]->name == "admin")
         {
-            $this->loadingState = true;
-            
             $teacher_check = Classes::select('teacher_check')->where('id',$class_id)->first()->teacher_check;
             $teacher_check = intval(!$teacher_check);
             try {
-                Classes::select('teacher_check')->where('id',$class_id)->update(['teacher_check' => $teacher_check]);
+                Classes::where('id',$class_id)->update(['teacher_check' => $teacher_check]);
             } catch (\Throwable $th) {
                 dd($th->getCode());
             }
-
-            $this->loadingState = false;
         }
     }
 
@@ -62,8 +56,12 @@ class ClassesComponent extends Component
         }
     }
 
+    public function showClass($id){
+        $this->current_class = Classes::find($id);
+        $this->enrolment = Enrolment::find($this->current_class->enrolment_id);
+    }
+
     public function saveComment(){
-        $this->loadingState = true;
 
         // $class_comment = Comment::where('claid',$this->current_class)->first();
         // $class_comment->comments = $this->comment;
@@ -76,8 +74,6 @@ class ClassesComponent extends Component
             'class_id' => $this->current_class,
             'comment' => $this->comment,
         ]);
-
-        $this->loadingState = false;
     }
 
     public function clearComment(){
@@ -92,22 +88,25 @@ class ClassesComponent extends Component
 
         if(auth()->user()->roles[0]->name == "teacher")
         {
-            $classes = User::find(auth()->id())->teacherClasses()->orderBy('start_date', 'ASC')->get();
-            foreach ($classes as $key => $value) {
+            $this->classes = User::find(auth()->id())->teacherClasses()->orderBy('start_date', 'ASC')->get();
+            $this->classes = $this->classes->sortBy('start_date');
+            foreach ($this->classes as $key => $value) {
                 $this->students[$key] = $value->student();
             }
         }
         else if(auth()->user()->roles[0]->name == "student")
         {
-            
-            $classes = User::find(auth()->id())->studentClasses;
-            foreach ($classes as $key => $value) {
+            $this->classes = User::find(auth()->id())->studentClasses;
+            $this->classes = $this->classes->sortBy('start_date');
+            foreach ($this->classes as $key => $value) {
                 $this->teachers[$key] = $value->teacher();
             }
-        }else if(auth()->user()->roles[0]->name == "admin")
+        }
+        else if(auth()->user()->roles[0]->name == "admin")
         {
-            $classes = Classes::all();
-            foreach ($classes as $key => $value) {
+            $this->classes = Classes::all();
+            $this->classes = $this->classes->sortBy('start_date');
+            foreach ($this->classes as $key => $value) {
                 $this->students[$key] = $value->student();
                 $this->teachers[$key] = $value->teacher();
             }
@@ -115,7 +114,7 @@ class ClassesComponent extends Component
 
         $this->comments = Classes::find($this->current_class);
         if($this->comments != NULL){
-            $this->comments = $this->comments->comments;
+            $this->comments = $this->comments[0]->comments;
         }else{
             $this->comments = [];
         }

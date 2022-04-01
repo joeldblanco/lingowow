@@ -91,9 +91,104 @@ class QuestionController extends Controller
      */
     public function show($exam_id, $question_id)
     {
-        $question = Question::find($question_id);
+        //
+    }
 
-        return view('admin.exams.questions.show',compact('question','exam_id'));
+    /**
+     * Display the specified resource.
+     *
+     * @param  \App\Models\Question  $question
+     * @return \Illuminate\Http\Response
+     */
+    public function import(Request $request)
+    {
+        $exam_id = $request->exam_id;
+        $file = $request->file('import-file');
+        $mime_type = $file->getClientMimeType();
+        $file = file($file, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+
+        if($file && $mime_type == "text/plain"){
+            $options = [];
+            $options_aux = [];
+            $answer = "";
+            $counter = 0;
+            $question_description = "";
+            foreach($file as $line){
+                
+                if(preg_match("/[ABCDEFGHIJKLMNOPQRSTUVWXYZ]\./",$line)){
+                    $options[] = preg_replace("/[ABCDEFGHIJKLMNOPQRSTUVWXYZ]\. /","",$line);
+
+                }else if(preg_match("/ANSWER:/",$line)){
+                    $answer = str_replace("ANSWER: ","",$line);
+                    switch($answer){
+                        case 'A':
+                            $answer = 1;
+                        break;
+
+                        case 'B':
+                            $answer = 2;
+                        break;
+
+                        case 'C':
+                            $answer = 3;
+                        break;
+
+                        case 'D':
+                            $answer = 4;
+                        break;
+
+                        case 'E':
+                            $answer = 5;
+                        break;
+
+                        case 'F':
+                            $answer = 6;
+                        break;
+
+                        default:
+                            $answer = null;
+                        break;
+                    }
+
+                    foreach($options as $key => $value){
+                        $options_aux['option-text-'.($key+1)] = $value;
+                        $options_aux['selected-option'] = $answer;
+                    }
+                    $options = $options_aux;
+
+                    $question = new Question;
+                    $question->value = 1;
+                    $question->description = $question_description;
+                    $question->type = 'multiple-choice';
+                    $question->data = json_encode([
+                        'path-to-file' => NULL,
+                        'options' => $options,
+                    ]);
+                    $question->save();
+
+                    DB::table('exam_question')->insert([
+                        'question_id' => $question->id,
+                        'exam_id' => $exam_id,
+                    ]);
+
+                    $options = [];
+                    $options_aux = [];
+                    $answer = "";
+                    $counter = 0;
+                    $question_description = "";
+
+                }else{
+                    $question_description = $line;
+                }
+
+                $counter++;
+
+            }
+        }else{
+            return redirect()->back()->with("error","Invalid data");
+        }
+
+        return redirect()->route('exam.show',$exam_id);
     }
 
     /**
@@ -102,9 +197,11 @@ class QuestionController extends Controller
      * @param  \App\Models\Question  $question
      * @return \Illuminate\Http\Response
      */
-    public function edit(Question $question)
+    public function edit($exam_id, $question_id)
     {
-        //
+        $question = Question::find($question_id);
+
+        return view('admin.exams.questions.show',compact('question','exam_id'));
     }
 
     /**
@@ -164,8 +261,10 @@ class QuestionController extends Controller
      * @param  \App\Models\Question  $question
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Question $question)
+    public function destroy($exam_id, $question_id)
     {
-        //
+        $question = Question::find($question_id);
+        $question->delete();
+        return redirect()->route('exam.show',$exam_id);
     }
 }

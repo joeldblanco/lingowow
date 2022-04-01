@@ -1,5 +1,5 @@
 <x-app-layout>
-    <div class="bg-white font-sans" x-data="{create_question: false, import_create: true, questionList: true, error: @if(session('error')) true @else false @endif}" x-cloak>
+    <div class="bg-white font-sans" x-data="{import_question: false, create_question: false, import_create: true, questionList: true, error: @if(session('error')) true @else false @endif}" x-cloak>
         @if (session('error'))
             <div x-show="error; setTimeout(() => error = false, 3000)" x-transition.duration.100ms @click.outside="error=false" class="flex justify-center fixed bottom-5 left-5 z-20">
                 <div class="w-full px-6 py-3 shadow-2xl flex flex-col items-center border-t sm:w-auto sm:m-4 sm:rounded-lg sm:flex-row sm:border bg-red-600 border-red-600 text-white">
@@ -58,9 +58,40 @@
                         {{ csrf_field() }}
                     </form>
                 </div>
+                <div class="fixed inset-0 w-full h-full z-20 bg-black bg-opacity-50 duration-300 overflow-y-auto"
+                x-transition:enter="transition duration-300"
+                x-transition:enter-start="opacity-0"
+                x-transition:enter-end="opacity-100"
+                x-transition:leave="transition duration-300"
+                x-transition:leave-start="opacity-100"
+                x-transition:leave-end="opacity-0"
+                x-show="import_question"
+                >
+                <form action="{{route('question.import')}}" enctype="multipart/form-data" method="POST" id="exam-form">
+                    <div class="w-full h-full flex items-center justify-center">
+                        <div class="leading-loose">
+                            <div id="import-questions-form" class="max-w-xl m-4 p-10 bg-white rounded shadow-2xl space-y-1" @click.outside="import_question=false">
+                                <div class="flex justify-between border-b mb-5 py-4 text-3xl">
+                                    <h1 class="">Import Questions</h1>
+                                    <i class="fas fa-times cursor-pointer text-xl" @click="import_question=false"></i>
+                                </div>
+                                <div class="flex flex-col">
+                                    <label for="import-file" class="text-sm">File to import</label>
+                                    <input type="file" name="import-file" id="import-file" class="px-2 py-2 text-gray-700 bg-gray-200 rounded" required accept=".txt">
+                                </div>
+                                <input type="text" name="exam_id" id="exam_id" class="hidden" value="{{$exam_id}}">
+                                <div class="flex pt-4 justify-end">
+                                    <button class="px-4 py-1 text-white font-light tracking-wider bg-gray-900 rounded">Create</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {{ csrf_field() }}
+                </form>
+            </div>
                 <div class="flex space-x-4 mb-4" x-show="import_create">
                     <button class="text-center border rounded-md p-2 hover:bg-green-300" @click="create_question = true"><i class="fas fa-plus-square text-green-600"></i></button>
-                    <button class="text-center border rounded-md p-2 hover:bg-blue-300"><i class="fas fa-file-import text-blue-600"></i></button>
+                    <button for="input-file" class="text-center border rounded-md p-2 hover:bg-blue-300" @click="import_question = true"><i class="fas fa-file-import text-blue-600"></i></button>
                 </div>
                 <table class="text-left w-full border-collapse" x-show="questionList">
                     <thead>
@@ -71,6 +102,7 @@
                         <th class="py-4 px-6 bg-gray-100 font-bold uppercase text-sm text-gray-600 border-b border-gray-400 text-center">Type</th>
                         <th class="py-4 px-6 bg-gray-100 font-bold uppercase text-sm text-gray-600 border-b border-gray-400 text-center">Created at</th>
                         <th class="py-4 px-6 bg-gray-100 font-bold uppercase text-sm text-gray-600 border-b border-gray-400 text-center">Status</th>
+                        {{-- <th class="py-4 px-6 bg-gray-100 font-bold uppercase text-sm text-gray-600 border-b border-gray-400"></th> --}}
                         <th class="py-4 px-6 bg-gray-100 font-bold uppercase text-sm text-gray-600 border-b border-gray-400"></th>
                         <th class="py-4 px-6 bg-gray-100 font-bold uppercase text-sm text-gray-600 border-b border-gray-400"></th>
                         </tr>
@@ -85,11 +117,14 @@
                                 <td class="py-4 px-6 border-b border-gray-400 text-center uppercase">{{$question->type}}</td>
                                 <td class="py-4 px-6 border-b border-gray-400 text-center">{{$question->created_at->isoFormat('L')}}</td>
                                 <td class="py-4 px-6 border-b border-gray-400 text-center">@if($question->deleted_at == NULL) Active @else Inactive @endif</td>
-                                <td class="py-4 px-6 border-b border-gray-400 text-center">
+                                {{-- <td class="py-4 px-6 border-b border-gray-400 text-center">
                                     <a href="{{route('question.show',[$exam_id,$question->id])}}" class="text-gray-600 font-bold py-1 px-3 rounded text-xs bg-blue-100 hover:bg-blue-500 hover:text-white">View</a>
-                                </td>
+                                </td> --}}
                                 <td class="py-4 px-6 border-b border-gray-400 text-center">
                                     <a href="{{route('question.edit',[$exam_id,$question->id])}}" class="text-gray-600 font-bold py-1 px-3 rounded text-xs bg-blue-100 hover:bg-blue-500 hover:text-white">Edit</a>
+                                </td>
+                                <td class="py-4 px-6 border-b border-gray-400 text-center">
+                                    <a href="{{route('question.destroy',[$exam_id,$question->id])}}" class="text-gray-600 font-bold py-1 px-3 rounded text-xs bg-red-100 hover:bg-red-500 hover:text-white">Delete</a>
                                 </td>
                             </tr>
                         @endforeach
@@ -100,7 +135,7 @@
                             <td class="py-4 px-6 border-b border-gray-400 text-center"></td>
                             <td class="py-4 px-6 border-b border-gray-400 text-center">There are no questions</td>
                             <td class="py-4 px-6 border-b border-gray-400 text-center"></td>
-                            <td class="py-4 px-6 border-b border-gray-400 text-center"></td>
+                            {{-- <td class="py-4 px-6 border-b border-gray-400 text-center"></td> --}}
                             <td class="py-4 px-6 border-b border-gray-400 text-center"></td>
                         </tr>
                     @endif
@@ -111,6 +146,17 @@
         </div>
     </div>
     <script>
+
+        ////////////////////////////////
+
+        $("#input-file").change(function(){
+            if($("#input-file")[0].files.length > 0){
+                //
+            }
+        });
+
+        ///////////////////////////////
+
         $("#question-type").change(function(){
             var option = $("#question-type").find(":selected").text();
             $('#options').empty();

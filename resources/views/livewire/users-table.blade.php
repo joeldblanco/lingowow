@@ -181,6 +181,9 @@
     </div>
     {{-- End Show User Info Modal --}}
     @endif
+    <div wire:loading>
+        @include('components.loading-state')
+    </div>
 
     <div class="bg-black bg-opacity-50 z-10 fixed top-0 left-0 w-full h-full flex items-center justify-center" x-show="createUser" x-transition x-cloak>
         {{-- <div class="container mx-auto py-6 px-4"> --}}

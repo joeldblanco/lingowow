@@ -1,6 +1,32 @@
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
     <head>
+        @php
+
+            // dd(Auth::user()->canBeImpersonated());
+
+            if(isset($_GET['tz']) && session('tz') == null)
+            {
+                // This is just an example. In application this will come from Javascript (via an AJAX or something)
+                $timezone_offset_minutes = $_GET['tz'];  // $_GET['timezone_offset_minutes']
+
+                // Convert minutes to seconds
+                $timezone_name = timezone_name_from_abbr("", $timezone_offset_minutes*60, false);
+                session(['tz' => $timezone_name]);
+            }
+
+            function tz()
+            {
+                if(session('tz') == null){
+                    return true;
+                }else{
+                    return false;
+                }
+
+                // return !isset($_GET['tz']);
+            }
+        @endphp
+        
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
@@ -26,6 +52,7 @@
         {{-- <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script> --}}
         <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
         <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+        <script src="https://cdn.tiny.cloud/1/xmua6246us3vdfealnkl1yf7ja0zafr4cttuehqtyz7nen6o/tinymce/5/tinymce.min.js" referrerpolicy="origin"></script>
     </head>
     <body class="font-sans antialiased">
         <x-jet-banner />
@@ -54,5 +81,14 @@
         @livewireScripts
         <script src="https://cdn.jsdelivr.net/gh/livewire/turbolinks@v0.1.x/dist/livewire-turbolinks.js" data-turbolinks-eval="false"></script>
         {{-- @include('components.loading-state') --}}
+        <script>
+            let _tz = JSON.parse("{{ json_encode(tz()) }}");
+            if(_tz)
+            {
+                var tz = new Date().getTimezoneOffset();
+                tz = tz == 0 ? 0 : -tz;
+                window.location.href = window.location.href + "?tz=" + tz;
+            }
+        </script>
     </body>
 </html>

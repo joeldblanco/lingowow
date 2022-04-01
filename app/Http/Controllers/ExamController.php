@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Attempt;
 use App\Models\Exam;
 use App\Models\Question;
 use Illuminate\Http\Request;
@@ -67,8 +68,7 @@ class ExamController extends Controller
     /**
      * Display the exam for users.
      *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @param  int  $exam_id
      */
     public function display($exam_id)
     {
@@ -76,6 +76,38 @@ class ExamController extends Controller
         $questions = $exam->questions;
         
         return view('exams.display',compact('exam'));
+    }
+
+    /**
+     * Automatically corrects the exam.
+     *
+     * @param  int  $exam_id
+     */
+    public static function correct($attempt_id)
+    {
+        $attempt = Attempt::find($attempt_id);
+
+        if($attempt->user_id == auth()->id() || auth()->user()->roles[0]->name == "admin" || auth()->user()->roles[0]->name == "teacher"){
+            $exam_id = $attempt->exam_id;
+            $student_answers = json_decode($attempt->data);
+            $student_answers = json_decode(json_encode($student_answers),true);
+            $student_answers = $student_answers["answers"];
+            $exam = Exam::find($exam_id);
+            $questions = $exam->questions;
+            $answers = [];
+            $result = 0;
+
+            foreach ($student_answers as $key => $value) {
+                if($questions[$key]->answer() == $value){
+                    $result += $questions[$key]->value;
+                }
+                $answers[$key] = [$questions[$key]->answer(), $value];
+            }
+            
+            return view('exams.result',compact('result','answers','questions'));
+        }else{
+            return view('errors.404');
+        }           
     }
 
     /**

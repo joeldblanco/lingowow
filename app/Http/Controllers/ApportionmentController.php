@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Classes;
 use App\Models\Course;
+use App\Models\User;
 use Carbon\Carbon;
 use Carbon\CarbonPeriod;
 use Illuminate\Contracts\Session\Session;
@@ -72,17 +74,47 @@ class ApportionmentController extends Controller
                 }, $next_period_end);
             }
         }
-        
+
+        $teacher_id = 248;
+
+        $teacher_classes = User::find($teacher_id)->teacherClasses;
+
+        dd($days, $teacher_id, $teacher_classes);
 
         return [$qty,$days];
     }
 
     public static function currentPeriod(){
-        $current_period_start = new Carbon('first monday of this month');
-        $current_period_end = (new Carbon('first monday of this month'))->addDays(5);
-        $current_period_end->addWeeks(3);
-        $current_period_end->addDays(1);
+        $first_monday = new Carbon('first monday of this month');
+        if($first_monday < Carbon::now()){
+            $current_period_start = new Carbon('first monday of this month');
+            $current_period_end = (new Carbon('first monday of this month'))->addDays(5);
+            $current_period_end->addWeeks(3);
+            $current_period_end->addDays(1);
+        }else{
+            $current_period_start = new Carbon('first monday of last month');
+            $current_period_end = (new Carbon('first monday of last month'))->addDays(5);
+            $current_period_end->addWeeks(3);
+            $current_period_end->addDays(1);
+        }
 
         return [$current_period_start->toDateTimeString(),$current_period_end->toDateTimeString()];
+    }
+
+    public static function getPeriod($class){
+        
+        $period = CarbonPeriod::between('2022-01-03', now()->addYear())->addFilter(function ($date) {
+            return $date->is('first monday of this month');
+        });
+
+        $class = new Carbon($class);
+
+        foreach ($period as $key => $date) {
+            if($date <= $class){
+                $class_period = $date->format("F Y");
+            }
+        }
+        
+        return $class_period;
     }
 }

@@ -413,7 +413,7 @@ class SchedulingCalendarController extends Controller
 
         Cart::destroy();
         $course_id = session('selected_course');
-        $teacher_id = session('teacher_id');
+        // $teacher_id = session('teacher_id');
 
         $product = Course::find($course_id)->products->first();
 
@@ -422,7 +422,6 @@ class SchedulingCalendarController extends Controller
 
         Cart::add($product->id, $product->name, $product_qty, ($product->sale_price == null ? $product->regular_price : $product->sale_price))->associate('App\Models\Product');
         session([
-            'selected_teacher' => $teacher_id,
             'course_id' => $course_id,
             'classes_dates' => $apportionment[1]
         ]);

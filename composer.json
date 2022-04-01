@@ -24,6 +24,7 @@
         "spatie/laravel-permission": "^4.0",
         "srmklive/paypal": "~1.0",
         "tightenco/ziggy": "^1.4",
+        "tinymce/tinymce": "^5.10",
         "web-token/jwt-easy": "^2.2",
         "web-token/jwt-framework": "^2.2",
         "web-token/jwt-signature-algorithm-hmac": "^2.2"

@@ -1,26 +1,5 @@
 <x-app-layout>
 
-    @php
-
-        // dd(Auth::user()->canBeImpersonated());
-
-        if(isset($_GET['tz']))
-        {
-            // This is just an example. In application this will come from Javascript (via an AJAX or something)
-            $timezone_offset_minutes = $_GET['tz'];  // $_GET['timezone_offset_minutes']
-
-            // Convert minutes to seconds
-            $timezone_name = timezone_name_from_abbr("", $timezone_offset_minutes*60, false);
-            session(['tz' => $timezone_name]);
-        }
-
-        function tz()
-        {
-            $tz = isset($_GET['tz']) ? "false" : isset($_GET['tz']);
-            return $tz;
-        }
-    @endphp
-
     <div class="bg-white font-sans">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden">
@@ -110,7 +89,7 @@
                         @if (Auth::user()->roles->pluck('name')[0] == 'student')
                             <a href="{{route('classroom',auth()->id())}}" class="inline-block bg-blue-800 text-white px-6 py-4 rounded hover:bg-blue-900 hover:text-white hover:no-underline">Classroom</a>
                         @endif
-                        @if (Auth::user()->roles->pluck('name')[0] == 'teacher' || Auth::user()->roles->pluck('name')[0] == 'student')
+                        @if (Auth::user()->roles->pluck('name')[0] == 'teacher' || Auth::user()->roles->pluck('name')[0] == 'student' || Auth::user()->roles->pluck('name')[0] == 'admin')
                             <a href="{{route('classes.index')}}" class="inline-block bg-blue-500 text-white px-6 py-4 rounded hover:bg-blue-600 hover:text-white hover:no-underline">Classes</a>
                         @endif
                     </div>
@@ -124,14 +103,5 @@
             </div>
         </div>
     </div>
-    <script>
-        let _tz = {{tz()}};
-        if(_tz)
-        {
-            var tz = new Date().getTimezoneOffset();
-            tz = tz == 0 ? 0 : -tz;
-            window.location.href = window.location.href + "?tz=" + tz;
-        }
-    </script>
 
 </x-app-layout>

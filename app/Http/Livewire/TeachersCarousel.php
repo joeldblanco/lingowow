@@ -18,6 +18,28 @@ class TeachersCarousel extends Component
     public $loadingState = false;
     protected $listeners = ['loadingState'];
 
+    // public function mount(){
+    //     $available_teachers = User::join('model_has_roles',function($join){
+    //                             $join->on('users.id','=','model_has_roles.model_id')
+    //                                 ->where('model_has_roles.role_id','=','3');
+    //                         })->get();
+
+    //     foreach ($available_teachers as $key => $value) {
+    //     $available_teachers[$key] = Schedule::where('user_id',$value->id)->where('selected_schedule', '<>', null)->select('user_id')->first();
+    //     if($available_teachers[$key] == null){
+    //     unset($available_teachers[$key]);
+    //     }else{
+    //     $available_teachers[$key] = $available_teachers[$key]->user_id;
+    //     }
+    //     }
+
+    //     $available_teachers = User::find($available_teachers);
+    //     $available_teachers = $available_teachers->shuffle();
+    //     session(['first_teacher' => $available_teachers[0]->id]);
+    //     session(['teacher_id' => $available_teachers[0]->id]);
+    //     dd($available_teachers[0]->id);
+    // }
+
     public function saveTeacher($teacher_id)
     {
         Cart::destroy();
@@ -69,6 +91,7 @@ class TeachersCarousel extends Component
         $available_teachers = User::find($available_teachers);
         $available_teachers = $available_teachers->shuffle();
         session(['first_teacher' => $available_teachers[0]->id]);
+        session(['teacher_id' => $available_teachers[0]->id]);
         
         return view('livewire.teachers-carousel',compact('available_teachers'));
     }
