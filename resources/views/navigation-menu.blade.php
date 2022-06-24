@@ -1,42 +1,54 @@
 @php
-    $nav_links = [
-        [
-            'name' => 'Home',
-            'route' => route('home'),
-            'status' => request()->routeIs('home'),
-            'roles' => ['student','guest','teacher','admin'],
-        ],
-        [
-            'name' => 'Dashboard',
-            'route' => route('dashboard'),
-            'status' => request()->routeIs('dashboard'),
-            'roles' => ['student','guest','teacher','admin'],
-        ],
-        [
-            'name' => 'Courses',
-            'route' => route('courses.index'),
-            'status' => request()->is('courses','courses/*'),
-            'roles' => ['student','guest','teacher','admin'],
-        ],
-        [
-            'name' => 'Pages',
-            'route' => route('pages'),
-            'status' => request()->routeIs('pages'),
-            'roles' => ['student','guest','teacher','admin'],
-        ],
-        [
-            'name' => 'Shop',
-            'route' => route('shop'),
-            'status' => request()->is('shop','shop/*'),
-            'roles' => ['student','guest','admin'],
-        ],
-        [
-            'name' => 'Admin Dashboard',
-            'route' => route('admin.dashboard'),
-            'status' => request()->routeIs('admin.dashboard'),
-            'roles' => ['admin'],
-        ],
-    ]
+
+$nav_links = [
+    [
+        'name' => 'Home',
+        'route' => route('home'),
+        'status' => request()->routeIs('home'),
+        'roles' => ['student', 'guest', 'teacher', 'admin'],
+    ],
+    [
+        'name' => 'Courses',
+        'route' => route('course.index'),
+        'status' => request()->is('courses', 'courses/*'),
+        'roles' => ['student', 'guest', 'teacher', 'admin'],
+    ],
+    // [
+    //     'name' => 'Pages',
+    //     'route' => route('pages'),
+    //     'status' => request()->routeIs('pages'),
+    //     'roles' => ['student','guest','teacher','admin'],
+    // ],
+    [
+        'name' => 'Shop',
+        'route' => route('shop'),
+        'status' => request()->is('shop', 'shop/*'),
+        'roles' => ['student', 'guest', 'admin'],
+    ],
+];
+
+if (auth()->user()->roles[0]->name == 'admin') {
+    $dashboard = array([
+        'name' => 'Dashboard',
+        'route' => route('admin.dashboard'),
+        'status' => request()->routeIs('admin.dashboard'),
+        'roles' => ['admin'],
+    ]);
+} else {
+    $dashboard = array([
+        'name' => 'Dashboard',
+        'route' => route('dashboard'),
+        'status' => request()->routeIs('dashboard'),
+        'roles' => ['student', 'guest', 'teacher'],
+    ]);
+}
+
+// array_push($nav_links, $dashboard);
+array_splice( $nav_links, 1, 0, $dashboard );
+
+//TO DELETE//
+array_shift($nav_links)
+
 @endphp
 
 <nav x-data="{ open: false }" class="bg-white border-b border-gray-100 shadow">
@@ -54,15 +66,11 @@
                 <!-- Navigation Links -->
                 <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
                     @foreach ($nav_links as $nav_link)
-
-                        @if (in_array(Auth::user()->roles->pluck('name')[0],$nav_link['roles']))
-                            
+                        @if (in_array(Auth::user()->roles->pluck('name')[0], $nav_link['roles']))
                             <x-jet-nav-link href="{{ $nav_link['route'] }}" :active="$nav_link['status']">
                                 {{ $nav_link['name'] }}
                             </x-jet-nav-link>
-                        
-                        @endif               
-
+                        @endif
                     @endforeach
                 </div>
             </div>
@@ -74,46 +82,51 @@
                         <x-jet-dropdown align="right" width="60">
                             <x-slot name="trigger">
                                 <span class="inline-flex rounded-md">
-                                    <button type="button" class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 bg-white hover:bg-gray-50 hover:text-gray-700 focus:outline-none focus:bg-gray-50 active:bg-gray-50 transition">
+                                    <button type="button"
+                                        class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 bg-white hover:bg-gray-50 hover:text-gray-700 focus:outline-none focus:bg-gray-50 active:bg-gray-50 transition">
                                         {{ Auth::user()->currentTeam->name }}
 
-                                        <svg class="ml-2 -mr-0.5 h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                                            <path fill-rule="evenodd" d="M10 3a1 1 0 01.707.293l3 3a1 1 0 01-1.414 1.414L10 5.414 7.707 7.707a1 1 0 01-1.414-1.414l3-3A1 1 0 0110 3zm-3.707 9.293a1 1 0 011.414 0L10 14.586l2.293-2.293a1 1 0 011.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" />
+                                        <svg class="ml-2 -mr-0.5 h-4 w-4" xmlns="http://www.w3.org/2000/svg"
+                                            viewBox="0 0 20 20" fill="currentColor">
+                                            <path fill-rule="evenodd"
+                                                d="M10 3a1 1 0 01.707.293l3 3a1 1 0 01-1.414 1.414L10 5.414 7.707 7.707a1 1 0 01-1.414-1.414l3-3A1 1 0 0110 3zm-3.707 9.293a1 1 0 011.414 0L10 14.586l2.293-2.293a1 1 0 011.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z"
+                                                clip-rule="evenodd" />
                                         </svg>
                                     </button>
                                 </span>
-                            </x-    slot>
+                                </x- slot>
 
-                            <x-slot name="content">
-                                <div class="w-60">
-                                    <!-- Team Management -->
-                                    <div class="block px-4 py-2 text-xs text-gray-400">
-                                        {{ __('Manage Team') }}
-                                    </div>
+                                <x-slot name="content">
+                                    <div class="w-60">
+                                        <!-- Team Management -->
+                                        <div class="block px-4 py-2 text-xs text-gray-400">
+                                            {{ __('Manage Team') }}
+                                        </div>
 
-                                    <!-- Team Settings -->
-                                    <x-jet-dropdown-link href="{{ route('teams.show', Auth::user()->currentTeam->id) }}">
-                                        {{ __('Team Settings') }}
-                                    </x-jet-dropdown-link>
-
-                                    @can('create', Laravel\Jetstream\Jetstream::newTeamModel())
-                                        <x-jet-dropdown-link href="{{ route('teams.create') }}">
-                                            {{ __('Create New Team') }}
+                                        <!-- Team Settings -->
+                                        <x-jet-dropdown-link
+                                            href="{{ route('teams.show', Auth::user()->currentTeam->id) }}">
+                                            {{ __('Team Settings') }}
                                         </x-jet-dropdown-link>
-                                    @endcan
 
-                                    <div class="border-t border-gray-100"></div>
+                                        @can('create', Laravel\Jetstream\Jetstream::newTeamModel())
+                                            <x-jet-dropdown-link href="{{ route('teams.create') }}">
+                                                {{ __('Create New Team') }}
+                                            </x-jet-dropdown-link>
+                                        @endcan
 
-                                    <!-- Team Switcher -->
-                                    <div class="block px-4 py-2 text-xs text-gray-400">
-                                        {{ __('Switch Teams') }}
+                                        <div class="border-t border-gray-100"></div>
+
+                                        <!-- Team Switcher -->
+                                        <div class="block px-4 py-2 text-xs text-gray-400">
+                                            {{ __('Switch Teams') }}
+                                        </div>
+
+                                        @foreach (Auth::user()->allTeams() as $team)
+                                            <x-jet-switchable-team :team="$team" />
+                                        @endforeach
                                     </div>
-
-                                    @foreach (Auth::user()->allTeams() as $team)
-                                        <x-jet-switchable-team :team="$team" />
-                                    @endforeach
-                                </div>
-                            </x-slot>
+                                </x-slot>
                         </x-jet-dropdown>
                     </div>
                 @endif
@@ -122,7 +135,8 @@
                 <div class="ml-3 relative">
                     <x-jet-dropdown align="right" width="80">
                         <x-slot name="trigger">
-                            <button class="flex text-sm border-2 border-transparent rounded-full focus:outline-none focus:border-gray-300 transition p-2">
+                            <button
+                                class="flex text-sm border-2 border-transparent rounded-full focus:outline-none focus:border-gray-300 transition p-2">
                                 <i class="fas fa-envelope text-gray-500 text-lg w-full"></i>
                             </button>
                         </x-slot>
@@ -133,85 +147,83 @@
                                 {{ __('Messages') }}
                             </div>
 
-                                @php
-                                    $messages = DB::table('messages')
-                                                        ->where('sender_id',auth()->id())
-                                                        ->orWhere('receiver_id',auth()->id())
-                                                        ->get();
-
-                                    $conversations = [];
-                                    $participants = [];
-
-                                    foreach ($messages as $key => $value) {
-
-                                        if(count($conversations) > 7){
-                                            break;
-                                        }
-
-                                        $conversations[$key] = $value->conversation_id;
-
-                                        if($value->sender_id == auth()->id()){
-                                            array_push($participants,$value->receiver_id);
-                                            // Str::limit($notification_data[$key], 45, '...');
-                                        }else{
-                                            array_push($participants,$value->sender_id);
-                                        }
+                            @php
+                                $messages = DB::table('messages')
+                                    ->where('sender_id', auth()->id())
+                                    ->orWhere('receiver_id', auth()->id())
+                                    ->get();
+                                
+                                $conversations = [];
+                                $participants = [];
+                                
+                                foreach ($messages as $key => $value) {
+                                    if (count($conversations) > 7) {
+                                        break;
                                     }
-
-                                    $conversations = array_values(array_unique($conversations));
-                                    $participants = array_values(array_unique($participants));
-
-                                    // foreach ($conversations as $key => $value) {
-                                        $last_messages["created_at"] = 0;
-                                    // }
-
-                                    foreach ($conversations as $key => $conversation_id) {
-                                        foreach ($messages as $message) {
-                                            if(($message->conversation_id == $conversation_id) AND ($message->created_at > $last_messages['created_at'])){
-                                                $last_messages[$key] = $message;
-                                                $last_messages_conversation_id[$key] = $message->conversation_id;
-                                            }
+                                
+                                    $conversations[$key] = $value->conversation_id;
+                                
+                                    if ($value->sender_id == auth()->id()) {
+                                        array_push($participants, $value->receiver_id);
+                                        // Str::limit($notification_data[$key], 45, '...');
+                                    } else {
+                                        array_push($participants, $value->sender_id);
+                                    }
+                                }
+                                
+                                $conversations = array_values(array_unique($conversations));
+                                $participants = array_values(array_unique($participants));
+                                
+                                // foreach ($conversations as $key => $value) {
+                                $last_messages['created_at'] = 0;
+                                // }
+                                
+                                foreach ($conversations as $key => $conversation_id) {
+                                    foreach ($messages as $message) {
+                                        if ($message->conversation_id == $conversation_id and $message->created_at > $last_messages['created_at']) {
+                                            $last_messages[$key] = $message;
+                                            $last_messages_conversation_id[$key] = $message->conversation_id;
                                         }
                                     }
+                                }
+                                
+                                unset($last_messages['created_at']);
+                                
+                                foreach ($participants as $key => $value) {
+                                    $participants[$key] = DB::table('users')
+                                        ->where('id', $value)
+                                        ->select('first_name', 'last_name')
+                                        ->get();
+                                
+                                    $participants[$key] = $participants[$key][0];
+                                }
+                                
+                            @endphp
 
-                                    unset($last_messages["created_at"]);
+                            @if (count($messages) > 0)
 
-                                    foreach ($participants as $key => $value) {
-                                        $participants[$key] = DB::table('users')
-                                            ->where('id',$value)
-                                            ->select('first_name','last_name')
-                                            ->get();
+                                {{-- {{dd($messages)}} --}}
 
-                                        $participants[$key] = $participants[$key][0];
-                                    }
-
-                                @endphp
-
-                                @if (count($messages) > 0)
-
-                                    {{-- {{dd($messages)}} --}}
-                                    
-                                    @for ($i=0; $i<count($participants); $i++)
-
-                                        <x-jet-dropdown-link href="{{ route('chat.show',$last_messages_conversation_id[$i]) }}">
-                                            {{-- <p class="@if($notification_read_at[$key] == null) font-bold @endif"> --}}
-                                            <p class="font-bold">
-                                                {{$participants[$i]->first_name}} {{$participants[$i]->last_name}}
-                                            </p>
-                                            <p class="text-xs text-gray-400">{{Str::limit($last_messages[$i]->message_content, 25, '...')}}</p>
-                                        </x-jet-dropdown-link>
-
-                                    @endfor
-
-                                    <x-jet-dropdown-link href="{{ route('chat.index') }}" class="border-t mt-2">
-                                        <p class="text-center">
-                                            See All
+                                @for ($i = 0; $i < count($participants); $i++)
+                                    <x-jet-dropdown-link
+                                        href="{{ route('chat.show', $last_messages_conversation_id[$i]) }}">
+                                        {{-- <p class="@if ($notification_read_at[$key] == null) font-bold @endif"> --}}
+                                        <p class="font-bold">
+                                            {{ $participants[$i]->first_name }} {{ $participants[$i]->last_name }}
                                         </p>
+                                        <p class="text-xs text-gray-400">
+                                            {{ Str::limit($last_messages[$i]->message_content, 25, '...') }}</p>
                                     </x-jet-dropdown-link>
+                                @endfor
 
-                                @else
-                                    <p class="p-1 text-sm text-center">There are no messages</p>
-                                @endif
+                                <x-jet-dropdown-link href="{{ route('chat.index') }}" class="border-t mt-2">
+                                    <p class="text-center">
+                                        See All
+                                    </p>
+                                </x-jet-dropdown-link>
+                            @else
+                                <p class="p-1 text-sm text-center">There are no messages</p>
+                            @endif
 
                             <div class="border-t border-gray-100"></div>
                         </x-slot>
@@ -222,7 +234,8 @@
                 <div class="ml-3 relative">
                     <x-jet-dropdown align="right" width="80">
                         <x-slot name="trigger">
-                            <button class="flex text-sm border-2 border-transparent rounded-full focus:outline-none focus:border-gray-300 transition p-2">
+                            <button
+                                class="flex text-sm border-2 border-transparent rounded-full focus:outline-none focus:border-gray-300 transition p-2">
                                 <i class="fas fa-bell text-gray-500 text-lg w-full"></i>
                             </button>
                         </x-slot>
@@ -233,46 +246,79 @@
                             </div>
 
                             @php
-                                $notifications = DB::table('notifications')->where('notifiable_id',auth()->id())->select('id','data','read_at','created_at')->limit(7)->get();
-
+                                $notifications = DB::table('notifications')
+                                    ->where('notifiable_id', auth()->id())
+                                    ->select('id', 'data', 'read_at', 'type', 'created_at')
+                                    ->limit(7)
+                                    ->get();
+                                
                                 foreach ($notifications as $key => $value) {
-
-                                    $temp_array = json_decode($value->data);
-                                    if(count($temp_array) > 0){
-                                        $user = App\Models\User::find($temp_array[0]);
-                                        // $schedule_string = $temp_array[1];
-                                    }else{
+                                    $data_array = json_decode($value->data, 1);
+                                
+                                    $value->type = explode('\\', $value->type);
+                                    $value->type = end($value->type);
+                                
+                                    if (count($data_array) > 0) {
+                                        $user = App\Models\User::find($data_array['user_id']);
+                                    } else {
                                         $user = App\Models\User::find(auth()->id());
                                     }
-                                    $notification_data[$key] = "New class booked by ".$user->first_name." ".$user->last_name;
-
+                                
                                     $notification_read_at[$key] = $value->read_at;
-
+                                
                                     $notification_created_at[$key] = new Carbon\Carbon($value->created_at);
                                     $notification_created_at[$key] = $notification_created_at[$key]->diffForHumans();
-
+                                
                                     $notification_id[$key] = $value->id;
+                                
+                                    switch ($value->type) {
+                                        case 'BookedClass':
+                                            $notification_icon = 'fas fa-bookmark';
+                                            $notification_data[$key] = 'The student ' . $user->first_name . ' ' . $user->last_name . ' has booked a class ' . $data_array['schedule_string'];
+                                            break;
+                                
+                                        case 'ClassRescheduled':
+                                            $notification_icon = 'fas fa-calendar-alt';
+                                            $notification_data[$key] = 'The student ' . $user->first_name . ' ' . $user->last_name . ' has rescheduled a class. New schedule: ' . $data_array['schedule_string'];
+                                            break;
+                                
+                                        case 'StudentUnrolment':
+                                            $notification_icon = 'fas fa-calendar-alt';
+                                            if (auth()->user()->roles[0]->name == 'student') {
+                                                $notification_data[$key] = 'You have been automatically unenroled from the course ' . $data_array['course_name'];
+                                            }
+                                            break;
+                                
+                                        case 'StudentUnrolmentToTeacher':
+                                            $notification_icon = 'fas fa-calendar-alt';
+                                            $notification_data[$key] = 'The student ' . $user->first_name . ' ' . $user->last_name . ' has been automatically unenroled from course ' . $data_array['schedule_string'];
+                                            break;
+                                
+                                        default:
+                                            $notification_icon = 'fas fa-bell';
+                                            $notification_data[$key] = 'You have a new notification.';
+                                            break;
+                                    }
                                 }
-
+                                
                             @endphp
 
                             @if (count($notifications) > 0)
                                 @foreach ($notifications as $key => $value)
-
-                                    <x-jet-dropdown-link href="{{ route('notifications.show', $notification_id[$key]) }}">
-                                        <p class="@if($notification_read_at[$key] == null) font-bold @endif">
-                                            {{Str::limit($notification_data[$key], 40, '...')}}
+                                    <x-jet-dropdown-link
+                                        href="{{ route('notifications.show', $notification_id[$key]) }}">
+                                        <p class="@if ($notification_read_at[$key] == null) font-bold @endif">
+                                            {{ Str::limit($notification_data[$key], 40, '...') }}
                                         </p>
                                     </x-jet-dropdown-link>
-
                                 @endforeach
 
-                                <x-jet-dropdown-link href="{{ route('notifications.index') }}" class="border-t mt-2">
+                                <x-jet-dropdown-link href="{{ route('notifications.index') }}"
+                                    class="border-t mt-2">
                                     <p class="text-center">
                                         See All
                                     </p>
                                 </x-jet-dropdown-link>
-
                             @else
                                 <p class="p-1 text-sm text-center">There are no notifications</p>
                             @endif
@@ -285,16 +331,23 @@
                     <x-jet-dropdown align="right" width="48">
                         <x-slot name="trigger">
                             @if (Laravel\Jetstream\Jetstream::managesProfilePhotos())
-                                <button class="flex text-sm border-2 border-transparent rounded-full focus:outline-none focus:border-gray-300 transition">
-                                    <img class="h-8 w-8 rounded-full object-cover" src="{{ Auth::user()->profile_photo_url }}" alt="{{ Auth::user()->name }}" />
+                                <button
+                                    class="flex text-sm border-2 border-transparent rounded-full focus:outline-none focus:border-gray-300 transition">
+                                    <img class="h-8 w-8 rounded-full object-cover"
+                                        src="{{ Auth::user()->profile_photo_url }}"
+                                        alt="{{ Auth::user()->name }}" />
                                 </button>
                             @else
                                 <span class="inline-flex rounded-md">
-                                    <button type="button" class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 bg-white hover:text-gray-700 focus:outline-none transition">
+                                    <button type="button"
+                                        class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 bg-white hover:text-gray-700 focus:outline-none transition">
                                         {{ Auth::user()->name }}
 
-                                        <svg class="ml-2 -mr-0.5 h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                                            <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                                        <svg class="ml-2 -mr-0.5 h-4 w-4" xmlns="http://www.w3.org/2000/svg"
+                                            viewBox="0 0 20 20" fill="currentColor">
+                                            <path fill-rule="evenodd"
+                                                d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+                                                clip-rule="evenodd" />
                                         </svg>
                                     </button>
                                 </span>
@@ -323,8 +376,7 @@
                             <form method="POST" action="{{ route('logout') }}">
                                 @csrf
 
-                                <x-jet-dropdown-link href="{{ route('logout') }}"
-                                         onclick="event.preventDefault();
+                                <x-jet-dropdown-link href="{{ route('logout') }}" onclick="event.preventDefault();
                                                 this.closest('form').submit();">
                                     {{ __('Log Out') }}
                                 </x-jet-dropdown-link>
@@ -337,10 +389,13 @@
 
             <!-- Hamburger -->
             <div class="-mr-2 flex items-center sm:hidden">
-                <button @click="open = ! open" class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 focus:text-gray-500 transition">
+                <button @click="open = ! open"
+                    class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 focus:text-gray-500 transition">
                     <svg class="h-6 w-6" stroke="currentColor" fill="none" viewBox="0 0 24 24">
-                        <path :class="{'hidden': open, 'inline-flex': ! open }" class="inline-flex" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-                        <path :class="{'hidden': ! open, 'inline-flex': open }" class="hidden" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        <path :class="{'hidden': open, 'inline-flex': ! open }" class="inline-flex" stroke-linecap="round" stroke-linejoin="round"
+                            stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                        <path :class="{'hidden': ! open, 'inline-flex': open }" class="hidden" stroke-linecap="round" stroke-linejoin="round"
+                            stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                     </svg>
                 </button>
             </div>
@@ -353,9 +408,9 @@
             @foreach ($nav_links as $nav_link)
                 <x-jet-responsive-nav-link href="{{ $nav_link['route'] }}" :active="$nav_link['status']">
                     {{ $nav_link['name'] }}
-            </x-jet-responsive-nav-link>
+                </x-jet-responsive-nav-link>
             @endforeach
-            
+
         </div>
 
         <!-- Responsive Settings Options -->
@@ -363,7 +418,8 @@
             <div class="flex items-center px-4">
                 @if (Laravel\Jetstream\Jetstream::managesProfilePhotos())
                     <div class="flex-shrink-0 mr-3">
-                        <img class="h-10 w-10 rounded-full object-cover" src="{{ Auth::user()->profile_photo_url }}" alt="{{ Auth::user()->name }}" />
+                        <img class="h-10 w-10 rounded-full object-cover" src="{{ Auth::user()->profile_photo_url }}"
+                            alt="{{ Auth::user()->name }}" />
                     </div>
                 @endif
 
@@ -389,8 +445,7 @@
                 <form method="POST" action="{{ route('logout') }}">
                     @csrf
 
-                    <x-jet-responsive-nav-link href="{{ route('logout') }}"
-                                   onclick="event.preventDefault();
+                    <x-jet-responsive-nav-link href="{{ route('logout') }}" onclick="event.preventDefault();
                                     this.closest('form').submit();">
                         {{ __('Log Out') }}
                     </x-jet-responsive-nav-link>
@@ -405,7 +460,8 @@
                     </div>
 
                     <!-- Team Settings -->
-                    <x-jet-responsive-nav-link href="{{ route('teams.show', Auth::user()->currentTeam->id) }}" :active="request()->routeIs('teams.show')">
+                    <x-jet-responsive-nav-link href="{{ route('teams.show', Auth::user()->currentTeam->id) }}"
+                        :active="request()->routeIs('teams.show')">
                         {{ __('Team Settings') }}
                     </x-jet-responsive-nav-link>
 

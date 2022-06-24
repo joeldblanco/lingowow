@@ -1,3 +1,4 @@
+{{-- {{dd($enter_classroom)}} --}}
 @if(isset($enter_classroom) && $enter_classroom)
 
     <div id="meet"></div>

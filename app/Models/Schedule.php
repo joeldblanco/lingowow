@@ -16,5 +16,5 @@ class Schedule extends Model
      *
      * @var array
      */
-    protected $fillable = ['user_id','selected_schedule','deleted_at'];
+    protected $fillable = ['user_id','selected_schedule','deleted_at', 'enrolment_id'];
 }

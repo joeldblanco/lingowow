@@ -62,7 +62,7 @@
             <footer class="flex justify-center p-2">
             <button
                 wire:click="edit()"
-                onclick="saveSchedule({{isset($user_schedule) ? count($user_schedule) : 0}},'schedule.update',{{Auth::user()->roles->pluck('id')[0]}});toggleCellBlock()"
+                onclick="saveSchedule({{isset($user_schedules) ? count($user_schedules) : 0}},'schedule.update',{{Auth::user()->roles->pluck('id')[0]}});toggleCellBlock()"
                 class="bg-green-600 font-semibold text-white p-2 w-32 mr-1 rounded-full hover:bg-green-700 focus:outline-none focus:ring shadow-lg hover:shadow-none transition-all duration-300"
                 @click=" showModal1 = false, editBtn = true, edit = false, loadingState = true"
             >

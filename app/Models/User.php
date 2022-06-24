@@ -13,6 +13,7 @@ use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use aberkanidev\Coupons\Traits\CanRedeemCoupons;
+use Illuminate\Support\Facades\DB;
 use Lab404\Impersonate\Models\Impersonate;
 use Lab404\Impersonate\Services\ImpersonateManager;
 
@@ -86,7 +87,7 @@ class User extends Authenticatable implements MustVerifyEmail
 
     public function units()
     {
-        return $this->belongsToMany(Unit::class);
+        return $this->belongsToMany(Unit::class)->orderBy('unit_id');
     }
 
     public function schedules()
@@ -136,24 +137,50 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->hasManyThrough(Classes::class, Enrolment::class, 'teacher_id');
     }
 
+    /**
+     * Get all the user's friends.
+     */
+    public function friends()
+    {
+        $friends = DB::table('friend_requests')->where('status',1)->where('sender_id',auth()->id())->orWhere('receiver_id',auth()->id())->get();
+        $friends_list = [];
 
-    // public function getAuthIdentifierName()
-    // {
-    //     return 'email';
-    // }
+        foreach($friends as $friend){
+            if($friend->sender_id == auth()->id()){
+                $friends_list[] = User::find($friend->receiver_id);
+            }else{
+                $friends_list[] = User::find($friend->sender_id);
+            }
+        }
 
-    // public function setImpersonating($id)
-    // {
-    //     session()->put('impersonate', $id);
-    // }
+        return $friends_list;
+    }
 
-    // public function stopImpersonating()
-    // {
-    //     session()->forget('impersonate');
-    // }
+    /**
+     * Get all the user's friend requests.
+     */
+    public function friend_requests()
+    {
+        $friend_requests = DB::table('friend_requests')->where('status',NULL)->where('sender_id',auth()->id())->orWhere('receiver_id',auth()->id())->get();
+        $friend_requests_list = [];
 
-    // public function isImpersonating()
-    // {
-    //     return session()->has('impersonate');
-    // }
+        foreach($friend_requests as $friend_request){
+            if($friend_request->sender_id == auth()->id()){
+                $friend_requests_list[] = User::find($friend_request->receiver_id);
+            }else{
+                $friend_requests_list[] = User::find($friend_request->sender_id);
+            }
+        }
+
+        return $friend_requests_list;
+    }
+
+    /**
+     * Get all the user's posts.
+     */
+    public function posts()
+    {
+        return $this->hasMany(Post::class, 'author_id');
+    }
+
 }

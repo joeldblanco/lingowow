@@ -46,17 +46,16 @@ class ProfileController extends Controller
      */
     public function show($id)
     {
-        try {
-            $user = User::where('id',$id)->get();
-            $user = $user[0];
-        } catch (\Throwable $th) {
-            if($th->getMessage() == "Undefined array key 0"){
-                return "User doesn't exist.";
-            }
+        $user = User::find($id);
+        if ($user == null) {
+            abort(404);
         }
-        
 
-        return view('profile.show',compact('user'));
+        $friends = $user->friends();
+        $friend_requests = $user->friend_requests();
+        $posts = $user->posts;
+
+        return view('profile.show', compact('user', 'friends', 'friend_requests', 'posts'));
     }
 
     /**

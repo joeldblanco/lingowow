@@ -74,8 +74,8 @@ class ClassRescheduledToTeacher extends Notification
     public function toDatabase()
     {
         return [
-            $this->student->id,
-            $this->schedule_string
+            "user_id" => $this->student->id,
+            "schedule_string" => $this->schedule_string
         ];
     }
 

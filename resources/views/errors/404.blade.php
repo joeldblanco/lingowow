@@ -322,7 +322,7 @@
         <div class="box__description-text">It seems like we couldn't find the page you were looking for</div>
         </div>
         
-        <a href="{{url()->previous()}}" class="box__button">Go back</a>
+        <a href="{{route('home')}}" class="box__button">Go home</a>
         
     </div>
 </div>

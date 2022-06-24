@@ -3,12 +3,13 @@
 namespace App\Notifications;
 
 use App\Models\Course;
+use App\Models\User;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class ClassCanceledToStudent extends Notification implements ShouldQueue
+class StudentUnrolment extends Notification implements ShouldQueue
 {
     use Queueable;
 
@@ -19,9 +20,10 @@ class ClassCanceledToStudent extends Notification implements ShouldQueue
      *
      * @return void
      */
-    public function __construct($course_id)
+    public function __construct($student_id, $course_id)
     {
         $this->course = Course::find($course_id)->select('course_name')->first();
+        $this->student = User::find($student_id);
     }
 
     /**
@@ -47,15 +49,16 @@ class ClassCanceledToStudent extends Notification implements ShouldQueue
                     ->subject('Unenrollment notice!')
                     ->line('Greetings, dear '.$notifiable->first_name.' '.$notifiable->last_name.'.')
                     ->line('We are writing to notify you that you have been unenroled from '.$this->course->course_name)
-                    ->line('Click the button below to check your current schedule.')
-                    ->action('Check Schedule', url('/dashboard'))
+                    ->line('Click the button below to purchase another package and continue enjoying our services.')
+                    ->action('Shop', url('/shop'))
                     ->line('If you have any questions, please contact us through the regular channels.');
     }
 
     public function toDatabase()
     {
         return [
-           //
+            "user_id" => $this->student->id,
+            "course_name" => $this->course->course_name
         ];
     }
 

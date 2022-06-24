@@ -75,11 +75,11 @@ class ApportionmentController extends Controller
             }
         }
 
-        $teacher_id = 248;
+        $teacher_id = session('teacher_id');
 
         $teacher_classes = User::find($teacher_id)->teacherClasses;
 
-        dd($days, $teacher_id, $teacher_classes);
+        // dd($days, $teacher_id, $teacher_classes);
 
         return [$qty,$days];
     }

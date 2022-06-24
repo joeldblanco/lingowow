@@ -12,13 +12,6 @@ class Course extends Model
     use SoftDeletes;
 
     /**
-     * The primary key associated with the table.
-     *
-     * @var string
-     */
-    protected $primaryKey = 'course_id';
-
-    /**
      * Get the products associated with the course.
      */
     public function products()
@@ -27,10 +20,10 @@ class Course extends Model
     }
 
     /**
-     * Get the modukes associated with the course.
+     * Get the modules associated with the course.
      */
     public function modules()
     {
-        return $this->belongsToMany(Module::class,'course_product','course_id','product_id');
+        return $this->hasMany(Module::class);
     }
 }

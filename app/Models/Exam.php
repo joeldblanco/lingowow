@@ -16,4 +16,13 @@ class Exam extends Model
     {
         return $this->belongsToMany(Question::class);
     }
+
+    /**
+     * Get the attempts for the exam.
+     */
+    public function attempts()
+    {
+        return $this->hasMany(Attempt::class);
+    }
+
 }

@@ -9,8 +9,8 @@ use App\Models\Schedule;
 use Illuminate\Http\Request;
 use App\Models\User;
 use App\Notifications\BookedClass;
-use App\Notifications\ClassCanceledToStudent;
-use App\Notifications\ClassCanceledToTeacher;
+use App\Notifications\StudentUnrolment;
+use App\Notifications\StudentUnrolmentToTeacher;
 // use Illuminate\Contracts\Session\Session;
 use Illuminate\Support\Facades\Auth;
 // use Illuminate\Support\Facades\DB;
@@ -40,7 +40,7 @@ class SchedulingCalendarController extends Controller
     public function create(Request $request)
     {
         $plan = session('plan');
-        
+
         return view('calendar-selection', compact('plan'));
     }
 
@@ -51,17 +51,17 @@ class SchedulingCalendarController extends Controller
      * @return \Illuminate\Http\Response
      */
     public static function store()
-    {    
+    {
         //VARIABLE INITIALIZATION//
         $student_id = auth()->id();
         $student = User::find($student_id);
-        $teacher_id = session('selected_teacher');
+        $teacher_id = session('teacher_id');
         $teacher = User::find($teacher_id);
         $course_id = session('course_id');
         $student_schedule = json_decode(session('user_schedule'));
         $classes_dates = session('classes_dates');
-        $teacher_students = Enrolment::where('teacher_id',$teacher_id)->select('student_id')->get();
-        
+        $teacher_students = Enrolment::where('teacher_id', $teacher_id)->select('student_id')->get();
+
 
         //CREATING STUDENT'S ENROLMENT (OR UPDATING IT, IN CASE IT ALREADY EXISTS BUT IS SOFTDELETED)//
         $enrolment = Enrolment::withTrashed()->updateOrCreate(
@@ -69,10 +69,12 @@ class SchedulingCalendarController extends Controller
             ['teacher_id' => $teacher_id, 'deleted_at' => NULL]
         );
 
+
         //CREATING STUDENT'S SCHEDULE (OR UPDATING IT, IN CASE IT ALREADY EXISTS BUT IS SOFTDELETED)//
         $student_schedule = json_encode($student_schedule);
+
         Schedule::withTrashed()->updateOrCreate(
-            ['user_id' => $student_id,'enrolment_id' => $enrolment->id],
+            ['user_id' => $student_id, 'enrolment_id' => $enrolment->id],
             ['selected_schedule' => $student_schedule, 'deleted_at' => NULL]
         );
 
@@ -98,18 +100,19 @@ class SchedulingCalendarController extends Controller
                 'enrolment_id' => $enrolment->id,
             ]);
         }
-            
+
 
         //STORING ALL TEACHER'S STUDENTS' SCHEDULES IN ONE ARRAY//
         foreach ($teacher_students as $tskey => $tsvalue) {
-            $teacher_students_schedule[$tskey] = Schedule::where('user_id',$tsvalue->student_id)->select('selected_schedule')->first();
+            $teacher_students_schedule[$tskey] = Schedule::where('user_id', $tsvalue->student_id)->select('selected_schedule')->first();
             $teacher_students_schedule[$tskey] = $teacher_students_schedule[$tskey]->selected_schedule;
             $teacher_students_schedule = json_decode($teacher_students_schedule[$tskey]);
         }
 
 
         //SENDING NOTIFICATION TO TEACHER//
-        Notification::sendNow($teacher, new BookedClass($student->id));
+        $notification = Notification::sendNow($teacher, new BookedClass($student->id));
+        // dd($notification, $teacher);
     }
 
     /**
@@ -143,72 +146,76 @@ class SchedulingCalendarController extends Controller
      */
     public function update(Request $request)
     {
-        if($request->error == "false")
-        {
-            $request->data = explode(',', $request->data);
-            $requested_schedule = array_chunk($request->data,2);
+        if ($request->error == "false") {
+            // $request->data = explode(',', $request->data);
+            $request->data = json_decode($request->data);
+            $requested_schedule = array_filter($request->data);
+            $requested_schedule = array_values($requested_schedule);
+            // $requested_schedule = array_chunk($request->data,2);
+
+            // dd($request->data);
 
             $user_role = Auth::user()->roles->pluck('name')[0];
             $user_id = auth()->id();
 
-            $user_schedule = Schedule::select('selected_schedule')->where('user_id',$user_id)->get();
+            $user_schedule = Schedule::select('selected_schedule')->where('user_id', $user_id)->get();
             $user_schedule = json_decode($user_schedule[0]->selected_schedule);
 
-            if($user_role == "student"){
+            if ($user_role == "student") {
 
-                $enrolment = Enrolment::where('student_id',$user_id)->get();
-                dd($enrolment);
+                $enrolment = Enrolment::where('student_id', $user_id)->first();
+                // dd($enrolment);
                 $teacher_id = $enrolment->teacher_id;
-                $teacher_id = $teacher_id[0]->teacher_id;
+                // $teacher_id = $teacher_id[0]->teacher_id;
 
-                $teacher_students = Enrolment::select('student_id')->where('teacher_id',$teacher_id)->get();
+                $teacher_students = Enrolment::select('student_id')->where('teacher_id', $teacher_id)->get();
                 foreach ($teacher_students as $key => $value) {
                     $teacher_students[$key] = $value->student_id;
                 }
 
-                $teacher_students_schedule = Schedule::select('selected_schedule')->whereIn('user_id',$teacher_students)->get();
+                $teacher_students_schedule = Schedule::select('selected_schedule')->whereIn('user_id', $teacher_students)->get();
                 foreach ($teacher_students_schedule as $key => $value) {
                     $teacher_students_schedule[$key] = json_decode($value->selected_schedule);
                 }
                 $teacher_students_schedule = array_merge(...$teacher_students_schedule);
 
                 foreach ($user_schedule as $t_schedule) {
-                    \array_splice($teacher_students_schedule, array_search($t_schedule,$teacher_students_schedule), 1);
+                    \array_splice($teacher_students_schedule, array_search($t_schedule, $teacher_students_schedule), 1);
                 }
-                
-                $teacher_selected_schedule = Schedule::select('selected_schedule')->where('user_id',$teacher_id)->get();
+
+                $teacher_selected_schedule = Schedule::select('selected_schedule')->where('user_id', $teacher_id)->get();
                 $teacher_selected_schedule = json_decode($teacher_selected_schedule[0]->selected_schedule);
                 $teacher_available_schedule = $teacher_selected_schedule;
                 foreach ($teacher_students_schedule as $t_schedule) {
-                    \array_splice($teacher_available_schedule, array_search($t_schedule,$teacher_available_schedule), 1);
+                    \array_splice($teacher_available_schedule, array_search($t_schedule, $teacher_available_schedule), 1);
                 }
 
                 $count = 0;
-                foreach($requested_schedule as $u_schedule){
-                    if(in_array($u_schedule,$teacher_selected_schedule)){
-                        if(in_array($u_schedule,$teacher_available_schedule)){
+                foreach ($requested_schedule as $u_schedule) {
+                    if (in_array($u_schedule, $teacher_selected_schedule)) {
+                        if (in_array($u_schedule, $teacher_available_schedule)) {
                             $count++;
-                        }else if(in_array($u_schedule,$user_schedule)){
+                        } else if (in_array($u_schedule, $user_schedule)) {
                             unset($user_schedule[array_search($u_schedule, $user_schedule)]);
                             $count++;
                         }
                     }
                 }
 
-                if($count == count($requested_schedule)){
+                if ($count == count($requested_schedule)) {
 
-                    foreach($teacher_available_schedule as $t_schedule){
-                        foreach($requested_schedule as $r_schedule){
-                            if($r_schedule == $t_schedule){
-                                \array_splice($teacher_available_schedule, array_search($t_schedule,$teacher_available_schedule), 1);
+                    foreach ($teacher_available_schedule as $t_schedule) {
+                        foreach ($requested_schedule as $r_schedule) {
+                            if ($r_schedule == $t_schedule) {
+                                \array_splice($teacher_available_schedule, array_search($t_schedule, $teacher_available_schedule), 1);
                             }
                         }
                     }
 
-                    foreach($teacher_selected_schedule as $t_s_schedule){
-                        foreach($user_schedule as $u_schedule){
-                            if($t_s_schedule == $u_schedule){
-                                array_push($teacher_available_schedule,$t_s_schedule);
+                    foreach ($teacher_selected_schedule as $t_s_schedule) {
+                        foreach ($user_schedule as $u_schedule) {
+                            if ($t_s_schedule == $u_schedule) {
+                                array_push($teacher_available_schedule, $t_s_schedule);
                             }
                         }
                     }
@@ -232,37 +239,37 @@ class SchedulingCalendarController extends Controller
                     $teacher = User::find($teacher_id);
                     Notification::sendNow($teacher, new ClassRescheduledToTeacher($student));
                     Notification::sendNow($student, new ClassRescheduledToStudent);
-
-                }else{
+                } else {
                     $message = "Request rejected. Those blocks are not available.";
                 }
+            } else if ($user_role == "teacher") {
 
-            }else if($user_role == "teacher"){
-                
                 $students_schedules = [];
                 $affected_students = [];
-                $students_enrolments = Enrolment::where('teacher_id',$user_id)->get();
-                
-                foreach($students_enrolments as $student_enrolment){
-                    $student_schedule = Schedule::select('selected_schedule')->where('enrolment_id',$student_enrolment->id)->first();
+                $students_enrolments = Enrolment::where('teacher_id', $user_id)->get();
+
+                foreach ($students_enrolments as $student_enrolment) {
+                    $student_schedule = Schedule::select('selected_schedule')->where('enrolment_id', $student_enrolment->id)->first();
                     $student_schedule = json_decode($student_schedule->selected_schedule);
-                    array_push($students_schedules,$student_schedule);
+                    array_push($students_schedules, $student_schedule);
                 }
 
-                foreach($students_schedules as $key => $student_block){
+                foreach ($students_schedules as $key => $student_schedule) {
 
                     // dd($requested_schedule, $students_schedules);
 
                     // if($student_block != null){
-                        // foreach($value as $index => $student_block){
-                            // dd($students_schedules, $key, $student_block, $students_enrolments[$key]->student_id);
+                    foreach ($student_schedule as $index => $student_block) {
 
-                            if(in_array($student_block,$requested_schedule) && !in_array($students_enrolments[$key]->student_id,$affected_students)){
-                                array_push($affected_students,$students_enrolments[$key]->student_id);
-                            }
-                        // }
+                        // dd($students_schedules, $key, $student_block, $students_enrolments[$key]->student_id);
+
+                        if (in_array($student_block, $requested_schedule)) {
+                            array_push($affected_students, $students_enrolments[$key]->student_id);
+                        }
+                    }
                     // }
                 }
+                $affected_students = array_unique($affected_students);
 
                 Schedule::withTrashed()->updateOrCreate(
                     ['user_id' => $user_id],
@@ -272,7 +279,7 @@ class SchedulingCalendarController extends Controller
                 // Schedule::upsert([
                 //     ['user_id' => $user_id, 'selected_schedule' => json_encode($requested_schedule)]
                 // ],['user_id'],['selected_schedule']);
-                
+
                 // $students_schedules = array_merge(...$students_schedules);
 
                 // $teacher_available_schedule = $requested_schedule;
@@ -288,15 +295,14 @@ class SchedulingCalendarController extends Controller
 
                 $message = "Your schedule has been successfully updated. ";
 
-                if(count($affected_students) > 0){
+                if (count($affected_students) > 0) {
                     session(['affected_students' => $affected_students]);
                     $message .= "However, the blocks taken by the following students will remain intact until the end of the current academic period: ";
                 }
             }
-        }else{
+        } else {
             $message = "Request rejected";
-            switch($request->error)
-            {
+            switch ($request->error) {
                 case "same_day":
                     $message .= ". You cannot select two classes for the same day.";
                     break;
@@ -322,11 +328,11 @@ class SchedulingCalendarController extends Controller
      * @param  int  $course_id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($student_id,$course_id)
+    public function destroy($student_id, $course_id)
     {
-        $user_enrolment = Enrolment::where('student_id',$student_id)->where('course_id',$course_id)->first();
+        $user_enrolment = Enrolment::where('student_id', $student_id)->where('course_id', $course_id)->first();
 
-        if($user_enrolment){
+        if ($user_enrolment) {
 
             $student = User::find($student_id);
             $teacher = User::find($user_enrolment->teacher_id);
@@ -336,10 +342,9 @@ class SchedulingCalendarController extends Controller
             $student_schedule->delete();
             $user_enrolment->delete();
 
-            Notification::sendNow($teacher, new ClassCanceledToTeacher($student,$to_delete_schedule));
-            Notification::sendNow($student, new ClassCanceledToStudent($course_id));
-
-        }else{
+            Notification::sendNow($teacher, new StudentUnrolmentToTeacher($student, $course_id, $to_delete_schedule));
+            Notification::sendNow($student, new StudentUnrolment($student->id, $course_id));
+        } else {
             return "User not enrolled";
         }
     }
@@ -352,9 +357,8 @@ class SchedulingCalendarController extends Controller
      */
     public function checkForTeachers(Request $request)
     {
-        $request->data = explode(',', $request->data);
-        $cells = array_chunk($request->data,2);
-
+        $cells = json_decode($request->data);
+        // $cells = array_chunk($request->data, 2);
         session(['user_schedule' => json_encode($cells)]);
 
         // $teachers = User::join('model_has_roles',function($join){
@@ -370,7 +374,7 @@ class SchedulingCalendarController extends Controller
         // foreach ($teachers as $key => $value) {
 
         //     $teachers_available_schedule[$key] = Schedule::where('user_id',$value->id)->select('selected_schedule')->get();
-            
+
         //     $teachers_students = Enrolment::where('teacher_id',$value->id)->select('student_id')->get();
 
         //     foreach ($teachers_students as $tskey => $tsvalue) {
@@ -378,7 +382,7 @@ class SchedulingCalendarController extends Controller
         //         $teachers_students_schedule[$tskey] = Schedule::where('user_id',$tsvalue->student_id)->select('selected_schedule')->get();
 
         //         $teachers_students_schedule[$tskey] = $teachers_students_schedule[$tskey][0]->selected_schedule;
-            
+
         //         $teachers_students_schedule = json_decode($teachers_students_schedule[$tskey]);
         //     }
 
@@ -388,7 +392,7 @@ class SchedulingCalendarController extends Controller
         //         if($teachers_available_schedule[$key] != null)
         //             array_splice($teachers_available_schedule[$key], array_search($s_schedule,$teachers_available_schedule[$key]), 1);
         //     }
-            
+
         // }
 
         // foreach($teachers_available_schedule as $key => $value){
@@ -413,7 +417,6 @@ class SchedulingCalendarController extends Controller
 
         Cart::destroy();
         $course_id = session('selected_course');
-        // $teacher_id = session('teacher_id');
 
         $product = Course::find($course_id)->products->first();
 

@@ -19,34 +19,33 @@ class PricingTableComponent extends Component
     public $popup_message = "";
     public $popup_color = "";
 
-    public function showSelectedProduct($course_id){
+    public function showSelectedProduct($course_id)
+    {
         session(['selected_course' => $course_id]);
         $this->selectedProduct = $course_id;
-        $this->emit('loadingState',false);
+        $this->emit('loadingState', false);
     }
 
     public function store($nOfClasses)
     {
-        $enroled = Enrolment::where('student_id',auth()->id())
-                            // ->where('course_id',session('selected_course'))
-                            ->withTrashed()
-                            ->first();
+        $enroled = Enrolment::where('student_id', auth()->id())
+            // ->where('course_id',session('selected_course'))
+            ->withTrashed()
+            ->first();
 
-        if($enroled != null){
+        if ($enroled != null) {
             $deleted = $enroled->trashed();
         }
-        
-        if($enroled && !$deleted)
-        {
+
+        if ($enroled && !$deleted) {
             // dd("User already enroled in this course.");
             $this->popup_message = "User already enroled in a course.";
             $this->popup_color = "red";
             $this->popup = true;
-        }else{
+        } else {
             session(['plan' => $nOfClasses]);
             redirect()->route("schedule.create");
         }
-        
     }
 
     public function render()
@@ -56,12 +55,12 @@ class PricingTableComponent extends Component
         // dd($this->selectedProduct);
 
         $plans =  DB::table('plans')
-            ->join('plansproducts',function($join) use (&$product){
-                $join->on('plans.id','=','plansproducts.plan_id')
-                    ->where('plansproducts.product_id','=',$product->id);
+            ->join('plansproducts', function ($join) use (&$product) {
+                $join->on('plans.id', '=', 'plansproducts.plan_id')
+                    ->where('plansproducts.product_id', '=', $product->id);
             })
-        ->get();
+            ->get();
 
-        return view('livewire.pricing-table-component')->with(compact('product','plans'));
+        return view('livewire.pricing-table-component')->with(compact('product', 'plans'));
     }
 }

@@ -27,23 +27,25 @@ class BookedClass extends Notification implements ShouldQueue
         $schedule = json_decode($schedule->selected_schedule);
         $schedule_string = "";
         $days = ["Sundays","Mondays","Tuesdays","Wednesdays","Thursdays","Fridays","Saturdays"];
-
-        for($i = 0; $i < count($schedule); $i++){
-            $schedule[$i][0] = $schedule[$i][0].':00';
-            $schedule[$i][1] = $days[intval($schedule[$i][1])];
-
-            
-            if($i == (count($schedule)-1)){
-                $schedule_string = substr_replace($schedule_string,"", -2);
-                $schedule_string .= " and ".$schedule[$i][1]." at ".$schedule[$i][0].", ";
-            }else{
-                $schedule_string .= "on ".$schedule[$i][1]." at ".$schedule[$i][0].", ";
+        
+        if($schedule != null){
+            for($i = 0; $i < count($schedule); $i++){
+                $schedule[$i][0] = $schedule[$i][0].':00';
+                $schedule[$i][1] = $days[intval($schedule[$i][1])];
+    
+                
+                if($i == (count($schedule)-1)){
+                    $schedule_string = substr_replace($schedule_string,"", -2);
+                    $schedule_string .= " and ".$schedule[$i][1]." at ".$schedule[$i][0].", ";
+                }else{
+                    $schedule_string .= "on ".$schedule[$i][1]." at ".$schedule[$i][0].", ";
+                }
             }
+            $schedule_string = substr_replace($schedule_string,"", -2);
+            $schedule_string .= ".";
+    
+            $this->schedule_string = $schedule_string;
         }
-        $schedule_string = substr_replace($schedule_string,"", -2);
-        $schedule_string .= ".";
-
-        $this->schedule_string = $schedule_string;
     }
 
     /**
@@ -77,8 +79,8 @@ class BookedClass extends Notification implements ShouldQueue
     public function toDatabase()
     {
         return [
-            $this->student->id,
-            $this->schedule_string
+            "user_id" => $this->student->id,
+            "schedule_string" => $this->schedule_string
         ];
     }
 

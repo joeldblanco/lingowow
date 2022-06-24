@@ -21,38 +21,41 @@ class Notifications extends Component
         
         foreach ($this->notifications as $key => $value) {
 
-            $temp_array = explode('\\',$value->type);
-            $temp_array = $temp_array[count($temp_array)-1];
-            $this->notification_type[$key] = $temp_array;
+            $data_array = explode('\\',$value->type);
+            $data_array = $data_array[count($data_array)-1];
+            $this->notification_type[$key] = $data_array;
 
-            $temp_array = json_decode($value->data);
-            // dd($value);
-            $user = User::find($temp_array[0]);
-            $temp_array = [
-                'first_name' => $user->first_name,
-                'last_name' => $user->last_name,
-                'schedule_string' => $temp_array[1],
-            ];
+            $data_array = json_decode($value->data, 1);
+            // dd($data_array);
+            $user = User::find($data_array["user_id"]);
+            // $data_array = [
+            //     'first_name' => $user->first_name,
+            //     'last_name' => $user->last_name,
+            //     'schedule_string' => $data_array['schedule_string'],
+            // ];
+            // dd($data_array);
 
             switch ($this->notification_type[$key]) {
                 case "BookedClass":
                     $this->notification_icon[$key] = "fas fa-bookmark";
-                    $this->notification_data[$key] = "The student ".$temp_array['first_name']." ".$temp_array['last_name']." has booked a class ".$temp_array['schedule_string'];
+                    $this->notification_data[$key] = "The student ".$user->first_name." ".$user->last_name." has booked a class ".$data_array['schedule_string'];
                 break;
 
                 case "ClassRescheduled":
                     $this->notification_icon[$key] = "fas fa-calendar-alt";
-                    $this->notification_data[$key] = "The student ".$temp_array['first_name']." ".$temp_array['last_name']." has rescheduled a class. New scheduled classes ".$temp_array['schedule_string'];
+                    $this->notification_data[$key] = "The student ".$user->first_name." ".$user->last_name." has rescheduled a class. New scheduled classes ".$data_array['schedule_string'];
                 break;
 
-                case "ClassCanceledToStudent":
+                case "StudentUnrolment":
                     $this->notification_icon[$key] = "fas fa-calendar-alt";
-                    $this->notification_data[$key] = "The student ".$user->first_name." ".$user->last_name." has canceled a class. Canceled class: ".$temp_array['schedule_string'];
+                    if(auth()->user()->roles[0]->name == "student"){
+                        $this->notification_data[$key] = "You have been automatically unenroled from the course ".$data_array['course_name'];
+                    }
                 break;
 
-                case "ClassCanceledToTeacher":
+                case "StudentUnrolmentToTeacher":
                     $this->notification_icon[$key] = "fas fa-calendar-times";
-                    $this->notification_data[$key] = "The student ".$user->first_name." ".$user->last_name." has canceled a class. Canceled class: ".$temp_array['schedule_string'];
+                    $this->notification_data[$key] = "The student ".$user->first_name." ".$user->last_name." has been automatically unenroled from the course ". $data_array['course_name'] .', which leaves your blocks '.$data_array['schedule_string'].' free.';
                 break;
                 
                 default:

@@ -8,8 +8,9 @@ use Livewire\Component;
 
 class ExamDisplay extends Component
 {
-    public $exam, $question, $total_questions, $index, $answer, $attempt, $startAttempt, $examContent;
+    public $exam, $question, $total_questions, $index, $answer, $attempt, $startAttempt, $examContent, $essay_content = "";
     public $answers = [];
+    protected $listeners = ['timerExpired' => 'submitExam'];
 
     public function mount()
     {
@@ -62,20 +63,47 @@ class ExamDisplay extends Component
 
     public function updatedAnswer($answer)
     {
+        $answer = explode("-",$answer);
         // array_push($this->answers, $this->index => $answer);
-        $this->answers[$this->index] = $answer;
+        $this->answers[$answer[1]] = $answer[0];
+        // dd($this->answers);
     }
 
     public function submitExam()
     {
-        // ExamController::correct($this->exam->id, $this->answers);
-        $this->attempt->data = json_encode(["answers" => $this->answers]);
-        $this->attempt->save();
-        return redirect()->route('exam.result',$this->attempt->id);
+        $indexes = [];
+        foreach($this->exam->questions as $question)
+        {
+            if($question->type == "essay"){
+                $essay_index = $question->id;
+            }else{
+                $indexes[] = $question->id;
+            }
+        }
+
+        foreach($indexes as $index)
+        {
+            if(!isset($this->answers[$index])){
+                $this->answers[$index] = -1;
+            }
+        }
+        $this->answers[$essay_index] = $this->essay_content;
+        ksort($this->answers);
+        $this->answers = array_values($this->answers);
+        if(auth()->user()->roles[0]->name != "student"){
+            return redirect()->route('exam.display',$this->exam->id);
+        }else{
+            // dd($this->answers, $this->exam->questions);
+            $this->attempt->data = json_encode(["answers" => $this->answers]);
+            $this->attempt->save();
+            return redirect()->route('exam.result',$this->attempt->id);
+        }
     }
     
     public function render()
     {
+        // dd($this->answer);
+        // dd(in_array($this->exam->questions[1]->id, array_keys($this->answers)));
         if(count($this->exam->questions) > 0) $this->question = $this->exam->questions[$this->index];
         return view('livewire.exam-display');
     }

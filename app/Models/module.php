@@ -10,6 +10,14 @@ class Module extends Model
     use HasFactory;
 
     /**
+     * Get the course that owns the module.
+     */
+    public function course()
+    {
+        return $this->belongsTo(Course::class);
+    }
+
+    /**
      * Get the units for the module.
      */
     public function units()

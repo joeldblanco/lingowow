@@ -91,7 +91,7 @@ class TeachersCarousel extends Component
         $available_teachers = User::find($available_teachers);
         $available_teachers = $available_teachers->shuffle();
         session(['first_teacher' => $available_teachers[0]->id]);
-        session(['teacher_id' => $available_teachers[0]->id]);
+        // session(['teacher_id' => $available_teachers[0]->id]);
         
         return view('livewire.teachers-carousel',compact('available_teachers'));
     }

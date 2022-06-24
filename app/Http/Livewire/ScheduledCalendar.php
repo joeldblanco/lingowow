@@ -67,6 +67,9 @@ class ScheduledCalendar extends Component
     public function render()
     {
         $this->user_schedules = auth()->user()->schedules->toArray();
+        if(count($this->user_schedules) > 0) $this->user_schedules = json_decode(json_encode($this->user_schedules[0]),1);
+        // dd($this->user_courses);
+        if($this->user_schedules == null) $this->user_schedules = [];
         foreach ($this->user_schedules as $key => $value) {
             if($value == null)
             {
@@ -74,9 +77,9 @@ class ScheduledCalendar extends Component
             }
         }
         
-        foreach ($this->user_schedules as $key => $value) {
-            $this->user_courses_aux[$this->user_courses[$key]] = $value;
-        }
+        // foreach ($this->user_schedules as $key => $value) {
+        //     $this->user_courses_aux[$this->user_courses[$key]] = $value;
+        // }
         // if(count($this->user_schedules) > 0){
         //     foreach ($this->user_schedules as $key => $value) {
         //         // $this->user_schedule[$key] = json_decode($value->selected_schedule);

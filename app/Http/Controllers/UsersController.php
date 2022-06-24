@@ -13,9 +13,9 @@ class UsersController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index($role)
     {
-        return view('admin.users.users');
+        return view('admin.users.index', compact('role'));
     }
 
     /**
@@ -87,7 +87,7 @@ class UsersController extends Controller
     public function impersonate($id)
     {
         $user = User::find($id);
-        Auth::user()->impersonate($user);        
+        Auth::user()->impersonate($user);
 
         return redirect()->route('dashboard');
     }
@@ -97,5 +97,14 @@ class UsersController extends Controller
         Auth::user()->leaveImpersonation();
 
         return redirect()->route('admin.dashboard');
+    }
+
+    public function addUnit($user_id, ...$units_id)
+    {
+        $user = User::find($user_id);
+        foreach($units_id as $unit_id){
+            $unit = $user->units()->updateExistingPivot($unit_id,['unit_id' => $unit_id]);
+            if(!$unit) $user->units()->attach($unit_id);
+        }
     }
 }

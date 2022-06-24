@@ -15,7 +15,7 @@ class SchedulingCalendar extends Component
     public function __construct($plan = 0)
     {
         // $user = User::find(auth()->id());
-        $this->teacher_id = 248;
+        $this->teacher_id = session('first_teacher');
         $this->schedule = json_decode(User::find($this->teacher_id)->schedules[0]->selected_schedule);
         // echo session('first_teacher');
         $this->plan = $plan;

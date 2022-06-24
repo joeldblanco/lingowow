@@ -1,6 +1,6 @@
 <div class="p-6 sm:px-20 bg-white border-b border-gray-200">
 
-    <x-latest-news-carousel />
+    {{-- <x-latest-news-carousel /> --}}
 
     {{-- <x-post-card author="Joel Blanco" size="md" author_pic_url="https://picsum.photos/200" post_pic_url="https://picsum.photos/200">
         <x-slot name="title">
@@ -14,11 +14,11 @@
     </x-post-card> --}}
 </div>
 
-<div class="p-6 sm:px-20 bg-white border-b border-gray-200">
+{{-- <div class="p-6 sm:px-20 bg-white border-b border-gray-200">
 
     <x-courses-carousel />
 
-</div>
+</div> --}}
 
 {{-- <div class="p-6 sm:px-20 bg-white border-b border-gray-200">
 

@@ -8,6 +8,7 @@
         "php": "^7.3|^8.0",
         "aberkanidev/laravel-coupons": "^1.1",
         "beyondcode/laravel-websockets": "^1.12",
+        "pusher/pusher-php-server": "^5.0",
         "fideloper/proxy": "^4.4",
         "firebase/php-jwt": "^5.3",
         "fruitcake/laravel-cors": "^2.0",

@@ -1,4 +1,4 @@
-function saveSchedule(plan,routeTo,role = 2){
+function saveSchedule(plan, routeTo, role = 2){
     
     var cells = $(".selected, .selectable .ui-selected");
     var error = false;
@@ -11,7 +11,9 @@ function saveSchedule(plan,routeTo,role = 2){
         var data = [];
     
         for (let i=0; i<cells.length; i++){
-            data[i] = cells[i];
+            if(cells[i] != ""){
+                data[i] = cells[i];
+            }
         }
 
         
@@ -36,6 +38,8 @@ function saveSchedule(plan,routeTo,role = 2){
             error = "too_much_days";
         }
 
+        data = JSON.stringify(data);
+
         post(route(routeTo), {
             data: data,
             error: error,
@@ -52,14 +56,22 @@ function saveSchedule(plan,routeTo,role = 2){
         var data = [];
     
         for (let i=0; i<cells.length; i++){
-            data[i] = cells[i];
+            if(cells[i] != ""){
+                data[i] = cells[i];
+            }
         }
+
+        data = JSON.stringify(data);
+
+        // console.log();
 
         post(route(routeTo), {
             data: data,
             error: error,
             "_token": $("meta[name='csrf-token']").attr("content")
         });
+
+        // console.log(data, cells);
 
     }
 

@@ -11,6 +11,11 @@ class Attempt extends Model
 
     public function exam()
     {
-        return $this->hasOne(Exam::class);
+        return $this->belongsTo(Exam::class);
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
     }
 }

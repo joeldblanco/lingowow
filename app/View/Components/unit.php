@@ -7,13 +7,13 @@ use Illuminate\View\Component;
 class unit extends Component
 {
 
-    public $name,$url_slide,$url_doc,$url_audio,$name_foro,$url_foro;
+    public $name, $url_slide, $url_doc, $url_audio, $name_foro, $url_foro;
     /**
      * Create a new component instance.
      *
      * @return void
      */
-    public function __construct($name,$slide,$doc,$audio,$nameforo,$foro)
+    public function __construct($name, $slide, $doc, $audio, $nameforo, $foro)
     {
         $this->name = $name;
         $this->url_slide = $slide;

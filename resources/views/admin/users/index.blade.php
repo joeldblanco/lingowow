@@ -61,7 +61,7 @@
             </div> --}}
 
             {{-- <livewire:users-table-component /> --}}
-            <livewire:users-table />
+            <livewire:users-table :role="$role" />
         </div>
     </div>
 

@@ -44,6 +44,7 @@ class ClassroomController extends Controller
 
     public function openRoom($id)
     {
+        // $current_period = ApportionmentController::getPeriod('2022-05-17'); //TO_DELETE
         $current_period = ApportionmentController::currentPeriod();
         $enrolment = Enrolment::where('student_id',$id)->first();
         if(isset($enrolment)){
@@ -51,6 +52,8 @@ class ClassroomController extends Controller
             $next_classes = [];
             $current_tz = session('tz');
             $student = User::find($id);
+            $enter_classroom = false;
+            $message = "Student doesn't have any class left.";
 
         
             foreach($classes as $key => $value)

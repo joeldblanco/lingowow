@@ -9,6 +9,7 @@ use App\Models\Enrolment;
 use App\Models\Exam;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 
 class AnalyticsController extends Controller
@@ -19,10 +20,12 @@ class AnalyticsController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function index()
-    {
+    {   
+        $current_period = ApportionmentController::currentPeriod();
         $invoices = Invoice::all();
+        // $invoices = Invoice::whereDate('created_at', '>=', $current_period[0])->whereDate('created_at', '<=', $current_period[1])->get();
         $total_earnings = 0;
-        $total_invoices = Invoice::count();
+        $total_invoices = count($invoices);
         $guests = [];
         $students = [];
         $teachers = [];
@@ -32,19 +35,16 @@ class AnalyticsController extends Controller
         $profit = [];
         $paypal_commissions = [];
 
-        $model_roles = DB::table('model_has_roles')->select('role_id','model_id')->get();
+        $model_roles = DB::table('model_has_roles')->select('role_id', 'model_id')->get();
         foreach ($model_roles as $model_role) {
 
-            if($model_role->role_id == 1){
+            if ($model_role->role_id == 1) {
                 $guests[] = $model_role->model_id;
-
-            }else if($model_role->role_id == 2){
+            } else if ($model_role->role_id == 2) {
                 $students[] = $model_role->model_id;
-
-            }else if($model_role->role_id == 3){
+            } else if ($model_role->role_id == 3) {
                 $teachers[] = $model_role->model_id;
-
-            }else if($model_role->role_id == 4){
+            } else if ($model_role->role_id == 4) {
                 $admins[] = $model_role->model_id;
             }
         }
@@ -54,34 +54,33 @@ class AnalyticsController extends Controller
         $total_teachers = count($teachers);
         $total_admins = count($admins);
 
-        $guests = User::find($guests);
-        $students = User::find($students);
+        // $guests = User::find($guests);
+        // $students = User::find($students);
         $teachers = User::find($teachers);
-        $admins = User::find($admins);
+        // $admins = User::find($admins);
 
-        $current_period = ApportionmentController::currentPeriod();
+        // $current_period = ApportionmentController::currentPeriod();
         // dd('2022-01-06 12:00:00' >= $current_period[0],'2022-01-06 12:00:00' <= $current_period[1]);
 
         foreach ($teachers as $key => $value) {
-            $enrolments = Enrolment::where('teacher_id',$value->id)->select('id','course_id')->get();
+            $enrolments = Enrolment::where('teacher_id', $value->id)->select('id', 'course_id')->get();
 
             foreach ($enrolments as $enrolment) {
-                $n_classes = Classes::where('enrolment_id',$enrolment->id)->whereDate('start_date','>=',$current_period[0])->where('teacher_check',1)->where('student_check',1)->count();
+                $n_classes = Classes::where('enrolment_id', $enrolment->id)->whereDate('start_date', '>=', $current_period[0])->where('teacher_check', 1)->where('student_check', 1)->count();
                 $product = Course::find($enrolment->course_id)->products->first();
-                if($product->sale_price == NULL)
-                {
+                if ($product->sale_price == NULL) {
                     $product_price = $product->regular_price;
-                }else{
+                } else {
                     $product_price = $product->sale_price;
                 }
-                
+
                 if (str_contains($product->slug, "english-regular")) {
                     $teacher_payment = 4.99;
-                }else if (str_contains($product->slug, "english-conversational")) {
+                } else if (str_contains($product->slug, "english-conversational")) {
                     $teacher_payment = 6.99;
-                }else if (str_contains($product->slug, "spanish-regular")) {
+                } else if (str_contains($product->slug, "spanish-regular")) {
                     $teacher_payment = 6.99;
-                }else if (str_contains($product->slug, "spanish-conversational")) {
+                } else if (str_contains($product->slug, "spanish-conversational")) {
                     $teacher_payment = 7.99;
                 }
 
@@ -93,53 +92,51 @@ class AnalyticsController extends Controller
             }
         }
 
-
-        $payment = [];
         $total_payment = 0;
         foreach ($classes as $key => $value) {
 
             $payment[$key] = 0;
             foreach ($value as $v_key => $v_value) {
-                $payment[$key] += round($v_value,2);
+                $payment[$key] += round($v_value, 2);
             }
 
             $payment[$key] = -$payment[$key];
-            if($payment[$key] != 0){
-                $paypal_comission = ((-0.3+$payment[$key])/(0.946))-$payment[$key];
-            }else{
+            if ($payment[$key] != 0) {
+                $paypal_comission = ((-0.3 + $payment[$key]) / (0.946)) - $payment[$key];
+            } else {
                 $paypal_comission = 0;
             };
-            $payment[$key] = round($payment[$key]+$paypal_comission,2);
-            $paypal_commissions[$key] = round($paypal_comission,2);
+            $payment[$key] = round($payment[$key] + $paypal_comission, 2);
+            $paypal_commissions[$key] = round($paypal_comission, 2);
 
             $total_payment += $payment[$key];
         }
 
-        $total_paypal_commissions = round(array_sum($paypal_commissions),2);
+        $total_paypal_commissions = round(array_sum($paypal_commissions), 2);
 
 
         $aux_profit = [];
         $total_profit = 0;
         foreach ($profit as $key => $value) {
             $aux_profit[$key] = 0;
-            foreach($value as $v_key => $v_value) {
-                $aux_profit[$key] += round($v_value,2);
+            foreach ($value as $v_key => $v_value) {
+                $aux_profit[$key] += round($v_value, 2);
             }
             $aux_profit[$key] += $payment[$key];
 
-            $total_profit += round($aux_profit[$key],2);
+            $total_profit += round($aux_profit[$key], 2);
         }
 
 
         $total_classes = 0;
-        if(isset($data['classes'][$key]))
+        if (isset($data['classes'][$key]))
             foreach ($data['classes'][$key] as $classes) {
                 $total_classes += count($classes);
             };
 
         $total_users = User::count();
 
-        foreach($invoices as $invoice){
+        foreach ($invoices as $invoice) {
             $total_earnings += $invoice->price;
         }
 
@@ -147,78 +144,19 @@ class AnalyticsController extends Controller
         $month_total = 0;
         $months_total = [];
         $months = [];
-        
+
         foreach ($invoices as $invoice) {
-            // echo $invoice->created_at->month."<br>";
-            // echo $invoice->price."<br><br>";
-            
-            if($month != $invoice->created_at->month){
+            if ($month != $invoice->created_at->month) {
                 $month = $invoice->created_at->month;
                 $month_total = 0;
             }
-            
-            array_push($months,$invoice->created_at->month);
+
+            array_push($months, (new Carbon($invoice->created_at))->isoFormat("MMM"));
             $month_total += $invoice->price;
             $months_total[$month] = $month_total;
         }
 
         $months = array_unique($months);
-        
-        foreach ($months as $key => $value) {
-            switch ($value) {
-                case '1':
-                    $months[$key] = "Jan";
-                    break;
-                
-                case '2':
-                    $months[$key] = "Feb";
-                    break;
-            
-                case '3':
-                    $months[$key] = "Mar";
-                    break;
-            
-                case '4':
-                    $months[$key] = "Apr";
-                    break;
-            
-                case '5':
-                    $months[$key] = "May";
-                    break;
-            
-                case '6':
-                    $months[$key] = "Jun";
-                    break;
-            
-                case '7':
-                    $months[$key] = "Jul";
-                    break;
-            
-                case '8':
-                    $months[$key] = "Aug";
-                    break;
-            
-                case '9':
-                    $months[$key] = "Sep";
-                    break;
-            
-                case '10':
-                    $months[$key] = "Oct";
-                    break;
-            
-                case '11':
-                    $months[$key] = "Nov";
-                    break;
-            
-                case '12':
-                    $months[$key] = "Dec";
-                    break;
-            
-                default:
-                    $months[$key] = "NaN";
-                    break;
-            }
-        }
 
         $total_exams = Exam::all()->count();
 
@@ -233,10 +171,10 @@ class AnalyticsController extends Controller
             'invoices' => $invoices,
             'months' => $months,
             'months_total' => $months_total,
-            'guests' => $guests,
-            'students' => $students,
+            // 'guests' => $guests,
+            // 'students' => $students,
             'teachers' => $teachers,
-            'admins' => $admins,
+            // 'admins' => $admins,
             'payment' => $payment,
             'total_payment' => $total_payment,
             'total_profit' => $total_profit,

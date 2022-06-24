@@ -12,13 +12,15 @@ class CoursesCarousel extends Component
     protected $listeners = ['loadingState'];
     public $courses;
 
-    public function loadingState($status){
+    public function loadingState($status)
+    {
         $this->loadingState = $status;
     }
 
-    public function selectProduct($course_id){
+    public function selectProduct($course_id)
+    {
         $this->loadingState(true);
-        $this->emit('showSelectedProduct',$course_id);
+        $this->emit('showSelectedProduct', $course_id);
     }
 
     public function render()

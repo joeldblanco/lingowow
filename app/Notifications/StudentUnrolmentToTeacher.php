@@ -2,12 +2,13 @@
 
 namespace App\Notifications;
 
+use App\Models\Course;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class ClassCanceledToTeacher extends Notification implements ShouldQueue
+class StudentUnrolmentToTeacher extends Notification implements ShouldQueue
 {
     use Queueable;
 
@@ -18,8 +19,9 @@ class ClassCanceledToTeacher extends Notification implements ShouldQueue
      *
      * @return void
      */
-    public function __construct($student,$deleted_schedule)
+    public function __construct($student, $course_id, $deleted_schedule)
     {
+        $this->course = Course::find($course_id)->select('course_name')->first();
         $this->student = $student;
         $schedule = json_decode($deleted_schedule->selected_schedule);
         $schedule_string = "";
@@ -67,7 +69,7 @@ class ClassCanceledToTeacher extends Notification implements ShouldQueue
         return (new MailMessage)
                     ->subject('New Available Block!')
                     ->line('Greetings, dear '.$notifiable->first_name.' '.$notifiable->last_name.'.')
-                    ->line('We are writing to notify you that student '.$this->student->first_name.' '.$this->student->last_name.' will not continue with his classes, which leaves your blocks '.$this->schedule_string.' free.')
+                    ->line('We are writing to notify you that student '.$this->student->first_name.' '.$this->student->last_name.' have been automatically unenroled from the course '. $this->course->course_name . ', which leaves your blocks '.$this->schedule_string.' free.')
                     ->line('Click the button below to check your current schedule.')
                     ->action('Check Schedule', url('/dashboard'))
                     ->line('If you have any questions, please contact us through the regular channels.');
@@ -76,8 +78,9 @@ class ClassCanceledToTeacher extends Notification implements ShouldQueue
     public function toDatabase()
     {
         return [
-            $this->student->id,
-            $this->schedule_string
+            "user_id" => $this->student->id,
+            "schedule_string" => $this->schedule_string,
+            "course_name" => $this->course->course_name
         ];
     }
 
