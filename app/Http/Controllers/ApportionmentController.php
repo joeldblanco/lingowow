@@ -127,21 +127,77 @@ class ApportionmentController extends Controller
         return [$current_period_start->toDateTimeString(), $current_period_end->toDateTimeString()];
     }
 
-    public static function getPeriod($class)
-    {
+    public static function getPeriod($class, $extended = false){
 
-        $period = CarbonPeriod::between('2022-01-03', now()->addYear())->addFilter(function ($date) {
-            return $date->is('first monday of this month');
-        });
+        if($extended){
+            $today = new Carbon($class);
+            $month = $today->isoFormat('MMMM G');
+            $first_monday = new Carbon('first monday of '.$month);
+            if($first_monday < Carbon::now()){
+                $period_start_date = new Carbon('first monday of '.$month);
+                $period_end_date = (new Carbon('first monday of '.$month))->addDays(5);
+                $period_end_date->addWeeks(3);
+                $period_end_date->addDays(1);
+            }else{
+                $period_start_date = new Carbon('first monday of '.$month);
+                $period_end_date = (new Carbon('first monday of '.$month))->addDays(5);
+                $period_end_date->addWeeks(3);
+                $period_end_date->addDays(1);
+            }
 
-        $class = new Carbon($class);
+            return [$period_start_date->toDateTimeString(),$period_end_date->toDateTimeString()];
 
-        foreach ($period as $key => $date) {
-            if ($date <= $class) {
-                $class_period = $date->format("F Y");
+        }else{
+            $period = CarbonPeriod::between('2022-01-03', now()->addYear())->addFilter(function ($date) {
+                return $date->is('first monday of this month');
+            });
+    
+            $class = new Carbon($class);
+    
+            foreach ($period as $key => $date) {
+                if($date <= $class){
+                    $class_period = $date->format("F Y");
+                }
             }
         }
 
         return $class_period;
     }
+
+    // public static function getPreviousPeriod($class, $extended = false){
+
+    //     if($extended){
+    //         $today = new Carbon($class);
+    //         $month = $today->isoFormat('MMMM G');
+    //         $first_monday = new Carbon('first monday of '.$month);
+    //         if($first_monday < Carbon::now()){
+    //             $current_period_start = new Carbon('first monday of this month');
+    //             $current_period_end = (new Carbon('first monday of this month'))->addDays(5);
+    //             $current_period_end->addWeeks(3);
+    //             $current_period_end->addDays(1);
+    //         }else{
+    //             $current_period_start = new Carbon('first monday of last month');
+    //             $current_period_end = (new Carbon('first monday of last month'))->addDays(5);
+    //             $current_period_end->addWeeks(3);
+    //             $current_period_end->addDays(1);
+    //         }
+
+    //         return [$current_period_start->toDateTimeString(),$current_period_end->toDateTimeString()];
+
+    //     }else{
+    //         $period = CarbonPeriod::between('2022-01-03', now()->addYear())->addFilter(function ($date) {
+    //             return $date->is('first monday of this month');
+    //         });
+    
+    //         $class = new Carbon($class);
+    
+    //         foreach ($period as $key => $date) {
+    //             if($date <= $class){
+    //                 $class_period = $date->format("F Y");
+    //             }
+    //         }
+    //     }
+        
+    //     return $class_period;
+    // }
 }

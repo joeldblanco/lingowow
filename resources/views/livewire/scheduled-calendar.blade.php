@@ -7,6 +7,10 @@
         //dd(session('plan'));
         //dd(date('m-d-Y h:i:s a'));
         $scheduled_classes;
+        
+        $scheduled_classes = App\Models\Enrolment::select('student_id')
+            ->where('teacher_id', $user_id)
+            ->get();
         $temp_student_schedule = [];
         $student_schedule = [];
         $students_schedules = [];
@@ -284,6 +288,11 @@
 
         </div>
         {{-- @endif --}}
+        @include('modal')
+        @include('components.loading-state')
+
+    </div>
+    {{-- @endif --}}
 
         <script type="text/javascript" src="{{ asset('js/scheduleSelection.js') }}" defer></script>
         <script src="{{ asset('js/viselect.cjs.js') }}"></script>
@@ -509,3 +518,6 @@
             // });
         </script>
     </div>
+       
+    
+</div>

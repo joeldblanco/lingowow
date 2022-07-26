@@ -31,4 +31,12 @@ class Unit extends Model
     {
         return $this->belongsToMany(User::class);
     }
+
+    /**
+     * Get all unit activities.
+     */
+    public function activities()
+    {
+        return $this->hasMany(Activity::class);
+    }
 }

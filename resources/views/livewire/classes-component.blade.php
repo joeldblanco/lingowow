@@ -15,8 +15,14 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden py-5">
                 @if(count($classes) > 0)
-                    <p class="text-2xl font-bold w-full text-center">Classes</p>
-                    <p class="text-xl w-full text-center text-gray-600">Classes pending review: {{count($to_review_classes)}}</p>
+                    <div class="flex justify-between w-full items-center">
+                        <button wire:click="previousPeriod"><i class="fas fa-angle-left text-4xl"></i></button>
+                        <div class="flex flex-col">
+                            <p class="text-2xl font-bold w-full text-center">Classes</p>
+                            @role('admin') <p class="text-xl w-full text-center text-gray-600">Classes pending review: {{count($to_review_classes)}}</p> @endrole
+                        </div>
+                        <button wire:click="nextPeriod"><i class="fas fa-angle-right text-4xl"></i></button>
+                    </div>
                     @foreach ($periods as $month_year)
                         <table class="flex flex-col w-full space-y-5 border border-gray-200 p-5 my-5 rounded-lg">
                             <thead>
@@ -52,12 +58,12 @@
                                             </td> --}}
                                             @hasanyrole('student|admin')
                                                 <td class="flex w-full justify-center">
-                                                    <a href="{{route('profile.show',$teachers[$key]->id)}}" class="hover:underline hover:text-blue-500">{{$teachers[$key]->first_name}} {{$teachers[$key]->last_name}}</a>
+                                                    <a href="{{route('profile.show',$value->teacher()->id)}}" class="hover:underline hover:text-blue-500">{{$value->teacher()->first_name}} {{$value->teacher()->last_name}}</a>
                                                 </td>
                                             @endhasanyrole
                                             @hasanyrole('teacher|admin')
                                                 <td class="flex w-full justify-center">
-                                                    <a href="{{route('profile.show',$students[$key]->id)}}" class="hover:underline hover:text-blue-500">{{$students[$key]->first_name}} {{$students[$key]->last_name}}</a>
+                                                    <a href="{{route('profile.show',$value->student()->id)}}" class="hover:underline hover:text-blue-500">{{$value->student()->first_name}} {{$value->student()->last_name}}</a>
                                                 </td>
                                             @endhasanyrole
                                             @php
@@ -98,6 +104,7 @@
                                         </tr>
                                     @endif
                                 @endforeach
+                                {{$classes->links()}}
                             </tbody>
                         </table>
                     @endforeach
@@ -144,9 +151,13 @@
                 </header>
                 <main class="p-6 text-left">
                     @if($current_class != null)
-                        <p><span class="font-bold">Course:</span> {{App\Models\Course::find($enrolment->course_id)->course_name}}</p>
-                        <p><span class="font-bold">Teacher:</span> {{App\Models\User::find($enrolment->teacher_id)->first_name}} {{App\Models\User::find($enrolment->teacher_id)->last_name}}</p>
-                        <p><span class="font-bold">Student:</span> {{App\Models\User::find($enrolment->student_id)->first_name}} {{App\Models\User::find($enrolment->student_id)->last_name}}</p>
+                        @php
+                            $current_class_teacher = $current_class->teacher();
+                            $current_class_student = $current_class->student();
+                        @endphp
+                        <p><span class="font-bold">Course:</span> {{$enrolment->course->course_name}}</p>
+                        <p><span class="font-bold">Teacher:</span> {{$current_class_teacher->first_name}} {{$current_class_teacher->last_name}}</p>
+                        <p><span class="font-bold">Student:</span> {{$current_class_student->first_name}} {{$current_class_student->last_name}}</p>
                         <p><span class="font-bold">Class Date:</span> {{$current_class->start_date}}</p>
                         <p><span class="font-bold">Did the professor teach the class?</span> @if($current_class->teacher_check == 0) No @else Yes @endif</p>
                         <p><span class="font-bold">Did the student receive the class?</span> @if($current_class->student_check == 0) No @else Yes @endif</p>

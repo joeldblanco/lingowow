@@ -45,20 +45,19 @@ class QuestionController extends Controller
                 'question-value' => 'min:0|max:100',
             ]);
 
-            if($request->input('question-type') == "multiple-choice"){
+            if ($request->input('question-type') == "multiple-choice") {
                 $request->validate([
                     'selected-option' => 'required',
                 ]);
             }
-
         } catch (\Throwable $th) {
-            $request->session()->flash('error',$th->getMessage());
-            return redirect()->route('exam.show',$exam_id);
+            $request->session()->flash('error', $th->getMessage());
+            return redirect()->route('exam.show', $exam_id);
         }
 
 
         $file = $request->file('question-file');
-        $path_to_file = $file == null ? null : $request->file('question-file')->storeAs('public/questions/files', time().'.'.$file->getClientOriginalExtension());
+        $path_to_file = $file == null ? null : $request->file('question-file')->storeAs('public/questions/files', time() . '.' . $file->getClientOriginalExtension());
 
         $question = new Question;
         $question->value = $request->input('question-value');
@@ -66,7 +65,7 @@ class QuestionController extends Controller
         $question->type = $request->input('question-type');
         $question->data = json_encode([
             'path-to-file' => $path_to_file,
-            'options' =>[
+            'options' => [
                 'option-text-1' => $request->input('option-text-1'),
                 'option-text-2' => $request->input('option-text-2'),
                 'option-text-3' => $request->input('option-text-3'),
@@ -75,12 +74,9 @@ class QuestionController extends Controller
         ]);
 
         $question->save();
-        DB::table('exam_question')->insert([
-            'question_id' => $question->id,
-            'exam_id' => $exam_id,
-        ]);
+        $question->exams()->attach([$exam_id]);
 
-        return redirect()->route('exam.show',$exam_id);
+        return redirect()->route('exam.show', $exam_id);
     }
 
     /**
@@ -107,51 +103,50 @@ class QuestionController extends Controller
         $mime_type = $file->getClientMimeType();
         $file = file($file, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
 
-        if($file && $mime_type == "text/plain"){
+        if ($file && $mime_type == "text/plain") {
             $options = [];
             $options_aux = [];
             $answer = "";
             $counter = 0;
             $question_description = "";
-            foreach($file as $line){
-                
-                if(preg_match("/[ABCDEFGHIJKLMNOPQRSTUVWXYZ]\./",$line)){
-                    $options[] = preg_replace("/[ABCDEFGHIJKLMNOPQRSTUVWXYZ]\. /","",$line);
+            foreach ($file as $line) {
 
-                }else if(preg_match("/ANSWER:/",$line)){
-                    $answer = str_replace("ANSWER: ","",$line);
-                    switch($answer){
+                if (preg_match("/[ABCDEFGHIJKLMNOPQRSTUVWXYZ]\./", $line)) {
+                    $options[] = preg_replace("/[ABCDEFGHIJKLMNOPQRSTUVWXYZ]\. /", "", $line);
+                } else if (preg_match("/ANSWER:/", $line)) {
+                    $answer = str_replace("ANSWER: ", "", $line);
+                    switch ($answer) {
                         case 'A':
                             $answer = 1;
-                        break;
+                            break;
 
                         case 'B':
                             $answer = 2;
-                        break;
+                            break;
 
                         case 'C':
                             $answer = 3;
-                        break;
+                            break;
 
                         case 'D':
                             $answer = 4;
-                        break;
+                            break;
 
                         case 'E':
                             $answer = 5;
-                        break;
+                            break;
 
                         case 'F':
                             $answer = 6;
-                        break;
+                            break;
 
                         default:
                             $answer = null;
-                        break;
+                            break;
                     }
 
-                    foreach($options as $key => $value){
-                        $options_aux['option-text-'.($key+1)] = $value;
+                    foreach ($options as $key => $value) {
+                        $options_aux['option-text-' . ($key + 1)] = $value;
                         $options_aux['selected-option'] = $answer;
                     }
                     $options = $options_aux;
@@ -164,31 +159,26 @@ class QuestionController extends Controller
                         'path-to-file' => NULL,
                         'options' => $options,
                     ]);
+                    
                     $question->save();
-
-                    DB::table('exam_question')->insert([
-                        'question_id' => $question->id,
-                        'exam_id' => $exam_id,
-                    ]);
+                    $question->exams()->attach([$exam_id]);
 
                     $options = [];
                     $options_aux = [];
                     $answer = "";
                     $counter = 0;
                     $question_description = "";
-
-                }else{
+                } else {
                     $question_description = $line;
                 }
 
                 $counter++;
-
             }
-        }else{
-            return redirect()->back()->with("error","Invalid data");
+        } else {
+            return redirect()->back()->with("error", "Invalid data");
         }
 
-        return redirect()->route('exam.show',$exam_id);
+        return redirect()->route('exam.show', $exam_id);
     }
 
     /**
@@ -201,7 +191,7 @@ class QuestionController extends Controller
     {
         $question = Question::find($question_id);
 
-        return view('admin.exams.questions.show',compact('question','exam_id'));
+        return view('admin.exams.questions.show', compact('question', 'exam_id'));
     }
 
     /**
@@ -222,20 +212,19 @@ class QuestionController extends Controller
                 'question-value' => 'min:0|max:100',
             ]);
 
-            if($request->input('question-type') == "multiple-choice"){
+            if ($request->input('question-type') == "multiple-choice") {
                 $request->validate([
                     'selected-option' => 'required',
                 ]);
             }
-
         } catch (\Throwable $th) {
-            $request->session()->flash('error',$th->getMessage());
-            return redirect()->route('exam.show',$exam_id);
+            $request->session()->flash('error', $th->getMessage());
+            return redirect()->route('exam.show', $exam_id);
         }
 
 
         $file = $request->file('question-file');
-        $path_to_file = $file == null ? null : $request->file('question-file')->storeAs('questions/files', time().'.'.$file->getClientOriginalExtension());
+        $path_to_file = $file == null ? null : $request->file('question-file')->storeAs('questions/files', time() . '.' . $file->getClientOriginalExtension());
 
         $question = Question::find($question_id);
         $question->value = $request->input('question-value');
@@ -243,7 +232,7 @@ class QuestionController extends Controller
         $question->type = $request->input('question-type');
         $question->data = json_encode([
             'path-to-file' => $path_to_file,
-            'options' =>[
+            'options' => [
                 'option-text-1' => $request->input('option-text-1'),
                 'option-text-2' => $request->input('option-text-2'),
                 'option-text-3' => $request->input('option-text-3'),
@@ -252,7 +241,7 @@ class QuestionController extends Controller
         ]);
         $question->save();
 
-        return redirect()->route('exam.show',$exam_id);
+        return redirect()->route('exam.show', $exam_id);
     }
 
     /**
@@ -265,6 +254,6 @@ class QuestionController extends Controller
     {
         $question = Question::find($question_id);
         $question->delete();
-        return redirect()->route('exam.show',$exam_id);
+        return redirect()->route('exam.show', $exam_id);
     }
 }

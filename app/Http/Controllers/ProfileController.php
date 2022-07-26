@@ -46,16 +46,7 @@ class ProfileController extends Controller
      */
     public function show($id)
     {
-        $user = User::find($id);
-        if ($user == null) {
-            abort(404);
-        }
-
-        $friends = $user->friends();
-        $friend_requests = $user->friend_requests();
-        $posts = $user->posts;
-
-        return view('profile.show', compact('user', 'friends', 'friend_requests', 'posts'));
+        return view('profile.show', compact('id'));
     }
 
     /**

@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ActivityController;
 use App\Http\Controllers\AnalyticsController;
 use App\Http\Controllers\AttemptController;
 use App\Http\Controllers\ChatController;
@@ -145,12 +146,21 @@ Route::middleware(['web', 'auth', 'verified', 'impersonate'])->group(function ()
         Route::post('/admin/exam/{exam_id}/question/update/{question_id}', [QuestionController::class, 'update'])->name('question.update');
         Route::post('/admin/exam/question/import', [QuestionController::class, 'import'])->name('question.import');
 
-        // //ROUTES FOR UNITS//
+        //ROUTES FOR UNITS//
         Route::get('/unit/{id}/details', [UnitController::class, "details"])->name('unit.details');
         Route::get('/exam/{id}/details', [ExamController::class, "details"])->name('exam.details');
 
         //ROUTES FOR CLASSES//
         Route::get('/admin/classes', [ClassController::class, 'index'])->name('admin.classes.index');
+
+        //ROUTES FOR ACTIVITIES//
+        Route::resource('/activities', ActivityController::class);
+        // Route::get('/admin/activities/create', [ActivityController::class, 'create'])->name('admin.activities.create');
+        // Route::post('/admin/activities', [ActivityController::class, 'store'])->name('admin.activities.store');
+        // Route::get('/admin/activities/{id}', [ActivityController::class, 'show'])->name('admin.activities.show');
+        // Route::get('/admin/activities/{id}/edit', [ActivityController::class, 'edit'])->name('admin.activities.edit');
+        // Route::patch('/admin/activities/{id}', [ActivityController::class, 'update'])->name('admin.activities.update');
+        // Route::post('/admin/activities/{id}', [ActivityController::class, 'destroy'])->name('admin.activities.destroy');
 
         //ROUTES FOR IMPERSONATION//
         Route::get('/users/impersonate/{id}', [UsersController::class, 'impersonate'])->name('impersonate');
@@ -181,7 +191,7 @@ Route::middleware(['web', 'auth', 'verified', 'impersonate'])->group(function ()
     Route::get('/notifications', [NotificationsController::class, 'index'])->name('notifications.index');
     Route::get('/notifications/{id}', [NotificationsController::class, 'show'])->name('notifications.show');
 
-    //ROUTES FOR NOTIFICATIONS//
+    //ROUTES FOR CHAT//
     Route::get('/chat', [ChatController::class, 'index'])->name('chat.index');
     Route::get('/chat/{num}', [ChatController::class, 'show'])->name('chat.show');
 

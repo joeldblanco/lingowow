@@ -28,26 +28,30 @@ $nav_links = [
 ];
 
 if (auth()->user()->roles[0]->name == 'admin') {
-    $dashboard = array([
-        'name' => 'Dashboard',
-        'route' => route('admin.dashboard'),
-        'status' => request()->routeIs('admin.dashboard'),
-        'roles' => ['admin'],
-    ]);
+    $dashboard = [
+        [
+            'name' => 'Dashboard',
+            'route' => route('admin.dashboard'),
+            'status' => request()->routeIs('admin.dashboard'),
+            'roles' => ['admin'],
+        ],
+    ];
 } else {
-    $dashboard = array([
-        'name' => 'Dashboard',
-        'route' => route('dashboard'),
-        'status' => request()->routeIs('dashboard'),
-        'roles' => ['student', 'guest', 'teacher'],
-    ]);
+    $dashboard = [
+        [
+            'name' => 'Dashboard',
+            'route' => route('dashboard'),
+            'status' => request()->routeIs('dashboard'),
+            'roles' => ['student', 'guest', 'teacher'],
+        ],
+    ];
 }
 
 // array_push($nav_links, $dashboard);
-array_splice( $nav_links, 1, 0, $dashboard );
+array_splice($nav_links, 1, 0, $dashboard);
 
 //TO DELETE//
-array_shift($nav_links)
+array_shift($nav_links);
 
 @endphp
 
@@ -148,11 +152,10 @@ array_shift($nav_links)
                             </div>
 
                             @php
-                                $messages = DB::table('messages')
-                                    ->where('sender_id', auth()->id())
-                                    ->orWhere('receiver_id', auth()->id())
+                                $messages = App\Models\Message::where('user_id', auth()->id())
+                                    // ->where('sender_id', auth()->id())
+                                    // ->orWhere('receiver_id', auth()->id())
                                     ->get();
-                                
                                 $conversations = [];
                                 $participants = [];
                                 
@@ -163,8 +166,8 @@ array_shift($nav_links)
                                 
                                     $conversations[$key] = $value->conversation_id;
                                 
-                                    if ($value->sender_id == auth()->id()) {
-                                        array_push($participants, $value->receiver_id);
+                                    if ($value->user_id == auth()->id()) {
+                                        array_push($participants, $value->user_id);
                                         // Str::limit($notification_data[$key], 45, '...');
                                     } else {
                                         array_push($participants, $value->sender_id);
@@ -180,7 +183,7 @@ array_shift($nav_links)
                                 
                                 foreach ($conversations as $key => $conversation_id) {
                                     foreach ($messages as $message) {
-                                        if ($message->conversation_id == $conversation_id and $message->created_at > $last_messages['created_at']) {
+                                        if ($message->conversation_id == $conversation_id and $message->created_at > new Carbon\Carbon($last_messages['created_at'])) {
                                             $last_messages[$key] = $message;
                                             $last_messages_conversation_id[$key] = $message->conversation_id;
                                         }
@@ -202,8 +205,6 @@ array_shift($nav_links)
 
                             @if (count($messages) > 0)
 
-                                {{-- {{dd($messages)}} --}}
-
                                 @for ($i = 0; $i < count($participants); $i++)
                                     <x-jet-dropdown-link
                                         href="{{ route('chat.show', $last_messages_conversation_id[$i]) }}">
@@ -215,15 +216,15 @@ array_shift($nav_links)
                                             {{ Str::limit($last_messages[$i]->message_content, 25, '...') }}</p>
                                     </x-jet-dropdown-link>
                                 @endfor
-
-                                <x-jet-dropdown-link href="{{ route('chat.index') }}" class="border-t mt-2">
-                                    <p class="text-center">
-                                        See All
-                                    </p>
-                                </x-jet-dropdown-link>
                             @else
                                 <p class="p-1 text-sm text-center">There are no messages</p>
                             @endif
+
+                            <x-jet-dropdown-link href="{{ route('chat.index') }}" class="border-t mt-2">
+                                <p class="text-center">
+                                    See All
+                                </p>
+                            </x-jet-dropdown-link>
 
                             <div class="border-t border-gray-100"></div>
                         </x-slot>
@@ -312,16 +313,15 @@ array_shift($nav_links)
                                         </p>
                                     </x-jet-dropdown-link>
                                 @endforeach
-
-                                <x-jet-dropdown-link href="{{ route('notifications.index') }}"
-                                    class="border-t mt-2">
-                                    <p class="text-center">
-                                        See All
-                                    </p>
-                                </x-jet-dropdown-link>
                             @else
                                 <p class="p-1 text-sm text-center">There are no notifications</p>
                             @endif
+
+                            <x-jet-dropdown-link href="{{ route('notifications.index') }}" class="border-t mt-2">
+                                <p class="text-center">
+                                    See All
+                                </p>
+                            </x-jet-dropdown-link>
                         </x-slot>
                     </x-jet-dropdown>
                 </div>
@@ -376,7 +376,8 @@ array_shift($nav_links)
                             <form method="POST" action="{{ route('logout') }}">
                                 @csrf
 
-                                <x-jet-dropdown-link href="{{ route('logout') }}" onclick="event.preventDefault();
+                                <x-jet-dropdown-link href="{{ route('logout') }}"
+                                    onclick="event.preventDefault();
                                                 this.closest('form').submit();">
                                     {{ __('Log Out') }}
                                 </x-jet-dropdown-link>
@@ -392,10 +393,11 @@ array_shift($nav_links)
                 <button @click="open = ! open"
                     class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 focus:text-gray-500 transition">
                     <svg class="h-6 w-6" stroke="currentColor" fill="none" viewBox="0 0 24 24">
-                        <path :class="{'hidden': open, 'inline-flex': ! open }" class="inline-flex" stroke-linecap="round" stroke-linejoin="round"
-                            stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-                        <path :class="{'hidden': ! open, 'inline-flex': open }" class="hidden" stroke-linecap="round" stroke-linejoin="round"
-                            stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        <path :class="{ 'hidden': open, 'inline-flex': !open }" class="inline-flex"
+                            stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M4 6h16M4 12h16M4 18h16" />
+                        <path :class="{ 'hidden': !open, 'inline-flex': open }" class="hidden" stroke-linecap="round"
+                            stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                     </svg>
                 </button>
             </div>
@@ -403,7 +405,7 @@ array_shift($nav_links)
     </div>
 
     <!-- Responsive Navigation Menu -->
-    <div :class="{'block': open, 'hidden': ! open}" class="hidden sm:hidden">
+    <div :class="{ 'block': open, 'hidden': !open }" class="hidden sm:hidden">
         <div class="pt-2 pb-3 space-y-1">
             @foreach ($nav_links as $nav_link)
                 <x-jet-responsive-nav-link href="{{ $nav_link['route'] }}" :active="$nav_link['status']">
@@ -418,8 +420,8 @@ array_shift($nav_links)
             <div class="flex items-center px-4">
                 @if (Laravel\Jetstream\Jetstream::managesProfilePhotos())
                     <div class="flex-shrink-0 mr-3">
-                        <img class="h-10 w-10 rounded-full object-cover" src="{{ Auth::user()->profile_photo_url }}"
-                            alt="{{ Auth::user()->name }}" />
+                        <img class="h-10 w-10 rounded-full object-cover"
+                            src="{{ Auth::user()->profile_photo_url }}" alt="{{ Auth::user()->name }}" />
                     </div>
                 @endif
 
@@ -445,7 +447,8 @@ array_shift($nav_links)
                 <form method="POST" action="{{ route('logout') }}">
                     @csrf
 
-                    <x-jet-responsive-nav-link href="{{ route('logout') }}" onclick="event.preventDefault();
+                    <x-jet-responsive-nav-link href="{{ route('logout') }}"
+                        onclick="event.preventDefault();
                                     this.closest('form').submit();">
                         {{ __('Log Out') }}
                     </x-jet-responsive-nav-link>

@@ -7,8 +7,7 @@
     "require": {
         "php": "^7.3|^8.0",
         "aberkanidev/laravel-coupons": "^1.1",
-        "beyondcode/laravel-websockets": "^1.12",
-        "pusher/pusher-php-server": "^5.0",
+        "beyondcode/laravel-websockets": "^1.13",
         "fideloper/proxy": "^4.4",
         "firebase/php-jwt": "^5.3",
         "fruitcake/laravel-cors": "^2.0",
@@ -22,6 +21,7 @@
         "laravel/tinker": "^2.5",
         "livewire/livewire": "^2.0",
         "paypal/rest-api-sdk-php": "^1.14",
+        "pusher/pusher-php-server": "^7.0",
         "spatie/laravel-permission": "^4.0",
         "srmklive/paypal": "~1.0",
         "tightenco/ziggy": "^1.4",

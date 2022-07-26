@@ -61,6 +61,12 @@ $nav_links = [
         'parent_link' => request()->is('admin', 'admin/*'),
     ],
     [
+        'name' => 'Activities',
+        'route' => route('activities.index'),
+        'status' => request()->is('activities', 'activities/*'),
+        'parent_link' => request()->is('admin', 'admin/*'),
+    ],
+    [
         'name' => 'Marketing',
         'route' => route('coupons.index'),
         'status' => request()->routeIs('coupons.index'),
