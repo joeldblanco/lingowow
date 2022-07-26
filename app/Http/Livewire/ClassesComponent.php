@@ -2,19 +2,37 @@
 
 namespace App\Http\Livewire;
 
+use App\Http\Controllers\ApportionmentController;
 use App\Models\Classes;
 use App\Models\Comment;
 use App\Models\Enrolment;
 use App\Models\User;
+use Carbon\Carbon;
 use Livewire\Component;
+use Livewire\WithPagination;
 
 class ClassesComponent extends Component
 {
-    public $classes, $teachers, $students, $studentClassCheck = "", $teacherClassCheck = "", $comment = "", $current_class, $comments = [], $enrolment, $to_review_classes;
+    use WithPagination;
+    
+    public /*$classes, $teachers, $students,*/ $studentClassCheck = "", $teacherClassCheck = "", $comment = "", $current_class, $comments = [], $enrolment, $to_review_classes;
 
     protected $rules = [
         'comment' => 'required|string|max:500',
     ];
+
+    public function mount()
+    {
+        if(auth()->user()->getRoleNames()->first() == "student"){
+            $this->current_class = User::find(auth()->user()->id)->studentClasses()->last();
+        }else if(auth()->user()->getRoleNames()->first() == "teacher"){
+            $this->current_class = User::find(auth()->user()->id)->teacherClasses()->last();
+        }else{
+            $this->current_class = Classes::all()->last();
+        }
+
+        $this->enrolment = Enrolment::find($this->current_class->enrolment_id);
+    }
 
     public function studentClassCheck($class_id)
     {
@@ -25,6 +43,7 @@ class ClassesComponent extends Component
                 $class = Classes::find($class_id);
                 $class->student_check = $student_check;
                 $class->save();
+                $this->current_class = $class;
             } catch (\Throwable $th) {
                 dd($th->getCode());
             }
@@ -38,6 +57,7 @@ class ClassesComponent extends Component
             $teacher_check = intval(!$teacher_check);
             try {
                 Classes::where('id', $class_id)->update(['teacher_check' => $teacher_check]);
+                $this->current_class = Classes::find($class_id);
             } catch (\Throwable $th) {
                 dd($th->getCode());
             }
@@ -46,9 +66,9 @@ class ClassesComponent extends Component
 
     public function loadComment($id)
     {
-        $this->enrolment = Enrolment::find(Classes::find($id)->enrolment_id);
-        $this->current_class = $id;
-        $this->comment = Classes::find($id)->comments;
+        $this->current_class = Classes::find($id);
+        $this->enrolment = Enrolment::find($this->current_class->enrolment_id);
+        $this->comment = $this->current_class->comments;
 
         if ($this->comment == NULL) {
             $this->comment = "";
@@ -83,32 +103,71 @@ class ClassesComponent extends Component
         $this->current_class = "";
     }
 
+    public function previousPeriod()
+    {
+        $class_period = ApportionmentController::getPeriod($this->current_class->start_date, true);
+        $class_period = (new Carbon($class_period[0]))->subMonth();
+        $class_period = ApportionmentController::getPeriod($class_period->toDateTimeString(), true);
+        
+        
+        if(auth()->user()->getRoleNames()->first() == "student"){
+            $this->current_class = User::find(auth()->user()->id)->studentClasses()->whereBetween('start_date', $class_period)->last();
+        }else if(auth()->user()->getRoleNames()->first() == "teacher"){
+            $this->current_class = User::find(auth()->user()->id)->teacherClasses()->whereBetween('start_date', $class_period)->last();
+        }else{
+            $this->current_class = Classes::all()->whereBetween('start_date', $class_period)->last();
+        }
+
+        $this->enrolment = Enrolment::find($this->current_class->enrolment_id);
+        $this->setPage(1);
+    }
+
+    public function nextPeriod()
+    {
+        $class_period = ApportionmentController::getPeriod($this->current_class->start_date, true);
+        $class_period = (new Carbon($class_period[0]))->addMonth();
+        $class_period = ApportionmentController::getPeriod($class_period->toDateTimeString(), true);
+        
+        
+        if(auth()->user()->getRoleNames()->first() == "student"){
+            $this->current_class = User::find(auth()->user()->id)->studentClasses()->whereBetween('start_date', $class_period)->last();
+        }else if(auth()->user()->getRoleNames()->first() == "teacher"){
+            $this->current_class = User::find(auth()->user()->id)->teacherClasses()->whereBetween('start_date', $class_period)->last();
+        }else{
+            $this->current_class = Classes::all()->whereBetween('start_date', $class_period)->last();
+        }
+
+        $this->enrolment = Enrolment::find($this->current_class->enrolment_id);
+        $this->setPage(1);
+    }
+
     public function render()
     {
-        $this->teachers = [];
-        $this->students = [];
+        // $this->teachers = [];
+        // $this->students = [];
         $this->to_review_classes = [];
         $role = auth()->user()->roles[0]->name;
 
         if ($role == "teacher") {
-            $this->classes = User::find(auth()->id())->teacherClasses;
-            // $this->classes = User::find(auth()->id())->teacherClasses()->orderBy('start_date', 'ASC')->get();
-            $this->classes = $this->classes->sortBy('start_date');
-            foreach ($this->classes as $key => $value) {
-                $this->students[$key] = $value->student();
-            }
+            $classes = User::find(auth()->id())->teacherClasses->whereBetween('start_date', ApportionmentController::getPeriod($this->current_class->start_date, true))->orderBy('start_date')->paginate(10);
+            // $classes = User::find(auth()->id())->teacherClasses()->orderBy('start_date', 'ASC')->get();
+            $classes = $classes->sortBy('start_date');
+            // foreach ($classes as $key => $value) {
+            //     $this->students[$key] = $value->student();
+            // }
         } else if ($role == "student") {
-            $this->classes = User::find(auth()->id())->studentClasses;
-            $this->classes = $this->classes->sortBy('start_date');
-            foreach ($this->classes as $key => $value) {
-                $this->teachers[$key] = $value->teacher();
-            }
+            $classes = User::find(auth()->id())->studentClasses->whereBetween('start_date', ApportionmentController::getPeriod($this->current_class->start_date, true))->orderBy('start_date')->paginate(10);
+            $classes = $classes->sortBy('start_date');
+            // foreach ($classes as $key => $value) {
+            //     // $this->teachers[$key] = $value->teacher();
+            // }
         } else if ($role == "admin") {
-            $this->classes = Classes::all();
-            $this->classes = $this->classes->sortBy('start_date');
-            foreach ($this->classes as $key => $value) {
-                $this->students[$key] = $value->student();
-                $this->teachers[$key] = $value->teacher();
+            // dd(ApportionmentController::getPeriod($this->current_class->start_date, true));
+            $classes = Classes::whereBetween('start_date', ApportionmentController::getPeriod($this->current_class->start_date, true))->orderBy('start_date')->paginate(10);
+            // $classes = $classes->sortBy('start_date');
+            foreach ($classes as $key => $value) {
+                // $this->students[$key] = $value->student();
+                // $this->teachers[$key] = $value->teacher();
 
                 if (!$value->student_check || !$value->teacher_check) {
                     $this->to_review_classes[] = $value->id;
@@ -125,8 +184,9 @@ class ClassesComponent extends Component
             $this->comments = [];
         }
 
-        // dd($this->comments, $this->current_class);
 
-        return view('livewire.classes-component');
+        return view('livewire.classes-component', [
+            'classes' => $classes
+        ]);
     }
 }

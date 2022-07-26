@@ -2,97 +2,97 @@
 
 namespace App\Http\Livewire;
 
+use App\Models\Conversation;
+use App\Models\Message;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Notification;
 use Livewire\Component;
 
 class Chat extends Component
 {
+
     public $conversations = [];
     public $last_messages = [];
-    public $participants = [];
-    public $messages;
-    public $conversation_id;
+    // public $participants = [];
+    public $conversation_id = 0;
     public $participant;
     public $text_message;
     public $search;
     public $friends;
     public $show_id;
+    public $conversation;
 
-    public function mount()
+    //LIVEWIRE FUNCTION FOR GETTING LARAVEL ECHO LISTENERS//
+    public function getListeners()
     {
-        $this->messages = DB::table('messages')
-                        ->where('sender_id',auth()->id())
-                        ->orWhere('receiver_id',auth()->id())
-                        ->first();
-
-        // foreach ($this->messages as $key => $value) {
-        //     array_push($this->conversations,$value->conversation_id);
-        // }
-
-        if(($this->messages != null) AND isset($this->messages)){
-            $this->conversation_id = $this->messages->conversation_id;
-        }
-
-        $friends = null;
-
-        if(isset($friends)){
-            $this->friends = DB::table('friend_requests')
-                            ->where('receiver_id',auth()->id())
-                            ->where('status',1)
-                            ->select('sender_id')
-                            ->union($friends)
-                            ->get();
-
-            foreach($this->friends as $key => $value){
-                if(isset($this->friends[$key]->receiver_id)){
-                    $this->friends[$key] = User::find($this->friends[$key]->receiver_id);
-                }else if(isset($this->friends[$key]->sender_id)){
-                    $this->friends[$key] = User::find($this->friends[$key]->sender_id);
-                }
-            }
-        }
+        $user_id = auth()->user()->id;
+        return [
+            "echo-notification:App.Models.User.{$user_id},notification" => 'render',
+        ];
     }
 
+    //FUNCTION FOR SHOWING SELECTED CONVERSATION (TRIGGERED WHEN A CONVERSATION IS CLICKED ON VIEW)//
     public function showConversation($id)
     {
-        if(isset($this->show_id)){
-            dd($this->messages);
-            $this->conversation_id = $this->show_id;
-        }else{
-            $this->conversation_id = $id;
+        //SELECT CONVERSATION THAT MATCHES CONVERSATION ID IN DATABASE AND STORES IT IN CONVERSATION VARIABLE//
+        $this->conversation = Conversation::find($id);
+
+        //STORES CONVERSATION ID IN CONVERSATION ID VARIABLE//
+        $this->conversation_id = $id;
+    }
+
+    //FUNCTION FOR SENDING MESSAGES (TRIGGERED WHEN 'SEND' BUTTON IS CLICKED)//
+    public function send_message()
+    {
+        //DELETES ALL EMPTY SPACES IN MESSAGE TEXT//
+        $message = preg_replace('/\s+/', '', $this->text_message);
+
+        //VERIFIES IS MESSAGE LENGTH IS GREATER THAN ZERO AFTER DELETING ALL EMPTY SPACES//
+        if (strlen($message) > 0) {
+
+            //VERIFIES IF CONVERSATION ID VARIABLE EXISTS AND IS DIFFERENT TO 'NULL'//
+            if ($this->conversation_id) {
+
+                //SELECT CONVERSATION THAT MATCHES CONVERSATION ID IN DATABASE AND STORES IT IN CONVERSATION VARIABLE//
+                $this->conversation = Conversation::find($this->conversation_id);
+            } else {
+
+                //CREATES NEW CONVERSATION AND STORES IT IN CONVERSATION VARIABLE. ADDITIONALLY, SETS STATUS TO  1 (ACTIVE)//
+                $this->conversation = Conversation::create([
+                    'status' => 1
+                ]);
+
+                //STORES RECENTLY CREATED CONVERSATION ID IN CONVERSATION ID VARIABLE//
+                $this->conversation_id = $this->conversation->id;
+
+                //STORES CURRENT USER'S ID AND PARTICIPANT'S ID IN INTERMEDIATE TABLE (ELOQUENT MANY-TO-MANY RELATIONSHIP'S ATTACH METHOD)//
+                $this->conversation->users()->attach([auth()->id(), $this->participant->id]);
+            }
+
+            //CREATES NEW MESSAGE AND ATTACHES IT TO THE CONVERSATION//
+            $this->conversation->messages()->create([
+                'user_id' => auth()->id(),
+                'message_content' => $this->text_message,
+                'message_type' => 1,
+            ]);
+
+            //SENDS NEW MESSAGE NOTIFICATION TO PARTICIPANT//
+            Notification::send($this->users_notifications, new \App\Notifications\NewMessage());
+            $this->text_message = "";
+        } else {
+            dd('Impossible!');
         }
     }
 
-    public function send_message()
+    public function getUsersNotificationsProperty()
     {
-        $message = preg_replace('/\s+/', '', $this->text_message);
+        return $this->conversation ? $this->conversation->users->where('id', '!=', auth()->id()) : [];
+    }
 
-        if(strlen($message) > 0){
-            if($this->conversation_id == null)
-            {
-                $conversation = DB::table('conversations')
-                    ->insertGetId([
-                        'status' => 1
-                    ]);
-
-                $this->conversation_id = $conversation;
-            }
-
-            DB::table('messages')
-                ->insert([
-                    'conversation_id' => $this->conversation_id,
-                    'sender_id' => auth()->id(),
-                    'receiver_id' => $this->participant->id,
-                    'message_content' => $this->text_message,
-                    'message_type' => 1,
-                    'status' => 1
-                ]);
-                $this->text_message = "";
-                
-        }else{
-            dd('Impossible!');
-        }
+    public function getMessagesProperty()
+    {
+        return $this->conversation ? $this->conversation->messages : [];
     }
 
     public function selectParticipant($participant_id)
@@ -100,67 +100,28 @@ class Chat extends Component
         $this->participant = User::find($participant_id);
     }
 
+    public function updatedTextMessage($value)
+    {
+        if ($value) {
+            Notification::send($this->users_notifications, new \App\Notifications\UserTyping($this->conversation->id));
+        }
+    }
+
     public function render()
     {
-        $conversations = DB::table('messages')
-                        ->where('sender_id',auth()->id())
-                        ->orWhere('receiver_id',auth()->id())
-                        ->get();
+        $user = User::find(auth()->id());
+        $this->friends = $user->friends();
+        $this->conversations = $user->conversations;
+        $this->conversations_id = [];
 
-        if(isset($conversations)){
-            foreach ($conversations as $conversation) {
-                array_push($this->conversations,$conversation->conversation_id);
-            }
-            $this->conversations = array_values(array_unique($this->conversations));
+        if ($this->conversation) {
+            $this->conversation->messages()->where('user_id', '!=', auth()->id())->where('read', null)->update([
+                'read' => now()
+            ]);
+            Notification::send($this->users_notifications, new \App\Notifications\MessageRead());
+            $this->emit("scrollIntoView");
         }
-
-        if(isset($this->show_id) AND (in_array($this->show_id,$this->conversations))){
-            $this->conversation_id = $this->show_id;
-        }
-
-        $this->messages = DB::table('messages')
-                        ->where('conversation_id',$this->conversation_id)
-                        ->where('status',1)
-                        ->get();
         
-        foreach ($this->conversations as $conversation_id) {
-            $message = DB::table('messages')->where('conversation_id',$conversation_id)->first();
-            $this->last_messages[$conversation_id] = DB::table('messages')->where('conversation_id',$conversation_id)->orderBy('id','desc')->first();
-
-            if($message->sender_id == auth()->id()){
-                $this->participants[$conversation_id] = $message->receiver_id;
-            }else{
-                $this->participants[$conversation_id] = $message->sender_id;
-            }
-        }
-
-        foreach ($this->participants as $key => $value) {
-            $this->participants[$key] = User::find($value);
-        }
-
-        if((count($this->participants) > 0) AND ($this->conversation_id != null)){
-            $this->participant = $this->participants[$this->conversation_id];
-        }
-
-        $this->friends = DB::table('friend_requests')
-                        ->where('sender_id',auth()->id())
-                        ->orWhere('receiver_id',auth()->id())
-                        ->where('status',1)
-                        ->get();
-
-        if(isset($this->friends)){
-            foreach ($this->friends as $key => $value) {
-                if($value->sender_id == auth()->id())
-                {
-                    $this->friends[$key] = $value->receiver_id;
-                }else{
-                    $this->friends[$key] = $value->sender_id;
-                }
-            }
-
-            $this->friends = User::find($this->friends);
-        }
-
         return view('livewire.chat');
     }
 }

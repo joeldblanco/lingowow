@@ -13,6 +13,7 @@ use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use aberkanidev\Coupons\Traits\CanRedeemCoupons;
+use App\Http\Livewire\Chat;
 use Illuminate\Support\Facades\DB;
 use Lab404\Impersonate\Models\Impersonate;
 use Lab404\Impersonate\Services\ImpersonateManager;
@@ -142,18 +143,32 @@ class User extends Authenticatable implements MustVerifyEmail
      */
     public function friends()
     {
-        $friends = DB::table('friend_requests')->where('status',1)->where('sender_id',auth()->id())->orWhere('receiver_id',auth()->id())->get();
-        $friends_list = [];
+        $friends = DB::table('friends')->where('status', 1)->where(function ($query) {
+            $query->where('user_id', $this->id)->orWhere('friend_id', $this->id);
+        })->get();
+        // $friends_list = [];
 
-        foreach($friends as $friend){
-            if($friend->sender_id == auth()->id()){
-                $friends_list[] = User::find($friend->receiver_id);
-            }else{
-                $friends_list[] = User::find($friend->sender_id);
+        foreach ($friends as $key => $value) {
+            if ($value->user_id == $this->id) {
+                $friends[$key] = User::find($value->friend_id);
+            } else {
+                $friends[$key] = User::find($value->user_id);
             }
         }
 
-        return $friends_list;
+        return $friends;
+
+        // return $this->hasMany(Friend::class)->where('status',1);
+    }
+
+    public function messages()
+    {
+        return $this->hasMany(Message::class);
+    }
+
+    public function conversations()
+    {
+        return $this->belongsToMany(Conversation::class)->withPivot('color', 'active')->withTimestamps();
     }
 
     /**
@@ -161,13 +176,13 @@ class User extends Authenticatable implements MustVerifyEmail
      */
     public function friend_requests()
     {
-        $friend_requests = DB::table('friend_requests')->where('status',NULL)->where('sender_id',auth()->id())->orWhere('receiver_id',auth()->id())->get();
+        $friend_requests = DB::table('friend_requests')->where('status', NULL)->where('sender_id', auth()->id())->orWhere('receiver_id', auth()->id())->get();
         $friend_requests_list = [];
 
-        foreach($friend_requests as $friend_request){
-            if($friend_request->sender_id == auth()->id()){
+        foreach ($friend_requests as $friend_request) {
+            if ($friend_request->sender_id == auth()->id()) {
                 $friend_requests_list[] = User::find($friend_request->receiver_id);
-            }else{
+            } else {
                 $friend_requests_list[] = User::find($friend_request->sender_id);
             }
         }
@@ -183,4 +198,11 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->hasMany(Post::class, 'author_id');
     }
 
+    /**
+     * The activities associated with the user.
+     */
+    public function activities()
+    {
+        return $this->belongsToMany(Activity::class);
+    }
 }

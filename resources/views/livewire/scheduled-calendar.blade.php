@@ -1,7 +1,7 @@
 <div>
 
     @php
-
+        
         $scheduled_classes = App\Models\Enrolment::select('student_id')
             ->where('teacher_id', $user_id)
             ->get();
@@ -176,6 +176,7 @@
         </div>
         @include('modal')
         @include('components.loading-state')
+
     </div>
     {{-- @endif --}}
 
@@ -223,4 +224,5 @@
 
         });
     </script>
+    
 </div>

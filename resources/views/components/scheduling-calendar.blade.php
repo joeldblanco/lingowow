@@ -1,5 +1,13 @@
 <div>
 
+  <style>
+    .selection-area {
+      background: rgba(46, 115, 252, 0.11);
+      border: 2px solid rgba(98, 155, 255, 0.81);
+      border-radius: 0.1em;
+    }
+  </style>
+
   <script>
 
     $( function() {
@@ -107,10 +115,10 @@
     </div>
     <button class="bg-green-500 rounded-lg text-white font-bold px-6 py-1 my-3 shadow-md" onclick="saveSchedule({{$plan}},'schedule.check')">Save</button>
     {{-- <button class="bg-blue-500 rounded-lg text-white font-bold px-6 py-1 my-3 shadow-md" wire:model="$mode = 0">Edit</button> --}}
+  
   </div>
 
   {{-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script> --}}
   <script type="text/javascript" src="{{ asset('js/scheduleSelection.js') }}" defer></script>
-  {{-- <script src="https://cdn.jsdelivr.net/npm/@simonwep/selection-js/lib/selection.min.js"></script> --}}
 
 </div>
