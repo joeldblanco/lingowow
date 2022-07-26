@@ -1,0 +1,179 @@
+.selection-areaa {
+    background: rgba(46, 115, 252, 0.11);
+    border: 2px solid rgba(98, 155, 255, 0.81);
+    border-radius: 0.1em;
+}
+
+.container {
+  border-radius: 0.25rem;
+  user-select: none;
+}
+
+.selection-area {
+  background: #4f90f22d;
+  border: 1px solid #4f90f2;
+}
+
+.selected {
+  background: hsl(200, 80%, 65%);
+  border: 1px solid rgba(0, 0, 0, 0.075);
+}
+
+.occupied {
+  background:#ffafa7;
+  border: 1px solid rgba(0, 0, 0, 0.075);
+}
+.width {
+  width: 11.11%;
+  text-align: center;
+}
+
+.available {
+  background: #a5eecd;
+  border: 1px solid rgba(0, 0, 0, 0.075);
+}
+.available.selectable:hover {
+  border: 2px solid rgba(1, 167, 86, 0.785);
+}
+
+.paging_simple{
+  display: flex;
+  justify-content: center;
+}
+
+/* .next {
+ visibility: hidden;
+ margin-left: 15px;
+ cursor: pointer; 
+
+}
+
+.next::before{
+  margin-left: 15px;
+ cursor: pointer; 
+  content: "Next Week";
+  visibility: visible;
+} */
+
+.previous {
+  /* margin-left: 15px; */
+  cursor: pointer; 
+  /* color: #fc4a1e; */
+ }
+
+.not-active { 
+  pointer-events: none; 
+  cursor: default; 
+} 
+
+.not_visible {
+  /* visibility: hidden; */
+}
+/* .separatortittle-b {
+  height: 20px;
+  width: 100%;
+  background-image: radial-gradient(
+    farthest-side at 50% -50%,
+    hsla(0, 0%, 0%, 0.5),
+    hsla(0, 0%, 0%, 0));
+  position: relative;
+} */
+
+/* .separatortittle-t {
+  height: 20px;
+  width: 100%;
+  background-image: radial-gradient(
+   farthest-side at -50% 50%,
+    hsla(0, 0%, 0%, 0.5),
+    hsla(0, 0%, 0%, 0));
+  position: relative;
+} */
+
+/* .titulounit {
+  font-size: 1.640625rem;
+  letter-spacing: .1em;
+  color: #5ccecd;
+  font-weight: 700;
+  text-align: center;
+} */
+
+/* .titulomodule {
+  font-size: 1;
+  letter-spacing: .05em;
+  color: #5ccecd;
+  font-weight: 700;
+} */
+
+/* TOOLTIP */
+
+.button_tooltip{
+  display: block;
+  background-color: #ffffff;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+.tooltip {
+  position: relative;
+  display: inline-block;
+  /* border-bottom: 1px dotted black; If you want dots under the hoverable text */
+}
+
+/* Tooltip text */
+.tooltip .tooltiptext {
+  visibility: hidden;
+  width: 120px;
+  background-color: black;
+  color: #fff;
+  text-align: center;
+  padding: 5px 0;
+  border-radius: 6px;
+ 
+  /* Position the tooltip text - see examples below! */
+  position: absolute;
+  z-index: 1;
+}
+
+.tooltip .tooltiptext {
+  width: 120px;
+  bottom: 100%;
+  left: 50%;
+  margin-left: -60px; /* Use half of the width (120/2 = 60), to center the tooltip */
+}
+
+.tooltip .tooltiptext::after {
+  content: " ";
+  position: absolute;
+  top: 100%; /* At the bottom of the tooltip */
+  left: 50%;
+  margin-left: -5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: black transparent transparent transparent;
+}
+
+/* Show the tooltip text when you mouse over the tooltip container */
+.tooltip:hover .tooltiptext {
+  visibility: visible;
+}
+
+[x-cloak] {
+  display: none !important;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+/* @media screen and (prefers-reduced-motion: reduce) {
+	html {
+		scroll-behavior: auto;
+	}
+} */
+
+.selectable .ui-selecting { background: #FECA40; }
+.selectable .ui-selected, .selected { background: #009d71; color: white; }
+.selectable { list-style-type: none; margin: 0; padding: 0; }
+.selectable div, .cell { float: left; width: 100px; height: 25px; text-align: center; }
+.taken { background: #fc4a1e; }
