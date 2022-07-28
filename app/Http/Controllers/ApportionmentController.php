@@ -42,32 +42,30 @@ class ApportionmentController extends Controller
         foreach ($schedule as $key => $value) {
             $day = $value[1];
             $time = $value[0];
-            $qty += $today->diffInDaysFiltered(function(Carbon $date) use(&$day, &$time, &$days) {
-                if($date->isDayOfWeek($day))
-                {
+            $qty += $today->diffInDaysFiltered(function (Carbon $date) use (&$day, &$time, &$days) {
+                if ($date->isDayOfWeek($day)) {
                     $date->hour = $time;
                     $date->minute = 0;
                     $date->second = 0;
-                    array_push($days,$date->toDateTimeString());
+                    array_push($days, $date->toDateTimeString());
                 }
                 // if($date->isDayOfWeek($day)) array_push($days,get_class_methods($date));
                 return $date->isDayOfWeek($day);
             }, $current_period_end);
         }
 
-        if($qty <= 0){
+        if ($qty <= 0) {
             $qty = 0;
             $days = [];
             foreach ($schedule as $key => $value) {
                 $day = $value[1];
                 $time = $value[0];
-                $qty += $next_period_start->diffInDaysFiltered(function(Carbon $date) use(&$day, &$time, &$days) {
-                    if($date->isDayOfWeek($day))
-                    {
+                $qty += $next_period_start->diffInDaysFiltered(function (Carbon $date) use (&$day, &$time, &$days) {
+                    if ($date->isDayOfWeek($day)) {
                         $date->hour = $time;
                         $date->minute = 0;
                         $date->second = 0;
-                        array_push($days,$date->toDateTimeString());
+                        array_push($days, $date->toDateTimeString());
                     }
                     // if($date->isDayOfWeek($day)) array_push($days,get_class_methods($date));
                     return $date->isDayOfWeek($day);
@@ -81,24 +79,52 @@ class ApportionmentController extends Controller
 
         // dd($days, $teacher_id, $teacher_classes);
 
-        return [$qty,$days];
+        //CONSULTA DE CLASES REAGENDADAS EN EL PERIODO ACTUAL PARA RESTAR AL COBRO
+
+        $current_period = ApportionmentController::currentPeriod();
+        $period_start_c = new Carbon($current_period[0]);
+        $period_end_c = new Carbon($current_period[1]);
+
+        $abcense = Classes::select("start_date")
+            ->where("status", "1")
+            ->whereBetween("start_date", [$period_start_c->subDay()->toDateTimeString(), $period_end_c->toDateTimeString()])
+            ->get();
+
+        if ($abcense != null) {
+            foreach ($abcense as $key => $value) {
+                $abcense[$key] = $value->start_date;
+            }
+            $abcense = json_decode($abcense);
+        } else {
+            $abcense = [];
+        }
+
+        $days_diff = array_diff($days, $abcense);
+        $days_diff = array_values($days_diff);
+
+        $qty_diff = sizeof($days_diff);
+
+        //dd($days_diff, $qty_diff);
+
+        return [$qty_diff, $days_diff];
     }
 
-    public static function currentPeriod(){
+    public static function currentPeriod()
+    {
         $first_monday = new Carbon('first monday of this month');
-        if($first_monday < Carbon::now()){
+        if ($first_monday < Carbon::now()) {
             $current_period_start = new Carbon('first monday of this month');
             $current_period_end = (new Carbon('first monday of this month'))->addDays(5);
             $current_period_end->addWeeks(3);
             $current_period_end->addDays(1);
-        }else{
+        } else {
             $current_period_start = new Carbon('first monday of last month');
             $current_period_end = (new Carbon('first monday of last month'))->addDays(5);
             $current_period_end->addWeeks(3);
             $current_period_end->addDays(1);
         }
 
-        return [$current_period_start->toDateTimeString(),$current_period_end->toDateTimeString()];
+        return [$current_period_start->toDateTimeString(), $current_period_end->toDateTimeString()];
     }
 
     public static function getPeriod($class, $extended = false){
@@ -134,7 +160,7 @@ class ApportionmentController extends Controller
                 }
             }
         }
-        
+
         return $class_period;
     }
 

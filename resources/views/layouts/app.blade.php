@@ -63,7 +63,7 @@
 <body class="font-sans antialiased">
     <x-jet-banner />
 
-    <div class="min-h-screen bg-gray-100 flex flex-col">
+    <div class="min-h-screen bg-white flex flex-col">
 
         @if (Auth::user()->isImpersonated())
             <div class="bg-green-500 text-center py-3">
@@ -78,7 +78,7 @@
         <!-- Page Content -->
         @livewireScripts
 
-        <main>
+        <main class="pb-20 w-full">
             {{ $slot }}
         </main>
         @include('footer')

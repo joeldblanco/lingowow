@@ -16,9 +16,9 @@
                     </tr>
                     </thead>
                     <tbody>
-
+                        {{-- {{dd(Cart::content())}} --}}
                         @foreach (Cart::content() as $item)
-                            
+                            {{-- {{dd(Cart::content())}} --}}
                             <tr>
                                 <td class="hidden pb-4 md:table-cell">
                                 <a href="#">

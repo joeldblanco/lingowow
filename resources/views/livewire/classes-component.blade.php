@@ -9,7 +9,7 @@
         }
 
         $periods = array_unique($periods);
-
+        //dd($periods);
     @endphp
     <div class="bg-white font-sans">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
@@ -49,6 +49,7 @@
                                 </tr>
                             </thead>
                             <tbody class="space-y-4">
+                                
                                 @foreach ($classes as $key => $value)
                                     @if(App\Http\Controllers\ApportionmentController::getPeriod($value->start_date) == $month_year)
                                         <tr class="flex justify-around @if(in_array($value->id, $to_review_classes)) bg-yellow-100 @endif">
@@ -67,14 +68,15 @@
                                             @endhasanyrole
                                             @php
                                                 $lesson_date = (new Carbon\Carbon($value->start_date));
+                                                // dd($lesson_date);
                                             @endphp
                                             @if ($lesson_date->lt(Carbon\Carbon::now()))
                                                 <td class="flex w-full justify-center text-red-500 cursor-pointer hover:underline" @click="classDetails = true" wire:click="showClass({{$value->id}})">
-                                                    {{$lesson_date->format('d/m/Y - g:00 a')}}
+                                                    {{$lesson_date->format('d/m/Y - h:00 a')}}
                                                 </td>
                                             @else
                                                 <td class="flex w-full justify-center text-green-500 cursor-pointer hover:underline" @click="classDetails = true"  wire:click="showClass({{$value->id}})">
-                                                    {{$lesson_date->format('d/m/Y - g:00 a')}}
+                                                    {{$lesson_date->format('d/m/Y - h:00 a')}}
                                                 </td>
                                             @endif
                                             {{-- <td class="flex w-full justify-center">
@@ -178,10 +180,11 @@
                 </footer>
                 <div>
                     @foreach ($comments as $comment)
+                        {{-- {{dd($comment->author()->profile_photo_path)}} --}}
                         <div class="flex space-x-3 p-4">
-                            <img class="rounded-full w-10 h-10" src="{{Storage::url($comment->author()[0]->profile_photo_path)}}" alt="profile_picture">
+                            <img class="rounded-full w-10 h-10" src="{{Storage::url($comment->author()->profile_photo_path)}}" alt="profile_picture">
                             <div class="flex flex-col items-start w-full">
-                                <p class="font-bold text-sm mb-2">{{$comment->author()[0]->first_name}} {{$comment->author()[0]->last_name}}</p>
+                                <p class="font-bold text-sm mb-2">{{$comment->author()->first_name}} {{$comment->author()->last_name}}</p>
                                 <div class="border rounded-md px-3 py-2 w-full bg-gray-200">
                                     <p>{{$comment->comment}}</p>
                                     <p class="text-xs mt-2 w-full text-right">{{$comment->updated_at}}</p>
@@ -247,9 +250,9 @@
                 <div>
                     @foreach ($comments as $comment)
                         <div class="flex space-x-3 p-4">
-                            <img class="rounded-full w-10 h-10" src="{{Storage::url($comment->author()[0]->profile_photo_path)}}" alt="profile_picture">
+                            <img class="rounded-full w-10 h-10" src="{{Storage::url($comment->author()->profile_photo_path)}}" alt="profile_picture">
                             <div class="flex flex-col items-start w-full">
-                                <p class="font-bold text-sm mb-2">{{$comment->author()[0]->first_name}} {{$comment->author()[0]->last_name}}</p>
+                                <p class="font-bold text-sm mb-2">{{$comment->author()->first_name}} {{$comment->author()->last_name}}</p>
                                 <div class="border rounded-md px-3 py-2 w-full bg-gray-200">
                                     <p>{{$comment->comment}}</p>
                                     <p class="text-xs mt-2 w-full text-right">{{$comment->updated_at}}</p>

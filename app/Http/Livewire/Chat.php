@@ -80,9 +80,10 @@ class Chat extends Component
             //SENDS NEW MESSAGE NOTIFICATION TO PARTICIPANT//
             Notification::send($this->users_notifications, new \App\Notifications\NewMessage());
             $this->text_message = "";
-        } else {
-            dd('Impossible!');
         }
+        //  else {
+        //     dd('Impossible!');
+        // }
     }
 
     public function getUsersNotificationsProperty()

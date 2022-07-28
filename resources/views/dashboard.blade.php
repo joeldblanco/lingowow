@@ -1,6 +1,6 @@
 <x-app-layout>
 
-    <div class="bg-white font-sans">
+    <div style="width: 100%" class="bg-white font-sans">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden">
                 {{-- @if (isset($_GET['tz'])) --}}

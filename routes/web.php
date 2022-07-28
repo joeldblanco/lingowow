@@ -94,7 +94,7 @@ Route::middleware(['web', 'auth', 'verified', 'impersonate'])->group(function ()
 
     //ROUTES FOR SCHEDULE//
     Route::post('/schedule/check', [SchedulingCalendarController::class, 'checkForTeachers'])->name("schedule.check");
-    Route::middleware('checkPreviousUrlName:shop|schedule.check,shop')->get('/schedule/selection', [SchedulingCalendarController::class, 'create'])->name("schedule.create");
+    Route::middleware('checkPreviousUrlName:shop|schedule.check|schedule.create,shop')->get('/schedule/selection', [SchedulingCalendarController::class, 'create'])->name("schedule.create");
     Route::post('/schedule/update', [SchedulingCalendarController::class, 'update'])->name("schedule.update");
     Route::get('/schedule/destroy/{student_id}/{course_id}', [SchedulingCalendarController::class, 'destroy'])->name("schedule.destroy");
 

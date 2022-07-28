@@ -151,6 +151,7 @@ class ExamController extends Controller
      */
     public static function manually_correct($attempt_id, $question_id)
     {
+        
     }
 
     /**

@@ -34,7 +34,7 @@ class SchedulingCalendarController extends Controller
 
     /**
      * Show the form for creating a new resource.
-     *
+     * 
      * @return \Illuminate\Http\Response
      */
     public function create(Request $request)
@@ -146,6 +146,7 @@ class SchedulingCalendarController extends Controller
      */
     public function update(Request $request)
     {
+        dd($request->data);
         if ($request->error == "false") {
             // $request->data = explode(',', $request->data);
             $request->data = json_decode($request->data);
@@ -233,7 +234,8 @@ class SchedulingCalendarController extends Controller
                     // User::where('id',$teacher_id)
                     // ->update(['available_schedule' => $teacher_available_schedule]);
 
-                    $message = "Request accepted";
+                    $message = "Request accepted. ";
+                    $message .= "However, it will be effective for the following period";
 
                     $student = User::find($user_id);
                     $teacher = User::find($teacher_id);
@@ -357,78 +359,100 @@ class SchedulingCalendarController extends Controller
      */
     public function checkForTeachers(Request $request)
     {
-        $cells = json_decode($request->data);
-        // $cells = array_chunk($request->data, 2);
-        session(['user_schedule' => json_encode($cells)]);
+        // dd($request);
+        if ($request->error == "false") {
+            $cells = json_decode($request->data);
+            // $cells = array_chunk($request->data, 2);
+            session(['user_schedule' => json_encode($cells)]);
 
-        // $teachers = User::join('model_has_roles',function($join){
-        //                 $join->on('users.id','=','model_has_roles.model_id')
-        //                      ->where('model_has_roles.role_id','=','3');
-        //             })
-        //             ->get();
+            // $teachers = User::join('model_has_roles',function($join){
+            //                 $join->on('users.id','=','model_has_roles.model_id')
+            //                      ->where('model_has_roles.role_id','=','3');
+            //             })
+            //             ->get();
 
-        // $available_teachers = [];
+            // $available_teachers = [];
 
-        // $teachers_available_schedule = [];
-        // $teachers_students_schedule = [];
-        // foreach ($teachers as $key => $value) {
+            // $teachers_available_schedule = [];
+            // $teachers_students_schedule = [];
+            // foreach ($teachers as $key => $value) {
 
-        //     $teachers_available_schedule[$key] = Schedule::where('user_id',$value->id)->select('selected_schedule')->get();
+            //     $teachers_available_schedule[$key] = Schedule::where('user_id',$value->id)->select('selected_schedule')->get();
 
-        //     $teachers_students = Enrolment::where('teacher_id',$value->id)->select('student_id')->get();
+            //     $teachers_students = Enrolment::where('teacher_id',$value->id)->select('student_id')->get();
 
-        //     foreach ($teachers_students as $tskey => $tsvalue) {
+            //     foreach ($teachers_students as $tskey => $tsvalue) {
 
-        //         $teachers_students_schedule[$tskey] = Schedule::where('user_id',$tsvalue->student_id)->select('selected_schedule')->get();
+            //         $teachers_students_schedule[$tskey] = Schedule::where('user_id',$tsvalue->student_id)->select('selected_schedule')->get();
 
-        //         $teachers_students_schedule[$tskey] = $teachers_students_schedule[$tskey][0]->selected_schedule;
+            //         $teachers_students_schedule[$tskey] = $teachers_students_schedule[$tskey][0]->selected_schedule;
 
-        //         $teachers_students_schedule = json_decode($teachers_students_schedule[$tskey]);
-        //     }
+            //         $teachers_students_schedule = json_decode($teachers_students_schedule[$tskey]);
+            //     }
 
-        //     $teachers_available_schedule[$key] = json_decode($teachers_available_schedule[$key][0]->selected_schedule);
+            //     $teachers_available_schedule[$key] = json_decode($teachers_available_schedule[$key][0]->selected_schedule);
 
-        //     foreach ($teachers_students_schedule as $s_schedule) {
-        //         if($teachers_available_schedule[$key] != null)
-        //             array_splice($teachers_available_schedule[$key], array_search($s_schedule,$teachers_available_schedule[$key]), 1);
-        //     }
+            //     foreach ($teachers_students_schedule as $s_schedule) {
+            //         if($teachers_available_schedule[$key] != null)
+            //             array_splice($teachers_available_schedule[$key], array_search($s_schedule,$teachers_available_schedule[$key]), 1);
+            //     }
 
-        // }
+            // }
 
-        // foreach($teachers_available_schedule as $key => $value){
+            // foreach($teachers_available_schedule as $key => $value){
 
-        //     $matched_blocks = 0;
+            //     $matched_blocks = 0;
 
-        //     if($value != null){
-        //         foreach($cells as $cell){
-        //             // dd($teacher_schedule);
-        //             if(in_array($cell,$value)){
-        //                 $matched_blocks++;
-        //             }
-        //         }
-        //     }
+            //     if($value != null){
+            //         foreach($cells as $cell){
+            //             // dd($teacher_schedule);
+            //             if(in_array($cell,$value)){
+            //                 $matched_blocks++;
+            //             }
+            //         }
+            //     }
 
-        //     if($matched_blocks == count($cells)){
-        //         array_push($available_teachers,$teachers[$key]);
-        //     }
-        // }
+            //     if($matched_blocks == count($cells)){
+            //         array_push($available_teachers,$teachers[$key]);
+            //     }
+            // }
 
-        // session(['available_teachers' => $available_teachers]);
+            // session(['available_teachers' => $available_teachers]);
 
-        Cart::destroy();
-        $course_id = session('selected_course');
+            Cart::destroy();
+            $course_id = session('selected_course');
 
-        $product = Course::find($course_id)->products->first();
+            $product = Course::find($course_id)->products->first();
 
-        $apportionment = ApportionmentController::calculateApportionment(session('plan'));
-        $product_qty = $apportionment[0];
+            $apportionment = ApportionmentController::calculateApportionment(session('plan'));
+            $product_qty = $apportionment[0];
+            //dd($apportionment);
+            Cart::add($product->id, $product->name, $product_qty, ($product->sale_price == null ? $product->regular_price : $product->sale_price))->associate('App\Models\Product');
+            session([
+                'course_id' => $course_id,
+                'classes_dates' => $apportionment[1]
+            ]);
 
-        Cart::add($product->id, $product->name, $product_qty, ($product->sale_price == null ? $product->regular_price : $product->sale_price))->associate('App\Models\Product');
-        session([
-            'course_id' => $course_id,
-            'classes_dates' => $apportionment[1]
-        ]);
+            return view('cart');
+        }else {
+            Cart::destroy();
+            $message = "Request rejected";
+            switch ($request->error) {
+                case "same_day":
+                    $message .= ". You cannot select two classes for the same day.";
+                    break;
+                case "not_enough_days":
+                    $message .= ". You selected fewer classes than those reflected in your plan.";
+                    break;
+                case "too_much_days":
+                    $message .= ". You selected more classes than those reflected in your plan.";
+                    break;
+            }
+            
+        }
 
-        return view('cart');
+        session(['message' => $message]);
+        //dd($message);
+        return redirect()->route("schedule.create");
     }
 }

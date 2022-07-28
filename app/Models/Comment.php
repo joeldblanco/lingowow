@@ -21,11 +21,13 @@ class Comment extends Model
      */
     public function author()
     {
-        return User::find(Classes::find($this->class_id)->teacher());
+        // dd($this->author);
+        return User::find($this->author);
     }
 
     protected $fillable = [
         'comment',
         'class_id',
+        'author'
     ];
 }

@@ -16,7 +16,7 @@ class CheckPreviousUrlName
      */
     public function handle(Request $request, Closure $next, $routeToCheck,$routeToRedirect)
     {
-
+        //dd($request);
         $routesToCheck = is_array($routeToCheck)
             ? $routeToCheck
             : explode('|', $routeToCheck);

@@ -1,5 +1,11 @@
 <x-app-layout>
 
+    {{-- MENSAJE --}}
+
+   
+
+    {{-- FIN MENSAJE --}}
+
     <div class="bg-white font-sans">
 
         <div class="max-w-lg mx-auto sm:px-6 lg:px-8">
