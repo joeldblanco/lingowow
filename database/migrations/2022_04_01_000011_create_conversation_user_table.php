@@ -18,7 +18,8 @@ class CreateConversationUserTable extends Migration
             $table->bigInteger('user_id');
             $table->bigInteger('conversation_id');
             $table->string('color',20)->nullable();
-            $table->tinyInteger('active');
+            $table->tinyInteger('active')->default(1);
+            $table->timestamps();
         });
     }
 

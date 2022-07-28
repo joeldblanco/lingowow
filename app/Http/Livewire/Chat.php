@@ -40,6 +40,9 @@ class Chat extends Component
 
         //STORES CONVERSATION ID IN CONVERSATION ID VARIABLE//
         $this->conversation_id = $id;
+
+        //SCROLLING TO VIEW//
+        $this->emit("scrollIntoView");
     }
 
     //FUNCTION FOR SENDING MESSAGES (TRIGGERED WHEN 'SEND' BUTTON IS CLICKED)//
@@ -58,10 +61,8 @@ class Chat extends Component
                 $this->conversation = Conversation::find($this->conversation_id);
             } else {
 
-                //CREATES NEW CONVERSATION AND STORES IT IN CONVERSATION VARIABLE. ADDITIONALLY, SETS STATUS TO  1 (ACTIVE)//
-                $this->conversation = Conversation::create([
-                    'status' => 1
-                ]);
+                //CREATES NEW CONVERSATION AND STORES IT IN CONVERSATION VARIABLE//
+                $this->conversation = Conversation::create();
 
                 //STORES RECENTLY CREATED CONVERSATION ID IN CONVERSATION ID VARIABLE//
                 $this->conversation_id = $this->conversation->id;
@@ -83,6 +84,9 @@ class Chat extends Component
         } else {
             dd('Impossible!');
         }
+
+        //SCROLLING TO VIEW//
+        $this->emit("scrollIntoView");
     }
 
     public function getUsersNotificationsProperty()
@@ -102,7 +106,7 @@ class Chat extends Component
 
     public function updatedTextMessage($value)
     {
-        if ($value) {
+        if ($value && $this->conversation) {
             Notification::send($this->users_notifications, new \App\Notifications\UserTyping($this->conversation->id));
         }
     }
@@ -119,7 +123,6 @@ class Chat extends Component
                 'read' => now()
             ]);
             Notification::send($this->users_notifications, new \App\Notifications\MessageRead());
-            $this->emit("scrollIntoView");
         }
         
         return view('livewire.chat');

@@ -33,14 +33,6 @@
 
     <title>{{ config('app.name', 'Laravel') }}</title>
 
-        <div class="min-h-screen bg-white flex flex-col">
-            
-            @if (Auth::user()->isImpersonated())
-                <div class="bg-green-500 text-center py-3">
-                    <p class="text-white font-semibold">Impersonating</p>
-                    <a href="{{route('stopImpersonation')}}" class="text-sm hover:font-bold">Stop Impersonation</a>
-                </div>
-            @endif
     <!-- Fonts -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap">
 
@@ -51,12 +43,6 @@
         integrity="sha512-BiFZ6oflftBIwm6lYCQtQ5DIRQ6tm02svznor2GYQOfAlT3pnVJ10xCrU3XuXnUrWQ4EG8GKxntXnYEdKY0Ugg=="
         crossorigin="anonymous" referrerpolicy="no-referrer" />
 
-            <!-- Page Content -->
-            <main style="width: 100%">
-                {{ $slot }}
-            </main>
-            @include('footer')
-        </div>
     @livewireStyles
     @routes
 
@@ -77,7 +63,7 @@
 <body class="font-sans antialiased">
     <x-jet-banner />
 
-    <div class="min-h-screen bg-gray-100 flex flex-col">
+    <div class="min-h-screen bg-white flex flex-col">
 
         @if (Auth::user()->isImpersonated())
             <div class="bg-green-500 text-center py-3">
@@ -92,7 +78,7 @@
         <!-- Page Content -->
         @livewireScripts
 
-        <main>
+        <main style="" class="pb-20">
             {{ $slot }}
         </main>
         @include('footer')

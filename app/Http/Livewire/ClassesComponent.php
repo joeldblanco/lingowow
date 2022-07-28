@@ -24,6 +24,7 @@ class ClassesComponent extends Component
     public function mount()
     {
         if(auth()->user()->getRoleNames()->first() == "student"){
+            // dd((User::find(auth()->user()->id))->studentClasses()->first());
             $this->current_class = User::find(auth()->user()->id)->studentClasses()->last();
         }else if(auth()->user()->getRoleNames()->first() == "teacher"){
             $this->current_class = User::find(auth()->user()->id)->teacherClasses()->last();
@@ -32,6 +33,7 @@ class ClassesComponent extends Component
         }
 
         $this->enrolment = Enrolment::find($this->current_class->enrolment_id);
+        // dd($this->enrolment);
     }
 
     public function studentClassCheck($class_id)

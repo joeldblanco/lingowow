@@ -7,10 +7,6 @@
         //dd(session('plan'));
         //dd(date('m-d-Y h:i:s a'));
         $scheduled_classes;
-        
-        $scheduled_classes = App\Models\Enrolment::select('student_id')
-            ->where('teacher_id', $user_id)
-            ->get();
         $temp_student_schedule = [];
         $student_schedule = [];
         $students_schedules = [];
@@ -135,7 +131,7 @@
 
     {{-- @if ($role != 'admin') --}}
     <div class="container mx-auto mt-10" x-data="{ editBtn: true, edit: false, showModal1: false, showModal2: false, showModal3: false, showModalAbsence: false, event: {{ $event }}, loadingState: false }" x-cloak>
-        <div class="wrapper bg-white rounded shadow w-full">
+        <div class="wrapper bg-white rounded w-full">
             {{-- <p x-show="event">Event</p> --}}
 
             <!-- INICIO DEL HORARIO DE JUAN -->
@@ -287,237 +283,232 @@
 
 
         </div>
-        {{-- @endif --}}
-        @include('modal')
-        @include('components.loading-state')
 
     </div>
     {{-- @endif --}}
 
-        <script type="text/javascript" src="{{ asset('js/scheduleSelection.js') }}" defer></script>
-        <script src="{{ asset('js/viselect.cjs.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('js/scheduleSelection.js') }}" defer></script>
+    <script src="{{ asset('js/viselect.cjs.js') }}"></script>
 
-        <script src="{{ asset('js/jquery.datetimepicker.full.min.js') }}"></script>
-        <script>
-            console.log("inicio");
-            var hoyLocal = new Date(@json($hoy));
+    <script src="{{ asset('js/jquery.datetimepicker.full.min.js') }}"></script>
+    <script>
+        console.log("inicio");
+        var hoyLocal = new Date(@json($hoy));
 
-            var horaLocal = hoyLocal.getHours();
-            // var horaUTC = hoyLocal.getUTCHours();
-            var difHora = hoyLocal.getTimezoneOffset()/60;
-            var OpenUTC = 11; // Hora UTC a la que abre la academia en PERU! (06:00 am Hora local en peru) (07:00 am hora local)
-            var OpenLocal = OpenUTC - difHora;
+        var horaLocal = hoyLocal.getHours();
+        // var horaUTC = hoyLocal.getUTCHours();
+        var difHora = hoyLocal.getTimezoneOffset() / 60;
+        var OpenUTC = 11; // Hora UTC a la que abre la academia en PERU! (06:00 am Hora local en peru) (07:00 am hora local)
+        var OpenLocal = OpenUTC - difHora;
 
-            //Asignar hora UTC y Local al Horario
+        //Asignar hora UTC y Local al Horario
 
-            cellsUTC = $('.UTC');
-            cellsLocal = $('.Local');
-            for (let i = 0; i < cellsUTC.length; i++) {
-                if (OpenUTC < 10) {
-                    cellsUTC[i].innerHTML = "0" + OpenUTC + ":00";
-                } else {
-                    cellsUTC[i].innerHTML = OpenUTC + ":00";
-                }
-                
-                if (OpenUTC >= 23) {
-                    OpenUTC = 0;
-                } else {
-                    OpenUTC++;
-                }
-
-
-                if (OpenLocal < 10) {
-                    cellsLocal[i].innerHTML = "0" + OpenLocal + ":00";
-                } else {
-                    cellsLocal[i].innerHTML = OpenLocal + ":00";
-                }
-                
-                if (OpenLocal >= 23) {
-                    OpenLocal = 0;
-                } else {
-                    OpenLocal++;
-                }
+        cellsUTC = $('.UTC');
+        cellsLocal = $('.Local');
+        for (let i = 0; i < cellsUTC.length; i++) {
+            if (OpenUTC < 10) {
+                cellsUTC[i].innerHTML = "0" + OpenUTC + ":00";
+            } else {
+                cellsUTC[i].innerHTML = OpenUTC + ":00";
             }
 
+            if (OpenUTC >= 23) {
+                OpenUTC = 0;
+            } else {
+                OpenUTC++;
+            }
+
+
+            if (OpenLocal < 10) {
+                cellsLocal[i].innerHTML = "0" + OpenLocal + ":00";
+            } else {
+                cellsLocal[i].innerHTML = OpenLocal + ":00";
+            }
+
+            if (OpenLocal >= 23) {
+                OpenLocal = 0;
+            } else {
+                OpenLocal++;
+            }
+        }
+
+        var role = "{{ Auth::user()->roles->pluck('name')[0] }}";
+
+        $(".selectable").selectable({
+            //disabled: true
+        });
+
+        $('body').on("contentChanged", event => {
+            // console.log("hola")
+            var cells = $(".selected");
+            // console.log(cells);
             var role = "{{ Auth::user()->roles->pluck('name')[0] }}";
 
-            $(".selectable").selectable({
-                //disabled: true
-            });
+            if (role == "student") {
 
-            $('body').on("contentChanged", event => {
-                // console.log("hola")
-                var cells = $(".selected");
-                // console.log(cells);
-                var role = "{{ Auth::user()->roles->pluck('name')[0] }}";
+                $(".cell").click(function() {
+                    var selectedCells = 0;
+                    var nOfClasses = {{ isset($user_schedules) ? count($user_schedules) : 0 }};
 
-                if (role == "student") {
+                    selectedCells = $(".ui-selected").length;
 
-                    $(".cell").click(function() {
-                        var selectedCells = 0;
-                        var nOfClasses = {{ isset($user_schedules) ? count($user_schedules) : 0 }};
+                    if ($(this).hasClass("ui-selected") && $(this).hasClass("cell_block")) {
+                        $(this).removeClass("ui-selected");
+                    } else if ($(this).hasClass("cell_block") && (selectedCells < nOfClasses)) {
+                        $(this).addClass("ui-selected");
+                    }
+                });
 
-                        selectedCells = $(".ui-selected").length;
-
-                        if ($(this).hasClass("ui-selected") && $(this).hasClass("cell_block")) {
-                            $(this).removeClass("ui-selected");
-                        } else if ($(this).hasClass("cell_block") && (selectedCells < nOfClasses)) {
-                            $(this).addClass("ui-selected");
-                        }
-                    });
-
-                } else if (role == "teacher") {
-                    var disabled = $(".selectable").selectable("option", "disabled");
-                    $(".selectable").selectable("option", "disabled", !disabled);
-                    $(".selectable").on("selectableselected", function(event, ui) {
-                        // $.inArray("taken",ui.selected.classList);
-                        if ($.inArray("taken", ui.selected.classList) > 0) {
-                            console.log(true);
-                        } else {
-                            console.log(false);
-                        }
-                    });
-                }
-
-            });
-
-
-            //Seleccion de horario
-
-            console.log("hola1");
-
-
-            function toggleCellBlock() {
-
-                if (role == "teacher") {
-                    $(".preoccupied").toggleClass("occupied");
-                    $(".preoccupied").toggleClass("selectable");
-                    $(".preoccupied").removeClass("selected");
-                    $(".name-student").toggleClass("not-active")
-                }
-
-                $(".schedule_cell").toggleClass("cell_block");
-                $(".available").toggleClass("selectable");
-                $(".available").removeClass("selected");
-                $(".preselected").addClass("selected");
-                $(".tool-tip").toggleClass("invisible")
-                //$(".preoccupied").addClass("occupied");
-                numClass = classSelected.length;
-                init = false;
-                classSelected = preClass;
-
-                // console.log(classSelected)
+            } else if (role == "teacher") {
+                var disabled = $(".selectable").selectable("option", "disabled");
+                $(".selectable").selectable("option", "disabled", !disabled);
+                $(".selectable").on("selectableselected", function(event, ui) {
+                    // $.inArray("taken",ui.selected.classList);
+                    if ($.inArray("taken", ui.selected.classList) > 0) {
+                        console.log(true);
+                    } else {
+                        console.log(false);
+                    }
+                });
             }
 
+        });
 
-            let numClass = 0;
-            let classSelected = [];
-            let preClass = @json($schedule_user);
-            // console.log(preClass);
-            classSelected = preClass;
-            // console.log(classSelected);
-            numClass = classSelected.length;
-            //$('.notAvailable').length + $('.available').length
-            let qtyClass = classSelected.length;
+
+        //Seleccion de horario
+
+        console.log("hola1");
+
+
+        function toggleCellBlock() {
+
             if (role == "teacher") {
-                qtyClass = ($('.notAvailable').length + $('.available').length);
+                $(".preoccupied").toggleClass("occupied");
+                $(".preoccupied").toggleClass("selectable");
+                $(".preoccupied").removeClass("selected");
+                $(".name-student").toggleClass("not-active")
             }
-            let preClassTd = [];
-            preClass.forEach(element => {
-                preClassTd.push(document.getElementById(element));
-            });
 
+            $(".schedule_cell").toggleClass("cell_block");
             $(".available").toggleClass("selectable");
-            $(".notAvailable").toggleClass("selectable");
+            $(".available").removeClass("selected");
             $(".preselected").addClass("selected");
-            $(".preoccupied").addClass("occupied");
-            $(".name-student").toggleClass("not-active");
-            $(".tool-tip").toggleClass("invisible");
-            let init = false;
-            // console.log(preClassTd)
-            const selection = new SelectionArea({
-                    selectables: ["td.selectable"],
-                    boundaries: [".container"],
-                })
-                .on("start", ({
-                    store,
-                    event
-                }) => {
-                    if (!init) {
-                        // console.log("hola?")
-                        store.stored = preClassTd;
-                        init = true;
-                    }
-                    // console.log(init)
+            $(".tool-tip").toggleClass("invisible")
+            //$(".preoccupied").addClass("occupied");
+            numClass = classSelected.length;
+            init = false;
+            classSelected = preClass;
+
+            // console.log(classSelected)
+        }
+
+
+        let numClass = 0;
+        let classSelected = [];
+        let preClass = @json($schedule_user);
+        // console.log(preClass);
+        classSelected = preClass;
+        // console.log(classSelected);
+        numClass = classSelected.length;
+        //$('.notAvailable').length + $('.available').length
+        let qtyClass = classSelected.length;
+        if (role == "teacher") {
+            qtyClass = ($('.notAvailable').length + $('.available').length);
+        }
+        let preClassTd = [];
+        preClass.forEach(element => {
+            preClassTd.push(document.getElementById(element));
+        });
+
+        $(".available").toggleClass("selectable");
+        $(".notAvailable").toggleClass("selectable");
+        $(".preselected").addClass("selected");
+        $(".preoccupied").addClass("occupied");
+        $(".name-student").toggleClass("not-active");
+        $(".tool-tip").toggleClass("invisible");
+        let init = false;
+        // console.log(preClassTd)
+        const selection = new SelectionArea({
+                selectables: ["td.selectable"],
+                boundaries: [".container"],
+            })
+            .on("start", ({
+                store,
+                event
+            }) => {
+                if (!init) {
+                    // console.log("hola?")
+                    store.stored = preClassTd;
+                    init = true;
+                }
+                // console.log(init)
+                // console.log(store)
+                if (!event.ctrlKey && !event.metaKey) {
                     // console.log(store)
-                    if (!event.ctrlKey && !event.metaKey) {
-                        // console.log(store)
-                        for (const el of store.stored) {
-                            //console.log("si")
-                            if (el.classList.contains("selected") && el.classList.contains("selectable")) {
-                                el.classList.remove("selected");
-                                classSelected = classSelected.filter(function(cf) {
-                                    return cf !== el.id;
-                                });
-                                if (numClass > 0)
-                                    numClass--;
-                                //console.log("uno"+numClass);
-                            }
-                        }
-
-                        selection.clearSelection();
-                    }
-                    //console.log(store.stored)
-                })
-                .on(
-                    "move",
-                    ({
-                        store: {
-                            changed: {
-                                added,
-                                removed
-                            }
-                        }
-                    }) => {
-                        // console.log(added)
-                        for (const el of added) {
-                            if (!(el.classList.contains("selected"))) {
-                                if (numClass < qtyClass) {
-                                    el.classList.add("selected");
-                                    classSelected.push(el.id);
-                                    numClass++;
-                                    //console.log("dos"+numClass);
-                                }
-                            }
-                        }
-
-                        for (const el of removed) {
-                            if (el.classList.contains("selected")) {
-                                el.classList.remove("selected");
-                                classSelected = classSelected.filter(function(cf) {
-                                    return cf !== el.id;
-                                });
+                    for (const el of store.stored) {
+                        //console.log("si")
+                        if (el.classList.contains("selected") && el.classList.contains("selectable")) {
+                            el.classList.remove("selected");
+                            classSelected = classSelected.filter(function(cf) {
+                                return cf !== el.id;
+                            });
+                            if (numClass > 0)
                                 numClass--;
-                            }
-                            //console.log("tres"+numClass);
-
+                            //console.log("uno"+numClass);
                         }
+                    }
+
+                    selection.clearSelection();
+                }
+                //console.log(store.stored)
+            })
+            .on(
+                "move",
+                ({
+                    store: {
+                        changed: {
+                            added,
+                            removed
+                        }
+                    }
+                }) => {
+                    // console.log(added)
+                    for (const el of added) {
+                        if (!(el.classList.contains("selected"))) {
+                            if (numClass < qtyClass) {
+                                el.classList.add("selected");
+                                classSelected.push(el.id);
+                                numClass++;
+                                //console.log("dos"+numClass);
+                            }
+                        }
+                    }
+
+                    for (const el of removed) {
+                        if (el.classList.contains("selected")) {
+                            el.classList.remove("selected");
+                            classSelected = classSelected.filter(function(cf) {
+                                return cf !== el.id;
+                            });
+                            numClass--;
+                        }
+                        //console.log("tres"+numClass);
 
                     }
 
-                );
+                }
 
-            //DATETIMEPICKER SCHEDULE
+            );
 
-            // $('#datetimepicker').datetimepicker({
-            //     format: 'd.m.Y H:i',
-            //     inline: true,
-            //     lang: 'ru',
-            //     value: '22-07-2022 04:00',
-            //     format: 'd-m-Y H:i'
-            // });
-        </script>
-    </div>
-       
-    
+        //DATETIMEPICKER SCHEDULE
+
+        // $('#datetimepicker').datetimepicker({
+        //     format: 'd.m.Y H:i',
+        //     inline: true,
+        //     lang: 'ru',
+        //     value: '22-07-2022 04:00',
+        //     format: 'd-m-Y H:i'
+        // });
+    </script>
+
 </div>
