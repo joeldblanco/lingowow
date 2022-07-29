@@ -140,7 +140,7 @@ class AnalyticsController extends Controller
             $total_earnings += $invoice->price;
         }
 
-        $month = $invoices[0]->created_at->month;
+        if(count($invoices)) $month = $invoices[0]->created_at->month;
         $month_total = 0;
         $months_total = [];
         $months = [];
