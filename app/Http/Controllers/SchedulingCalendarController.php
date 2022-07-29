@@ -62,7 +62,7 @@ class SchedulingCalendarController extends Controller
         $classes_dates = session('classes_dates');
         $teacher_students = Enrolment::where('teacher_id', $teacher_id)->select('student_id')->get();
 
-
+        
         //CREATING STUDENT'S ENROLMENT (OR UPDATING IT, IN CASE IT ALREADY EXISTS BUT IS SOFTDELETED)//
         $enrolment = Enrolment::withTrashed()->updateOrCreate(
             ['student_id' => $student_id, 'course_id' => $course_id],
@@ -78,7 +78,7 @@ class SchedulingCalendarController extends Controller
             ['selected_schedule' => $student_schedule, 'deleted_at' => NULL]
         );
 
-
+        
         //ADDING CLASS DURATION (40 MIN) TO CLASS START DATETIME AND STORING IT IN ANOTHER VARIABLE (TO CREATE CLASS END DATETIME)//
         foreach ($classes_dates as $key => $value) {
             $classes_dates[$key] = [];
@@ -101,7 +101,7 @@ class SchedulingCalendarController extends Controller
             ]);
         }
 
-
+        
         //STORING ALL TEACHER'S STUDENTS' SCHEDULES IN ONE ARRAY//
         foreach ($teacher_students as $tskey => $tsvalue) {
             $teacher_students_schedule[$tskey] = Schedule::where('user_id', $tsvalue->student_id)->select('selected_schedule')->first();
@@ -111,8 +111,9 @@ class SchedulingCalendarController extends Controller
 
 
         //SENDING NOTIFICATION TO TEACHER//
+        
+        // dd($student->id);
         $notification = Notification::sendNow($teacher, new BookedClass($student->id));
-        // dd($notification, $teacher);
     }
 
     /**
@@ -146,7 +147,7 @@ class SchedulingCalendarController extends Controller
      */
     public function update(Request $request)
     {
-        dd($request->data);
+        // dd($request->data);
         if ($request->error == "false") {
             // $request->data = explode(',', $request->data);
             $request->data = json_decode($request->data);
@@ -160,6 +161,7 @@ class SchedulingCalendarController extends Controller
             $user_id = auth()->id();
 
             $user_schedule = Schedule::select('selected_schedule')->where('user_id', $user_id)->get();
+            // dd($user_id);
             $user_schedule = json_decode($user_schedule[0]->selected_schedule);
 
             if ($user_role == "student") {

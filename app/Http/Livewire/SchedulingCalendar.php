@@ -17,6 +17,7 @@ class SchedulingCalendar extends Component
 
     public function mount($plan = 0)
     {
+        // dd($this->plan);
         // $user = User::find(auth()->id());
         $this->teacher_id = session('first_teacher');
         $this->schedule = json_decode(User::find($this->teacher_id)->schedules[0]->selected_schedule);
@@ -50,6 +51,7 @@ class SchedulingCalendar extends Component
      */
     public function render()
     {   
+        
         //$this->dispatchBrowserEvent("initSchedule");
         // dd($this->apport);
         return view('components.scheduling-calendar');

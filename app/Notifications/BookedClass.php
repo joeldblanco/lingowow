@@ -22,8 +22,12 @@ class BookedClass extends Notification implements ShouldQueue
      */
     public function __construct($student_id)
     {
+        
         $this->student = User::find($student_id)->first();
-        $schedule = $this->student->schedules->first()->selected_schedule;
+        // dd($this->student);
+        // $schedule = $this->student->schedules->first()->selected_schedule;
+        $schedule = Schedule::select('selected_schedule')->where('user_id', $student_id)->first()->selected_schedule;
+        // dd($schedule);
         $schedule = json_decode($schedule);
         $schedule_string = "";
         $days = ["Sundays","Mondays","Tuesdays","Wednesdays","Thursdays","Fridays","Saturdays"];

@@ -140,7 +140,7 @@
                         id="absence_reason" placeholder="Reason for Absence" required>
                 </div>
 
-                <div class="container mx-auto">
+                <div class="container mx-auto" x-data="{ editBtn: true, edit: false, showModal1: false, showModal2: false, showModal3: false, showModalAbsence: false, event: {{ $event }}, loadingState: false }" x-cloak>
                     <div class="wrapper bg-white rounded shadow w-full">
 
                         {{-- <h3 class="text-4xl font-bold text-gray-800">Select your schedule</h3>

@@ -14,9 +14,12 @@ class CreateFriendsTable extends Migration
     public function up()
     {
         Schema::create('friends', function (Blueprint $table) {
+            $table->bigIncrements('id');
             $table->bigInteger('user_id', false, true);
             $table->bigInteger('friend_id', false, true);
+            $table->tinyInteger('status')->default(0);
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

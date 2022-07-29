@@ -3,6 +3,7 @@
 
 
     @php
+    
         $hoy = (new Carbon\Carbon())->toCookieString();
         
         $scheduled_classes = App\Models\Enrolment::select('student_id')
