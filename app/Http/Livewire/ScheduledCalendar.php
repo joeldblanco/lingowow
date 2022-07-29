@@ -62,6 +62,8 @@ class ScheduledCalendar extends Component
             foreach ($this->teacher_schedule as $key => $value) {
                 $this->teacher_schedule[$key] = json_decode($value->selected_schedule);
             }
+
+            if(!$this->teacher_schedule->first()) $this->teacher_schedule = [];
     
             if (count($this->teacher_schedule) > 0) $this->teacher_schedule = json_decode(json_encode($this->teacher_schedule[0]), 1); 
         }

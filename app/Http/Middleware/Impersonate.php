@@ -44,6 +44,8 @@ class Impersonate
             Auth::guard('web')->onceUsingId(session('impersonate'));
         }
 
+        // dd($request);
+
         return $next($request);
     }
 }

@@ -78,7 +78,7 @@
         <!-- Page Content -->
         @livewireScripts
 
-        <main style="" class="pb-20">
+        <main class="pb-20 w-full">
             {{ $slot }}
         </main>
         @include('footer')

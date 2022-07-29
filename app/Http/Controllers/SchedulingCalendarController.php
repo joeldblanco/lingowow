@@ -147,7 +147,7 @@ class SchedulingCalendarController extends Controller
      */
     public function update(Request $request)
     {
-        // dd($request);
+        // dd($request->data);
         if ($request->error == "false") {
             // $request->data = explode(',', $request->data);
             $request->data = json_decode($request->data);
@@ -361,7 +361,7 @@ class SchedulingCalendarController extends Controller
      */
     public function checkForTeachers(Request $request)
     {
-        //dd($request);
+        // dd($request);
         if ($request->error == "false") {
             $cells = json_decode($request->data);
             // $cells = array_chunk($request->data, 2);

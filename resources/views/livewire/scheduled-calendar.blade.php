@@ -22,6 +22,8 @@
                 ->where('teacher_id', $teacher_id)
                 ->get();
         
+                // dd($scheduled_classes);
+
             $current_period = App\Http\Controllers\ApportionmentController::currentPeriod();
             $period_start_c = new Carbon\Carbon($current_period[0]);
             $period_end_c = new Carbon\Carbon($current_period[1]);
@@ -29,13 +31,14 @@
                 ->where('student_id', $user_id)
                 ->first();
         
-            //dd($my_enrolment);
+            // dd($current_period);
             if ($my_enrolment != null) {
                 $classes = App\Models\Classes::select()
                     ->where('enrolment_id', $my_enrolment->id)
-                    ->whereBetween('start_date', [$period_start_c->subDay()->toDateTimeString(), $period_end_c->toDateTimeString()])
+                    // ->whereBetween('start_date', [$period_start_c->subDay()->toDateTimeString(), $period_end_c->toDateTimeString()])
+                    ->whereDate('start_date', '>=', $period_start_c->subDay()->toDateTimeString())
                     ->get();
-        
+                // dd($classes);
                 foreach ($classes as $key => $value) {
                     $classes[$key] = $value->start_date;
                 }
@@ -124,7 +127,7 @@
             $date_format_class[$key] = $classes[$key]->isoFormat('ddd, D MMM HH:mm a');
         }
         
-        //dd($date_classess);
+        
         
     @endphp
     <link rel="stylesheet" type="text/css" href="{{ asset('css/jquery.datetimepicker.min.css') }}">

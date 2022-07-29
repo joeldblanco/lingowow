@@ -5,7 +5,7 @@
     @php
     
         $hoy = (new Carbon\Carbon())->toCookieString();
-
+        
         $scheduled_classes = App\Models\Enrolment::select('student_id')
             ->where('teacher_id', $teacher_id)
             ->get();
@@ -123,7 +123,7 @@
         
     @endphp
 
-    <div class="container mx-auto" x-data="{ editBtn: true, edit: false, showModal1: false, showModal2: false, showModal3: false, showModalAbsence: false, event: {{ $event }}, loadingState: false }" x-cloak>
+    <div class="container mx-auto" x-data="{ editBtn: true, edit: false, showModal1: false, showModal2: false, showModal3: false, event: {{ $event }}, loadingState: false, showModalAbsence: false }" x-cloak>
         <div class="wrapper bg-white rounded shadow w-full">
 
             <h3 class="text-4xl font-bold text-gray-800">Select your schedule</h3>
@@ -213,16 +213,40 @@
         {{-- <script src="https://cdn.jsdelivr.net/npm/@simonwep/selection-js/lib/selection.min.js"></script> --}}
 
 
-        @include('modal')
+        {{-- MODAL DE CONFIRMACIÓN DE HORARIOS --}}
+        <x-modal type="info" name="showModalAbsence">
+            <x-slot name="title">
+                Are you sure?
+            </x-slot>
 
+            <x-slot name="content">
+                Are you sure you want to save your schedule?
+            </x-slot>
+
+            <x-slot name="footer" class="justify-center">
+                <button
+                    onclick="saveSchedule({{ isset($plan) ? $plan : 0 }},'schedule.check',{{ Auth::user()->roles->pluck('id')[0] }});toggleCellBlock()"
+                    class="bg-green-600 font-semibold text-white p-2 w-32 mr-1 rounded-full hover:bg-green-700 focus:outline-none focus:ring shadow-lg hover:shadow-none transition-all duration-300"
+                    @click=" showModalAbsence = false, editBtn = true, edit = false, loadingState = true">
+                    Save
+                </button>
+                <button
+                    class="bg-red-600 font-semibold text-white p-2 ml-1 w-32 rounded-full hover:bg-red-700 focus:outline-none focus:ring shadow-lg hover:shadow-none transition-all duration-300"
+                    @click=" showModalAbsence = false ">
+                    Cancel
+                </button>
+            </x-slot>
+        </x-modal>
+
+        {{-- @include('modal') --}}
 
 
         <script>
             $(function() {
-    
+
                 var selectedCells = 0;
                 var nOfClasses = {{ $plan }};
-    
+
                 $(".cell_block").click(function() {
                     if ($(this).hasClass("selected")) {
                         $(this).removeClass("selected");
@@ -231,18 +255,60 @@
                             $(this).addClass("selected");
                         }
                     }
-    
+
                     selectedCells = $(".selected").length;
                 });
-    
+
             });
-    
-    
+
+
+            let numClass = 0;
+
+            Livewire.hook('element.updated', (el, component) => {
+                numClass = 0;
+
+                var hoyLocal = new Date(@json($hoy));
+                var horaLocal = hoyLocal.getHours();
+                // var horaUTC = hoyLocal.getUTCHours();
+                var difHora = hoyLocal.getTimezoneOffset() / 60;
+                var OpenUTC = 11; // Hora UTC a la que abre la academia en PERU! (06:00 am Hora local en peru) (07:00 am hora local)
+                var OpenLocal = OpenUTC - difHora;
+
+                //Asignar hora UTC y Local al Horario
+                cellsUTC = $('.UTC');
+                cellsLocal = $('.Local');
+                for (let i = 0; i < cellsUTC.length; i++) {
+                    if (OpenUTC < 10) {
+                        cellsUTC[i].innerHTML = "0" + OpenUTC + ":00";
+                    } else {
+                        cellsUTC[i].innerHTML = OpenUTC + ":00";
+                    }
+
+                    if (OpenUTC >= 23) {
+                        OpenUTC = 0;
+                    } else {
+                        OpenUTC++;
+                    }
+
+
+                    if (OpenLocal < 10) {
+                        cellsLocal[i].innerHTML = "0" + OpenLocal + ":00";
+                    } else {
+                        cellsLocal[i].innerHTML = OpenLocal + ":00";
+                    }
+
+                    if (OpenLocal >= 23) {
+                        OpenLocal = 0;
+                    } else {
+                        OpenLocal++;
+                    }
+                }
+            });
+
             // Funcion de seleccion en el horario
             //window.addEventListener('initSchedule', event => {
-            console.log("hola");
+            // console.log("hola");
             const qtyClass = {{ $plan }};
-            let numClass = 0;
             let classSelected = [];
             let preClass = ["1-6", "2-6", "3-6", "4-6", "5-6", "6-6"];
             classSelected = preClass;
@@ -251,7 +317,7 @@
                 preClassTd.push(document.getElementById(element));
             });
             let init = true;
-    
+
             const selection = new SelectionArea({
                     selectables: ["td.selectable"],
                     boundaries: [".container"],
@@ -264,7 +330,7 @@
                         store.stored = preClassTd;
                         init = true;
                     }
-    
+
                     if (!event.ctrlKey && !event.metaKey) {
                         //console.log(store)
                         for (const el of store.stored) {
@@ -278,7 +344,7 @@
                                 //console.log("uno"+numClass);
                             }
                         }
-    
+
                         selection.clearSelection();
                     }
                     //console.log(store.stored)
@@ -304,7 +370,7 @@
                                 }
                             }
                         }
-    
+
                         for (const el of removed) {
                             if (el.classList.contains("selected")) {
                                 el.classList.remove("selected");
@@ -314,23 +380,22 @@
                                 numClass--;
                             }
                             //console.log("tres"+numClass);
-    
+
                         }
-    
+
                     }
-    
+
                 );
-    
+
             //});
             var hoyLocal = new Date(@json($hoy));
             var horaLocal = hoyLocal.getHours();
             // var horaUTC = hoyLocal.getUTCHours();
-            var difHora = hoyLocal.getTimezoneOffset()/60;
+            var difHora = hoyLocal.getTimezoneOffset() / 60;
             var OpenUTC = 11; // Hora UTC a la que abre la academia en PERU! (06:00 am Hora local en peru) (07:00 am hora local)
             var OpenLocal = OpenUTC - difHora;
-    
+
             //Asignar hora UTC y Local al Horario
-    
             cellsUTC = $('.UTC');
             cellsLocal = $('.Local');
             for (let i = 0; i < cellsUTC.length; i++) {
@@ -339,20 +404,20 @@
                 } else {
                     cellsUTC[i].innerHTML = OpenUTC + ":00";
                 }
-    
+
                 if (OpenUTC >= 23) {
                     OpenUTC = 0;
                 } else {
                     OpenUTC++;
                 }
-    
-    
+
+
                 if (OpenLocal < 10) {
                     cellsLocal[i].innerHTML = "0" + OpenLocal + ":00";
                 } else {
                     cellsLocal[i].innerHTML = OpenLocal + ":00";
                 }
-    
+
                 if (OpenLocal >= 23) {
                     OpenLocal = 0;
                 } else {

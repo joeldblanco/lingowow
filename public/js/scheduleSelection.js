@@ -120,6 +120,8 @@ function saveSchedule(plan, routeTo, role = 2){
 
     data = JSON.stringify(data);
 
+    // console.log(plan);
+
     post(route(routeTo), {
         data: data,
         error: error,

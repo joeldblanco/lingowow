@@ -1,5 +1,4 @@
 <x-app-layout>
-
     <div class="flex flex-col bg-white">
         <div class="flex space-x-4 p-4 bg-gray-100 my-2 mx-5 rounded-xl">
             <div class="flex flex-col w-2/3 space-y-5">

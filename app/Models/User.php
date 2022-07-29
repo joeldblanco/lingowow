@@ -127,7 +127,7 @@ class User extends Authenticatable implements MustVerifyEmail
      */
     public function studentClasses()
     {
-        return $this->hasManyThrough(Classes::class, Enrolment::class, 'student_id');
+        return $this->hasManyThrough(Classes::class, Enrolment::class, 'student_id')->withTrashedParents();
     }
 
     /**
