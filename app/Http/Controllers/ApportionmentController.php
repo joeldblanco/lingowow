@@ -30,7 +30,9 @@ class ApportionmentController extends Controller
 
         $next_period_start = new Carbon('first monday of next month');
         $next_period_end = (new Carbon('first monday of next month'))->addDays(6);
+        $next_period_end->addDays(1);
         $next_period_end->addWeeks(3);
+        // dd($next_period_end);
 
         foreach ($schedule as $key => $value) {
             $schedule[$key][0] = (int)$value[0];
@@ -60,7 +62,9 @@ class ApportionmentController extends Controller
             foreach ($schedule as $key => $value) {
                 $day = $value[1];
                 $time = $value[0];
+                
                 $qty += $next_period_start->diffInDaysFiltered(function (Carbon $date) use (&$day, &$time, &$days) {
+                
                     if ($date->isDayOfWeek($day)) {
                         $date->hour = $time;
                         $date->minute = 0;
@@ -104,7 +108,7 @@ class ApportionmentController extends Controller
 
         $qty_diff = sizeof($days_diff);
 
-        //dd($days_diff, $qty_diff);
+        // dd($days, $qty);
 
         return [$qty_diff, $days_diff];
     }

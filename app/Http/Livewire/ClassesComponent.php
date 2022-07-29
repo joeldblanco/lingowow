@@ -158,7 +158,7 @@ class ClassesComponent extends Component
         if ($role == "teacher") {
             $classes = User::find(auth()->id())->teacherClasses()->whereBetween('start_date', ApportionmentController::getPeriod($this->current_class->start_date, true))->orderBy('start_date')->paginate(10);
             // $classes = User::find(auth()->id())->teacherClasses->sortBy('start_date', 'ASC')->get();
-            $classes = $classes->sortBy('start_date');
+            // $classes = $classes->sortBy('start_date');
             // foreach ($classes as $key => $value) {
             //     $this->students[$key] = $value->student();
             // }

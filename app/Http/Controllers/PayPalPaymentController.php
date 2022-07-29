@@ -52,11 +52,13 @@ class PayPalPaymentController extends Controller
      */
     public function getExpressCheckout(Request $request)
     {
+        // dd($request);
         $recurring = ($request->get('mode') === 'recurring') ? true : false;
         $cart = $this->getCheckoutData($recurring);
 
         try {
             $response = $this->provider->setExpressCheckout($cart, $recurring);
+            
             return redirect($response['paypal_link']);
         } catch (\Exception $e) {
             $invoice = $this->createInvoice($cart, 'Invalid');

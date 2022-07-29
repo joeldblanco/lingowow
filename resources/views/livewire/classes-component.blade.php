@@ -104,6 +104,7 @@
                                         </tr>
                                     @endif
                                 @endforeach
+                                {{-- {{dd($classes)}} --}}
                                 {{$classes->links()}}
                             </tbody>
                         </table>
