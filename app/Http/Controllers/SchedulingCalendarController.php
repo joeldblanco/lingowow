@@ -68,16 +68,15 @@ class SchedulingCalendarController extends Controller
             ['student_id' => $student_id, 'course_id' => $course_id],
             ['teacher_id' => $teacher_id, 'deleted_at' => NULL]
         );
-
+        
 
         //CREATING STUDENT'S SCHEDULE (OR UPDATING IT, IN CASE IT ALREADY EXISTS BUT IS SOFTDELETED)//
         $student_schedule = json_encode($student_schedule);
-
-        Schedule::withTrashed()->updateOrCreate(
+        
+        $schedule = Schedule::withTrashed()->updateOrCreate(
             ['user_id' => $student_id, 'enrolment_id' => $enrolment->id],
             ['selected_schedule' => $student_schedule, 'deleted_at' => NULL]
         );
-
         
         //ADDING CLASS DURATION (40 MIN) TO CLASS START DATETIME AND STORING IT IN ANOTHER VARIABLE (TO CREATE CLASS END DATETIME)//
         foreach ($classes_dates as $key => $value) {
