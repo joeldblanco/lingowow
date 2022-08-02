@@ -4,22 +4,22 @@
             <button
                 class="px-3 py-2 border border-gray-300 rounded-md font-bold hover:bg-gray-200 hover:border-white hover:text-gray-800 @if ($role == 1) bg-gray-400 text-gray-100 @endif"
                 wire:click="selectRole(1)">Guests @if ($role == 1)
-                    ({{ count($models) }})
+                    ({{ $models->count() }})
                 @endif </button>
             <button
                 class="px-3 py-2 border border-gray-300 rounded-md font-bold hover:bg-gray-200 hover:border-white hover:text-gray-800 @if ($role == 2) bg-gray-400 text-gray-100 @endif"
                 wire:click="selectRole(2)">Students @if ($role == 2)
-                    ({{ count($models) }})
+                    ({{ $models->count() }})
                 @endif </button>
             <button
                 class="px-3 py-2 border border-gray-300 rounded-md font-bold hover:bg-gray-200 hover:border-white hover:text-gray-800 @if ($role == 3) bg-gray-400 text-gray-100 @endif"
                 wire:click="selectRole(3)">Teachers @if ($role == 3)
-                    ({{ count($models) }})
+                    ({{ $models->count() }})
                 @endif </button>
             <button
                 class="px-3 py-2 border border-gray-300 rounded-md font-bold hover:bg-gray-200 hover:border-white hover:text-gray-800 @if ($role == 4) bg-gray-400 text-gray-100 @endif"
                 wire:click="selectRole(4)">Admins @if ($role == 4)
-                    ({{ count($models) }})
+                    ({{ $models->count() }})
                 @endif </button>
         </div>
         <div class="flex flex-col justify-center">
@@ -27,6 +27,7 @@
                 User</button>
         </div>
     </div>
+    {{ $models->links() }}
     <div class="flex flex-col space-y-8">
         <div class="flex flex-row w-full gap-x-4 gap-y-4 flex-wrap justify-evenly items-stretch">
             @foreach ($models as $user)
@@ -74,6 +75,7 @@
             @endforeach
         </div>
     </div>
+    {{ $models->links() }}
 
     @if ($selected_teacher)
         {{-- Show User Info Modal --}}
@@ -226,16 +228,17 @@
                 </div>
                 <input class="w-full px-2 py-2 text-gray-700 bg-gray-200 rounded" name="user_username" type="text"
                     required placeholder="Username" aria-label="Username" wire:model="username">
-                <input class="w-full px-2 py-2 text-gray-700 bg-gray-200 rounded" name="user_password" type="password"
-                    required placeholder="Password" aria-label="Password" wire:model="password">
+                <input class="w-full px-2 py-2 text-gray-700 bg-gray-200 rounded" name="user_password"
+                    type="password" required placeholder="Password" aria-label="Password" wire:model="password">
                 <input class="w-full px-2 py-2 text-gray-700 bg-gray-200 rounded" name="user_password_confirm"
                     type="password" required placeholder="Password Confirmation" aria-label="Password"
                     wire:model="password_confirm">
                 <div class="flex mt-2 w-full space-x-1">
                     <input class="w-full px-2 py-2 text-gray-700 bg-gray-200 rounded" name="user_name" type="text"
                         required placeholder="Name" aria-label="Name" wire:model="first_name">
-                    <input class="w-full px-2 py-2 text-gray-700 bg-gray-200 rounded" name="user_lastname" type="text"
-                        required placeholder="Last Name" aria-label="Lastname" wire:model="last_name">
+                    <input class="w-full px-2 py-2 text-gray-700 bg-gray-200 rounded" name="user_lastname"
+                        type="text" required placeholder="Last Name" aria-label="Lastname"
+                        wire:model="last_name">
                 </div>
                 <input class="w-full px-2 py-2 text-gray-700 bg-gray-200 rounded" name="user_email" type="email"
                     required placeholder="Email" aria-label="Email" wire:model="email">
@@ -264,21 +267,22 @@
                     <i class="fas fa-times cursor-pointer text-xl" @click="editUser = false"></i>
                 </div>
                 @if ($current_user != null)
-                    <input class="w-full px-2 py-2 text-gray-700 bg-gray-200 rounded" name="user_username" type="text"
-                        required placeholder="Username" aria-label="Username" wire:model="username">
+                    <input class="w-full px-2 py-2 text-gray-700 bg-gray-200 rounded" name="user_username"
+                        type="text" required placeholder="Username" aria-label="Username" wire:model="username">
                     <input class="w-full px-2 py-2 text-gray-700 bg-gray-200 rounded" name="user_password"
                         type="password" required placeholder="Password" aria-label="Password" wire:model="password">
                     <input class="w-full px-2 py-2 text-gray-700 bg-gray-200 rounded" name="user_password_confirm"
                         type="password" required placeholder="Password Confirmation" aria-label="Password"
                         wire:model="password_confirm">
                     <div class="flex mt-2 w-full space-x-1">
-                        <input class="w-full px-2 py-2 text-gray-700 bg-gray-200 rounded" name="user_name" type="text"
-                            required placeholder="Name" aria-label="Name" wire:model="first_name">
+                        <input class="w-full px-2 py-2 text-gray-700 bg-gray-200 rounded" name="user_name"
+                            type="text" required placeholder="Name" aria-label="Name" wire:model="first_name">
                         <input class="w-full px-2 py-2 text-gray-700 bg-gray-200 rounded" name="user_lastname"
-                            type="text" required placeholder="Last Name" aria-label="Lastname" wire:model="last_name">
+                            type="text" required placeholder="Last Name" aria-label="Lastname"
+                            wire:model="last_name">
                     </div>
-                    <input class="w-full px-2 py-2 text-gray-700 bg-gray-200 rounded" name="user_email" type="email"
-                        required placeholder="Email" aria-label="Email" wire:model="email">
+                    <input class="w-full px-2 py-2 text-gray-700 bg-gray-200 rounded" name="user_email"
+                        type="email" required placeholder="Email" aria-label="Email" wire:model="email">
                     <select class="w-full px-2 py-2 text-gray-700 bg-gray-200 rounded" name="roles" required
                         wire:model="user_role">
                         <option value="1">Guest</option>

@@ -15,7 +15,7 @@ class UsersTable extends Component
 {
     public $role;
     public $users = [];
-    public $models;
+    private $models;
     public $selected_teacher;
     public $days = ['SUNDAY', 'MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY'];
     public $user_schedule;
@@ -47,7 +47,8 @@ class UsersTable extends Component
 
     public function selectRole($role)
     {
-        $this->role = $role;
+        // $this->role = $role;
+        redirect()->route('admin.users', $role);
     }
 
     public function createUser()
@@ -113,13 +114,14 @@ class UsersTable extends Component
 
     public function render()
     {
-        $models = DB::table('model_has_roles')->select('model_id')->where('role_id', $this->role)->get();
+        $this->models = DB::table('model_has_roles')->select('model_id')->where('role_id', $this->role)->get();
 
         $this->users = [];
-        foreach ($models as $model) {
+        foreach ($this->models as $model) {
             $this->users[] = $model->model_id;
         }
-        $this->models = User::find($this->users);
+        $this->models = User::whereIn('id',$this->users)->paginate(20);
+        $models = $this->models;
 
         if ($this->selected_teacher != null) {
 
@@ -167,6 +169,6 @@ class UsersTable extends Component
 
         $role =  Auth::user()->roles[0]->name;
 
-        return view('livewire.users-table');
+        return view('livewire.users-table', ['models' => $models]);
     }
 }
