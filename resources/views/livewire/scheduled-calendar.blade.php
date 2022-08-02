@@ -167,7 +167,7 @@
                             $i = $university_schedule_start;
                         @endphp
                         {{-- @for ($i = 0; $i < $university_schedule_hours; $i++) --}}
-                        @for ($hour = 0; $hour < $university_schedule_hours; $hour ++)
+                        @for ($hour = 0; $hour < $university_schedule_hours; $hour++)
                             <tr class="border">
                                 <td class="width border UTC">
                                     @if ($i < 10)
@@ -263,7 +263,7 @@
                                 // echo $i . ' ' . $university_schedule_end . ' ';
                                 if ($i == 23) {
                                     $i = 0;
-                                }else{
+                                } else {
                                     $i++;
                                 }
                             @endphp
@@ -312,7 +312,8 @@
         var horaLocal = hoyLocal.getHours();
         // var horaUTC = hoyLocal.getUTCHours();
         var difHora = hoyLocal.getTimezoneOffset() / 60;
-        var OpenUTC = @json($university_schedule_start); // Hora UTC a la que abre la academia en PERU! (06:00 am Hora local en peru) (07:00 am hora local)
+        var OpenUTC =
+            @json($university_schedule_start); // Hora UTC a la que abre la academia en PERU! (06:00 am Hora local en peru) (07:00 am hora local)
         var OpenLocal = OpenUTC - difHora;
 
         //Asignar hora UTC y Local al Horario
@@ -332,9 +333,13 @@
             //     OpenUTC++;
             // }
 
-
             if (OpenLocal < 10) {
-                cellsLocal[i].innerHTML = "0" + OpenLocal + ":00";
+                if (OpenLocal < 0) {
+                    OpenLocal += 24;
+                    cellsLocal[i].innerHTML = OpenLocal + ":00";
+                } else {
+                    cellsLocal[i].innerHTML = "0" + OpenLocal + ":00";
+                }
             } else {
                 cellsLocal[i].innerHTML = OpenLocal + ":00";
             }
