@@ -1,8 +1,8 @@
 <div>
 
     @php
-        //$ts = json_decode($teacher_schedule);
         
+        // dd($university_schedule_hours);
         //$plan = session('plan');
         //dd(session('plan'));
         //dd(date('m-d-Y h:i:s a'));
@@ -22,8 +22,8 @@
                 ->where('teacher_id', $teacher_id)
                 ->get();
         
-                // dd($scheduled_classes);
-
+            // dd($scheduled_classes);
+        
             $current_period = App\Http\Controllers\ApportionmentController::currentPeriod();
             $period_start_c = new Carbon\Carbon($current_period[0]);
             $period_end_c = new Carbon\Carbon($current_period[1]);
@@ -127,8 +127,6 @@
             $date_format_class[$key] = $classes[$key]->isoFormat('ddd, D MMM HH:mm a');
         }
         
-        
-        
     @endphp
     <link rel="stylesheet" type="text/css" href="{{ asset('css/jquery.datetimepicker.min.css') }}">
 
@@ -166,24 +164,28 @@
                         <!--filas seleccionables-->
                         @php
                             $e = 0;
+                            $i = $university_schedule_start;
                         @endphp
-                        @for ($i = 0; $i < 16; $i++)
+                        {{-- @for ($i = 0; $i < $university_schedule_hours; $i++) --}}
+                        @for ($hour = 0; $hour < $university_schedule_hours; $hour ++)
                             <tr class="border">
-                                <td class="width border UTC">00:00</td>
-                                <td class="width border Local">
-                                    @if ($i + 6 < 10)
-                                        0{{ $i + 6 }}:00
+                                <td class="width border UTC">
+                                    @if ($i < 10)
+                                        0{{ $i }}:00
                                     @else
-                                        {{ $i + 6 }}:00
+                                        {{ $i }}:00
                                     @endif
                                 </td>
+                                <td class="width border Local">
+                                    {{-- AQUI LA HORA SE LLENA MEDIANTE JAVASCRIPT --}}
+                                </td>
                                 @foreach ($days as $day)
-                                    @if (in_array([$i + 6, $e], $user_schedules))
-                                        @if (in_array([$i + 6, $e], $students_schedules) && $role != 'student')
+                                    @if (in_array([$i, $e], $user_schedules))
+                                        @if (in_array([$i, $e], $students_schedules) && $role != 'student')
                                             @foreach ($students as $student)
-                                                @if (in_array([$i + 6, $e], $student[1]))
+                                                @if (in_array([$i, $e], $student[1]))
                                                     {{-- {{dd($student->first_name)}} --}}
-                                                    <td id="{{ $i + 6 }}-{{ $e }}"
+                                                    <td id="{{ $i }}-{{ $e }}"
                                                         class="border width selectable available preselected">
                                                         <a href="{{ route('profile.show', $student->id) }}"
                                                             class="text-sm text-green-100 font-bold name-student not-active">{{ $student->first_name }}
@@ -193,13 +195,13 @@
                                                 @endif
                                             @endforeach
                                         @else
-                                            <td id="{{ $i + 6 }}-{{ $e }}"
+                                            <td id="{{ $i }}-{{ $e }}"
                                                 class="border width selectable available preselected">
-                                                @if (in_array($i + 6 . '-' . $e, $date_classes))
+                                                @if (in_array($i . '-' . $e, $date_classes))
                                                     <div
                                                         class="flex flex-wrap flex-row justify-end gap-x-1 gap-y-0.5 pl-1 pr-1 tool-tip invisible">
                                                         @foreach ($date_classes as $key => $value)
-                                                            @if ($value === $i + 6 . '-' . $e)
+                                                            @if ($value === $i . '-' . $e)
                                                                 <button class="tooltip button_tooltip">
                                                                     <span
                                                                         class="tooltiptext mb-3">{{ $date_format_class[$key] }}</span>
@@ -211,14 +213,14 @@
                                             </td>
                                         @endif
                                     @else
-                                        @if (in_array([$i + 6, $e], $teacher_schedule) && !in_array([$i + 6, $e], $students_schedules))
-                                            <td id="{{ $i + 6 }}-{{ $e }}"
+                                        @if (in_array([$i, $e], $teacher_schedule) && !in_array([$i, $e], $students_schedules))
+                                            <td id="{{ $i }}-{{ $e }}"
                                                 class="border width selectable available">
-                                                @if (in_array($i + 6 . '-' . $e, $date_classes))
+                                                @if (in_array($i . '-' . $e, $date_classes))
                                                     <div
                                                         class="flex flex-wrap flex-row justify-end gap-x-1 gap-y-0.5 pl-1 pr-1 tool-tip invisible">
                                                         @foreach ($date_classes as $key => $value)
-                                                            @if ($value === $i + 6 . '-' . $e)
+                                                            @if ($value === $i . '-' . $e)
                                                                 <button class="tooltip button_tooltip">
                                                                     <span
                                                                         class="tooltiptext mb-3">{{ $date_format_class[$key] }}</span>
@@ -229,13 +231,13 @@
                                                 @endif
                                             </td>
                                         @else
-                                            <td id="{{ $i + 6 }}-{{ $e }}"
+                                            <td id="{{ $i }}-{{ $e }}"
                                                 class="border width selectable notAvailable preoccupied">
-                                                @if (in_array($i + 6 . '-' . $e, $date_classes))
+                                                @if (in_array($i . '-' . $e, $date_classes))
                                                     <div
                                                         class="flex flex-wrap flex-row justify-end gap-x-1 gap-y-0.5 pl-1 pr-1 tool-tip invisible">
                                                         @foreach ($date_classes as $key => $value)
-                                                            @if ($value === $i + 6 . '-' . $e)
+                                                            @if ($value === $i . '-' . $e)
                                                                 <button class="tooltip button_tooltip">
                                                                     <span
                                                                         class="tooltiptext mb-3">{{ $date_format_class[$key] }}</span>
@@ -254,8 +256,17 @@
                                 @endforeach
                                 @php
                                     $e = 0;
+                                    
                                 @endphp
                             </tr>
+                            @php
+                                // echo $i . ' ' . $university_schedule_end . ' ';
+                                if ($i == 23) {
+                                    $i = 0;
+                                }else{
+                                    $i++;
+                                }
+                            @endphp
                         @endfor
                     </table>
                 </div>
@@ -301,25 +312,25 @@
         var horaLocal = hoyLocal.getHours();
         // var horaUTC = hoyLocal.getUTCHours();
         var difHora = hoyLocal.getTimezoneOffset() / 60;
-        var OpenUTC = 11; // Hora UTC a la que abre la academia en PERU! (06:00 am Hora local en peru) (07:00 am hora local)
+        var OpenUTC = @json($university_schedule_start); // Hora UTC a la que abre la academia en PERU! (06:00 am Hora local en peru) (07:00 am hora local)
         var OpenLocal = OpenUTC - difHora;
 
         //Asignar hora UTC y Local al Horario
 
-        cellsUTC = $('.UTC');
+        // cellsUTC = $('.UTC');
         cellsLocal = $('.Local');
-        for (let i = 0; i < cellsUTC.length; i++) {
-            if (OpenUTC < 10) {
-                cellsUTC[i].innerHTML = "0" + OpenUTC + ":00";
-            } else {
-                cellsUTC[i].innerHTML = OpenUTC + ":00";
-            }
+        for (let i = 0; i < cellsLocal.length; i++) {
+            // if (OpenUTC < 10) {
+            //     cellsUTC[i].innerHTML = "0" + OpenUTC + ":00";
+            // } else {
+            //     cellsUTC[i].innerHTML = OpenUTC + ":00";
+            // }
 
-            if (OpenUTC >= 23) {
-                OpenUTC = 0;
-            } else {
-                OpenUTC++;
-            }
+            // if (OpenUTC >= 23) {
+            //     OpenUTC = 0;
+            // } else {
+            //     OpenUTC++;
+            // }
 
 
             if (OpenLocal < 10) {

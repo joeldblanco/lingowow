@@ -1,6 +1,16 @@
 <x-app-layout>
 
     @php
+        
+        //HORARIO UNIVERSIDAD
+        
+        $university_schedule_start = $university_schedule[0];
+        $university_schedule_end = $university_schedule[1];
+        $university_schedule_hours = $university_schedule[2];
+        
+        // PERIODO
+        
+        $hoy = (new Carbon\Carbon())->toCookieString();
         $current_period = App\Http\Controllers\ApportionmentController::currentPeriod();
         $period_start_c = new Carbon\Carbon($current_period[0]);
         $period_end_c = new Carbon\Carbon($current_period[1]);
@@ -37,7 +47,7 @@
         $abcense = App\Models\Classes::select('start_date')
             ->whereBetween('start_date', [$period_start_c->subDay()->toDateTimeString(), $period_end_c->toDateTimeString()])
             ->get();
-                        // ->where('status', '1')
+        // ->where('status', '1')
         
         foreach ($abcense as $key => $value) {
             $abcense[$key] = $value->start_date;
@@ -133,14 +143,16 @@
         <div class="flex space-x-4 p-4 bg-gray-100 mx-3 rounded-xl">
             <div class="wrapper bg-white rounded w-full p-24">
 
-                <h1 class="font-medium leading-tight text-xl mt-0 mb-2 text-center text-gray-500">Class to reschedule: {{$class_date}}</h1>
+                <h1 class="font-medium leading-tight text-xl mt-0 mb-2 text-center text-gray-500">Class to reschedule:
+                    {{ $class_date }}</h1>
 
                 <div class="mt-5 mb-10 grid grid-rows-1 grid-flow-col gap-4 justify-center ...">
                     <input class="@error('absence_reason') bg-red-500 @enderror" type="text" name="absence_reason"
                         id="absence_reason" placeholder="Reason for Absence" required>
                 </div>
 
-                <div class="container mx-auto" x-data="{ editBtn: true, edit: false, showModal1: false, showModal2: false, showModal3: false, showModalAbsence: false, event: {{ $event }}, loadingState: false }" x-cloak>
+                <div class="container mx-auto" x-data="{ editBtn: true, edit: false, showModal1: false, showModal2: false, showModal3: false, showModalAbsence: false, loadingState: false }" x-cloak>
+                    {{-- event: {{ $event }} PENDIENTE, ESTO FUE UN ERROR QUE NO RECONOCIA LA VARIABLE EVENT --}}
                     <div class="wrapper bg-white rounded shadow w-full">
 
                         {{-- <h3 class="text-4xl font-bold text-gray-800">Select your schedule</h3>
@@ -150,13 +162,15 @@
                             $days = ['SUNDAY', 'MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY'];
                             $aux = [];
                         @endphp
-                        <h1 class="font-medium leading-tight text-base mt-0 mb-2 text-left text-gray-600">Select the new date:</h1>
+                        <h1 class="font-medium leading-tight text-base mt-0 mb-2 text-left text-gray-600">Select the new
+                            date:</h1>
                         <!-- INICIO DEL HORARIO DE JUAN -->
-                        <table id="absence_table" class="border">
+                        <table id="absence_table" class="border" style="width: 100%">
                             <!--fila de los titulos-->
                             <thead>
                                 <tr>
-                                    <th class="cell" style="">LIMA TIME</th>
+                                    <th class="width border">UTC</th>
+                                    <th class="" style="">LOCAL</th>
                                     @foreach ($days as $day)
                                         <th class="border width" style="">
                                             {{ $day }}
@@ -169,9 +183,11 @@
                                 @php
                                     $e = 0;
                                     $d = 0;
+                                    $i = $university_schedule_start;
                                 @endphp
                                 @for ($week = 0; $week < 4; $week++)
                                     <tr>
+                                        <td class="width border"></td>
                                         <td class="width border"></td>
                                         <td class="width border">{{ $table_date[$d + 0] }}</td>
                                         <td class="width border">{{ $table_date[$d + 1] }}</td>
@@ -181,18 +197,23 @@
                                         <td class="width border">{{ $table_date[$d + 5] }}</td>
                                         <td class="width border">{{ $table_date[$d + 6] }}</td>
                                     </tr>
-                                    @for ($i = 0; $i < 16; $i++)
+                                    {{-- @for ($i = 0; $i < 16; $i++) --}}
+                                    @for ($hour = 0; $hour < $university_schedule_hours; $hour++)
                                         <tr class="border">
-                                            <td class="cell">
-                                                @if ($i + 6 < 10)
-                                                    0{{ $i + 6 }}:00
+                                            <td class="width border UTC">
+                                                @if ($i < 10)
+                                                    0{{ $i }}:00
                                                 @else
-                                                    {{ $i + 6 }}:00
+                                                    {{ $i }}:00
                                                 @endif
                                             </td>
+                                            <td class="width border Local">
+                                                {{-- AQUI LA HORA SE LLENA MEDIANTE JAVASCRIPT --}}
+                                            </td>
                                             @foreach ($days as $day)
-                                                @if (in_array([$i + 6, $e], $teacher_schedule) && ((new Carbon\carbon($day_format_range[$d]))->addHour($i+6)->greaterThan($now)))
-                                                    {{-- @php dd(($i+6)."-".$day_range[$d]); @endphp   --}}
+                                                @if (in_array([$i + 6, $e], $teacher_schedule) &&
+                                                    (new Carbon\carbon($day_format_range[$d]))->addHour($i + 6)->greaterThan($now))
+                                                    {{-- @php dd(($i+6)."-".$day_range[$d]); @endphp --}}
                                                     @if (in_array([$i + 6, $e], $students_schedules) || in_array($i + 6 . '-' . $day_range[$d], $abcense_classes))
                                                         <td id="{{ $i + 6 }}-{{ $e }}-{{ $week }}-{{ $period_range[$d] }}"
                                                             class="border width occupied">
@@ -217,6 +238,14 @@
                                                 $d -= 7;
                                             @endphp
                                         </tr>
+                                        @php
+                                            // echo $i . ' ' . $university_schedule_end . ' ';
+                                            if ($i == 23) {
+                                                $i = 0;
+                                            } else {
+                                                $i++;
+                                            }
+                                        @endphp
                                     @endfor
                                     @php
                                         
@@ -307,9 +336,9 @@
         $students_schedules = [];
         $scheduled_classes = App\Models\Enrolment::select('student_id')
             ->where('teacher_id', $teacher_id)
-            ->where('student_id','!=',$user)
+            ->where('student_id', '!=', $user)
             ->get();
-            
+        
         foreach ($scheduled_classes as $key => $value) {
             $students[$key] = $value->student_id;
         }
@@ -573,7 +602,7 @@
 
         // });
 
-        let hourForDays = 17;
+        let hourForDays = @json($university_schedule_hours) + 1;
         $("#absence_table").DataTable({
             searching: false,
             ordering: false,
@@ -581,8 +610,48 @@
             info: false,
             bLengthChange: false,
             pagingType: "simple",
-            stateSave: true,
+            // stateSave: true,
         });
+
+
+
+        var hoyLocal = new Date(@json($hoy));
+            var horaLocal = hoyLocal.getHours();
+            // var horaUTC = hoyLocal.getUTCHours();
+            var difHora = hoyLocal.getTimezoneOffset() / 60;
+            var OpenUTC = @json($university_schedule_start); // Hora UTC a la que abre la academia en PERU! (06:00 am Hora local en peru) (07:00 am hora local)
+            var OpenLocal = OpenUTC - difHora;
+
+            //Asignar hora UTC y Local al Horario
+            // cellsUTC = $('.UTC');
+            cellsLocal = $('.Local');
+            for (let i = 0; i < cellsLocal.length; i++) {
+                // if (OpenUTC < 10) {
+                //     cellsUTC[i].innerHTML = "0" + OpenUTC + ":00";
+                // } else {
+                //     cellsUTC[i].innerHTML = OpenUTC + ":00";
+                // }
+
+                // if (OpenUTC >= 23) {
+                //     OpenUTC = 0;
+                // } else {
+                //     OpenUTC++;
+                // }
+
+
+                if (OpenLocal < 10) {
+                    cellsLocal[i].innerHTML = "0" + OpenLocal + ":00";
+                } else {
+                    cellsLocal[i].innerHTML = OpenLocal + ":00";
+                }
+
+                if (OpenLocal >= 23) {
+                    OpenLocal = 0;
+                } else {
+                    OpenLocal++;
+                }
+            }
+
     </script>
 
     {{-- <link href='https://cdn.jsdelivr.net/npm/fullcalendar@5.10.2/main.min.css' rel='stylesheet' />

@@ -3,12 +3,15 @@
 namespace App\Http\Livewire;
 
 use App\Models\User;
+// use Illuminate\Console\Scheduling\Schedule;
+use App\Models\Schedule;
 use Livewire\Component;
 
 class SchedulingCalendar extends Component
 {
     
     public $schedule, $teacher_id;
+    public $university_schedule_start, $university_schedule_end, $university_schedule_hours;
     public $plan;
     public $event = "true";
     protected $listeners = ['loadSchedule'];
@@ -23,8 +26,12 @@ class SchedulingCalendar extends Component
         $this->schedule = json_decode(User::find($this->teacher_id)->schedules[0]->selected_schedule);
         // echo session('first_teacher');
         $this->plan = $plan;
-
         $this->schedule = [];
+        // dd(Schedule::university_schedule());
+        $university_schedule = Schedule::university_schedule();
+        $this->university_schedule_start = $university_schedule[0];
+        $this->university_schedule_end = $university_schedule[1];
+        $this->university_schedule_hours = $university_schedule[2];
     }
 
     /*public function dehydrate()

@@ -17,6 +17,7 @@ class ScheduledCalendar extends Component
     public $user_schedules;
     public $teacher_id;
     public $teacher_schedule;
+    public $university_schedule_start, $university_schedule_end, $university_schedule_hours;
     public $days = ['SUNDAY', 'MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY'];
     public $event = "true";
     public $user_id;
@@ -73,9 +74,12 @@ class ScheduledCalendar extends Component
         
         //array_merge($this->user_schedules);
         $this->user_schedules = $this->user_schedules->first();
-        
+        $university_schedule = Schedule::university_schedule();
+        $this->university_schedule_start = $university_schedule[0];
+        $this->university_schedule_end = $university_schedule[1];
+        $this->university_schedule_hours = $university_schedule[2];
 
-        //  dd($this->user_schedules);
+        // dd(Schedule::university_schedule());
     }
 
     public function edit()

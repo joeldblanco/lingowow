@@ -62,22 +62,22 @@ class SchedulingCalendarController extends Controller
         $classes_dates = session('classes_dates');
         $teacher_students = Enrolment::where('teacher_id', $teacher_id)->select('student_id')->get();
 
-        
+
         //CREATING STUDENT'S ENROLMENT (OR UPDATING IT, IN CASE IT ALREADY EXISTS BUT IS SOFTDELETED)//
         $enrolment = Enrolment::withTrashed()->updateOrCreate(
             ['student_id' => $student_id, 'course_id' => $course_id],
             ['teacher_id' => $teacher_id, 'deleted_at' => NULL]
         );
-        
+
 
         //CREATING STUDENT'S SCHEDULE (OR UPDATING IT, IN CASE IT ALREADY EXISTS BUT IS SOFTDELETED)//
         $student_schedule = json_encode($student_schedule);
-        
+
         $schedule = Schedule::withTrashed()->updateOrCreate(
             ['user_id' => $student_id, 'enrolment_id' => $enrolment->id],
             ['selected_schedule' => $student_schedule, 'deleted_at' => NULL]
         );
-        
+
         //ADDING CLASS DURATION (40 MIN) TO CLASS START DATETIME AND STORING IT IN ANOTHER VARIABLE (TO CREATE CLASS END DATETIME)//
         foreach ($classes_dates as $key => $value) {
             $classes_dates[$key] = [];
@@ -100,7 +100,7 @@ class SchedulingCalendarController extends Controller
             ]);
         }
 
-        
+
         //STORING ALL TEACHER'S STUDENTS' SCHEDULES IN ONE ARRAY//
         foreach ($teacher_students as $tskey => $tsvalue) {
             $teacher_students_schedule[$tskey] = Schedule::where('user_id', $tsvalue->student_id)->select('selected_schedule')->first();
@@ -110,7 +110,7 @@ class SchedulingCalendarController extends Controller
 
 
         //SENDING NOTIFICATION TO TEACHER//
-        
+
         // dd($student->id);
         $notification = Notification::sendNow($teacher, new BookedClass($student->id));
     }
@@ -251,12 +251,43 @@ class SchedulingCalendarController extends Controller
                 $affected_students = [];
                 $students_enrolments = Enrolment::where('teacher_id', $user_id)->get();
 
+                //Fechas para la consulta de las clases reagendadas en el periodo vigente.
+                $current_period = ApportionmentController::currentPeriod();
+                $period_end_c = new Carbon($current_period[1]);
+                $today = new Carbon();
+
                 foreach ($students_enrolments as $student_enrolment) {
                     $student_schedule = Schedule::select('selected_schedule')->where('enrolment_id', $student_enrolment->id)->first();
                     $student_schedule = json_decode($student_schedule->selected_schedule);
+
+                    //Consulta de las clases reagendadas en el periodo vigente.
+                    $abcense = Classes::select('start_date')
+                        ->where('status', '1')
+                        ->whereBetween('start_date', [$today->toDateTimeString(), $period_end_c->toDateTimeString()])
+                        ->get();
+
+                    foreach ($abcense as $key => $value) {
+                        $abcense[$key] = $value->start_date;
+                    }
+                    $abcense = json_decode($abcense);
+
+                    foreach ($abcense as $key => $value) {
+                        $abcense[$key] = new Carbon($abcense[$key]);
+                    }
+
+                    $abcense_classes = [];
+                    foreach ($abcense as $key => $value) {
+                        $abcense_classes[$key] = $abcense[$key]->isoFormat('H') . '-' . $abcense[$key]->isoFormat('d');
+                    }
+                    //Se añaden las clases reagendadas al horario de los estudiantes para un compendio general
+                    foreach ($abcense_classes as $classes){
+                        $class = explode("-", $classes);
+                        array_push($student_schedule,$class);
+                    }
+                    
                     array_push($students_schedules, $student_schedule);
                 }
-
+                
                 foreach ($students_schedules as $key => $student_schedule) {
 
                     // dd($requested_schedule, $students_schedules);
@@ -266,13 +297,17 @@ class SchedulingCalendarController extends Controller
 
                         // dd($students_schedules, $key, $student_block, $students_enrolments[$key]->student_id);
 
-                        if (in_array($student_block, $requested_schedule)) {
+                        if (!in_array($student_block, $requested_schedule)) {
                             array_push($affected_students, $students_enrolments[$key]->student_id);
                         }
                     }
                     // }
                 }
+
                 $affected_students = array_unique($affected_students);
+
+                // dd($students_schedules, $requested_schedule, $affected_students);
+
 
                 Schedule::withTrashed()->updateOrCreate(
                     ['user_id' => $user_id],
@@ -300,7 +335,7 @@ class SchedulingCalendarController extends Controller
 
                 if (count($affected_students) > 0) {
                     session(['affected_students' => $affected_students]);
-                    $message .= "However, the blocks taken by the following students will remain intact until the end of the current academic period: ";
+                    $message .= "However, the blocks taken and classes rescheduled by the following students will remain intact until the end of the current academic period: ";
                 }
             }
         } else {
@@ -435,7 +470,7 @@ class SchedulingCalendarController extends Controller
             ]);
 
             return view('cart');
-        }else {
+        } else {
             Cart::destroy();
             $message = "Request rejected";
             switch ($request->error) {
@@ -449,7 +484,6 @@ class SchedulingCalendarController extends Controller
                     $message .= ". You selected more classes than those reflected in your plan.";
                     break;
             }
-            
         }
 
         session(['message' => $message]);

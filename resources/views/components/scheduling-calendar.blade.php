@@ -3,7 +3,7 @@
 
 
     @php
-    
+        
         $hoy = (new Carbon\Carbon())->toCookieString();
         
         $scheduled_classes = App\Models\Enrolment::select('student_id')
@@ -62,6 +62,7 @@
         $now = new Carbon\Carbon();
         $date_range = new Carbon\CarbonPeriod($now, $period_end_c);
         $days_rest = 0;
+        $today = $now;
         //$period_range = [];
         
         foreach ($date_range as $key => $date) {
@@ -73,10 +74,10 @@
         // dd($days);
         $abcense = App\Models\Classes::select('start_date')
             ->where('status', '1')
-            ->whereBetween('start_date', [$period_start_c->subDay()->toDateTimeString(), $period_end_c->toDateTimeString()])
+            ->whereBetween('start_date', [$today->toDateTimeString(), $period_end_c->toDateTimeString()])
             ->get();
         
-        //dd($period_start_c);
+        // dd($abcense);
         
         foreach ($abcense as $key => $value) {
             $abcense[$key] = $value->start_date;
@@ -91,6 +92,8 @@
         foreach ($abcense as $key => $value) {
             $abcense_classes[$key] = $abcense[$key]->isoFormat('H') . '-' . $abcense[$key]->isoFormat('d');
         }
+        
+        // dd($abcense_classes);
         
         //Funcion que determina si esta disponible o no el dia.
         function notFree($a, $buscado, $days)
@@ -123,8 +126,14 @@
         
     @endphp
 
+    <a id="link-schedule" href="#link-s"></a>
+    <a name="link-s" class=""></a>
+    <br>
+
     <div class="container mx-auto" x-data="{ editBtn: true, edit: false, showModal1: false, showModal2: false, showModal3: false, event: {{ $event }}, loadingState: false, showModalAbsence: false }" x-cloak>
         <div class="wrapper bg-white rounded shadow w-full">
+
+
 
             <h3 class="text-4xl font-bold text-gray-800">Select your schedule</h3>
             <div class=" flex justify-between">
@@ -157,33 +166,38 @@
                 <!--filas seleccionables-->
                 @php
                     $e = 0;
+                    $i = $university_schedule_start;
                 @endphp
-                @for ($i = 0; $i < 16; $i++)
+                {{-- @for ($i = 0; $i < 16; $i++) --}}
+                @for ($hour = 0; $hour < $university_schedule_hours; $hour++)
                     <tr class="border">
-                        <td class="width border UTC">00:00</td>
-                        <td class="width border Local">
-                            @if ($i + 6 < 10)
-                                0{{ $i + 6 }}:00
+                        <td class="width border UTC">
+                            @if ($i < 10)
+                                0{{ $i }}:00
                             @else
-                                {{ $i + 6 }}:00
+                                {{ $i }}:00
                             @endif
                         </td>
+                        <td class="width border Local">
+                            {{-- AQUI LA HORA SE LLENA MEDIANTE JAVASCRIPT --}}
+                        </td>
                         @foreach ($days as $day)
-                            @if (in_array([$i + 6, $e], $schedule))
-                                @if (in_array([$i + 6, $e], $students_schedules))
-                                    <td id="{{ $i + 6 }}-{{ $e }}" class="border width"></td>
+                            @if (in_array([$i, $e], $schedule))
+                                @if (in_array([$i, $e], $students_schedules))
+                                    <td id="{{ $i }}-{{ $e }}" class="border width occupied"></td>
                                 @else
                                     {{-- @php dd(isFree($abcense_classes,"20-4",$days_rest)); @endphp --}}
 
-                                    @if (notFree($abcense_classes, $i + 6 . '-' . $e, $days_rest))
-                                        <td id="{{ $i + 6 }}-{{ $e }}" class="border width"></td>
+                                    @if (notFree($abcense_classes, $i . '-' . $e, $days_rest))
+                                        <td id="{{ $i }}-{{ $e }}" class="border width occupied">
+                                        </td>
                                     @else
-                                        <td id="{{ $i + 6 }}-{{ $e }}"
+                                        <td id="{{ $i }}-{{ $e }}"
                                             class="border width cursor-pointer available selectable"></td>
                                     @endif
                                 @endif
                             @else
-                                <td id="{{ $i + 6 }}-{{ $e }}" class="border width"></td>
+                                <td id="{{ $i }}-{{ $e }}" class="border width occupied"></td>
                             @endif
                             @php
                                 $e++;
@@ -193,6 +207,14 @@
                             $e = 0;
                         @endphp
                     </tr>
+                    @php
+                        // echo $i . ' ' . $university_schedule_end . ' ';
+                        if ($i == 23) {
+                            $i = 0;
+                        } else {
+                            $i++;
+                        }
+                    @endphp
                 @endfor
             </table>
             <!-- FIN DEL HORARIO DE JUAN -->
@@ -271,24 +293,25 @@
                 var horaLocal = hoyLocal.getHours();
                 // var horaUTC = hoyLocal.getUTCHours();
                 var difHora = hoyLocal.getTimezoneOffset() / 60;
-                var OpenUTC = 11; // Hora UTC a la que abre la academia en PERU! (06:00 am Hora local en peru) (07:00 am hora local)
+                var OpenUTC =
+                @json($university_schedule_start); // Hora UTC a la que abre la academia en PERU! (06:00 am Hora local en peru) (07:00 am hora local)
                 var OpenLocal = OpenUTC - difHora;
 
                 //Asignar hora UTC y Local al Horario
-                cellsUTC = $('.UTC');
+                // cellsUTC = $('.UTC');
                 cellsLocal = $('.Local');
-                for (let i = 0; i < cellsUTC.length; i++) {
-                    if (OpenUTC < 10) {
-                        cellsUTC[i].innerHTML = "0" + OpenUTC + ":00";
-                    } else {
-                        cellsUTC[i].innerHTML = OpenUTC + ":00";
-                    }
+                for (let i = 0; i < cellsLocal.length; i++) {
+                    // if (OpenUTC < 10) {
+                    //     cellsUTC[i].innerHTML = "0" + OpenUTC + ":00";
+                    // } else {
+                    //     cellsUTC[i].innerHTML = OpenUTC + ":00";
+                    // }
 
-                    if (OpenUTC >= 23) {
-                        OpenUTC = 0;
-                    } else {
-                        OpenUTC++;
-                    }
+                    // if (OpenUTC >= 23) {
+                    //     OpenUTC = 0;
+                    // } else {
+                    //     OpenUTC++;
+                    // }
 
 
                     if (OpenLocal < 10) {
@@ -392,24 +415,24 @@
             var horaLocal = hoyLocal.getHours();
             // var horaUTC = hoyLocal.getUTCHours();
             var difHora = hoyLocal.getTimezoneOffset() / 60;
-            var OpenUTC = 11; // Hora UTC a la que abre la academia en PERU! (06:00 am Hora local en peru) (07:00 am hora local)
+            var OpenUTC = @json($university_schedule_start); // Hora UTC a la que abre la academia en PERU! (06:00 am Hora local en peru) (07:00 am hora local)
             var OpenLocal = OpenUTC - difHora;
 
             //Asignar hora UTC y Local al Horario
-            cellsUTC = $('.UTC');
+            // cellsUTC = $('.UTC');
             cellsLocal = $('.Local');
-            for (let i = 0; i < cellsUTC.length; i++) {
-                if (OpenUTC < 10) {
-                    cellsUTC[i].innerHTML = "0" + OpenUTC + ":00";
-                } else {
-                    cellsUTC[i].innerHTML = OpenUTC + ":00";
-                }
+            for (let i = 0; i < cellsLocal.length; i++) {
+                // if (OpenUTC < 10) {
+                //     cellsUTC[i].innerHTML = "0" + OpenUTC + ":00";
+                // } else {
+                //     cellsUTC[i].innerHTML = OpenUTC + ":00";
+                // }
 
-                if (OpenUTC >= 23) {
-                    OpenUTC = 0;
-                } else {
-                    OpenUTC++;
-                }
+                // if (OpenUTC >= 23) {
+                //     OpenUTC = 0;
+                // } else {
+                //     OpenUTC++;
+                // }
 
 
                 if (OpenLocal < 10) {
@@ -423,6 +446,13 @@
                 } else {
                     OpenLocal++;
                 }
+            }
+
+            let BT = $(".button-teacher");
+            for (let i = 0; i < BT.length; i++) {
+                BT[i].addEventListener('click', function() {
+                    document.getElementById("link-schedule").click();
+                });
             }
         </script>
     </div>

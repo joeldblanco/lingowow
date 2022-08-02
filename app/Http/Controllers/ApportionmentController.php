@@ -30,7 +30,7 @@ class ApportionmentController extends Controller
 
         $next_period_start = new Carbon('first monday of next month');
         $next_period_end = (new Carbon('first monday of next month'))->addDays(6);
-        $next_period_end->addDays(1); 
+        $next_period_end->addDays(1);
         $next_period_end->addWeeks(3);
         // dd($next_period_end);
 
