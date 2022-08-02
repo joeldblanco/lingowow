@@ -19,7 +19,7 @@ class ClassController extends Controller
      */
     public function index()
     {
-
+        // dd("hola");
         // $posts = auth()->user()->posts()->orderBy('updated_at', 'DESC');
 
         // $posts = auth()->user()->posts->sortByDesc('updated_at');
@@ -157,7 +157,12 @@ class ClassController extends Controller
         }
         $students_schedules = array_merge(...$students_schedules);
 
-        return view('classes.edit', compact('id', 'class_date', 'student_id', 'teacher_id', 'teacher_schedule', 'students_schedules', 'students'));
+
+        //HORARIO DE LA UNIVERSIDAD
+
+        $university_schedule = Schedule::university_schedule();
+
+        return view('classes.edit', compact('university_schedule', 'id', 'class_date', 'student_id', 'teacher_id', 'teacher_schedule', 'students_schedules', 'students'));
     }
 
     /**

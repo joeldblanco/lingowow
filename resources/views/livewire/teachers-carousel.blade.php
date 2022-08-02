@@ -34,8 +34,9 @@
                                         <div class="border-t-2"></div>
                                         <div class="flex justify-center">
                                             <button wire:click.prevent="loadSchedule({{ $teacher->id }})"
-                                                class="inline-block bg-blue-800 text-white px-6 py-2 rounded hover:bg-blue-900 hover:text-white mt-5">Select</button>
-                                        </div>
+                                                class="button-teacher inline-block bg-blue-800 text-white px-6 py-2 rounded hover:bg-blue-900 hover:text-white mt-5">Select</button>
+                                            
+                                            </div>
                                     </div>
                                 </div>
                             </div>
