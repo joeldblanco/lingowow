@@ -6,6 +6,7 @@
         //$plan = session('plan');
         //dd(session('plan'));
         //dd(date('m-d-Y h:i:s a'));
+        
         $scheduled_classes;
         $temp_student_schedule = [];
         $student_schedule = [];
