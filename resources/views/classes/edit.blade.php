@@ -616,47 +616,41 @@
 
 
         var hoyLocal = new Date(@json($hoy));
-            var horaLocal = hoyLocal.getHours();
-            // var horaUTC = hoyLocal.getUTCHours();
-            var difHora = hoyLocal.getTimezoneOffset() / 60;
-            var OpenUTC = @json($university_schedule_start); // Hora UTC a la que abre la academia en PERU! (06:00 am Hora local en peru) (07:00 am hora local)
-            var OpenLocal = OpenUTC - difHora;
+        var horaLocal = hoyLocal.getHours();
+        // var horaUTC = hoyLocal.getUTCHours();
+        var difHora = hoyLocal.getTimezoneOffset() / 60;
+        var OpenUTC =
+        @json($university_schedule_start); // Hora UTC a la que abre la academia en PERU! (06:00 am Hora local en peru) (07:00 am hora local)
+        var OpenLocal = OpenUTC - difHora;
 
-            //Asignar hora UTC y Local al Horario
-            // cellsUTC = $('.UTC');
-            cellsLocal = $('.Local');
-            for (let i = 0; i < cellsLocal.length; i++) {
-                // if (OpenUTC < 10) {
-                //     cellsUTC[i].innerHTML = "0" + OpenUTC + ":00";
-                // } else {
-                //     cellsUTC[i].innerHTML = OpenUTC + ":00";
-                // }
+        //Asignar hora UTC y Local al Horario
+        // cellsUTC = $('.UTC');
+        cellsLocal = $('.Local');
+        for (let i = 0; i < cellsLocal.length; i++) {
+            // if (OpenUTC < 10) {
+            //     cellsUTC[i].innerHTML = "0" + OpenUTC + ":00";
+            // } else {
+            //     cellsUTC[i].innerHTML = OpenUTC + ":00";
+            // }
 
-                // if (OpenUTC >= 23) {
-                //     OpenUTC = 0;
-                // } else {
-                //     OpenUTC++;
-                // }
+            // if (OpenUTC >= 23) {
+            //     OpenUTC = 0;
+            // } else {
+            //     OpenUTC++;
+            // }
 
 
-                if (OpenLocal < 10) {
-                    if (OpenLocal < 0) {
+            if (OpenLocal < 10) {
+                if (OpenLocal < 0) {
                     OpenLocal += 24;
                     cellsLocal[i].innerHTML = OpenLocal + ":00";
                 } else {
                     cellsLocal[i].innerHTML = "0" + OpenLocal + ":00";
                 }
-                } else {
-                    cellsLocal[i].innerHTML = OpenLocal + ":00";
-                }
-
-                if (OpenLocal >= 23) {
-                    OpenLocal = 0;
-                } else {
-                    OpenLocal++;
-                }
+            } else {
+                cellsLocal[i].innerHTML = OpenLocal + ":00";
             }
-
+        }
     </script>
 
     {{-- <link href='https://cdn.jsdelivr.net/npm/fullcalendar@5.10.2/main.min.css' rel='stylesheet' />

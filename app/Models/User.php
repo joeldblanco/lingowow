@@ -205,4 +205,12 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return $this->belongsToMany(Activity::class);
     }
+
+    /**
+     * Get all the user's enrolments.
+     */
+    public function enrolments()
+    {
+        return $this->hasMany(Enrolment::class, 'student_id');
+    }
 }

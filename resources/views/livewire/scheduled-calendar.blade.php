@@ -1,5 +1,7 @@
 <div>
 
+    @livewire('schedule')
+
     @php
         
         // dd($university_schedule_hours);

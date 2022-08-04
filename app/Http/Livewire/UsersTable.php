@@ -127,7 +127,7 @@ class UsersTable extends Component
 
             $this->user_schedule = Schedule::select("selected_schedule")->where('user_id', $this->selected_teacher->id)->get();
             if ($this->user_schedule && (count($this->user_schedule) > 0)) {
-                $this->user_schedule = json_decode($this->user_schedule[0]->selected_schedule);
+                $this->user_schedule = $this->user_schedule[0]->selected_schedule;
             } else {
                 $this->user_schedule = [];
             }
@@ -146,13 +146,13 @@ class UsersTable extends Component
 
         foreach ($this->students as $key => $value) {
             $this->students[$key][1] = Schedule::select('selected_schedule')->where('user_id', $value->id)->get();
-            $this->students[$key][1] = json_decode($this->students[$key][1][0]->selected_schedule);
+            $this->students[$key][1] = $this->students[$key][1][0]->selected_schedule;
         }
 
         for ($i = 0; $i < count($scheduled_classes); $i++) {
             array_push($temp_student_schedule, Schedule::select('selected_schedule')->where('user_id', $scheduled_classes[$i]->student_id)->get());
             if ($temp_student_schedule[$i][0]->selected_schedule)
-                array_push($student_schedule, json_decode($temp_student_schedule[$i][0]->selected_schedule));
+                array_push($student_schedule, $temp_student_schedule[$i][0]->selected_schedule);
         }
 
         if (!empty(array_filter($student_schedule, function ($a) {
