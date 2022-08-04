@@ -92,7 +92,7 @@ class Schedule extends Component
 
     public function refresh()
     {
-        $this->user_schedules = ModelsSchedule::where('user_id', auth()->id())->get();
+        $this->user_schedules = ModelsSchedule::where('user_id', $this->user_id)->get();
         // if(count($this->user_schedules) > 0){
         foreach ($this->user_schedules as $key => $value) {
             $this->user_schedules[$key] = $value->selected_schedule;
@@ -119,9 +119,10 @@ class Schedule extends Component
 
             if (count($this->teacher_schedule) > 0) $this->teacher_schedule = json_decode(json_encode($this->teacher_schedule[0]), 1);
         }
+        $this->user_schedules = $this->user_schedules->first();
+
         $this->edit();
 
-        $this->user_schedules = $this->user_schedules->first();
     }
 
     public function loadTeacherSchedule($user_id)
