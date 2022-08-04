@@ -202,6 +202,11 @@ class Schedule extends Component
             $this->user_schedules = $user->schedules->where('enrolment_id', $enrolment->id)->first()->selected_schedule;
             $this->user_schedules = null ? [] : array_filter($this->user_schedules);
 
+            $this->schedule_user = $this->user_schedules;
+            foreach ($this->schedule_user as $key => $value) {
+                $this->schedule_user[$key] = implode('-', $value);
+            }
+
             $current_period = ApportionmentController::currentPeriod();
             $period_start_c = new Carbon($current_period[0]);
             // $period_end_c = new Carbon($current_period[1]);
@@ -221,6 +226,21 @@ class Schedule extends Component
                 $this->date_classes[$key] = $this->classes[$key]->isoFormat('H') . '-' . $this->classes[$key]->isoFormat('d');
                 $this->date_format_class[$key] = $this->classes[$key]->isoFormat('ddd, D MMM HH:mm a');
             }
+
+            $this->scheduled_classes = Enrolment::select('student_id')
+                ->where('teacher_id', $enrolment->teacher_id)
+                ->get();
+
+            foreach ($this->scheduled_classes as $key => $value) {
+                $this->students[$key] = $value->student_id;
+            }
+
+            $this->students = User::select('id', 'first_name', 'last_name')->find($this->students);
+
+            foreach ($this->students as $student) {
+                $this->students_schedules[] = $student->schedules->first()->selected_schedule;
+            }
+            $this->students_schedules = array_merge(...$this->students_schedules);
         }
     }
 

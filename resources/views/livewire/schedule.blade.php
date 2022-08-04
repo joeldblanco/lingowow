@@ -1,4 +1,5 @@
 <div>
+    {{dd(session()->all())}}
     <link rel="stylesheet" type="text/css" href="{{ asset('css/jquery.datetimepicker.min.css') }}">
 
     {{-- @if ($role != 'admin') --}}
@@ -291,6 +292,30 @@
                 </x-slot>
             </x-modal>
 
+            <x-modal type="info" name="showModal1">
+                <x-slot name="title">
+                    Are you sure?
+                </x-slot>
+
+                <x-slot name="content">
+                    Are you sure you want to save your schedule?
+                </x-slot>
+
+                <x-slot name="footer" class="justify-center">
+                    <button wire:click="edit()"
+                        onclick="saveSchedule({{ isset($user_schedules) ? count($user_schedules) : 0 }},'schedule.update',{{ Auth::user()->roles->pluck('id')[0] }});toggleCellBlock()"
+                        class="bg-green-600 font-semibold text-white p-2 w-32 mr-1 rounded-full hover:bg-green-700 focus:outline-none focus:ring shadow-lg hover:shadow-none transition-all duration-300"
+                        @click=" showModal1 = false, editBtn = true, edit = false, loadingState = true">
+                        Save
+                    </button>
+                    <button wire:click="edit()"
+                        class="bg-red-600 font-semibold text-white p-2 ml-1 w-32 rounded-full hover:bg-red-700 focus:outline-none focus:ring shadow-lg hover:shadow-none transition-all duration-300"
+                        @click=" showModal1 = false ">
+                        Cancel
+                    </button>
+                </x-slot>
+            </x-modal>           
+
             @include('components.loading-state')
             {{-- Clases para reagendar --}}
 
@@ -360,7 +385,7 @@
             });
 
             $('body').on("contentChanged", event => {
-                // console.log("hola")
+                console.log("hola")
                 var cells = $(".selected");
                 // console.log(cells);
                 var role = "{{ Auth::user()->roles->pluck('name')[0] }}";
