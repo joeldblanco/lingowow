@@ -41,6 +41,7 @@ class Schedule extends Component
     public $abcense_classes = [];
     public $days_rest = 0;
     public $mode = "show";
+    public $next_schedule = [];
 
     protected $listeners = ['showTeacherInfo', 'loadSelectingSchedule'];
 
@@ -205,6 +206,16 @@ class Schedule extends Component
             $this->schedule_user = $this->user_schedules;
             foreach ($this->schedule_user as $key => $value) {
                 $this->schedule_user[$key] = implode('-', $value);
+            }
+
+            $this->next_schedule = ModelsSchedule::select('next_schedule')
+                ->where('enrolment_id', $enrolment->id)
+                ->first();
+
+            if ($this->next_schedule != null) {
+                $this->next_schedule = json_decode($this->next_schedule->next_schedule);
+            } else {
+                $this->next_schedule = [];
             }
 
             $current_period = ApportionmentController::currentPeriod();
