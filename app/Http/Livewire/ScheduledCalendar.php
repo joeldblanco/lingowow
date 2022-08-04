@@ -6,9 +6,6 @@ use App\Models\Enrolment;
 use App\Models\Schedule;
 use Livewire\Component;
 use App\Models\User;
-use App\Models\ApportionmentController;
-use Illuminate\Support\Facades\DB;
-use phpDocumentor\Reflection\Types\This;
 
 class ScheduledCalendar extends Component
 {

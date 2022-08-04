@@ -12,6 +12,10 @@ class Schedule extends Model
     use HasFactory;
     use SoftDeletes;
 
+    protected $casts = [
+        'selected_schedule' => 'array',
+    ];
+
     /**
      * The attributes that are mass assignable.
      *
@@ -32,8 +36,7 @@ class Schedule extends Model
         $U_S = User::whereHas("roles", function ($role) {
             $role->where("name", "admin");
         })->first();
-        $U_S = $U_S->schedules->first();
-        $U_S = json_decode($U_S->selected_schedule);
+        $U_S = $U_S->schedules->first()->selected_schedule;
         $start = $U_S[0];
         $end = $U_S[1];
         $hours = 0;

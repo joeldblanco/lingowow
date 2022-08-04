@@ -294,7 +294,7 @@
                 // var horaUTC = hoyLocal.getUTCHours();
                 var difHora = hoyLocal.getTimezoneOffset() / 60;
                 var OpenUTC =
-                @json($university_schedule_start); // Hora UTC a la que abre la academia en PERU! (06:00 am Hora local en peru) (07:00 am hora local)
+                    @json($university_schedule_start); // Hora UTC a la que abre la academia en PERU! (06:00 am Hora local en peru) (07:00 am hora local)
                 var OpenLocal = OpenUTC - difHora;
 
                 //Asignar hora UTC y Local al Horario
@@ -415,7 +415,8 @@
             var horaLocal = hoyLocal.getHours();
             // var horaUTC = hoyLocal.getUTCHours();
             var difHora = hoyLocal.getTimezoneOffset() / 60;
-            var OpenUTC = @json($university_schedule_start); // Hora UTC a la que abre la academia en PERU! (06:00 am Hora local en peru) (07:00 am hora local)
+            var OpenUTC =
+            @json($university_schedule_start); // Hora UTC a la que abre la academia en PERU! (06:00 am Hora local en peru) (07:00 am hora local)
             var OpenLocal = OpenUTC - difHora;
 
             //Asignar hora UTC y Local al Horario
@@ -436,15 +437,14 @@
 
 
                 if (OpenLocal < 10) {
-                    cellsLocal[i].innerHTML = "0" + OpenLocal + ":00";
+                    if (OpenLocal < 0) {
+                        OpenLocal += 24;
+                        cellsLocal[i].innerHTML = OpenLocal + ":00";
+                    } else {
+                        cellsLocal[i].innerHTML = "0" + OpenLocal + ":00";
+                    }
                 } else {
                     cellsLocal[i].innerHTML = OpenLocal + ":00";
-                }
-
-                if (OpenLocal >= 23) {
-                    OpenLocal = 0;
-                } else {
-                    OpenLocal++;
                 }
             }
 
