@@ -64,7 +64,7 @@ class TeachersCarousel extends Component
         $this->loadingState = true;
         $this->selectedTeacher = $teacher_id;
         session(['teacher_id' => $teacher_id]);
-        $this->emit('loadSchedule', $teacher_id);
+        $this->emit('loadSelectingSchedule', $teacher_id);
         // dd($this->emit('loadSchedule', $teacher_id));
     }
 

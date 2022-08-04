@@ -60,7 +60,9 @@
                 
                 <livewire:teachers-carousel />
                 
-                <livewire:scheduling-calendar plan="{{$plan}}" />
+                {{-- <livewire:scheduling-calendar plan="{{$plan}}" /> --}}
+
+                @livewire('schedule', ['plan' => $plan, 'user_id' => auth()->id(), 'mode' => 'edit'])
 
             </div>
         </div>

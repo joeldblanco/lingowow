@@ -69,9 +69,12 @@ class SchedulingCalendarController extends Controller
             ['teacher_id' => $teacher_id, 'deleted_at' => NULL]
         );
 
+        //CHANGING STUDENT'S ROLE FROM 'GUEST' TO 'STUDENT'//
+        $student->removeRole('guest');
+        $student->assignRole('student');
 
         //CREATING STUDENT'S SCHEDULE (OR UPDATING IT, IN CASE IT ALREADY EXISTS BUT IS SOFTDELETED)//
-        $student_schedule = json_encode($student_schedule);
+        $student_schedule = $student_schedule;
 
         $schedule = Schedule::withTrashed()->updateOrCreate(
             ['user_id' => $student_id, 'enrolment_id' => $enrolment->id],
@@ -105,7 +108,7 @@ class SchedulingCalendarController extends Controller
         foreach ($teacher_students as $tskey => $tsvalue) {
             $teacher_students_schedule[$tskey] = Schedule::where('user_id', $tsvalue->student_id)->select('selected_schedule')->first();
             $teacher_students_schedule[$tskey] = $teacher_students_schedule[$tskey]->selected_schedule;
-            $teacher_students_schedule = json_decode($teacher_students_schedule[$tskey]);
+            // $teacher_students_schedule = json_decode($teacher_students_schedule[$tskey]);
         }
 
 
@@ -161,7 +164,7 @@ class SchedulingCalendarController extends Controller
 
             $user_schedule = Schedule::select('selected_schedule')->where('user_id', $user_id)->get();
             // dd($user_id);
-            $user_schedule = json_decode($user_schedule[0]->selected_schedule);
+            $user_schedule = $user_schedule[0]->selected_schedule;
 
             if ($user_role == "student") {
 
@@ -177,7 +180,7 @@ class SchedulingCalendarController extends Controller
 
                 $teacher_students_schedule = Schedule::select('selected_schedule')->whereIn('user_id', $teacher_students)->get();
                 foreach ($teacher_students_schedule as $key => $value) {
-                    $teacher_students_schedule[$key] = json_decode($value->selected_schedule);
+                    $teacher_students_schedule[$key] = $value->selected_schedule;
                 }
                 $teacher_students_schedule = array_merge(...$teacher_students_schedule);
 
@@ -186,7 +189,7 @@ class SchedulingCalendarController extends Controller
                 }
 
                 $teacher_selected_schedule = Schedule::select('selected_schedule')->where('user_id', $teacher_id)->get();
-                $teacher_selected_schedule = json_decode($teacher_selected_schedule[0]->selected_schedule);
+                $teacher_selected_schedule = $teacher_selected_schedule[0]->selected_schedule;
                 $teacher_available_schedule = $teacher_selected_schedule;
                 foreach ($teacher_students_schedule as $t_schedule) {
                     \array_splice($teacher_available_schedule, array_search($t_schedule, $teacher_available_schedule), 1);
@@ -228,7 +231,7 @@ class SchedulingCalendarController extends Controller
 
                     Schedule::withTrashed()->updateOrCreate(
                         ['user_id' => $user_id, 'enrolment_id' => $enrolment->id],
-                        ['selected_schedule' => json_encode($requested_schedule), 'deleted_at' => NULL]
+                        ['selected_schedule' => $requested_schedule, 'deleted_at' => NULL]
                     );
 
                     // $teacher_available_schedule = json_encode($teacher_available_schedule);
@@ -258,7 +261,7 @@ class SchedulingCalendarController extends Controller
 
                 foreach ($students_enrolments as $student_enrolment) {
                     $student_schedule = Schedule::select('selected_schedule')->where('enrolment_id', $student_enrolment->id)->first();
-                    $student_schedule = json_decode($student_schedule->selected_schedule);
+                    $student_schedule = $student_schedule->selected_schedule;
 
                     //Consulta de las clases reagendadas en el periodo vigente.
                     $abcense = Classes::select('start_date')
@@ -280,14 +283,14 @@ class SchedulingCalendarController extends Controller
                         $abcense_classes[$key] = $abcense[$key]->isoFormat('H') . '-' . $abcense[$key]->isoFormat('d');
                     }
                     //Se añaden las clases reagendadas al horario de los estudiantes para un compendio general
-                    foreach ($abcense_classes as $classes){
+                    foreach ($abcense_classes as $classes) {
                         $class = explode("-", $classes);
-                        array_push($student_schedule,$class);
+                        array_push($student_schedule, $class);
                     }
-                    
+
                     array_push($students_schedules, $student_schedule);
                 }
-                
+
                 foreach ($students_schedules as $key => $student_schedule) {
 
                     // dd($requested_schedule, $students_schedules);
@@ -311,7 +314,7 @@ class SchedulingCalendarController extends Controller
 
                 Schedule::withTrashed()->updateOrCreate(
                     ['user_id' => $user_id],
-                    ['selected_schedule' => json_encode($requested_schedule), 'deleted_at' => NULL]
+                    ['selected_schedule' => $requested_schedule, 'deleted_at' => NULL]
                 );
 
                 // Schedule::upsert([

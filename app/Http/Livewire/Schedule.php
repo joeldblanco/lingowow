@@ -20,7 +20,7 @@ class Schedule extends Component
     public $university_schedule_start, $university_schedule_end, $university_schedule_hours;
     public $days = ['SUNDAY', 'MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY'];
     public $event = "true";
-    public $user_id;
+    public $user;
     public $user_courses;
     public $user_courses_aux = [];
     public $scheduled_classes;
@@ -34,50 +34,95 @@ class Schedule extends Component
     public $date_format_class = [];
     public $hoy;
     public $course;
+    public $plan;
+    public $name;
+    public $schedule = [];
+    public $absence_classes;
+    public $abcense_classes = [];
+    public $days_rest = 0;
+    public $mode = "show";
 
-    protected $listeners = ['showTeacherInfo'];
+    protected $listeners = ['showTeacherInfo', 'loadSelectingSchedule'];
 
     /**
      * Create a new component instance.
      *
      * @return void
      */
-    public function mount($user_id, $course_id = null)
+    public function mount($user_id, $course_id = null, $plan = null, $mode = "show")
     {
         $course_id = 1;
         if (!is_null($course_id)) $this->course = Course::find($course_id);
         $this->hoy = (new Carbon())->toCookieString();
-        $this->role = auth()->user()->roles->first()->name;
-        $this->user_id = $user_id;
+        $this->role = User::find($user_id)->roles->first()->name;
+        $this->user = User::find($user_id);
+        $this->plan = $plan;
 
-        if ($this->role == "teacher") {
-            $this->teacher_schedule = User::find($this->user_id)->schedules->first()->selected_schedule;
+        if ($this->role == "guest") {
 
-            $this->loadTeacherSchedule($this->user_id);
+            $this->loadGuestSchedule($this->user->id);
         } else if ($this->role == "student") {
 
-            $this->teacher_id = Enrolment::select("teacher_id")
-                ->where("student_id", $this->user_id)->first()->teacher_id;
+            if ($this->user->enrolments->count() > 0) {
 
-            $this->teacher_schedule = User::find($this->teacher_id)->schedules;
+                $this->teacher_id = Enrolment::select("teacher_id")
+                    ->where("student_id", $this->user->id)->first();
 
-            foreach ($this->teacher_schedule as $key => $value) {
-                $this->teacher_schedule[$key] = $value->selected_schedule;
+                $this->teacher_id = $this->teacher_id->teacher_id;
+
+                $this->teacher_schedule = User::find($this->teacher_id)->schedules;
+
+                foreach ($this->teacher_schedule as $key => $value) {
+                    $this->teacher_schedule[$key] = $value->selected_schedule;
+                }
+
+                if (!$this->teacher_schedule->first()) $this->teacher_schedule = [];
+
+                if (count($this->teacher_schedule) > 0) $this->teacher_schedule = json_decode(json_encode($this->teacher_schedule[0]), 1);
+
+                $this->loadStudentSchedule($this->user->id);
             }
+        } else if ($this->role == "teacher") {
 
-            if (!$this->teacher_schedule->first()) $this->teacher_schedule = [];
+            $this->teacher_schedule = User::find($this->user->id)->schedules->first()->selected_schedule;
 
-            if (count($this->teacher_schedule) > 0) $this->teacher_schedule = json_decode(json_encode($this->teacher_schedule[0]), 1);
-
-            $this->loadStudentSchedule($this->user_id);
+            $this->loadTeacherSchedule($this->user->id);
         } else if ($this->role == "admin") {
-            $this->loadAdminSchedule($this->user_id);
+
+            $this->loadAdminSchedule($this->user->id);
         }
 
         $university_schedule = ModelsSchedule::university_schedule();
         $this->university_schedule_start = $university_schedule[0];
         $this->university_schedule_end = $university_schedule[1];
         $this->university_schedule_hours = $university_schedule[2];
+    }
+
+    public function loadSelectingSchedule($teacher_id)
+    {
+        $this->teacher_id = $teacher_id;
+        $this->name = User::find($this->teacher_id)->first_name . " " . User::find($this->teacher_id)->last_name;
+        $this->schedule = User::find($this->teacher_id)->schedules[0]->selected_schedule;
+
+        $scheduled_classes = Enrolment::select('student_id')
+            ->where('teacher_id', $teacher_id)
+            ->get();
+
+        $students = [];
+        foreach ($scheduled_classes as $key => $value) {
+            $students[$key] = $value->student_id;
+        }
+        $students = User::find($students);
+
+        $this->students_schedules = [];
+        foreach ($students as $student) {
+            $this->students_schedules[] = $student->schedules->first()->selected_schedule;
+        }
+        $this->students_schedules = array_merge(...$this->students_schedules);
+
+        if ($this->schedule == null) $this->schedule = [];
+        $this->emit('loadingState', false);
+        $this->edit();
     }
 
     public function edit()
@@ -87,12 +132,12 @@ class Schedule extends Component
 
     public function showTeacherInfo($user_id)
     {
-        $this->user_id = $user_id;
+        $this->user->id = $user_id;
     }
 
     public function refresh()
     {
-        $this->user_schedules = ModelsSchedule::where('user_id', $this->user_id)->get();
+        $this->user_schedules = ModelsSchedule::where('user_id', $this->user->id)->get();
         // if(count($this->user_schedules) > 0){
         foreach ($this->user_schedules as $key => $value) {
             $this->user_schedules[$key] = $value->selected_schedule;
@@ -102,12 +147,12 @@ class Schedule extends Component
         // }
 
         $this->teacher_id = Enrolment::select("teacher_id")
-            ->where("student_id", $this->user_id)->first();
+            ->where("student_id", $this->user->id)->first();
 
         if (!is_null($this->teacher_id) && $this->role == "student") {
             $this->teacher_id = $this->teacher_id->teacher_id;
         } else {
-            $this->teacher_id = $this->user_id;
+            $this->teacher_id = $this->user->id;
         }
 
         if (!is_null($this->teacher_id)) {
@@ -122,29 +167,30 @@ class Schedule extends Component
         $this->user_schedules = $this->user_schedules->first();
 
         $this->edit();
-
     }
 
-    public function loadTeacherSchedule($user_id)
+    public function loadGuestSchedule()
     {
-        $user = User::find($user_id);
-        $this->user_schedules = $user->schedules->first()->selected_schedule;
-        $this->user_schedules = null ? [] : array_filter($this->user_schedules);
-
-        $this->scheduled_classes = Enrolment::select('student_id')
-            ->where('teacher_id', $user_id)
+        $today = new Carbon();
+        $abcense = Classes::select('start_date')
+            ->where('status', '1')
+            ->whereBetween('start_date', [$today->toDateTimeString(), ApportionmentController::currentPeriod()[1]])
             ->get();
 
-        foreach ($this->scheduled_classes as $key => $value) {
-            $this->students[$key] = $value->student_id;
+        // dd($abcense);
+
+        foreach ($abcense as $key => $value) {
+            $abcense[$key] = $value->start_date;
+        }
+        $abcense = json_decode($abcense);
+
+        foreach ($abcense as $key => $value) {
+            $abcense[$key] = new Carbon($abcense[$key]);
         }
 
-        $this->students = User::select('id', 'first_name', 'last_name')->find($this->students);
-
-        foreach ($this->students as $student) {
-            $this->students_schedules[] = $student->schedules->first()->selected_schedule;
+        foreach ($abcense as $key => $value) {
+            $abcense_classes[$key] = $abcense[$key]->isoFormat('H') . '-' . $abcense[$key]->isoFormat('d');
         }
-        $this->students_schedules = array_merge(...$this->students_schedules);
     }
 
     public function loadStudentSchedule($user_id)
@@ -171,11 +217,6 @@ class Schedule extends Component
                 $this->classes[$key] = new Carbon($value["start_date"]);
             }
 
-            $this->schedule_user = $this->user_schedules;
-            foreach ($this->schedule_user as $key => $value) {
-                $this->schedule_user[$key] = implode('-', $value);
-            }
-
             foreach ($this->classes as $key => $value) {
                 $this->date_classes[$key] = $this->classes[$key]->isoFormat('H') . '-' . $this->classes[$key]->isoFormat('d');
                 $this->date_format_class[$key] = $this->classes[$key]->isoFormat('ddd, D MMM HH:mm a');
@@ -183,9 +224,59 @@ class Schedule extends Component
         }
     }
 
+    public function loadTeacherSchedule($user_id)
+    {
+        $this->user_schedules = $this->user->schedules->first()->selected_schedule;
+        $this->user_schedules = null ? [] : array_filter($this->user_schedules);
+
+        $this->schedule_user = $this->user_schedules;
+        foreach ($this->schedule_user as $key => $value) {
+            $this->schedule_user[$key] = implode('-', $value);
+        }
+
+        $this->scheduled_classes = Enrolment::select('student_id')
+            ->where('teacher_id', $user_id)
+            ->get();
+
+        foreach ($this->scheduled_classes as $key => $value) {
+            $this->students[$key] = $value->student_id;
+        }
+
+        $this->students = User::select('id', 'first_name', 'last_name')->find($this->students);
+
+        foreach ($this->students as $student) {
+            $this->students_schedules[] = $student->schedules->first()->selected_schedule;
+        }
+        $this->students_schedules = array_merge(...$this->students_schedules);
+    }
+
     public function loadAdminSchedule()
     {
         dd("admin");
+    }
+
+    public function notFree($a, $buscado, $days)
+    {
+        $i = 0;
+        if (is_array($a)) {
+            foreach ($a as $v) {
+                if ($buscado === $v) {
+                    $i++;
+                }
+            }
+        }
+
+        if ($i > 0) {
+            if ($i < $days / 7) {
+                return false;
+            } else {
+                return true;
+            }
+        } else {
+            return false;
+        }
+
+        // return $i;
     }
 
     /**
