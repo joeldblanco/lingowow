@@ -203,7 +203,7 @@ class SchedulingCalendarController extends Controller
                         }
                     }
                 }
-
+                // dd($count, count($requested_schedule));
                 if ($count == count($requested_schedule)) {
 
                     foreach ($teacher_available_schedule as $t_schedule) {
@@ -225,12 +225,12 @@ class SchedulingCalendarController extends Controller
                     // $requested_schedule = json_encode($requested_schedule);
                     // Schedule::where('user_id',$user_id)
                     // ->update(['selected_schedule' => $requested_schedule]);
-
-                    Schedule::withTrashed()->updateOrCreate(
+                    // dd($requested_schedule);
+                    $schedule = Schedule::withTrashed()->updateOrCreate(
                         ['user_id' => $user_id, 'enrolment_id' => $enrolment->id],
-                        ['selected_schedule' => json_encode($requested_schedule), 'deleted_at' => NULL]
+                        ['next_schedule' => json_encode($requested_schedule), 'deleted_at' => NULL]
                     );
-
+                    // dd($schedule);
                     // $teacher_available_schedule = json_encode($teacher_available_schedule);
                     // User::where('id',$teacher_id)
                     // ->update(['available_schedule' => $teacher_available_schedule]);
@@ -395,7 +395,7 @@ class SchedulingCalendarController extends Controller
      */
     public function checkForTeachers(Request $request)
     {
-        // dd($request);
+        // dd(session('plan'));
         if ($request->error == "false") {
             $cells = json_decode($request->data);
             // $cells = array_chunk($request->data, 2);

@@ -201,7 +201,7 @@
                                     @for ($hour = 0; $hour < $university_schedule_hours; $hour++)
                                         <tr class="border">
                                             <td class="width border UTC">
-                                                @if ($i < 10)
+                                                @if($i < 10)
                                                     0{{ $i }}:00
                                                 @else
                                                     {{ $i }}:00
@@ -211,20 +211,20 @@
                                                 {{-- AQUI LA HORA SE LLENA MEDIANTE JAVASCRIPT --}}
                                             </td>
                                             @foreach ($days as $day)
-                                                @if (in_array([$i + 6, $e], $teacher_schedule) &&
-                                                    (new Carbon\carbon($day_format_range[$d]))->addHour($i + 6)->greaterThan($now))
+                                                @if (in_array([$i, $e], $teacher_schedule) &&
+                                                    (new Carbon\carbon($day_format_range[$d]))->addHour($i)->greaterThan($now))
                                                     {{-- @php dd(($i+6)."-".$day_range[$d]); @endphp --}}
-                                                    @if (in_array([$i + 6, $e], $students_schedules) || in_array($i + 6 . '-' . $day_range[$d], $abcense_classes))
-                                                        <td id="{{ $i + 6 }}-{{ $e }}-{{ $week }}-{{ $period_range[$d] }}"
+                                                    @if (in_array([$i, $e], $students_schedules) || in_array($i . '-' . $day_range[$d], $abcense_classes))
+                                                        <td id="{{ $i }}-{{ $e }}-{{ $week }}-{{ $period_range[$d] }}"
                                                             class="border width occupied">
                                                         </td>
                                                     @else
-                                                        <td id="{{ $i + 6 }}-{{ $e }}-{{ $week }}-{{ $period_range[$d] }}"
+                                                        <td id="{{ $i }}-{{ $e }}-{{ $week }}-{{ $period_range[$d] }}"
                                                             class="border width cursor-pointer available selectable">
                                                         </td>
                                                     @endif
                                                 @else
-                                                    <td id="{{ $i + 6 }}-{{ $e }}-{{ $week }}-{{ $period_range[$d] }}"
+                                                    <td id="{{ $i }}-{{ $e }}-{{ $week }}-{{ $period_range[$d] }}"
                                                         class="border width occupied">
                                                     </td>
                                                 @endif
@@ -640,7 +640,12 @@
 
 
                 if (OpenLocal < 10) {
+                    if (OpenLocal < 0) {
+                    OpenLocal += 24;
+                    cellsLocal[i].innerHTML = OpenLocal + ":00";
+                } else {
                     cellsLocal[i].innerHTML = "0" + OpenLocal + ":00";
+                }
                 } else {
                     cellsLocal[i].innerHTML = OpenLocal + ":00";
                 }

@@ -12,10 +12,13 @@
         $students_schedules = [];
         $schedule_user = [];
         $classes = [];
+        $next_schedule = [];
         //
         $hoy = (new Carbon\Carbon())->toCookieString();
         // dd();
-        
+        $current_period = App\Http\Controllers\ApportionmentController::currentPeriod();
+        $period_start_c = new Carbon\Carbon($current_period[0]);
+        $period_end_c = new Carbon\Carbon($current_period[1]);
         //if ($this->teacher_id != null) {
         if ($role == 'student') {
             $scheduled_classes = App\Models\Enrolment::select('student_id')
@@ -24,15 +27,25 @@
         
             // dd($scheduled_classes);
         
-            $current_period = App\Http\Controllers\ApportionmentController::currentPeriod();
-            $period_start_c = new Carbon\Carbon($current_period[0]);
-            $period_end_c = new Carbon\Carbon($current_period[1]);
             $my_enrolment = App\Models\Enrolment::select('id')
                 ->where('student_id', $user_id)
                 ->first();
         
-            // dd($current_period);
             if ($my_enrolment != null) {
+                $next_schedule = App\Models\Schedule::select('next_schedule')
+                    ->where('enrolment_id', $my_enrolment->id)
+                    ->first();
+        
+                if ($next_schedule != null) {
+                    $next_schedule = json_decode($next_schedule->next_schedule);
+                } else {
+                    $next_schedule = [];
+                }
+        
+                // $next_schedule = array_merge(...$next_schedule);
+        
+                // dd($next_schedule);
+        
                 $classes = App\Models\Classes::select()
                     ->where('enrolment_id', $my_enrolment->id)
                     // ->whereBetween('start_date', [$period_start_c->subDay()->toDateTimeString(), $period_end_c->toDateTimeString()])
@@ -42,12 +55,38 @@
                 foreach ($classes as $key => $value) {
                     $classes[$key] = $value->start_date;
                 }
+        
                 $classes = json_decode($classes);
             }
         } else {
             $scheduled_classes = App\Models\Enrolment::select('student_id')
                 ->where('teacher_id', $user_id)
                 ->get();
+        
+            $enrolments = App\Models\Enrolment::select('id')
+                ->where('teacher_id', $user_id)
+                ->get();
+        
+            // dd($enrolments);
+            if ($enrolments != null) {
+                $enrolments = json_decode($enrolments);
+                foreach ($enrolments as $key => $value) {
+                    // dd($value);
+                    $classes_enrolment = App\Models\Classes::select()
+                        ->where('enrolment_id', $value->id)
+                        // ->whereBetween('start_date', [$period_start_c->subDay()->toDateTimeString(), $period_end_c->toDateTimeString()])
+                        ->whereDate('start_date', '>=', $period_start_c->subDay()->toDateTimeString())
+                        ->get();
+                    // dd($classes_enrolment);
+                    foreach ($classes_enrolment as $key => $value) {
+                        // $classes[$key] = $value->start_date;
+                        array_push($classes, $value->start_date);
+                    }
+                }
+                // $classes = json_decode($classes);
+            }
+        
+            // dd($classes);
         }
         
         // dd($scheduled_classes);
@@ -127,6 +166,8 @@
             $date_format_class[$key] = $classes[$key]->isoFormat('ddd, D MMM HH:mm a');
         }
         
+        // dd($students_schedules);
+        
     @endphp
     <link rel="stylesheet" type="text/css" href="{{ asset('css/jquery.datetimepicker.min.css') }}">
 
@@ -186,7 +227,7 @@
                                                 @if (in_array([$i, $e], $student[1]))
                                                     {{-- {{dd($student->first_name)}} --}}
                                                     <td id="{{ $i }}-{{ $e }}"
-                                                        class="border width selectable available preselected">
+                                                        class="border width selectable preavailable preselected">
                                                         <a href="{{ route('profile.show', $student->id) }}"
                                                             class="text-sm text-green-100 font-bold name-student not-active">{{ $student->first_name }}
                                                             {{ $student->last_name }}
@@ -196,7 +237,7 @@
                                             @endforeach
                                         @else
                                             <td id="{{ $i }}-{{ $e }}"
-                                                class="border width selectable available preselected">
+                                                class="border width selectable preavailable preselected">
                                                 @if (in_array($i . '-' . $e, $date_classes))
                                                     <div
                                                         class="flex flex-wrap flex-row justify-end gap-x-1 gap-y-0.5 pl-1 pr-1 tool-tip invisible">
@@ -204,7 +245,7 @@
                                                             @if ($value === $i . '-' . $e)
                                                                 <button class="tooltip button_tooltip">
                                                                     <span
-                                                                        class="tooltiptext mb-3">{{ $date_format_class[$key] }}</span>
+                                                                        class="tooltiptext mb-3">{{ $date_format_class[$key] . ' UTC' }}</span>
                                                                 </button>
                                                             @endif
                                                         @endforeach
@@ -215,15 +256,15 @@
                                     @else
                                         @if (in_array([$i, $e], $teacher_schedule) && !in_array([$i, $e], $students_schedules))
                                             <td id="{{ $i }}-{{ $e }}"
-                                                class="border width selectable available">
+                                                class="border width selectable preavailable ">
                                                 @if (in_array($i . '-' . $e, $date_classes))
                                                     <div
                                                         class="flex flex-wrap flex-row justify-end gap-x-1 gap-y-0.5 pl-1 pr-1 tool-tip invisible">
                                                         @foreach ($date_classes as $key => $value)
                                                             @if ($value === $i . '-' . $e)
-                                                                <button class="tooltip button_tooltip">
+                                                                <button class="tooltip button_tooltip_green">
                                                                     <span
-                                                                        class="tooltiptext mb-3">{{ $date_format_class[$key] }}</span>
+                                                                        class="tooltiptext mb-3">{{ $date_format_class[$key] . ' UTC' }}</span>
                                                                 </button>
                                                             @endif
                                                         @endforeach
@@ -232,15 +273,15 @@
                                             </td>
                                         @else
                                             <td id="{{ $i }}-{{ $e }}"
-                                                class="border width selectable notAvailable preoccupied">
+                                                class="border width selectable notAvailable preoccupied ">
                                                 @if (in_array($i . '-' . $e, $date_classes))
                                                     <div
                                                         class="flex flex-wrap flex-row justify-end gap-x-1 gap-y-0.5 pl-1 pr-1 tool-tip invisible">
                                                         @foreach ($date_classes as $key => $value)
                                                             @if ($value === $i . '-' . $e)
-                                                                <button class="tooltip button_tooltip">
+                                                                <button class="tooltip button_tooltip_green">
                                                                     <span
-                                                                        class="tooltiptext mb-3">{{ $date_format_class[$key] }}</span>
+                                                                        class="tooltiptext mb-3">{{ $date_format_class[$key] . ' UTC' }}</span>
                                                                 </button>
                                                             @endif
                                                         @endforeach
@@ -397,7 +438,16 @@
         //Seleccion de horario
 
         console.log("hola1");
+        next_schedule = @json($next_schedule);
 
+        if (next_schedule != null && next_schedule != []) {
+            for (let i = 0; i < next_schedule.length; i++) {
+                next_schedule[i] = next_schedule[i][0] + "-" + next_schedule[i][1];
+            }
+        }
+
+        next = [];
+        console.log(next_schedule)
 
         function toggleCellBlock() {
 
@@ -409,10 +459,14 @@
             }
 
             $(".schedule_cell").toggleClass("cell_block");
-            $(".available").toggleClass("selectable");
-            $(".available").removeClass("selected");
+            $(".preavailable").toggleClass("selectable");
+            $(".preavailable").removeClass("selected");
+            $(".preavailable").toggleClass("available");
             $(".preselected").addClass("selected");
-            $(".tool-tip").toggleClass("invisible")
+            $(".tool-tip").toggleClass("invisible");
+            $(".preoccupied").toggleClass("occupied");
+
+
             //$(".preoccupied").addClass("occupied");
             numClass = classSelected.length;
             init = false;
@@ -429,22 +483,29 @@
         classSelected = preClass;
         // console.log(classSelected);
         numClass = classSelected.length;
-        //$('.notAvailable').length + $('.available').length
+        //$('.notAvailable').length + $('.preavailable').length
         let qtyClass = classSelected.length;
         if (role == "teacher") {
-            qtyClass = ($('.notAvailable').length + $('.available').length);
+            qtyClass = ($('.notAvailable').length + $('.preavailable').length);
         }
         let preClassTd = [];
         preClass.forEach(element => {
             preClassTd.push(document.getElementById(element));
         });
 
-        $(".available").toggleClass("selectable");
+        $(".preavailable").toggleClass("selectable");
         $(".notAvailable").toggleClass("selectable");
         $(".preselected").addClass("selected");
-        $(".preoccupied").addClass("occupied");
+        // $(".preoccupied").addClass("occupied");
         $(".name-student").toggleClass("not-active");
         $(".tool-tip").toggleClass("invisible");
+
+        if (next_schedule != null && next_schedule != []) {
+            for (let i = 0; i < next_schedule.length; i++) {
+                $("#" + next_schedule[i]).toggleClass("next_schedule");
+            }
+        }
+
         let init = false;
         // console.log(preClassTd)
         const selection = new SelectionArea({

@@ -436,7 +436,12 @@
 
 
                 if (OpenLocal < 10) {
+                    if (OpenLocal < 0) {
+                    OpenLocal += 24;
+                    cellsLocal[i].innerHTML = OpenLocal + ":00";
+                } else {
                     cellsLocal[i].innerHTML = "0" + OpenLocal + ":00";
+                }
                 } else {
                     cellsLocal[i].innerHTML = OpenLocal + ":00";
                 }

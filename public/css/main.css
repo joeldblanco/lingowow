@@ -29,12 +29,19 @@
   text-align: center;
 }
 
+.preavailable {
+  /* background: #a5eecd; */
+  border: 1px solid rgba(0, 0, 0, 0.075);
+}
+
 .available {
   background: #a5eecd;
   border: 1px solid rgba(0, 0, 0, 0.075);
 }
-.available.selectable:hover {
+
+.selectable:hover {
   border: 2px solid rgba(1, 167, 86, 0.785);
+  cursor: pointer;
 }
 
 .paging_simple{
@@ -42,6 +49,9 @@
   justify-content: center;
 }
 
+.next_schedule {
+  background: #c6eea5;
+}
 /* .next {
  visibility: hidden;
  margin-left: 15px;
@@ -110,6 +120,14 @@
 .button_tooltip{
   display: block;
   background-color: #ffffff;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+.button_tooltip_green{
+  display: block;
+  background-color: #009d71;
   width: 10px;
   height: 10px;
   border-radius: 50%;
