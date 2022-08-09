@@ -49,7 +49,7 @@ class ClassroomController extends Controller
         $enrolment = Enrolment::where('student_id', $id)->first();
         if (isset($enrolment)) {
             $classes = Classes::where('enrolment_id', $enrolment->id)->whereDate('start_date', '>=', $current_period[0])->orderBy('start_date', 'asc')->get();
-            dd($classes);
+            // dd($classes);
             $current_tz = session('tz');
             $student = User::find($id);
             $enter_classroom = false;

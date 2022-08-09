@@ -106,14 +106,17 @@ class ClassController extends Controller
         $class_date = $class->start_date;
         $class_date = new Carbon($class_date);
         $class_date = $class_date->toCookieString();
-        //dd($class_date);
+        // dd($class_date);
 
         $teacher_schedule = Schedule::where('user_id', $teacher_id)->select('selected_schedule')->get()->toArray();
+        
         foreach ($teacher_schedule as $key => $value) {
-            $teacher_schedule[$key] = json_decode($value["selected_schedule"], 1);
+            // dd($value["selected_schedule"]);
+            // $teacher_schedule[$key] = json_decode($value["selected_schedule"], 1);
+            $teacher_schedule[$key] = $value["selected_schedule"];
         }
         $teacher_schedule = array_merge(...$teacher_schedule);
-
+        // dd($teacher_schedule);
 
 
         // $students = [];
@@ -149,7 +152,9 @@ class ClassController extends Controller
             $students[$key][1] = Schedule::select('selected_schedule')
                 ->where('user_id', $value->id)
                 ->get();
-            $students[$key][1] = json_decode($students[$key][1][0]->selected_schedule);
+            // $students[$key][1] = json_decode($students[$key][1][0]->selected_schedule);
+            // dd($students[$key][1][0]->selected_schedule);
+            $students[$key][1] = $students[$key][1][0]->selected_schedule;
         }
         
         foreach ($students as $student) {

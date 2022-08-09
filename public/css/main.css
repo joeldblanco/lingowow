@@ -52,25 +52,62 @@
 .next_schedule {
   background: #c6eea5;
 }
-/* .next {
+
+/* PAGINATE BOTTOM */
+#absence_table_paginate {
+  padding-top: 5px;
+  padding-bottom: 5px;
+}
+
+/* PAGINATE NEXT */
+.paginate_button.next {
  visibility: hidden;
  margin-left: 15px;
  cursor: pointer; 
 
 }
-
-.next::before{
-  margin-left: 15px;
- cursor: pointer; 
+.paginate_button.next::before{
+  /* margin-left: 15px; */
+  padding-left: 15px;
+  padding-right: 15px;
+  cursor: pointer; 
   content: "Next Week";
   visibility: visible;
-} */
+  background-color: #494949;
+  color: white;
+  border-radius: 5px;
+}
+.paginate_button.next:active{
+  transform: scale(0.98);
+}
 
-.previous {
-  /* margin-left: 15px; */
+/* PAGINATE PREVIOUS */
+.paginate_button.previous {
+  visibility: hidden;
+  margin-left: 15px;
   cursor: pointer; 
-  /* color: #fc4a1e; */
+ 
  }
+ .paginate_button.previous::before{
+   padding-left: 15px;
+   padding-right: 15px;
+   cursor: pointer; 
+   content: "Prev Week";
+   visibility: visible;
+   background-color: #494949;
+   color: white;
+   border-radius: 5px;
+ }
+ .paginate_button.previous:active{
+  transform: scale(0.98);
+}
+
+/* input[type=text] {
+  width: 50%;
+  padding: 12px 20px;
+  margin: 8px 0;
+  box-sizing: border-box;
+} */
 
 .not-active { 
   pointer-events: none; 

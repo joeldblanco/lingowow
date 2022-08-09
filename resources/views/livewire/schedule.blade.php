@@ -1,8 +1,11 @@
 <div>
     <link rel="stylesheet" type="text/css" href="{{ asset('css/jquery.datetimepicker.min.css') }}">
 
+    <a id="link-schedule" href="#link-s"></a>
+    <a name="link-s" class=""></a>
+    <br>
     {{-- @if ($role != 'admin') --}}
-    <div class="container mx-auto mt-10" x-data="{ editBtn: true, edit: false, showModal1: false, showModal2: false, showModal3: false, showModalAbsence: false, event: {{ $event }}, loadingState: false }" x-cloak>
+    <div class="container mx-auto mt-10" x-data="{ editBtn: true, edit: false, showModal1: false, showModal2: false, showModal3: false, showModalAbsence: @entangle('showModalAbsence'), event: {{ $event }}, loadingState: false }" x-cloak>
         <div class="wrapper bg-white rounded w-full">
             {{-- <p x-show="event">Event</p> --}}
 
@@ -11,6 +14,7 @@
 
                 @if ($role == 'guest')
                     @if ($mode == 'edit')
+
                         <h3 class="text-4xl font-bold text-gray-800">Select your schedule</h3>
                         <div class=" flex justify-between">
                             <h4 class="text-2xl font-bold text-gray-400 mb-8">Please, select {{ $plan }} blocks
@@ -24,80 +28,96 @@
                             </h4>
                         </div>
 
+                        {{-- <div wire:loading>
+                            @include('components.loading-state')
+                        </div> --}}
+
                         <!-- INICIO DEL HORARIO -->
-                        <table class="border" style="width: 100%">
-                            <!--fila de los titulos-->
-                            <tr>
-                                <th class="width border">UTC</th>
-                                <th class="" style="">LOCAL</th>
-                                @foreach ($days as $day)
-                                    <th class="border width" style="">
-                                        {{ $day }}
-                                    </th>
-                                @endforeach
-                            </tr>
-                            <!--filas seleccionables-->
-                            @php
-                                $e = 0;
-                                $i = $university_schedule_start;
-                            @endphp
-                            {{-- @for ($i = 0; $i < 16; $i++) --}}
-                            @for ($hour = 0; $hour < $university_schedule_hours; $hour++)
-                                <tr class="border">
-                                    <td class="width border UTC">
-                                        @if ($i < 10)
-                                            0{{ $i }}:00
-                                        @else
-                                            {{ $i }}:00
-                                        @endif
-                                    </td>
-                                    <td class="width border Local">
-                                        {{-- AQUI LA HORA SE LLENA MEDIANTE JAVASCRIPT --}}
-                                    </td>
+                        <div >
+                        
+                            <table class="border" style="width: 100%">
+                                <!--fila de los titulos-->
+                                <tr>
+                                    <th class="width border">UTC</th>
+                                    <th class="" style="">LOCAL</th>
                                     @foreach ($days as $day)
-                                        @if (in_array([$i, $e], $schedule))
-                                            @if (in_array([$i, $e], $students_schedules))
+                                        <th class="border width" style="">
+                                            {{ $day }}
+                                        </th>
+                                    @endforeach
+                                </tr>
+                                <!--filas seleccionables-->
+                                @php
+                                    // dd($data_selected);
+                                    $e = 0;
+                                    $i = $university_schedule_start;
+                                @endphp
+                                {{-- @for ($i = 0; $i < 16; $i++) --}}
+                                @for ($hour = 0; $hour < $university_schedule_hours; $hour++)
+                                    <tr class="border">
+                                        <td class="width border UTC">
+                                            @if ($i < 10)
+                                                0{{ $i }}:00
+                                            @else
+                                                {{ $i }}:00
+                                            @endif
+                                        </td>
+                                        <td class="width border Local">
+                                            {{-- AQUI LA HORA SE LLENA MEDIANTE JAVASCRIPT --}}
+                                        </td>
+                                        @foreach ($days as $day)
+                                            @if (in_array([$i, $e], $schedule))
+                                                @if (in_array([$i, $e], $students_schedules))
+                                                    <td id="{{ $i }}-{{ $e }}"
+                                                        class="border width occupied"></td>
+                                                @else
+                                                    {{-- @php dd(isFree($abcense_classes,"20-4",$days_rest)); @endphp --}}
+
+                                                    @if ($this->notFree($abcense_classes, $i . '-' . $e, $days_rest))
+                                                        <td id="{{ $i }}-{{ $e }}"
+                                                            class="border width occupied">
+                                                        </td>
+                                                    @else
+                                                        @if (in_array([$i, $e], $data_selected))
+                                                            <td id="{{ $i }}-{{ $e }}" 
+                                                                class="border width cursor-pointer available selectable selected">
+                                                            </td>
+                                                        @else
+                                                            <td id="{{ $i }}-{{ $e }}" 
+                                                                class="border width cursor-pointer available selectable">
+                                                            </td>
+                                                        @endif
+                                                    @endif
+                                                @endif
+                                            @else
                                                 <td id="{{ $i }}-{{ $e }}"
                                                     class="border width occupied"></td>
-                                            @else
-                                                {{-- @php dd(isFree($abcense_classes,"20-4",$days_rest)); @endphp --}}
-
-                                                @if ($this->notFree($abcense_classes, $i . '-' . $e, $days_rest))
-                                                    <td id="{{ $i }}-{{ $e }}"
-                                                        class="border width occupied">
-                                                    </td>
-                                                @else
-                                                    <td id="{{ $i }}-{{ $e }}"
-                                                        class="border width cursor-pointer available selectable"></td>
-                                                @endif
                                             @endif
-                                        @else
-                                            <td id="{{ $i }}-{{ $e }}"
-                                                class="border width occupied"></td>
-                                        @endif
+                                            @php
+                                                $e++;
+                                            @endphp
+                                        @endforeach
                                         @php
-                                            $e++;
+                                            $e = 0;
                                         @endphp
-                                    @endforeach
+                                    </tr>
                                     @php
-                                        $e = 0;
+                                        // echo $i . ' ' . $university_schedule_end . ' ';
+                                        if ($i == 23) {
+                                            $i = 0;
+                                        } else {
+                                            $i++;
+                                        }
                                     @endphp
-                                </tr>
-                                @php
-                                    // echo $i . ' ' . $university_schedule_end . ' ';
-                                    if ($i == 23) {
-                                        $i = 0;
-                                    } else {
-                                        $i++;
-                                    }
-                                @endphp
-                            @endfor
-                        </table>
+                                @endfor
+                            </table>
+                        </div>
                         <!-- FIN DEL HORARIO DE JUAN -->
 
                         <button @click="showModalAbsence = true"
+                            onclick="checkClass({{ isset($plan) ? $plan : 0 }},{{ Auth::user()->roles->pluck('id')[0] }});"
                             class="bg-green-500 rounded-lg text-white font-bold px-6 py-1 my-3 shadow-md"
-                            {{-- onclick="saveSchedule({{ $plan }},'schedule.check')" --}}>Save</button>
+                            {{-- onclick="saveSchedule({{ $plan }},'schedule.check')" --}} wire:click="edit()">Save</button>
                     @else
                         <div class="w-full text-center" style="background-color: rgba(255, 255, 255, 0.5)">
                             <h2 class="text-4xl font-bold text-red-800" style="margin-top: 15%">You haven't
@@ -168,7 +188,8 @@
                                                     <td id="{{ $i }}-{{ $e }}"
                                                         class="border width selectable preavailable preselected">
                                                         <div onclick="location.href='{{ route('profile.show', $student->id) }}';"
-                                                            class="text-sm text-green-100 font-bold name-student not-active cursor-pointer">{{ $student->first_name }}
+                                                            class="text-sm text-green-100 font-bold name-student not-active cursor-pointer">
+                                                            {{ $student->first_name }}
                                                             {{ $student->last_name }}
                                                         </div>
                                                     </td>
@@ -277,7 +298,35 @@
                 </x-slot>
 
                 <x-slot name="content">
-                    Are you sure you want to save your schedule?
+                    @php
+                        $data = session('data');
+                        // dd($data);
+                    @endphp
+                    @if ($data != [])
+                        <div class="pl-5 pr-5">
+                            <h5 class="text-left">Dear Student:</h5>
+                            <p class="text-left">The following classes will not be added to your schedule, nor added to
+                                your shopping cart, because in this period other students have the rescheduled block.
+                            </p>
+                            <br>
+                            @php
+                                // $data = session('data');
+                                
+                                foreach ($data as $key => $value) {
+                                    echo '<b>' . $value . '</b><br>';
+                                }
+                                session(['data' => []]);
+                                // session(['user_schedule' => []]);
+                            @endphp
+                            {{-- {{session("data")}} --}}
+                            <br>
+                            <p class="text-left">For the next period you will have your full schedule.</p>
+                            <p class="text-left">Do you wish to continue?</p>
+                        </div>
+                    @else
+                        <p>Are you sure you want to save your schedule?</p>
+                    @endif
+
                 </x-slot>
 
                 <x-slot name="footer" class="justify-center">
@@ -336,6 +385,13 @@
 
     @if ($role == 'teacher' || $role == 'student')
         <script>
+            let BT = $(".button-teacher");
+            for (let i = 0; i < BT.length; i++) {
+                BT[i].addEventListener('click', function() {
+                    document.getElementById("link-schedule").click();
+                });
+            }
+
             console.log("inicio");
             var hoyLocal = new Date(@json($hoy));
 
@@ -583,6 +639,7 @@
 
     @if ($role == 'guest')
         <script>
+            console.log("Inicio Guest")
             $(function() {
 
                 var selectedCells = 0;
@@ -634,7 +691,12 @@
 
 
                     if (OpenLocal < 10) {
-                        cellsLocal[i].innerHTML = "0" + OpenLocal + ":00";
+                        if (OpenLocal < 0) {
+                            OpenLocal += 24;
+                            cellsLocal[i].innerHTML = OpenLocal + ":00";
+                        } else {
+                            cellsLocal[i].innerHTML = "0" + OpenLocal + ":00";
+                        }
                     } else {
                         cellsLocal[i].innerHTML = OpenLocal + ":00";
                     }
@@ -652,13 +714,13 @@
             // console.log("hola");
             const qtyClass = {{ $plan }};
             let classSelected = [];
-            let preClass = ["1-6", "2-6", "3-6", "4-6", "5-6", "6-6"];
+            let preClass = @json($data_selected_format);
             classSelected = preClass;
             let preClassTd = [];
             preClass.forEach(element => {
                 preClassTd.push(document.getElementById(element));
             });
-            let init = true;
+            let init = false;
 
             const selection = new SelectionArea({
                     selectables: ["td.selectable"],
@@ -764,6 +826,12 @@
                     }
                 } else {
                     cellsLocal[i].innerHTML = OpenLocal + ":00";
+                }
+
+                if (OpenLocal >= 23) {
+                    OpenLocal = 0;
+                } else {
+                    OpenLocal++;
                 }
             }
 
