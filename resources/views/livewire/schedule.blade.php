@@ -325,8 +325,9 @@
                         </div>
                     @else
                         <p>Are you sure you want to save your schedule?</p>
+                        <br>
                     @endif
-
+                        
                 </x-slot>
 
                 <x-slot name="footer" class="justify-center">

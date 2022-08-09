@@ -120,11 +120,20 @@ class Schedule extends Component
         }
         $students = User::find($students);
 
+        $next_students_schedule = [];
         $this->students_schedules = [];
         foreach ($students as $student) {
             $this->students_schedules[] = $student->schedules->first()->selected_schedule;
+            if ($student->schedules->first()->next_schedule != null) {
+                array_push($next_students_schedule, $student->schedules->first()->next_schedule);
+            }
         }
         $this->students_schedules = array_merge(...$this->students_schedules);
+        $next_students_schedule = array_merge(...$next_students_schedule);
+
+        $this->students_schedules = array_merge($this->students_schedules, $next_students_schedule);
+
+        // dd($this->students_schedules);
 
         if ($this->schedule == null) $this->schedule = [];
         $this->emit('loadingState', false);
@@ -221,7 +230,7 @@ class Schedule extends Component
                 ->first();
 
             if ($this->next_schedule != null) {
-                $this->next_schedule = json_decode($this->next_schedule->next_schedule);
+                $this->next_schedule = $this->next_schedule->next_schedule;
             } else {
                 $this->next_schedule = [];
             }
@@ -256,10 +265,20 @@ class Schedule extends Component
 
             $this->students = User::select('id', 'first_name', 'last_name')->find($this->students);
 
+            $next_students_schedule = [];
             foreach ($this->students as $student) {
+                // dd($student->schedules->first());
                 $this->students_schedules[] = $student->schedules->first()->selected_schedule;
+                if ($student->schedules->first()->next_schedule != null) {
+                    array_push($next_students_schedule, $student->schedules->first()->next_schedule);
+                }
             }
+            
             $this->students_schedules = array_merge(...$this->students_schedules);
+            $next_students_schedule = array_merge(...$next_students_schedule);
+
+            $this->students_schedules = array_merge($this->students_schedules, $next_students_schedule);
+            // dd($this->students_schedules);
         }
     }
 
@@ -287,7 +306,7 @@ class Schedule extends Component
             $this->students_schedules[] = $student->schedules->first()->selected_schedule;
         }
         $this->students_schedules = array_merge(...$this->students_schedules);
-
+        
         
     }
 

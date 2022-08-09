@@ -14,6 +14,7 @@ class Schedule extends Model
 
     protected $casts = [
         'selected_schedule' => 'array',
+        'next_schedule' => 'array',
     ];
 
     /**
