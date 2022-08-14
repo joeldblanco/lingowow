@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateInvoicesTable extends Migration
+class CreateExamUserTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,14 +13,11 @@ class CreateInvoicesTable extends Migration
      */
     public function up()
     {
-        Schema::create('invoices', function (Blueprint $table) {
-            $table->increments('id');
-            $table->bigInteger('user_id',false,true);//
-            $table->string('title');
-            $table->double('price', 2);
-            $table->boolean('paid');
-            $table->timestamps();
+        Schema::create('exam_user', function (Blueprint $table) {
+            $table->bigInteger('exam_id', false, true);
+            $table->bigInteger('user_id', false, true);
 
+            $table->foreign('exam_id')->references('id')->on('exams');
             $table->foreign('user_id')->references('id')->on('users');
         });
     }
@@ -32,6 +29,6 @@ class CreateInvoicesTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('invoices');
+        Schema::dropIfExists('exam_user');
     }
 }

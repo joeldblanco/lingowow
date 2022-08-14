@@ -18,7 +18,7 @@ class CreateCourseProductTable extends Migration
             $table->bigInteger('course_id', false, true);
 
             $table->foreign('product_id')->references('id')->on('products');
-            $table->foreign('course_id')->references('course_id')->on('courses');
+            $table->foreign('course_id')->references('id')->on('courses');
         });
     }
 
