@@ -20,8 +20,16 @@ class Module extends Model
     /**
      * Get the units for the module.
      */
-    public function units()
+    // public function units()
+    // {
+    //     return $this->hasMany(Unit::class);
+    // }
+
+    /**
+     * Get the units for the module by groups.
+     */
+    public function groups()
     {
-        return $this->hasMany(Unit::class);
+        return $this->hasMany(group_unit::class);
     }
 }

@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
+class CreateGroupUnitsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,14 +13,15 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('modules', function (Blueprint $table) {
-            $table->bigIncrements('id');
-            $table->string('module_name',40);
-            $table->string('module_description',200);
+        Schema::create('group_units', function (Blueprint $table) {
+            $table->id();
+            $table->string('group_name',40);
+            $table->bigInteger('module_id',false,true);
             $table->string('priority',10);
-            $table->tinyInteger('status');
-            $table->bigInteger('course_id',false,true);
             $table->timestamps();
+            $table->softDeletes();
+
+            $table->foreign('module_id')->references('id')->on('modules');
         });
     }
 
@@ -31,6 +32,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('modules');
+        Schema::dropIfExists('group_units');
     }
-};
+}

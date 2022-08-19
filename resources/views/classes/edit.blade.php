@@ -633,18 +633,6 @@
 
         // });
 
-        let hourForDays = @json($university_schedule_hours) + 1;
-        $("#absence_table").DataTable({
-            searching: false,
-            ordering: false,
-            pageLength: hourForDays,
-            info: false,
-            bLengthChange: false,
-            pagingType: "simple",
-            // stateSave: true,
-        });
-
-
 
         var hoyLocal = new Date(@json($hoy));
         var horaLocal = hoyLocal.getHours();
@@ -688,6 +676,22 @@
                 OpenLocal++;
             }
         }
+
+
+        let hourForDays = @json($university_schedule_hours) + 1;
+        $("#absence_table").DataTable({
+            searching: false,
+            ordering: false,
+            pageLength: hourForDays,
+            info: false,
+            bLengthChange: false,
+            pagingType: "simple",
+            // stateSave: true,
+        });
+
+
+
+       
 
 
         console.log($('.paginate_button.next'));

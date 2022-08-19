@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Module;
 use App\Models\User;
+use App\Models\Group_unit;
 use Illuminate\Http\Request;
 
 class ModuleController extends Controller
@@ -50,21 +51,50 @@ class ModuleController extends Controller
         $user = User::find(auth()->id());
         $role = $user->roles->first()->name;
         $module = Module::find($id);
-        $units = $module->units->where('status', 1)->sort();
+        $units_module  = $module->groups;
+        //dd($units_module);
+
+        // $units_module = [];
+        // $module->groups->each(function($group, $key) use (&$units_module){
+        //     $group->units->each(function($unit, $key2) use (&$units_module){
+        //         array_push($units_module,$unit);
+        //     });
+        // });
+
+        // dd($module->groups->count());
+
+
+        // foreach ($groups as $key => $value) {
+        //     // dd(json_decode($value->units()->where('status','1')->get()));
+        //     $unit[] = $value->units()->where('status','1')->get();
+
+        // }
+
+        // dd($unit);
+        // $units = $module->units->where('status', 1)->sort();
 
         if ($role == "admin") {
-            $user_units = $module->units;
+            // $user_units = $module->units;
+            $user_units = $units_module;
         } else {
+            $user_units = $units_module;
             // $user_units = $user->units->where('status', 1);
             // $user_units = $user_units->diff($user_units->diff($module->units->where('status', 1)));
-            $user_units = $user->units->intersect($units)->sort();
+
+            // $user_units = $user->units->intersect($units)->sort();
         }
 
-        $units = $units->diff($user_units);
-
+        // $units = $units->diff($user_units);
+        // dd($units_module->first()->isPassed);
+        // foreach ($units_module->first()->isPassed($user->id) as $key => $value) {
+        // dd($units_module->first()->isPassed($user->id)->first()->pivot->nota);
+        // }
+        // $units = array_diff($units_module,$user_units);
+        $units = [];
         // dd($units[0]->exams);
-        
-        return view('course.module.show', compact('units', 'user_units'));
+        // dd($units_module, $user_units, $units);
+        // dd($user->id);
+        return view('course.module.show', compact('user', 'role', 'units', 'user_units'));
     }
 
     /**
@@ -99,5 +129,29 @@ class ModuleController extends Controller
     public function destroy(Module $module)
     {
         //
+    }
+
+    static function is_passed($nota, $id)
+    {
+
+        if ($nota != null) {
+
+            if (Group_unit::find($id)->priority == 'FIRST') {
+                return true;
+            } else {
+                $nota = $nota->pivot->nota;
+                if ($nota >= 10) {
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+        } else {
+            if (Group_unit::find($id)->priority == 'FIRST') {
+                return true;
+            } else {
+                return false;
+            }
+        }
     }
 }
