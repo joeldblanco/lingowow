@@ -55,8 +55,8 @@ class Schedule extends Component
         $course_id = 1;
         if (!is_null($course_id)) $this->course = Course::find($course_id);
         $this->hoy = (new Carbon())->toCookieString();
-        $this->role = User::find($user_id)->roles->first()->name;
         $this->user = User::find($user_id);
+        $this->role = $this->user->roles->first()->name;
         $this->plan = $plan;
 
         if ($this->role == "guest") {
@@ -90,7 +90,7 @@ class Schedule extends Component
             $this->loadTeacherSchedule($this->user->id);
         } else if ($this->role == "admin") {
 
-            $this->loadAdminSchedule($this->user->id);
+            // $this->loadAdminSchedule($this->user->id);
         }
 
         $university_schedule = ModelsSchedule::university_schedule();
@@ -122,7 +122,7 @@ class Schedule extends Component
         $this->students_schedules = array_merge(...$this->students_schedules);
 
         if ($this->schedule == null) $this->schedule = [];
-        $this->emit('loadingState', false);
+        // $this->emit('loadingState', false);
         $this->edit();
     }
 
@@ -258,7 +258,7 @@ class Schedule extends Component
     public function loadTeacherSchedule($user_id)
     {
         $this->user_schedules = $this->user->schedules->first()->selected_schedule;
-        $this->user_schedules = null ? [] : array_filter($this->user_schedules);
+        $this->user_schedules == null ? $this->user_schedules = [] : array_filter($this->user_schedules);
 
         $this->schedule_user = $this->user_schedules;
         foreach ($this->schedule_user as $key => $value) {
@@ -283,7 +283,8 @@ class Schedule extends Component
 
     public function loadAdminSchedule()
     {
-        dd("admin");
+        // $this->user_schedules = $this->user->schedules->first()->selected_schedule;
+        // $this->user_schedules == null ? $this->user_schedules = [] : array_filter($this->user_schedules);
     }
 
     public function notFree($a, $buscado, $days)
@@ -317,6 +318,7 @@ class Schedule extends Component
      */
     public function render()
     {
+        // dd($this->user);
         // $this->user_schedules = auth()->user()->schedules->toArray();
         // count($this->user_schedules) > 0 ? $this->user_schedules = array_merge(...$this->user_schedules) : false;
 

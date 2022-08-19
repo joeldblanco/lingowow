@@ -1,8 +1,12 @@
 <div>
     <link rel="stylesheet" type="text/css" href="{{ asset('css/jquery.datetimepicker.min.css') }}">
 
+    <div wire:loading>
+        @include('components.loading-state')
+    </div>
+
     {{-- @if ($role != 'admin') --}}
-    <div class="container mx-auto mt-10" x-data="{ editBtn: true, edit: false, showModal1: false, showModal2: false, showModal3: false, showModalAbsence: false, event: {{ $event }}, loadingState: false }" x-cloak>
+    <div class="container mx-auto mt-10" x-data="{ editBtn: true, edit: false, showModal1: false, showModal2: false, showModal3: false, showModalAbsence: false, event: {{ $event }} }" x-cloak>
         <div class="wrapper bg-white rounded w-full">
             {{-- <p x-show="event">Event</p> --}}
 
@@ -250,6 +254,7 @@
                         @endfor
                     </table>
                 </div>
+                
                 <div class="flex items-center flex-col  space-y-3 my-5" x-show="edit" x-transition>
 
                     <button onclick="toggleCellBlock()" @click="edit = false, editBtn = true"
@@ -284,7 +289,7 @@
                     <button
                         onclick="saveSchedule({{ isset($plan) ? $plan : 0 }},'schedule.check',{{ Auth::user()->roles->pluck('id')[0] }});toggleCellBlock()"
                         class="bg-green-600 font-semibold text-white p-2 w-32 mr-1 rounded-full hover:bg-green-700 focus:outline-none focus:ring shadow-lg hover:shadow-none transition-all duration-300"
-                        @click=" showModalAbsence = false, editBtn = true, edit = false, loadingState = true">
+                        @click=" showModalAbsence = false, editBtn = true, edit = false">
                         Save
                     </button>
                     <button
@@ -308,7 +313,7 @@
                     <button wire:click="edit()"
                         onclick="saveSchedule({{ isset($user_schedules) ? count($user_schedules) : 0 }},'schedule.update',{{ Auth::user()->roles->pluck('id')[0] }});toggleCellBlock()"
                         class="bg-green-600 font-semibold text-white p-2 w-32 mr-1 rounded-full hover:bg-green-700 focus:outline-none focus:ring shadow-lg hover:shadow-none transition-all duration-300"
-                        @click=" showModal1 = false, editBtn = true, edit = false, loadingState = true">
+                        @click=" showModal1 = false, editBtn = true, edit = false">
                         Save
                     </button>
                     <button wire:click="edit()"
@@ -319,7 +324,7 @@
                 </x-slot>
             </x-modal>
 
-            @include('components.loading-state')
+            {{-- @include('components.loading-state') --}}
             {{-- Clases para reagendar --}}
 
 
@@ -329,14 +334,14 @@
     {{-- @endif --}}
 
     <script type="text/javascript" src="{{ asset('js/scheduleSelection.js') }}" defer></script>
-    <script src="{{ asset('js/viselect.cjs.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('js/viselect.cjs.js') }}"></script>
 
     <script src="{{ asset('js/jquery.datetimepicker.full.min.js') }}"></script>
 
 
     @if ($role == 'teacher' || $role == 'student')
         <script>
-            console.log("inicio");
+            // console.log("inicio");
             var hoyLocal = new Date(@json($hoy));
 
             var horaLocal = hoyLocal.getHours();
@@ -349,7 +354,7 @@
             //Asignar hora UTC y Local al Horario
 
             // cellsUTC = $('.UTC');
-            cellsLocal = $('.Local');
+            let cellsLocal = $('.Local');
             for (let i = 0; i < cellsLocal.length; i++) {
                 // if (OpenUTC < 10) {
                 //     cellsUTC[i].innerHTML = "0" + OpenUTC + ":00";
@@ -426,8 +431,8 @@
 
             //Seleccion de horario
 
-            console.log("hola1");
-            next_schedule = @json($next_schedule);
+            // console.log("hola1");
+            let next_schedule = @json($next_schedule);
 
             if (next_schedule != null && next_schedule != []) {
                 for (let i = 0; i < next_schedule.length; i++) {
@@ -435,8 +440,8 @@
                 }
             }
 
-            next = [];
-            console.log(next_schedule);
+            let next = [];
+            // console.log(next_schedule);
 
             function toggleCellBlock() {
 
@@ -618,7 +623,7 @@
 
                 //Asignar hora UTC y Local al Horario
                 // cellsUTC = $('.UTC');
-                cellsLocal = $('.Local');
+                let cellsLocal = $('.Local');
                 for (let i = 0; i < cellsLocal.length; i++) {
                     // if (OpenUTC < 10) {
                     //     cellsUTC[i].innerHTML = "0" + OpenUTC + ":00";

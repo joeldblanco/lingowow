@@ -213,4 +213,13 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return $this->hasMany(Enrolment::class, 'student_id');
     }
+
+    public function personalMeeting($user_id)
+    {
+        if (auth()->user()->getRoleNames()->first() == "admin") {
+            return Meeting::where('atendee_id', $user_id)->first() == null ? "#" : (Meeting::where('atendee_id', $user_id)->first())->join_url;
+        } else {
+            return Meeting::where('atendee_id', $user_id)->first() == null ? "#" : (Meeting::where('atendee_id', $user_id)->first())->join_url;
+        }
+    }
 }

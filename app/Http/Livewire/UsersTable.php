@@ -16,7 +16,7 @@ class UsersTable extends Component
     public $role;
     public $users = [];
     private $models;
-    public $selected_teacher;
+    public $selected_teacher = null;
     public $days = ['SUNDAY', 'MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY'];
     public $user_schedule;
     public $students = [];
@@ -25,14 +25,12 @@ class UsersTable extends Component
     public $showUserInfo = false;
     public $current_user = null;
 
-    public function mount()
-    {
-        $this->selected_teacher = User::find(5);
-        $this->user_role = 1;
-        // $this->role = 2;
-        // $this->user_schedule = [];
+    // public function mount()
+    // {
+    //     $this->selected_teacher = User::find(5);
+    //     $this->user_role = 1;
 
-    }
+    // }
 
     public function showInfo($teacher_id)
     {
@@ -42,13 +40,13 @@ class UsersTable extends Component
         }
         $this->selected_teacher = User::find($teacher_id);
         // $this->emit('showTeacherInfo');
-        $this->showUserInfo = true;
+        // $this->showUserInfo = true;
     }
 
     public function selectRole($role)
     {
         // $this->role = $role;
-        redirect()->route('admin.users', $role);
+        redirect()->route('users', $role);
     }
 
     public function createUser()
@@ -114,60 +112,60 @@ class UsersTable extends Component
 
     public function render()
     {
-        $this->models = DB::table('model_has_roles')->select('model_id')->where('role_id', $this->role)->get();
+        $models = User::role($this->role)->paginate(20);
 
-        $this->users = [];
-        foreach ($this->models as $model) {
-            $this->users[] = $model->model_id;
-        }
-        $this->models = User::whereIn('id',$this->users)->paginate(20);
-        $models = $this->models;
+        // $this->users = [];
+        // foreach ($this->models as $model) {
+        //     $this->users[] = $model->model_id;
+        // }
+        // $this->models = User::whereIn('id',$this->users)->paginate(20);
+        // $models = $this->models;
 
-        if ($this->selected_teacher != null) {
+        // if ($this->selected_teacher != null) {
 
-            $this->user_schedule = Schedule::select("selected_schedule")->where('user_id', $this->selected_teacher->id)->get();
-            if ($this->user_schedule && (count($this->user_schedule) > 0)) {
-                $this->user_schedule = $this->user_schedule[0]->selected_schedule;
-            } else {
-                $this->user_schedule = [];
-            }
-        }
-
-        $scheduled_classes = Enrolment::select('student_id')->where('teacher_id', $this->selected_teacher->id)->get();
-        $temp_student_schedule = [];
-        $student_schedule = [];
-        $this->students = [];
-        foreach ($scheduled_classes as $key => $value) {
-            $this->students[$key] = $value->student_id;
-        }
-        // if(count($this->students) > 0){
-        $this->students = User::find($this->students);
+        //     $this->user_schedule = Schedule::select("selected_schedule")->where('user_id', $this->selected_teacher->id)->get();
+        //     if ($this->user_schedule && (count($this->user_schedule) > 0)) {
+        //         $this->user_schedule = $this->user_schedule[0]->selected_schedule;
+        //     } else {
+        //         $this->user_schedule = [];
+        //     }
         // }
 
-        foreach ($this->students as $key => $value) {
-            $this->students[$key][1] = Schedule::select('selected_schedule')->where('user_id', $value->id)->get();
-            $this->students[$key][1] = $this->students[$key][1][0]->selected_schedule;
-        }
+        // $scheduled_classes = Enrolment::select('student_id')->where('teacher_id', $this->selected_teacher->id)->get();
+        // $temp_student_schedule = [];
+        // $student_schedule = [];
+        // $this->students = [];
+        // foreach ($scheduled_classes as $key => $value) {
+        //     $this->students[$key] = $value->student_id;
+        // }
+        // // if(count($this->students) > 0){
+        // $this->students = User::find($this->students);
+        // // }
 
-        for ($i = 0; $i < count($scheduled_classes); $i++) {
-            array_push($temp_student_schedule, Schedule::select('selected_schedule')->where('user_id', $scheduled_classes[$i]->student_id)->get());
-            if ($temp_student_schedule[$i][0]->selected_schedule)
-                array_push($student_schedule, $temp_student_schedule[$i][0]->selected_schedule);
-        }
+        // foreach ($this->students as $key => $value) {
+        //     $this->students[$key][1] = Schedule::select('selected_schedule')->where('user_id', $value->id)->get();
+        //     $this->students[$key][1] = $this->students[$key][1][0]->selected_schedule;
+        // }
 
-        if (!empty(array_filter($student_schedule, function ($a) {
-            return $a !== null;
-        }))) {
-            $student_schedule = array_merge(...$student_schedule);
-        }
+        // for ($i = 0; $i < count($scheduled_classes); $i++) {
+        //     array_push($temp_student_schedule, Schedule::select('selected_schedule')->where('user_id', $scheduled_classes[$i]->student_id)->get());
+        //     if ($temp_student_schedule[$i][0]->selected_schedule)
+        //         array_push($student_schedule, $temp_student_schedule[$i][0]->selected_schedule);
+        // }
 
-        $this->students_schedules = [];
-        foreach ($this->students as $student) {
-            $this->students_schedules[] = $student[1];
-        }
-        $this->students_schedules = array_merge(...$this->students_schedules);
+        // if (!empty(array_filter($student_schedule, function ($a) {
+        //     return $a !== null;
+        // }))) {
+        //     $student_schedule = array_merge(...$student_schedule);
+        // }
 
-        $role =  Auth::user()->roles[0]->name;
+        // $this->students_schedules = [];
+        // foreach ($this->students as $student) {
+        //     $this->students_schedules[] = $student[1];
+        // }
+        // $this->students_schedules = array_merge(...$this->students_schedules);
+
+        // $role =  Auth::user()->roles[0]->name;
 
         return view('livewire.users-table', ['models' => $models]);
     }

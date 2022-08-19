@@ -38,8 +38,8 @@ $nav_links = [
     ],
     [
         'name' => 'Users',
-        'route' => route('admin.users',4),
-        'status' => request()->routeIs('admin.users'),
+        'route' => route('users',4),
+        'status' => request()->routeIs('users'),
         'parent_link' => request()->is('admin', 'admin/*'),
     ],
     [

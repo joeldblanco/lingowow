@@ -111,7 +111,9 @@
             </div>
         @endforeach
     </div>
-    @include('components.loading-state')
+    <div wire:loading>
+        @include('components.loading-state')
+    </div>
     <script>
         async function selectProduct(object) {
             // console.log(object);
