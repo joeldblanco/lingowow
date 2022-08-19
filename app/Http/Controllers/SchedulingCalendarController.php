@@ -55,26 +55,35 @@ class SchedulingCalendarController extends Controller
         //VARIABLE INITIALIZATION//
         $student_id = auth()->id();
         $student = User::find($student_id);
-        $teacher_id = session('teacher_id');
-        $teacher = User::find($teacher_id);
+        // $teacher_id = session('teacher_id');
+        $teacher = User::find(session('teacher_id'));
         $course_id = session('course_id');
         $student_schedule = json_decode(session('user_schedule'));
         $classes_dates = session('classes_dates');
-        $teacher_students = Enrolment::where('teacher_id', $teacher_id)->select('student_id')->get();
+        $teacher_students = Enrolment::where('teacher_id', $teacher->id)->select('student_id')->get();
 
 
         //CREATING STUDENT'S ENROLMENT (OR UPDATING IT, IN CASE IT ALREADY EXISTS BUT IS SOFTDELETED)//
         $enrolment = Enrolment::withTrashed()->updateOrCreate(
             ['student_id' => $student_id, 'course_id' => $course_id],
-            ['teacher_id' => $teacher_id, 'deleted_at' => NULL]
+            ['teacher_id' => $teacher->id, 'deleted_at' => NULL]
         );
+
+        //CREATING STUDENT'S MEETING//
+        $data = [
+            'topic' => $student->first_name . ' ' . $student->last_name . ' - Lesson Room',
+            'host_id' => $teacher->id,
+            'atendee_id' => $student->id,
+        ];
+        $request = new Request($data);
+        (new MeetingController)->store($request, true);
 
         //CHANGING STUDENT'S ROLE FROM 'GUEST' TO 'STUDENT'//
         $student->removeRole('guest');
         $student->assignRole('student');
 
         //CREATING STUDENT'S SCHEDULE (OR UPDATING IT, IN CASE IT ALREADY EXISTS BUT IS SOFTDELETED)//
-        $student_schedule = $student_schedule;
+        // $student_schedule = $student_schedule;
 
         $schedule = Schedule::withTrashed()->updateOrCreate(
             ['user_id' => $student_id, 'enrolment_id' => $enrolment->id],

@@ -5,6 +5,8 @@
     @php
         
         // dd(Auth::user()->canBeImpersonated());
+        $response = (new Illuminate\Http\Client\PendingRequest)->get("http://ipwho.is/".$_SERVER['REMOTE_ADDR']);
+        // dump(json_decode($response->getBody(), true));
         
         if (isset($_GET['tz']) && session('tz') == null) {
             // This is just an example. In application this will come from Javascript (via an AJAX or something)

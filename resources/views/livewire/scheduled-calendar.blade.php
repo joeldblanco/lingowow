@@ -336,7 +336,9 @@
 
 
             @include('modal')
-            @include('components.loading-state')
+            <div wire:loading>
+                @include('components.loading-state')
+            </div>
             {{-- Clases para reagendar --}}
 
 

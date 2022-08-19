@@ -27,8 +27,10 @@
                                 @hasanyrole('teacher|admin')
                                     <button onclick="window.location.href='{{ route('attempt.index', $user->id) }}';"
                                         class="border border-gray-500 rounded h-9 w-24 text-gray-500 hover:text-gray-700 hover:border-gray-700 hover:bg-gray-50">Attempts</button>
-                                    <button onclick="openClassroomPopupWindow(); return false;"
-                                        class="border border-green-500 rounded h-9 w-24 text-green-500 hover:text-green-700 hover:border-green-700 hover:bg-green-50">Classroom</button>
+                                    {{-- <button onclick="openClassroomPopupWindow(); return false;"
+                                        class="border border-green-500 rounded h-9 w-24 text-green-500 hover:text-green-700 hover:border-green-700 hover:bg-green-50">Classroom</button> --}}
+                                    <a href="{{ $user->personalMeeting($user->id) }}"
+                                        class="border border-green-500 rounded h-9 w-24 text-green-500 hover:text-green-700 hover:border-green-700 hover:bg-green-50 flex justify-center items-center">Classroom</a>
                                 @endhasanyrole
                                 @if ($user->id != auth()->id())
                                     @if ($request_sent != null)
@@ -309,8 +311,7 @@
                                 <div class="flex justify-between">
                                     <div class="flex items-center space-x-3">
                                         <img class="rounded-full w-12"
-                                            src="{{ Storage::url($friend->profile_photo_path) }}"
-                                            alt="profile_pic">
+                                            src="{{ Storage::url($friend->profile_photo_path) }}" alt="profile_pic">
                                         <p class="text-sm font-bold">{{ $friend->first_name }}
                                             {{ $friend->last_name }}</p>
                                     </div>
@@ -396,8 +397,7 @@
                                 <div class="flex justify-between">
                                     <div class="flex items-center space-x-3">
                                         <img class="rounded-full w-12"
-                                            src="{{ Storage::url($friend->profile_photo_path) }}"
-                                            alt="profile_pic">
+                                            src="{{ Storage::url($friend->profile_photo_path) }}" alt="profile_pic">
                                         <div>
                                             <p class="text-sm font-bold">{{ $friend->first_name }}
                                                 {{ $friend->last_name }}</p>

@@ -27,8 +27,7 @@ class ActivityController extends Controller
      */
     public function create()
     {
-        $units = Unit::all();
-        return view('activities.create', compact('units'));
+        return view('livewire.activity-create');
     }
 
     /**

@@ -176,7 +176,7 @@
             </div>
             <div class="flex flex-col w-1/3 space-y-4">
                 {{-- <div class="flex flex-col justify-between h-44"> --}}
-                <a href="{{ route('admin.users', 4) }}"
+                <a href="{{ route('users', 4) }}"
                     class="flex w-full border-2 border-green-500 bg-white text-gray-700 hover:bg-green-500 hover:text-white rounded-xl p-4 space-x-3 items-center transition-all duration-300 ease-in-out relative overflow-hidden">
                     {{-- <button class="border-2 border-green-600 p-2 rounded-lg w-10 h-10 items-center justify-center text-blue-300 z-10">
                             <i class="fas fa-ellipsis-h m-1"></i>
@@ -188,7 +188,7 @@
                         <p class="text-sm">Admins</p>
                     </div>
                 </a>
-                <a href="{{ route('admin.users', 3) }}"
+                <a href="{{ route('users', 3) }}"
                     class="flex w-full border-2 border-blue-500 bg-white text-gray-700 hover:bg-blue-500 hover:text-white rounded-xl p-4 space-x-3 items-center transition-all duration-300 ease-in-out relative overflow-hidden">
                     {{-- <button class="border-2 border-blue-600 p-2 rounded-lg w-10 h-10 items-center justify-center text-blue-300 z-10">
                             <i class="fas fa-ellipsis-h m-1"></i>
@@ -200,7 +200,7 @@
                         <p class="text-sm">Teachers</p>
                     </div>
                 </a>
-                <a href="{{ route('admin.users', 2) }}"
+                <a href="{{ route('users', 2) }}"
                     class="flex w-full border-2 border-red-500 bg-white text-gray-700 hover:bg-red-500 hover:text-white rounded-xl p-4 space-x-3 items-center transition-all duration-300 ease-in-out relative overflow-hidden">
                     {{-- <button class="border-2 border-red-600 p-2 rounded-lg w-10 h-10 items-center justify-center text-blue-300 z-10">
                             <i class="fas fa-ellipsis-h m-1"></i>
@@ -212,7 +212,7 @@
                         <p class="text-sm">Students</p>
                     </div>
                 </a>
-                <a href="{{ route('admin.users', 1) }}"
+                <a href="{{ route('users', 1) }}"
                     class="flex w-full border-2 border-purple-700 bg-white text-gray-700 hover:bg-purple-700 hover:text-white rounded-xl p-4 space-x-3 items-center transition-all duration-300 ease-in-out relative overflow-hidden">
                     {{-- <button class="border-2 border-purple-800 p-2 rounded-lg w-10 h-10 items-center justify-center text-blue-300 z-10">
                             <i class="fas fa-ellipsis-h m-1"></i>
