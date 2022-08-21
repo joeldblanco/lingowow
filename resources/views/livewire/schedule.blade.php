@@ -126,6 +126,13 @@
                 @endif
 
                 @if ($role == 'teacher')
+                    <div class="w-full text-center" style="background-color: rgba(255, 255, 255, 0.5)">
+                        <h2 class="text-4xl font-bold text-red-800" style="margin-top: 15%">You haven't
+                            selected a schedule yet.</h2>
+                        <h2 class="text-2xl font-bold text-gray-800">You can select a schedule by clicking the button below</h2>
+                        <a href="{{ route('shop') }}"
+                            class="inline-block bg-blue-800 text-white px-6 py-4 mt-8 rounded-lg hover:bg-blue-900 hover:text-white hover:no-underline">Select schedule</a>
+                    </div>
                 @endif
 
                 @if ($role == 'admin')
@@ -172,7 +179,8 @@
                                                     <td id="{{ $i }}-{{ $e }}"
                                                         class="border width selectable preavailable preselected">
                                                         <div onclick="location.href='{{ route('profile.show', $student->id) }}';"
-                                                            class="text-sm text-green-100 font-bold name-student not-active cursor-pointer">{{ $student->first_name }}
+                                                            class="text-sm text-green-100 font-bold name-student not-active cursor-pointer">
+                                                            {{ $student->first_name }}
                                                             {{ $student->last_name }}
                                                         </div>
                                                     </td>
@@ -254,7 +262,7 @@
                         @endfor
                     </table>
                 </div>
-                
+
                 <div class="flex items-center flex-col  space-y-3 my-5" x-show="edit" x-transition>
 
                     <button onclick="toggleCellBlock()" @click="edit = false, editBtn = true"
@@ -354,8 +362,8 @@
             //Asignar hora UTC y Local al Horario
 
             // cellsUTC = $('.UTC');
-            let cellsLocal = $('.Local');
-            for (let i = 0; i < cellsLocal.length; i++) {
+            var cellsLocal = $('.Local');
+            for (var i = 0; i < cellsLocal.length; i++) {
                 // if (OpenUTC < 10) {
                 //     cellsUTC[i].innerHTML = "0" + OpenUTC + ":00";
                 // } else {
@@ -432,15 +440,15 @@
             //Seleccion de horario
 
             // console.log("hola1");
-            let next_schedule = @json($next_schedule);
+            var next_schedule = @json($next_schedule);
 
             if (next_schedule != null && next_schedule != []) {
-                for (let i = 0; i < next_schedule.length; i++) {
+                for (var i = 0; i < next_schedule.length; i++) {
                     next_schedule[i] = next_schedule[i][0] + "-" + next_schedule[i][1];
                 }
             }
 
-            let next = [];
+            var next = [];
             // console.log(next_schedule);
 
             function toggleCellBlock() {
@@ -470,19 +478,19 @@
             }
 
 
-            let numClass = 0;
-            let classSelected = [];
-            let preClass = @json($schedule_user);
+            var numClass = 0;
+            var classSelected = [];
+            var preClass = @json($schedule_user);
             // console.log(preClass);
             classSelected = preClass;
             // console.log(classSelected);
             numClass = classSelected.length;
             //$('.notAvailable').length + $('.preavailable').length
-            let qtyClass = classSelected.length;
+            var qtyClass = classSelected.length;
             if (role == "teacher") {
                 qtyClass = ($('.notAvailable').length + $('.preavailable').length);
             }
-            let preClassTd = [];
+            var preClassTd = [];
             preClass.forEach(element => {
                 preClassTd.push(document.getElementById(element));
             });
@@ -495,14 +503,14 @@
             $(".tool-tip").toggleClass("invisible");
 
             if (next_schedule != null && next_schedule != []) {
-                for (let i = 0; i < next_schedule.length; i++) {
+                for (var i = 0; i < next_schedule.length; i++) {
                     $("#" + next_schedule[i]).toggleClass("next_schedule");
                 }
             }
 
-            let init = false;
+            var init = false;
             // console.log(preClassTd)
-            const selection = new SelectionArea({
+            var selection = new SelectionArea({
                     selectables: ["td.selectable"],
                     boundaries: [".container"],
                 })
@@ -519,7 +527,7 @@
                     // console.log(store)
                     if (!event.ctrlKey && !event.metaKey) {
                         // console.log(store)
-                        for (const el of store.stored) {
+                        for (var el of store.stored) {
                             //console.log("si")
                             if (el.classList.contains("selected") && el.classList.contains("selectable")) {
                                 el.classList.remove("selected");
@@ -547,7 +555,7 @@
                         }
                     }) => {
                         // console.log(added)
-                        for (const el of added) {
+                        for (var el of added) {
                             if (!(el.classList.contains("selected"))) {
                                 if (numClass < qtyClass) {
                                     el.classList.add("selected");
@@ -558,7 +566,7 @@
                             }
                         }
 
-                        for (const el of removed) {
+                        for (var el of removed) {
                             if (el.classList.contains("selected")) {
                                 el.classList.remove("selected");
                                 classSelected = classSelected.filter(function(cf) {
@@ -608,7 +616,7 @@
             });
 
 
-            let numClass = 0;
+            var numClass = 0;
 
             Livewire.hook('element.updated', (el, component) => {
                 numClass = 0;
@@ -623,8 +631,8 @@
 
                 //Asignar hora UTC y Local al Horario
                 // cellsUTC = $('.UTC');
-                let cellsLocal = $('.Local');
-                for (let i = 0; i < cellsLocal.length; i++) {
+                var cellsLocal = $('.Local');
+                for (var i = 0; i < cellsLocal.length; i++) {
                     // if (OpenUTC < 10) {
                     //     cellsUTC[i].innerHTML = "0" + OpenUTC + ":00";
                     // } else {
@@ -655,17 +663,17 @@
             // Funcion de seleccion en el horario
             //window.addEventListener('initSchedule', event => {
             // console.log("hola");
-            const qtyClass = {{ $plan }};
-            let classSelected = [];
-            let preClass = ["1-6", "2-6", "3-6", "4-6", "5-6", "6-6"];
+            var qtyClass = {{ $plan }};
+            var classSelected = [];
+            var preClass = ["1-6", "2-6", "3-6", "4-6", "5-6", "6-6"];
             classSelected = preClass;
-            let preClassTd = [];
+            var preClassTd = [];
             preClass.forEach(element => {
                 preClassTd.push(document.getElementById(element));
             });
-            let init = true;
+            var init = true;
 
-            const selection = new SelectionArea({
+            var selection = new SelectionArea({
                     selectables: ["td.selectable"],
                     boundaries: [".container"],
                 })
@@ -680,7 +688,7 @@
 
                     if (!event.ctrlKey && !event.metaKey) {
                         //console.log(store)
-                        for (const el of store.stored) {
+                        for (var el of store.stored) {
                             if (el.classList.contains("selected")) {
                                 el.classList.remove("selected");
                                 classSelected = classSelected.filter(function(cf) {
@@ -707,7 +715,7 @@
                         }
                     }) => {
                         //console.log(added)
-                        for (const el of added) {
+                        for (var el of added) {
                             if (!(el.classList.contains("selected"))) {
                                 if (numClass < qtyClass) {
                                     el.classList.add("selected");
@@ -718,7 +726,7 @@
                             }
                         }
 
-                        for (const el of removed) {
+                        for (var el of removed) {
                             if (el.classList.contains("selected")) {
                                 el.classList.remove("selected");
                                 classSelected = classSelected.filter(function(cf) {
@@ -746,7 +754,7 @@
             //Asignar hora UTC y Local al Horario
             // cellsUTC = $('.UTC');
             cellsLocal = $('.Local');
-            for (let i = 0; i < cellsLocal.length; i++) {
+            for (var i = 0; i < cellsLocal.length; i++) {
                 // if (OpenUTC < 10) {
                 //     cellsUTC[i].innerHTML = "0" + OpenUTC + ":00";
                 // } else {
@@ -772,8 +780,8 @@
                 }
             }
 
-            let BT = $(".button-teacher");
-            for (let i = 0; i < BT.length; i++) {
+            var BT = $(".button-teacher");
+            for (var i = 0; i < BT.length; i++) {
                 BT[i].addEventListener('click', function() {
                     document.getElementById("link-schedule").click();
                 });

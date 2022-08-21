@@ -23,6 +23,7 @@ class UsersTable extends Component
     public $students_schedules = [];
     public $username, $password, $password_confirm, $first_name, $last_name, $email, $user_role;
     public $showUserInfo = false;
+    public $createUser = false;
     public $current_user = null;
 
     // public function mount()
@@ -31,6 +32,11 @@ class UsersTable extends Component
     //     $this->user_role = 1;
 
     // }
+
+    public function createUser()
+    {
+        $this->createUser = true;
+    }
 
     public function showInfo($teacher_id)
     {
@@ -49,7 +55,7 @@ class UsersTable extends Component
         redirect()->route('users', $role);
     }
 
-    public function createUser()
+    public function saveUser()
     {
         if (($this->password != "" && $this->password_confirm != "") && ($this->password != null && $this->password_confirm != null) && ($this->password == $this->password_confirm)) {
             $user = User::withTrashed()->where('username', $this->username)->first();

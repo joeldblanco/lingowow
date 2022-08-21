@@ -48,7 +48,44 @@
                     </div>
                 </div>
                 {{ $users->links() }}
-                
+
+                <x-modal type="info" name="createUser">
+                    <x-slot name="title">
+                        Create User
+                    </x-slot>
+
+                    <x-slot name="content">
+                        <input class="w-full px-2 py-2 text-gray-700 bg-gray-200 rounded" name="user_username"
+                            type="text" required placeholder="Username" aria-label="Username" wire:model="username">
+                        <input class="w-full px-2 py-2 text-gray-700 bg-gray-200 rounded" name="user_password"
+                            type="password" required placeholder="Password" aria-label="Password" wire:model="password">
+                        <input class="w-full px-2 py-2 text-gray-700 bg-gray-200 rounded" name="user_password_confirm"
+                            type="password" required placeholder="Password Confirmation" aria-label="Password"
+                            wire:model="password_confirm">
+                        <div class="flex mt-2 w-full space-x-1">
+                            <input class="w-full px-2 py-2 text-gray-700 bg-gray-200 rounded" name="user_name"
+                                type="text" required placeholder="Name" aria-label="Name" wire:model="first_name">
+                            <input class="w-full px-2 py-2 text-gray-700 bg-gray-200 rounded" name="user_lastname"
+                                type="text" required placeholder="Last Name" aria-label="Lastname"
+                                wire:model="last_name">
+                        </div>
+                        <input class="w-full px-2 py-2 text-gray-700 bg-gray-200 rounded" name="user_email"
+                            type="email" required placeholder="Email" aria-label="Email" wire:model="email">
+                        <select class="w-full px-2 py-2 text-gray-700 bg-gray-200 rounded" name="roles" required
+                            wire:model="user_role">
+                            <option value="1">Guest</option>
+                            <option value="2">Student</option>
+                            <option value="3">Teacher</option>
+                            <option value="4">Admin</option>
+                        </select>
+                    </x-slot>
+
+                    <x-slot name="footer" class="justify-center">
+                        <button class="px-4 py-1 text-white font-light tracking-wider bg-gray-900 rounded"
+                            wire:click="saveUser">Create</button>
+                    </x-slot>
+                </x-modal>
+
             </div>
         </div>
     </div>

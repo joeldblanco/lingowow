@@ -197,7 +197,7 @@ class PayPalPaymentController extends Controller
     {
         $data = [];
 
-        $order_id = Invoice::all()->count() + 1;
+        $order_id = Invoice::last()->id + 1;
 
         $items = array();
 
