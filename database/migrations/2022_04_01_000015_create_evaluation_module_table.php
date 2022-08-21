@@ -14,12 +14,12 @@ class CreateEvaluationModuleTable extends Migration
     public function up()
     {
         Schema::create('evaluation_module', function (Blueprint $table) {
-            $table->bigInteger('id_user');
-            $table->bigInteger('id_module');
+            $table->bigInteger('id_user',false,true);
+            $table->bigInteger('id_module',false,true);
             $table->float('nota')->nullable();
 
-            // $table->foreign('id_user')->references('id')->on('users');
-            // $table->foreign('id_module')->references('id')->on('modules');
+            $table->foreign('id_user')->references('id')->on('users');//
+            $table->foreign('id_module')->references('id')->on('modules');//
         });
     }
 

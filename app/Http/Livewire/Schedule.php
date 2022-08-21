@@ -42,8 +42,11 @@ class Schedule extends Component
     public $days_rest = 0;
     public $mode = "show";
     public $next_schedule = [];
+    public $showModalAbsence = false;
+    public $data_selected = [];
+    public $data_selected_format = [];
 
-    protected $listeners = ['showTeacherInfo', 'loadSelectingSchedule'];
+    protected $listeners = ['showTeacherInfo', 'loadSelectingSchedule', 'checkForClass'];
 
     /**
      * Create a new component instance.
@@ -97,6 +100,8 @@ class Schedule extends Component
         $this->university_schedule_start = $university_schedule[0];
         $this->university_schedule_end = $university_schedule[1];
         $this->university_schedule_hours = $university_schedule[2];
+
+        session(['user_schedule' => []]);
     }
 
     public function loadSelectingSchedule($teacher_id)
@@ -115,11 +120,20 @@ class Schedule extends Component
         }
         $students = User::find($students);
 
+        $next_students_schedule = [];
         $this->students_schedules = [];
         foreach ($students as $student) {
             $this->students_schedules[] = $student->schedules->first()->selected_schedule;
+            if ($student->schedules->first()->next_schedule != null) {
+                array_push($next_students_schedule, $student->schedules->first()->next_schedule);
+            }
         }
         $this->students_schedules = array_merge(...$this->students_schedules);
+        $next_students_schedule = array_merge(...$next_students_schedule);
+
+        $this->students_schedules = array_merge($this->students_schedules, $next_students_schedule);
+
+        // dd($this->students_schedules);
 
         if ($this->schedule == null) $this->schedule = [];
         // $this->emit('loadingState', false);
@@ -138,6 +152,7 @@ class Schedule extends Component
 
     public function refresh()
     {
+
         $this->user_schedules = ModelsSchedule::where('user_id', $this->user->id)->get();
         // if(count($this->user_schedules) > 0){
         foreach ($this->user_schedules as $key => $value) {
@@ -166,6 +181,8 @@ class Schedule extends Component
             if (count($this->teacher_schedule) > 0) $this->teacher_schedule = json_decode(json_encode($this->teacher_schedule[0]), 1);
         }
         $this->user_schedules = $this->user_schedules->first();
+
+        
 
         $this->edit();
     }
@@ -213,7 +230,7 @@ class Schedule extends Component
                 ->first();
 
             if ($this->next_schedule != null) {
-                $this->next_schedule = json_decode($this->next_schedule->next_schedule);
+                $this->next_schedule = $this->next_schedule->next_schedule;
             } else {
                 $this->next_schedule = [];
             }
@@ -248,10 +265,20 @@ class Schedule extends Component
 
             $this->students = User::select('id', 'first_name', 'last_name')->find($this->students);
 
+            $next_students_schedule = [];
             foreach ($this->students as $student) {
+                // dd($student->schedules->first());
                 $this->students_schedules[] = $student->schedules->first()->selected_schedule;
+                if ($student->schedules->first()->next_schedule != null) {
+                    array_push($next_students_schedule, $student->schedules->first()->next_schedule);
+                }
             }
+            
             $this->students_schedules = array_merge(...$this->students_schedules);
+            $next_students_schedule = array_merge(...$next_students_schedule);
+
+            $this->students_schedules = array_merge($this->students_schedules, $next_students_schedule);
+            // dd($this->students_schedules);
         }
     }
 
@@ -279,6 +306,8 @@ class Schedule extends Component
             $this->students_schedules[] = $student->schedules->first()->selected_schedule;
         }
         $this->students_schedules = array_merge(...$this->students_schedules);
+        
+        
     }
 
     public function loadAdminSchedule()
@@ -311,6 +340,25 @@ class Schedule extends Component
         // return $i;
     }
 
+    public function checkForClass($data, $plan, $error)
+    {
+
+        $data = json_decode($data);
+        session(['user_schedule' => json_encode($data)]);
+
+        $apportionment = ApportionmentController::calculateApportionment($plan);
+        $days_no_pay = array_intersect($apportionment[3], $apportionment[2]);
+        foreach ($days_no_pay as $key => $value) {
+            $days_no_pay[$key] = new Carbon($days_no_pay[$key]);
+            $days_no_pay[$key] = $days_no_pay[$key]->toCookieString();
+        }
+        //  dd($apportionment,$days_no_pay);
+
+
+        session(['data' => $days_no_pay]);
+        $this->showModalAbsence = true;
+    }
+
     /**
      * Get the view / contents that represent the component.
      *
@@ -331,6 +379,23 @@ class Schedule extends Component
 
         // $this->teacher_schedule = $this->teacher_schedule;
 
+        $data_select = session('user_schedule');
+        $this->data_selected = $data_select;
+        // dd($this->data_selected);
+        if ($this->data_selected != []) {
+            $this->data_selected = json_decode($this->data_selected);
+
+            $this->data_selected_format = $this->data_selected;
+            foreach ($this->data_selected_format as $key => $value) {
+                $this->data_selected_format[$key] = implode('-', $value);
+            }
+            // foreach ($this->data_selected as $key => $value) {
+            //     $this->data_selected[$key] = new Carbon($this->data_selected[$key]);
+            //     $this->data_selected[$key] = $this->data_selected[$key]->isoFormat('H')."-".$this->data_selected[$key]->isoFormat('d');
+            // }
+            // session(['user_schedule' => []]);
+        }
+        // dd($this->data_selected_format);
         return view('livewire.schedule');
     }
 }

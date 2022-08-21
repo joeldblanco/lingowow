@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
+class CreatePostTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,17 +13,14 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('exams', function (Blueprint $table) {
-            $table->bigIncrements('id');
-            $table->bigInteger('unit_id',false,true);
-            $table->tinyInteger('type')->nullable();
-
-            $table->tinyInteger('min_score',false,true)->default('0');
-
+        Schema::create('post', function (Blueprint $table) {
+            $table->id();
+            $table->bigInteger('author_id',false,true);
+            $table->longText('content')->charset('utf8mb4')->collation('utf8mb4_bin');
             $table->timestamps();
             $table->softDeletes();
 
-            $table->foreign('unit_id')->references('id')->on('units');
+            $table->foreign('author_id')->references('id')->on('users');
         });
     }
 
@@ -34,6 +31,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('exams');
+        Schema::dropIfExists('post');
     }
-};
+}

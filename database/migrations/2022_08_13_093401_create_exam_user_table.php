@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateEvaluationUnitTable extends Migration
+class CreateExamUserTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,13 +13,12 @@ class CreateEvaluationUnitTable extends Migration
      */
     public function up()
     {
-        Schema::create('evaluation_unit', function (Blueprint $table) {
+        Schema::create('exam_user', function (Blueprint $table) {
+            $table->bigInteger('exam_id', false, true);
             $table->bigInteger('user_id', false, true);
-            $table->bigInteger('unit_id', false, true);
-            $table->float('nota')->nullable();
 
+            $table->foreign('exam_id')->references('id')->on('exams');
             $table->foreign('user_id')->references('id')->on('users');
-            $table->foreign('unit_id')->references('id')->on('units');
         });
     }
 
@@ -30,6 +29,6 @@ class CreateEvaluationUnitTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('evaluation_unit');
+        Schema::dropIfExists('exam_user');
     }
 }

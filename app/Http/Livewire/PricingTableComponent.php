@@ -55,9 +55,9 @@ class PricingTableComponent extends Component
         // dd($this->selectedProduct);
 
         $plans =  DB::table('plans')
-            ->join('plansproducts', function ($join) use (&$product) {
-                $join->on('plans.id', '=', 'plansproducts.plan_id')
-                    ->where('plansproducts.product_id', '=', $product->id);
+            ->join('plans_products', function ($join) use (&$product) {
+                $join->on('plans.id', '=', 'plans_products.plan_id')
+                    ->where('plans_products.product_id', '=', $product->id);
             })
             ->get();
 

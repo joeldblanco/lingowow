@@ -17,7 +17,9 @@ class ApportionmentController extends Controller
     public static function calculateApportionment($plan)
     {
         $plan = json_decode($plan);
+       
         $schedule = json_decode(session('user_schedule'));
+        
         $course_id = session("selected_course");
         $product = Course::find($course_id)->products->first();
 
@@ -111,7 +113,7 @@ class ApportionmentController extends Controller
 
         // dd($days, $qty);
 
-        return [$qty_diff, $days_diff];
+        return [$qty_diff, $days_diff, $days, $abcense];
     }
 
     public static function currentPeriod()

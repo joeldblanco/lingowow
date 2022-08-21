@@ -474,7 +474,7 @@ class SchedulingCalendarController extends Controller
 
             $apportionment = ApportionmentController::calculateApportionment(session('plan'));
             $product_qty = $apportionment[0];
-            //dd($apportionment);
+            // dd($apportionment);
             Cart::add($product->id, $product->name, $product_qty, ($product->sale_price == null ? $product->regular_price : $product->sale_price))->associate('App\Models\Product');
             session([
                 'course_id' => $course_id,
@@ -502,4 +502,6 @@ class SchedulingCalendarController extends Controller
         //dd($message);
         return redirect()->route("schedule.create");
     }
+
+   
 }

@@ -11,6 +11,18 @@
         // PERIODO
         
         $hoy = (new Carbon\Carbon())->toCookieString();
+        $tz = session('tz');
+        
+        $hoyLoc = Carbon\Carbon::now()->toCookieString();
+        $ip_add = $_SERVER['REMOTE_ADDR'];
+        
+        // $ch = curl_init('http://ipwho.is/' . $ip_add);
+        // curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        // curl_setopt($ch, CURLOPT_HEADER, false);
+        // $ipwhois = json_decode(curl_exec($ch), true);
+        // curl_close($ch);
+        // dd($ip_add);
+        
         $current_period = App\Http\Controllers\ApportionmentController::currentPeriod();
         $period_start_c = new Carbon\Carbon($current_period[0]);
         $period_end_c = new Carbon\Carbon($current_period[1]);
@@ -36,7 +48,7 @@
         }
         //$day_actual = new Carbon\carbon($day_format_range[28]);
         //$day_actual->addHour(5);
-        //dd($day_actual->addHour(5)->greaterThan($now));
+        // dd($table_date);
         //dd((new Carbon\carbon($day_format_range[18]))->addHour(0+6)->greaterThan($now),$now);
         // foreach ($date_range as $key => $date) {
         //     //if ($key) {
@@ -52,7 +64,7 @@
         foreach ($abcense as $key => $value) {
             $abcense[$key] = $value->start_date;
         }
-        $abcense = json_decode($abcense);
+        // $abcense = json_decode($abcense);
         
         foreach ($abcense as $key => $value) {
             $abcense[$key] = new Carbon\Carbon($abcense[$key]);
@@ -62,6 +74,7 @@
         $abcense_classes = [];
         foreach ($abcense as $key => $value) {
             $abcense_classes[$key] = $abcense[$key]->isoFormat('H') . '-' . $abcense[$key]->format('d');
+        
             // $abcense_classes[$key] = $abcense[$key]->format("g")."-".$abcense[$key]->isoFormat("d");
         }
         
@@ -147,7 +160,7 @@
                     {{ $class_date }}</h1>
 
                 <div class="mt-5 mb-10 grid grid-rows-1 grid-flow-col gap-4 justify-center ...">
-                    <input class="@error('absence_reason') bg-red-500 @enderror" type="text" name="absence_reason"
+                    <input class="" type="text" name="absence_reason"
                         id="absence_reason" placeholder="Reason for Absence" required>
                 </div>
 
@@ -201,7 +214,7 @@
                                     @for ($hour = 0; $hour < $university_schedule_hours; $hour++)
                                         <tr class="border">
                                             <td class="width border UTC">
-                                                @if($i < 10)
+                                                @if ($i < 10)
                                                     0{{ $i }}:00
                                                 @else
                                                     {{ $i }}:00
@@ -259,7 +272,7 @@
                         {{-- <button class="bg-blue-500 rounded-lg text-white font-bold px-6 py-1 my-3 shadow-md" wire:model="$mode = 0">Edit</button> --}}
                     </div>
                     {{-- <form action=""> --}}
-                    <div class="mt-5 grid grid-rows-4 grid-flow-col gap-4 justify-center ...">
+                    <div class="mt-10 grid grid-rows-2 grid-flow-col gap-4 justify-center ...">
                         <div class="flex space-x-3 items-center">
                             <input class="@error('message') border-red-500 @enderror" type="checkbox"
                                 name="consent_checkbox" id="consent_checkbox" required>
@@ -268,8 +281,17 @@
                         </div>
                         <!-- ... -->
 
-                        <button onclick="saveAbsence({{ $id }},'classes.update')">Submit</button>
+
                     </div>
+
+                    <div class="grid justify-center">
+                        <div>
+                            <button class="bg-blue-500 rounded-lg text-white font-bold px-6 py-1 my-3 shadow-md"
+                                onclick="saveAbsence({{ $id }},'classes.update')">Submit</button>
+                        </div>
+                    </div>
+
+
                     {{-- </form> --}}
 
                 </div>
@@ -325,10 +347,15 @@
         //dd(auth()->user());
         $user = auth()->user()->id;
         $teacher = App\Models\User::find($teacher_id);
-        $teacher_classes = $teacher->teacherClasses;
-        foreach ($teacher_classes as $key => $value) {
+        $teacher_class = $teacher->teacherClasses;
+        
+        $teacher_classes = [];
+        
+        foreach ($teacher_class as $key => $value) {
+            // dd($value->start_date);
             $teacher_classes[$key] = $value->start_date;
         }
+        
         $teacher_schedule = $teacher->schedules[0]->selected_schedule;
         
         $scheduled_classes;
@@ -348,15 +375,18 @@
             $students[$key][1] = App\Models\Schedule::select('selected_schedule')
                 ->where('user_id', $value->id)
                 ->get();
-            $students[$key][1] = json_decode($students[$key][1][0]->selected_schedule);
+            $students[$key][1] = $students[$key][1][0]->selected_schedule;
         }
         
         foreach ($students as $student) {
             $students_schedules[] = $student[1];
         }
         $students_schedules = array_merge(...$students_schedules);
+        
         // dd($students_schedules,$abcense_classes, in_array(["19","4"],$students_schedules));
         // dd($students_schedules);
+        $teacher_classes_encode = json_encode($teacher_classes);
+        $teacher_schedule_encode = json_encode($teacher_schedule);
     @endphp
 
     {{-- <link rel="stylesheet" type="text/css" href="{{ asset('css/jquery.dataTables.min.css') }}"> --}}
@@ -453,8 +483,9 @@
             date = year + "-" + month + "-" + day;
             hour = hour + ":00:00";
 
-            let teacher_classes = JSON.parse(decodeEntities("{{ $teacher_classes }}"));
-            let teacher_schedule = JSON.parse(decodeEntities("{{ $teacher_schedule }}"));
+            let teacher_classes = JSON.parse(decodeEntities("{{ $teacher_classes_encode }}"));
+            let teacher_schedule = JSON.parse(decodeEntities("{{ $teacher_schedule_encode }}"));
+
             // console.log(teacher_schedule);
             let teacher_hours = [];
             let teacher_classes2 = [];
@@ -602,25 +633,13 @@
 
         // });
 
-        let hourForDays = @json($university_schedule_hours) + 1;
-        $("#absence_table").DataTable({
-            searching: false,
-            ordering: false,
-            pageLength: hourForDays,
-            info: false,
-            bLengthChange: false,
-            pagingType: "simple",
-            // stateSave: true,
-        });
-
-
 
         var hoyLocal = new Date(@json($hoy));
         var horaLocal = hoyLocal.getHours();
         // var horaUTC = hoyLocal.getUTCHours();
         var difHora = hoyLocal.getTimezoneOffset() / 60;
         var OpenUTC =
-        @json($university_schedule_start); // Hora UTC a la que abre la academia en PERU! (06:00 am Hora local en peru) (07:00 am hora local)
+            @json($university_schedule_start); // Hora UTC a la que abre la academia en PERU! (06:00 am Hora local en peru) (07:00 am hora local)
         var OpenLocal = OpenUTC - difHora;
 
         //Asignar hora UTC y Local al Horario
@@ -650,7 +669,32 @@
             } else {
                 cellsLocal[i].innerHTML = OpenLocal + ":00";
             }
+            
+            if (OpenLocal >= 23) {
+                OpenLocal = 0;
+            } else {
+                OpenLocal++;
+            }
         }
+
+
+        let hourForDays = @json($university_schedule_hours) + 1;
+        $("#absence_table").DataTable({
+            searching: false,
+            ordering: false,
+            pageLength: hourForDays,
+            info: false,
+            bLengthChange: false,
+            pagingType: "simple",
+            // stateSave: true,
+        });
+
+
+
+       
+
+
+        console.log($('.paginate_button.next'));
     </script>
 
     {{-- <link href='https://cdn.jsdelivr.net/npm/fullcalendar@5.10.2/main.min.css' rel='stylesheet' />

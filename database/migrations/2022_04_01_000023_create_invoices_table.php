@@ -15,10 +15,13 @@ class CreateInvoicesTable extends Migration
     {
         Schema::create('invoices', function (Blueprint $table) {
             $table->increments('id');
+            $table->bigInteger('user_id',false,true);//
             $table->string('title');
             $table->double('price', 2);
             $table->boolean('paid');
             $table->timestamps();
+
+            $table->foreign('user_id')->references('id')->on('users');
         });
     }
 

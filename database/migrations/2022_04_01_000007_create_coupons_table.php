@@ -40,7 +40,7 @@ class CreateCouponsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists(config('coupons.table', 'coupons'));
         Schema::dropIfExists(config('coupons.voucherable_table', 'voucherables'));
+        Schema::dropIfExists(config('coupons.table', 'coupons'));
     }
 }
