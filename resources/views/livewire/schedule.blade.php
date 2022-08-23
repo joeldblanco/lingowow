@@ -398,8 +398,8 @@
 
     @if ($role == 'teacher' || $role == 'student')
         <script>
-            let BT = $(".button-teacher");
-            for (let i = 0; i < BT.length; i++) {
+            var BT = $(".button-teacher");
+            for (var i = 0; i < BT.length; i++) {
                 BT[i].addEventListener('click', function() {
                     document.getElementById("link-schedule").click();
                 });
