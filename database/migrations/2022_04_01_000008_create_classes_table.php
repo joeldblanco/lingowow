@@ -19,6 +19,7 @@ class CreateClassesTable extends Migration
             $table->dateTime('start_date');
             $table->dateTime('end_date');
             $table->bigInteger('enrolment_id',false,true);
+            $table->string('meeting_id')->nullable();
             $table->tinyInteger('teacher_check', false, true)->default(0);
             $table->tinyInteger('student_check', false, true)->default(0);
             $table->tinyInteger('status', false, true)->nullable();

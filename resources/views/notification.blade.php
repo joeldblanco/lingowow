@@ -22,7 +22,7 @@
                                 </td>
                             @endif
                         </tr>
-                        @if ($notification_type == 'BookedClass' || $notification_type == 'ClassRescheduled')
+                        @if ($notification_type == 'BookedClass' || $notification_type == 'ClassRescheduledToTeacher')
                             <tr
                                 class="text-gray-700 font-bold space-x-3 flex justify-around items-center pt-5 border-t-2">
                                 <td class="text-center border-gray-200 w-full">

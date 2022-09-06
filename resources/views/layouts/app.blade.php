@@ -5,7 +5,7 @@
     @php
         
         // dd(Auth::user()->canBeImpersonated());
-        $response = (new Illuminate\Http\Client\PendingRequest)->get("http://ipwho.is/".$_SERVER['REMOTE_ADDR']);
+        $response = (new Illuminate\Http\Client\PendingRequest())->get('http://ipwho.is/' . $_SERVER['REMOTE_ADDR']);
         // dump(json_decode($response->getBody(), true));
         
         if (isset($_GET['tz']) && session('tz') == null) {
@@ -50,6 +50,9 @@
 
     <!-- Scripts -->
     <script src="{{ asset('js/app.js') }}" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/shepherd.js@8.3.1/dist/js/shepherd.min.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/shepherd.js@8.3.1/dist/js/shepherd.min.js" defer></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/shepherd.js@8.3.1/dist/css/shepherd.css" />
     <script src="https://kit.fontawesome.com/968fe8efd4.js" crossorigin="anonymous" defer></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/flickity/2.2.2/flickity.pkgd.min.js"
         integrity="sha512-cA8gcgtYJ+JYqUe+j2JXl6J3jbamcMQfPe0JOmQGDescd+zqXwwgneDzniOd3k8PcO7EtTW6jA7L4Bhx03SXoA=="

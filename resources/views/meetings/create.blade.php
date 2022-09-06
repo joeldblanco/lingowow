@@ -1,4 +1,11 @@
 <x-app-layout>
+    @php
+        $now = Carbon\Carbon::now();
+        $now->second = 0;
+        $now->minute = 0;
+        $now->isoFormat('YYYY-MM-DDTHH:mm');
+        // dump($now);
+    @endphp
     <div class="bg-white font-sans">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="p-6 sm:px-20 bg-white border-b border-gray-200">
@@ -52,6 +59,15 @@
                                     <p class="text-xs font-light text-red-600">Required</p>
                                 @endif
                                 <p class="text-gray-500 text-sm font-light">Please select a atendee for the meeting</p>
+                            </div>
+                            <div class="pt-6 pb-2 space-y-1">
+                                <p class="font-bold text-gray-600 mb-1">Date & Time (UTC)</p>
+                                <input type="datetime-local" name="date" id="date" placeholder="Enter meeting date" step="3600" min="{{$now}}" value="0000-00-00T00:00" required
+                                    class="w-full rounded-md p-3 text-gray-600 hover:border-gray-600 @if ($errors->has('date')) border-red-600 @else border-gray-300 @endif ">
+                                @if ($errors->has('atendee_id'))
+                                    <p class="text-xs font-light text-red-600">Required</p>
+                                @endif
+                                <p class="text-gray-500 text-sm font-light">Please select a meeting date and time <a>(UTC)</a></p>
                             </div>
                         </div>
                     </div>

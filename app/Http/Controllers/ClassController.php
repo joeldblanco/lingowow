@@ -9,6 +9,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 use App\Models\Comment;
+use App\Models\Meeting;
 
 class ClassController extends Controller
 {
@@ -273,5 +274,18 @@ class ClassController extends Controller
     public function destroy(Classes $classes)
     {
         //
+    }
+
+    public static function getRecordingUrl($class)
+    {
+        // $meeting = Meeting::where('atendee_id',$class->student()->id)->where('host_id',$class->teacher()->id)->first();
+        $recordings = (new MeetingController)->getRecordings($class);
+        dump($recordings);
+        // if(isset($recordings["code"]) && ($recordings["code"] == 3301 || $recordings["code"] === 1001 || $recordings["code"] === 1010))
+        // {
+        //     return $recordings["message"];
+        // }else{
+    
+        // }
     }
 }

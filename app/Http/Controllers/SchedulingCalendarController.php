@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\CreateClasses;
+use App\Jobs\CreateSchedule;
+use App\Jobs\EnrolUser;
 use App\Models\Classes;
 use App\Models\Course;
 use App\Models\Enrolment;
@@ -50,12 +53,14 @@ class SchedulingCalendarController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public static function store()
+    public static function store($student_id = null)
     {
         //VARIABLE INITIALIZATION//
-        $student_id = auth()->id();
-        $student = User::find($student_id);
-        // $teacher_id = session('teacher_id');
+        if ($student_id == null){
+            $student = auth()->user();
+        }else{
+            $student = User::find($student_id);
+        }
         $teacher = User::find(session('teacher_id'));
         $course_id = session('course_id');
         $student_schedule = json_decode(session('user_schedule'));
@@ -64,33 +69,29 @@ class SchedulingCalendarController extends Controller
 
 
         //CREATING STUDENT'S ENROLMENT (OR UPDATING IT, IN CASE IT ALREADY EXISTS BUT IS SOFTDELETED)//
+        // EnrolUser::dispatch($student_id, $teacher->id, $course_id);
+
         $enrolment = Enrolment::withTrashed()->updateOrCreate(
-            ['student_id' => $student_id, 'course_id' => $course_id],
+            ['student_id' => $student->id, 'course_id' => $course_id],
             ['teacher_id' => $teacher->id, 'deleted_at' => NULL]
         );
 
-        //CREATING STUDENT'S MEETING//
-        $data = [
-            'topic' => $student->first_name . ' ' . $student->last_name . ' - Lesson Room',
-            'host_id' => $teacher->id,
-            'atendee_id' => $student->id,
-        ];
-        $request = new Request($data);
-        (new MeetingController)->store($request, true);
+        // session('enrolment_id', $enrolment->id);
 
         //CHANGING STUDENT'S ROLE FROM 'GUEST' TO 'STUDENT'//
+        // $student = User::find($student->id);
         $student->removeRole('guest');
         $student->assignRole('student');
 
         //CREATING STUDENT'S SCHEDULE (OR UPDATING IT, IN CASE IT ALREADY EXISTS BUT IS SOFTDELETED)//
-        // $student_schedule = $student_schedule;
-
-        $schedule = Schedule::withTrashed()->updateOrCreate(
-            ['user_id' => $student_id, 'enrolment_id' => $enrolment->id],
-            ['selected_schedule' => $student_schedule, 'deleted_at' => NULL]
-        );
+        // $schedule = Schedule::withTrashed()->updateOrCreate(
+        //     ['user_id' => $student_id, 'enrolment_id' => $enrolment->id],
+        //     ['selected_schedule' => $student_schedule, 'deleted_at' => NULL]
+        // );
+        CreateSchedule::dispatch($student->id, $student_schedule, $enrolment->id);
 
         //ADDING CLASS DURATION (40 MIN) TO CLASS START DATETIME AND STORING IT IN ANOTHER VARIABLE (TO CREATE CLASS END DATETIME)//
+        $classes_dates = session('classes_dates');
         foreach ($classes_dates as $key => $value) {
             $classes_dates[$key] = [];
 
@@ -105,26 +106,22 @@ class SchedulingCalendarController extends Controller
 
         //CREATING CLASSES (CLASS BOOKING)//
         foreach ($classes_dates as $date) {
-            Classes::create([
-                'start_date' => $date[0],
-                'end_date' => $date[1],
-                'enrolment_id' => $enrolment->id,
-            ]);
+            CreateClasses::dispatch($date, $enrolment->id);
         }
 
 
         //STORING ALL TEACHER'S STUDENTS' SCHEDULES IN ONE ARRAY//
-        foreach ($teacher_students as $tskey => $tsvalue) {
-            $teacher_students_schedule[$tskey] = Schedule::where('user_id', $tsvalue->student_id)->select('selected_schedule')->first();
-            $teacher_students_schedule[$tskey] = $teacher_students_schedule[$tskey]->selected_schedule;
-            // $teacher_students_schedule = json_decode($teacher_students_schedule[$tskey]);
-        }
+        // foreach ($teacher_students as $tskey => $tsvalue) {
+        //     $teacher_students_schedule[$tskey] = Schedule::where('user_id', $tsvalue->student_id)->select('selected_schedule')->first();
+        //     $teacher_students_schedule[$tskey] = $teacher_students_schedule[$tskey]->selected_schedule;
+        //     // $teacher_students_schedule = json_decode($teacher_students_schedule[$tskey]);
+        // }
 
 
         //SENDING NOTIFICATION TO TEACHER//
 
         // dd($student->id);
-        $notification = Notification::sendNow($teacher, new BookedClass($student->id));
+        Notification::sendNow($teacher, new BookedClass($student->id));
     }
 
     /**
@@ -502,6 +499,4 @@ class SchedulingCalendarController extends Controller
         //dd($message);
         return redirect()->route("schedule.create");
     }
-
-   
 }

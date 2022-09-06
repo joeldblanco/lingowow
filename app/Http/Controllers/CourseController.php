@@ -24,11 +24,8 @@ class CourseController extends Controller
             $courses = Course::all();
             $courses = $courses->unique();
         } else {
-            $courses = []; //dd($user->units);
-            // $user->units->each(function ($unit, $key) use (&$courses){
-            //     $courses[] = $unit->module->course;
-            // });
-
+            $courses = [];
+            
             if ($role == "teacher") {
                 $user->enrolments_teacher->each(function ($enrolment, $key) use (&$courses) {
                     $courses[] = $enrolment->course;
@@ -40,7 +37,7 @@ class CourseController extends Controller
             }
             $courses = array_unique($courses);
         }
-        //  dd($courses);
+
         return view('course.index', compact('courses'));
     }
 

@@ -162,6 +162,7 @@
                         <p><span class="font-bold">Class Date:</span> {{$current_class->start_date}}</p>
                         <p><span class="font-bold">Did the professor teach the class?</span> @if($current_class->teacher_check == 0) No @else Yes @endif</p>
                         <p><span class="font-bold">Did the student receive the class?</span> @if($current_class->student_check == 0) No @else Yes @endif</p>
+                        <p><span class="font-bold">Recording:</span> {{App\Http\Controllers\ClassController::getRecordingUrl($current_class)}}</p>
                     @endif
                 </main>
                 <footer class="flex justify-center p-2">

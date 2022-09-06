@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Meeting;
 use App\Models\User;
 use App\Traits\MeetingTrait;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 
@@ -37,63 +38,89 @@ class MeetingController extends Controller
         return view('meetings.create', compact('hosts', 'atendees'));
     }
 
-    public function store(Request $request, $return = false)
+    public function store(Request $request, $return = false, $class = null)
     {
         $this->validate($request, [
             'topic' => 'required',
             'host_id' => 'required',
-            'atendee_id' => 'required',
+            'date' => 'required|date',
         ]);
 
         $data = $request->all();
 
         $host = User::where('id', $data['host_id'])->select('id', 'email')->first();
-        $atendee = User::where('id', $data['atendee_id'])->select('id')->first();
+        if (array_key_exists('atendee_id', $data)) {
+            $atendee = User::where('id', $data['atendee_id'])->select('id')->first();
+        } else {
+            $atendee = null;
+        }
+        $data['date'] = Carbon::parse($data['date'])->toIso8601ZuluString();
 
-        if (!$this->meetingExists($host, $atendee)) {
+        // if (!$this->meetingExists($host, $atendee)) {
 
-            $path = 'users/' . $host['email'] . '/meetings';
-            $url = $this->retrieveZoomUrl();
+        $path = 'users/' . $host['email'] . '/meetings';
+        $url = $this->retrieveZoomUrl();
 
-            $body = [
-                'topic'      => $data['topic'],
-                'type'       => self::MEETING_TYPE_RECURRING,
-            ];
+        $body = [
+            'topic'      => $data['topic'],
+            'type'       => self::MEETING_TYPE_SCHEDULE,
+            'duration'  => 40,
+            'start_time' => $data['date'],
+            'timezone'  => 'UTC',
+        ];
 
-            $response = Http::withHeaders([
-                'Authorization' => 'Bearer ' . $this->jwt,
-                'Content-Type'  => 'application/json',
-            ])->post($url . $path, $body);
+        $response = Http::withHeaders([
+            'Authorization' => 'Bearer ' . $this->jwt,
+            'Content-Type'  => 'application/json',
+        ])->post($url . $path, $body);
 
-            $success = $response->getStatusCode() === 201;
+        $success = $response->getStatusCode() === 201;
 
-            if ($success) {
-                $data = json_decode($response->getBody(), true);
-                Meeting::updateOrInsert(
-                    ['host_id' => $host['id'], 'atendee_id' => $atendee['id']],
+        if ($success) {
+            $data = json_decode($response->getBody(), true);
+
+            if ($atendee != null) {
+                $meeting = Meeting::updateOrCreate(
+                    ['host_id' => $host['id'], 'atendee_id' => $atendee['id'], 'start_date' => $data['start_time']],
                     ['join_url' => $data['join_url'], 'topic' => $data['topic'], 'deleted_at' => NULL]
                 );
 
-                $meetings = Meeting::all();
-                $success = "Meeting created successfully";
-                session(['success' => $success]);
-            } else {
+                // dd($meeting);
 
-                $meetings = Meeting::all();
-                $error = json_decode($response->getBody(), true);
-                session(['error' => $error]);
+                $class->meeting_id = $meeting->id;
+                $class->save();
+            } else {
+                $meeting = Meeting::updateOrCreate(
+                    ['host_id' => $host['id'], 'start_date' => $data['start_time']],
+                    ['join_url' => $data['join_url'], 'topic' => $data['topic'], 'deleted_at' => NULL]
+                );
+
+                $class->meeting_id = $meeting->id;
+                $class->save();
             }
-        } else {
+
             $meetings = Meeting::all();
-            $error = [
-                'message' => "Meeting already exists",
-            ];
+            $success = "Meeting created successfully";
+            session(['success' => $success]);
+        } else {
+
+            $meetings = Meeting::all();
+            $error = json_decode($response->getBody(), true);
             session(['error' => $error]);
         }
 
+
+        // } else {
+        //     $meetings = Meeting::all();
+        //     $error = [
+        //         'message' => "Meeting already exists",
+        //     ];
+        //     session(['error' => $error]);
+        // }
+
         if ($return) {
             return $return;
-        }else{
+        } else {
             return view('meetings.index', compact('meetings'));
         }
     }
@@ -191,7 +218,7 @@ class MeetingController extends Controller
         }
     }
 
-    public function meetingExists($host, $atendee)
+    public function meetingExists($host, $atendee = null)
     {
         // $path = 'users/' . $host['email'] . '/meetings';
         // $url = $this->retrieveZoomUrl();
@@ -208,13 +235,44 @@ class MeetingController extends Controller
         // }
 
         // return false;
-
-        $meeting = Meeting::where('host_id', $host->id)->where('atendee_id', $atendee->id)->first();
+        if ($atendee != null) {
+            $meeting = Meeting::where('host_id', $host->id)->where('atendee_id', $atendee->id)->first();
+        } else {
+            $meeting = Meeting::where('host_id', $host->id)->first();
+        }
 
         if ($meeting) {
             return true;
         } else {
             return false;
         }
+    }
+
+    public function getRecordings($class)
+    {
+        // $path = 'past_meetings/' . $meeting->zoom_id() . '/instances';
+        // $url = $this->retrieveZoomUrl();
+        // $response = Http::withHeaders([
+        //     'Authorization' => 'Bearer ' . $this->jwt,
+        //     'Content-Type'  => 'application/json',
+        // ])->get($url . $path);
+        // $meeting_instances = json_decode($response->getBody(), true);
+
+        // $diff = 2147483647;
+        // $recording_files = null;
+        // foreach($meeting_instances["meetings"] as $meeting_instance)
+        // {
+        //     $recording_date = (int)Carbon::parse($meeting_instance["start_time"])->isoFormat('X');
+        //     $class_date = (int)Carbon::parse($class_date)->isoFormat('X');
+
+        //     if(abs($recording_date - $class_date) < $diff){
+        //         $diff = abs($recording_date - $class_date);
+        //         $recording_files = $meeting_instance;
+        //     }
+        // }
+
+        // // dd($recording_files);
+
+        // return $recording_files;
     }
 }

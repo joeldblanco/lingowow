@@ -15,6 +15,7 @@ use App\Http\Controllers\SchedulingCalendarController;
 use App\Http\Livewire\CartComponent;
 use App\Invoice;
 use App\Http\Controllers\CourseController;
+use App\Http\Controllers\EnrolmentController;
 use App\Http\Controllers\ExamController;
 use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\ModuleController;
@@ -170,11 +171,15 @@ Route::middleware(['web', 'auth', 'verified', 'impersonate'])->group(function ()
         //ROUTES FOR MEETINGS//
         Route::resource('/meetings', MeetingController::class);
 
+        //ROUTES FOR ENROLMENTS//
+        Route::resource('photos', EnrolmentController::class);
+
         //USER RESET//
         Route::get('/reset/{users}', function (User ...$users) {
             foreach ($users as $user) {
 
                 $user->studentClasses->each(function ($class) {
+                    // $deleted_class = $class->delete();
                     $class->delete();
                 });
                 $user->schedules->where('enrolment_id', $user->enrolments->first()->id)->first()->delete();

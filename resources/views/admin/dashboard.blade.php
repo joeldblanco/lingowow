@@ -4,7 +4,7 @@
             <div class="flex flex-col w-2/3 space-y-5">
                 <div class="flex space-x-5 h-44">
                     <div onclick="location.href='{{ route('admin.earnings') }}';"
-                        class="w-1/2 bg-purple-800 rounded-xl p-4 relative overflow-hidden cursor-pointer">
+                        class="w-1/2 bg-purple-800 rounded-xl p-4 relative overflow-hidden cursor-pointer earnings-div">
                         <div class="w-52 h-52 bg-purple-900 rounded-full absolute opacity-50 -right-4 -top-32"></div>
                         <div class="flex flex-col">
                             <div class="flex justify-between mb-4">
@@ -24,7 +24,7 @@
                         </div>
                     </div>
                     <div onclick="location.href='{{ route('admin.invoices') }}';"
-                        class="w-1/2 bg-blue-500 rounded-xl p-4 relative overflow-hidden cursor-pointer">
+                        class="w-1/2 bg-blue-500 rounded-xl p-4 relative overflow-hidden cursor-pointer invoices-div">
                         <div class="w-52 h-52 bg-blue-900 rounded-full absolute opacity-50 -right-4 -top-32"></div>
                         <div class="flex flex-col">
                             <div class="flex justify-between mb-4">
@@ -271,5 +271,6 @@
 
         chart.render();
     </script>
+    {{-- <script src="{{ asset('js/shepherdjs_tours/tour_1.js') }}" defer></script> --}}
 
 </x-app-layout>

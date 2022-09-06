@@ -271,6 +271,8 @@ array_shift($nav_links);
                                     $notification_created_at[$key] = $notification_created_at[$key]->diffForHumans();
                                 
                                     $notification_id[$key] = $value->id;
+
+                                    // dump($value->type);
                                 
                                     switch ($value->type) {
                                         case 'BookedClass':
@@ -278,7 +280,7 @@ array_shift($nav_links);
                                             $notification_data[$key] = 'The student ' . $user->first_name . ' ' . $user->last_name . ' has booked a class ' . $data_array['schedule_string'];
                                             break;
                                 
-                                        case 'ClassRescheduled':
+                                        case 'ClassRescheduledToTeacher':
                                             $notification_icon = 'fas fa-calendar-alt';
                                             $notification_data[$key] = 'The student ' . $user->first_name . ' ' . $user->last_name . ' has rescheduled a class. New schedule: ' . $data_array['schedule_string'];
                                             break;

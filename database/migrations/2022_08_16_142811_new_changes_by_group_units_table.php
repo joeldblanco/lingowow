@@ -18,21 +18,21 @@ class NewChangesByGroupUnitsTable extends Migration
             $table->dropForeign('units_module_id_foreign');
             $table->renameColumn('module_id', 'group_id');
             $table->foreign('group_id')->references('id')->on('group_units');
-         });
+        });
 
         //Changes on exams
         Schema::table('exams', function ($table) {
             $table->dropForeign('exams_unit_id_foreign');
             $table->renameColumn('unit_id', 'group_id');
             $table->foreign('group_id')->references('id')->on('group_units');
-         });
+        });
 
         //Changes on evaluation_unit
         Schema::table('evaluation_unit', function ($table) {
             $table->dropForeign('evaluation_unit_unit_id_foreign');
             $table->renameColumn('unit_id', 'group_id');
             $table->foreign('group_id')->references('id')->on('group_units');
-         });
+        });
     }
 
     /**

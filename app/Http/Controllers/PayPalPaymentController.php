@@ -197,9 +197,11 @@ class PayPalPaymentController extends Controller
     {
         $data = [];
 
-        $order_id = Invoice::last()->id + 1;
+        $order_id = Invoice::all()->last()->id + 1;
 
         $items = array();
+
+        // dd($order_id);
 
         foreach(Cart::content() as $item){
             array_push($items,['name'  => $item->name, 'price' => $item->price, 'qty' => $item->qty]);

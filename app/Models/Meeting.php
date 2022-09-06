@@ -15,7 +15,9 @@ class Meeting extends Model
         'topic',
         'host_id',
         'atendee_id',
-        'meeting_url',
+        // 'meeting_url',
+        'join_url',
+        'start_date'
     ];
 
     public function host()
