@@ -17,8 +17,9 @@ return new class extends Migration
             $table->bigIncrements('id');
             $table->string('module_name',40);
             $table->string('module_description',200);
+            $table->string('priority',10);
             $table->tinyInteger('status');
-            $table->integer('course_id')->unique();
+            $table->bigInteger('course_id',false,true);
             $table->timestamps();
         });
     }

@@ -18,15 +18,14 @@ class AttemptController extends Controller
      * 
      * @return \Illuminate\Http\Response
      */
-    public function index($user_id)
+    public function index(User $user)
     {
         $role = Auth::user()->roles->pluck('name')[0];
-        $user = User::find($user_id);
         if ($user != null) {
-            if ($role == "admin") {
-                $attempts = Attempt::all()->sortDesc();
-            } elseif ($role == "teacher") {
-                $attempts = Attempt::where('user_id', $user_id)->get()->sortDesc();
+            if ($role == ("admin" || "teacher")) {
+            //     $attempts = Attempt::all()->sortDesc();
+            // } elseif ($role == "teacher") {
+                $attempts = Attempt::where('user_id', $user->id)->get()->sortDesc();
             } else {
                 Attempt::where('user_id', auth()->id())->get();
             }

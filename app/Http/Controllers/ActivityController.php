@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Activity;
+use App\Models\Unit;
 use Illuminate\Http\Request;
 
 class ActivityController extends Controller
@@ -26,7 +27,7 @@ class ActivityController extends Controller
      */
     public function create()
     {
-        //
+        return view('livewire.activity-create');
     }
 
     /**

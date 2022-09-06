@@ -17,6 +17,9 @@ return new class extends Migration
             $table->bigIncrements('id');
             $table->bigInteger('unit_id',false,true);
             $table->tinyInteger('type')->nullable();
+
+            $table->tinyInteger('min_score',false,true)->default('0');
+
             $table->timestamps();
             $table->softDeletes();
 

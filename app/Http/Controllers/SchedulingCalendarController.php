@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\CreateClasses;
+use App\Jobs\CreateSchedule;
+use App\Jobs\EnrolUser;
 use App\Models\Classes;
 use App\Models\Course;
 use App\Models\Enrolment;
@@ -50,35 +53,45 @@ class SchedulingCalendarController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public static function store()
+    public static function store($student_id = null)
     {
         //VARIABLE INITIALIZATION//
-        $student_id = auth()->id();
-        $student = User::find($student_id);
-        $teacher_id = session('teacher_id');
-        $teacher = User::find($teacher_id);
+        if ($student_id == null){
+            $student = auth()->user();
+        }else{
+            $student = User::find($student_id);
+        }
+        $teacher = User::find(session('teacher_id'));
         $course_id = session('course_id');
         $student_schedule = json_decode(session('user_schedule'));
         $classes_dates = session('classes_dates');
-        $teacher_students = Enrolment::where('teacher_id', $teacher_id)->select('student_id')->get();
+        $teacher_students = Enrolment::where('teacher_id', $teacher->id)->select('student_id')->get();
 
-        
+
         //CREATING STUDENT'S ENROLMENT (OR UPDATING IT, IN CASE IT ALREADY EXISTS BUT IS SOFTDELETED)//
+        // EnrolUser::dispatch($student_id, $teacher->id, $course_id);
+
         $enrolment = Enrolment::withTrashed()->updateOrCreate(
-            ['student_id' => $student_id, 'course_id' => $course_id],
-            ['teacher_id' => $teacher_id, 'deleted_at' => NULL]
+            ['student_id' => $student->id, 'course_id' => $course_id],
+            ['teacher_id' => $teacher->id, 'deleted_at' => NULL]
         );
-        
+
+        // session('enrolment_id', $enrolment->id);
+
+        //CHANGING STUDENT'S ROLE FROM 'GUEST' TO 'STUDENT'//
+        // $student = User::find($student->id);
+        $student->removeRole('guest');
+        $student->assignRole('student');
 
         //CREATING STUDENT'S SCHEDULE (OR UPDATING IT, IN CASE IT ALREADY EXISTS BUT IS SOFTDELETED)//
-        $student_schedule = json_encode($student_schedule);
-        
-        $schedule = Schedule::withTrashed()->updateOrCreate(
-            ['user_id' => $student_id, 'enrolment_id' => $enrolment->id],
-            ['selected_schedule' => $student_schedule, 'deleted_at' => NULL]
-        );
-        
+        // $schedule = Schedule::withTrashed()->updateOrCreate(
+        //     ['user_id' => $student_id, 'enrolment_id' => $enrolment->id],
+        //     ['selected_schedule' => $student_schedule, 'deleted_at' => NULL]
+        // );
+        CreateSchedule::dispatch($student->id, $student_schedule, $enrolment->id);
+
         //ADDING CLASS DURATION (40 MIN) TO CLASS START DATETIME AND STORING IT IN ANOTHER VARIABLE (TO CREATE CLASS END DATETIME)//
+        $classes_dates = session('classes_dates');
         foreach ($classes_dates as $key => $value) {
             $classes_dates[$key] = [];
 
@@ -93,26 +106,22 @@ class SchedulingCalendarController extends Controller
 
         //CREATING CLASSES (CLASS BOOKING)//
         foreach ($classes_dates as $date) {
-            Classes::create([
-                'start_date' => $date[0],
-                'end_date' => $date[1],
-                'enrolment_id' => $enrolment->id,
-            ]);
+            CreateClasses::dispatch($date, $enrolment->id);
         }
 
-        
+
         //STORING ALL TEACHER'S STUDENTS' SCHEDULES IN ONE ARRAY//
-        foreach ($teacher_students as $tskey => $tsvalue) {
-            $teacher_students_schedule[$tskey] = Schedule::where('user_id', $tsvalue->student_id)->select('selected_schedule')->first();
-            $teacher_students_schedule[$tskey] = $teacher_students_schedule[$tskey]->selected_schedule;
-            $teacher_students_schedule = json_decode($teacher_students_schedule[$tskey]);
-        }
+        // foreach ($teacher_students as $tskey => $tsvalue) {
+        //     $teacher_students_schedule[$tskey] = Schedule::where('user_id', $tsvalue->student_id)->select('selected_schedule')->first();
+        //     $teacher_students_schedule[$tskey] = $teacher_students_schedule[$tskey]->selected_schedule;
+        //     // $teacher_students_schedule = json_decode($teacher_students_schedule[$tskey]);
+        // }
 
 
         //SENDING NOTIFICATION TO TEACHER//
-        
+
         // dd($student->id);
-        $notification = Notification::sendNow($teacher, new BookedClass($student->id));
+        Notification::sendNow($teacher, new BookedClass($student->id));
     }
 
     /**
@@ -161,7 +170,7 @@ class SchedulingCalendarController extends Controller
 
             $user_schedule = Schedule::select('selected_schedule')->where('user_id', $user_id)->get();
             // dd($user_id);
-            $user_schedule = json_decode($user_schedule[0]->selected_schedule);
+            $user_schedule = $user_schedule[0]->selected_schedule;
 
             if ($user_role == "student") {
 
@@ -177,7 +186,7 @@ class SchedulingCalendarController extends Controller
 
                 $teacher_students_schedule = Schedule::select('selected_schedule')->whereIn('user_id', $teacher_students)->get();
                 foreach ($teacher_students_schedule as $key => $value) {
-                    $teacher_students_schedule[$key] = json_decode($value->selected_schedule);
+                    $teacher_students_schedule[$key] = $value->selected_schedule;
                 }
                 $teacher_students_schedule = array_merge(...$teacher_students_schedule);
 
@@ -186,7 +195,7 @@ class SchedulingCalendarController extends Controller
                 }
 
                 $teacher_selected_schedule = Schedule::select('selected_schedule')->where('user_id', $teacher_id)->get();
-                $teacher_selected_schedule = json_decode($teacher_selected_schedule[0]->selected_schedule);
+                $teacher_selected_schedule = $teacher_selected_schedule[0]->selected_schedule;
                 $teacher_available_schedule = $teacher_selected_schedule;
                 foreach ($teacher_students_schedule as $t_schedule) {
                     \array_splice($teacher_available_schedule, array_search($t_schedule, $teacher_available_schedule), 1);
@@ -203,7 +212,7 @@ class SchedulingCalendarController extends Controller
                         }
                     }
                 }
-
+                // dd($count, count($requested_schedule));
                 if ($count == count($requested_schedule)) {
 
                     foreach ($teacher_available_schedule as $t_schedule) {
@@ -225,12 +234,12 @@ class SchedulingCalendarController extends Controller
                     // $requested_schedule = json_encode($requested_schedule);
                     // Schedule::where('user_id',$user_id)
                     // ->update(['selected_schedule' => $requested_schedule]);
-
-                    Schedule::withTrashed()->updateOrCreate(
+                    // dd($requested_schedule);
+                    $schedule = Schedule::withTrashed()->updateOrCreate(
                         ['user_id' => $user_id, 'enrolment_id' => $enrolment->id],
-                        ['selected_schedule' => json_encode($requested_schedule), 'deleted_at' => NULL]
+                        ['next_schedule' => $requested_schedule, 'deleted_at' => NULL]
                     );
-
+                    // dd($schedule);
                     // $teacher_available_schedule = json_encode($teacher_available_schedule);
                     // User::where('id',$teacher_id)
                     // ->update(['available_schedule' => $teacher_available_schedule]);
@@ -251,9 +260,40 @@ class SchedulingCalendarController extends Controller
                 $affected_students = [];
                 $students_enrolments = Enrolment::where('teacher_id', $user_id)->get();
 
+                //Fechas para la consulta de las clases reagendadas en el periodo vigente.
+                $current_period = ApportionmentController::currentPeriod();
+                $period_end_c = new Carbon($current_period[1]);
+                $today = new Carbon();
+
                 foreach ($students_enrolments as $student_enrolment) {
                     $student_schedule = Schedule::select('selected_schedule')->where('enrolment_id', $student_enrolment->id)->first();
-                    $student_schedule = json_decode($student_schedule->selected_schedule);
+                    $student_schedule = $student_schedule->selected_schedule;
+
+                    //Consulta de las clases reagendadas en el periodo vigente.
+                    $abcense = Classes::select('start_date')
+                        ->where('status', '1')
+                        ->whereBetween('start_date', [$today->toDateTimeString(), $period_end_c->toDateTimeString()])
+                        ->get();
+
+                    foreach ($abcense as $key => $value) {
+                        $abcense[$key] = $value->start_date;
+                    }
+                    $abcense = json_decode($abcense);
+
+                    foreach ($abcense as $key => $value) {
+                        $abcense[$key] = new Carbon($abcense[$key]);
+                    }
+
+                    $abcense_classes = [];
+                    foreach ($abcense as $key => $value) {
+                        $abcense_classes[$key] = $abcense[$key]->isoFormat('H') . '-' . $abcense[$key]->isoFormat('d');
+                    }
+                    //Se añaden las clases reagendadas al horario de los estudiantes para un compendio general
+                    foreach ($abcense_classes as $classes) {
+                        $class = explode("-", $classes);
+                        array_push($student_schedule, $class);
+                    }
+
                     array_push($students_schedules, $student_schedule);
                 }
 
@@ -266,17 +306,21 @@ class SchedulingCalendarController extends Controller
 
                         // dd($students_schedules, $key, $student_block, $students_enrolments[$key]->student_id);
 
-                        if (in_array($student_block, $requested_schedule)) {
+                        if (!in_array($student_block, $requested_schedule)) {
                             array_push($affected_students, $students_enrolments[$key]->student_id);
                         }
                     }
                     // }
                 }
+
                 $affected_students = array_unique($affected_students);
+
+                // dd($students_schedules, $requested_schedule, $affected_students);
+
 
                 Schedule::withTrashed()->updateOrCreate(
                     ['user_id' => $user_id],
-                    ['selected_schedule' => json_encode($requested_schedule), 'deleted_at' => NULL]
+                    ['selected_schedule' => $requested_schedule, 'deleted_at' => NULL]
                 );
 
                 // Schedule::upsert([
@@ -300,7 +344,7 @@ class SchedulingCalendarController extends Controller
 
                 if (count($affected_students) > 0) {
                     session(['affected_students' => $affected_students]);
-                    $message .= "However, the blocks taken by the following students will remain intact until the end of the current academic period: ";
+                    $message .= "However, the blocks taken and classes rescheduled by the following students will remain intact until the end of the current academic period: ";
                 }
             }
         } else {
@@ -360,7 +404,7 @@ class SchedulingCalendarController extends Controller
      */
     public function checkForTeachers(Request $request)
     {
-        // dd($request);
+        // dd(session('plan'));
         if ($request->error == "false") {
             $cells = json_decode($request->data);
             // $cells = array_chunk($request->data, 2);
@@ -427,7 +471,7 @@ class SchedulingCalendarController extends Controller
 
             $apportionment = ApportionmentController::calculateApportionment(session('plan'));
             $product_qty = $apportionment[0];
-            //dd($apportionment);
+            // dd($apportionment);
             Cart::add($product->id, $product->name, $product_qty, ($product->sale_price == null ? $product->regular_price : $product->sale_price))->associate('App\Models\Product');
             session([
                 'course_id' => $course_id,
@@ -435,7 +479,7 @@ class SchedulingCalendarController extends Controller
             ]);
 
             return view('cart');
-        }else {
+        } else {
             Cart::destroy();
             $message = "Request rejected";
             switch ($request->error) {
@@ -449,7 +493,6 @@ class SchedulingCalendarController extends Controller
                     $message .= ". You selected more classes than those reflected in your plan.";
                     break;
             }
-            
         }
 
         session(['message' => $message]);

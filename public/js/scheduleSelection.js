@@ -210,6 +210,41 @@ function saveAbsence(id, routeTo, role = 2){
 
 }
 
+function checkClass(plan, role = 2){
+    
+    var cells = $(".selected");
+    error = false;
+    //console.log($('.selectable'))
+    for (var i=0; i<cells.length; i++){
+        cells[i] = cells[i].id.split("-");
+    }
+
+    var data = [];
+
+    for (let i=0; i<cells.length; i++){
+        if(cells[i] != ""){
+            data[i] = cells[i];
+        }
+    }
+
+
+    if(data.length < 1){
+        error = "not_enough_days";
+    }
+    if(data.length > 1){
+        error = "too_much_days";
+    }
+
+    console.log(data);
+
+    data = JSON.stringify(data);
+
+    console.log(data);
+
+    Livewire.emit("checkForClass",data,plan,error);
+    
+}
+
 /**
  * sends a request to the specified url from a form. this will change the window location.
  * @param {string} path the path to send the post request to

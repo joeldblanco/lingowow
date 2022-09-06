@@ -52,11 +52,13 @@ class PayPalPaymentController extends Controller
      */
     public function getExpressCheckout(Request $request)
     {
+        // dd($request);
         $recurring = ($request->get('mode') === 'recurring') ? true : false;
         $cart = $this->getCheckoutData($recurring);
 
         try {
             $response = $this->provider->setExpressCheckout($cart, $recurring);
+            // dd($response);
             return redirect($response['paypal_link']);
         } catch (\Exception $e) {
             $invoice = $this->createInvoice($cart, 'Invalid');
@@ -195,9 +197,11 @@ class PayPalPaymentController extends Controller
     {
         $data = [];
 
-        $order_id = Invoice::all()->count() + 1;
+        $order_id = Invoice::all()->last()->id + 1;
 
         $items = array();
+
+        // dd($order_id);
 
         foreach(Cart::content() as $item){
             array_push($items,['name'  => $item->name, 'price' => $item->price, 'qty' => $item->qty]);

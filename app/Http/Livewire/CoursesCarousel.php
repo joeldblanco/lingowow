@@ -9,17 +9,17 @@ class CoursesCarousel extends Component
 {
 
     public $loadingState = false;
-    protected $listeners = ['loadingState'];
+    // protected $listeners = ['loadingState'];
     public $courses;
 
-    public function loadingState($status)
-    {
-        $this->loadingState = $status;
-    }
+    // public function loadingState($status)
+    // {
+    //     $this->loadingState = $status;
+    // }
 
     public function selectProduct($course_id)
     {
-        $this->loadingState(true);
+        // $this->loadingState(true);
         $this->emit('showSelectedProduct', $course_id);
     }
 
