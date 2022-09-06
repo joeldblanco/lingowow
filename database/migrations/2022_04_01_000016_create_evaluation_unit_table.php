@@ -14,12 +14,12 @@ class CreateEvaluationUnitTable extends Migration
     public function up()
     {
         Schema::create('evaluation_unit', function (Blueprint $table) {
-            $table->bigInteger('id_user', false, true);
-            $table->bigInteger('id_unit', false, true);
+            $table->bigInteger('user_id', false, true);
+            $table->bigInteger('unit_id', false, true);
             $table->float('nota')->nullable();
 
-            $table->foreign('id_user')->references('id')->on('users');
-            $table->foreign('id_unit')->references('id')->on('units');
+            $table->foreign('user_id')->references('id')->on('users');
+            $table->foreign('unit_id')->references('id')->on('units');
         });
     }
 

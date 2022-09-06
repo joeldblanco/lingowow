@@ -7,7 +7,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class ClassRescheduledToTeacher extends Notification
+class ClassRescheduledToTeacher extends Notification implements ShouldQueue
 {
     use Queueable;
 
@@ -21,7 +21,7 @@ class ClassRescheduledToTeacher extends Notification
     public function __construct($student)
     {
         $this->student = $student;
-        $schedule = json_decode($student->selected_schedule);
+        $schedule = $student->selected_schedule;
         $schedule_string = "";
         $days = ["Sundays","Mondays","Tuesdays","Wednesdays","Thursdays","Fridays","Saturdays"];
 

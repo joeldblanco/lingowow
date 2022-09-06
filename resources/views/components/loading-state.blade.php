@@ -1,4 +1,4 @@
-<div x-show="loadingState" x-cloak>
+<div>
     <style>
   
         .loader-dots div {

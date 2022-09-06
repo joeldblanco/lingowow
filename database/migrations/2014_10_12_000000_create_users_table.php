@@ -21,8 +21,23 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
+<<<<<<< HEAD
             $table->string('profile_photo_path')->default('profile-photos/default_pp.jpg');
             $table->rememberToken();
+=======
+            
+            $table->tinyInteger('status',false,true)->default('1');
+            $table->text('selected_schedule')->nullable();
+            $table->text('available_schedule')->nullable();
+            $table->string('meeting_id',255)->nullable();
+            //$table->text('two_factor_secret')->nullable();
+            //$table->text('two_factor_recovery_codes')->nullable();
+            $table->string('remember_token',100)->nullable();
+            $table->bigInteger('current_team_id',false,true)->nullable();
+
+            $table->text('profile_photo_path')->default('profile-photos/default_pp.jpg');
+            // $table->rememberToken();
+>>>>>>> bce4cfed14109878c128d890fe62adbc70f3a8cb
             $table->timestamps();
             $table->softDeletes();
         });

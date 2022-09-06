@@ -24,6 +24,7 @@ return new class extends Migration
             $table->tinyInteger('status')->default(1);
             $table->bigInteger('module_id',false,true);
             $table->timestamps();
+            $table->softDeletes();
 
             $table->foreign('module_id')->references('id')->on('modules');
         });

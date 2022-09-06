@@ -14,15 +14,23 @@ class Unit extends Model
     /**
      * Get the module that owns the unit.
      */
-    public function module()
+    // public function module()
+    // {
+    //     return $this->belongsTo(Module::class);
+    // }
+
+    /**
+     * Get the group that owns the unit.
+     */
+    public function group()
     {
-        return $this->belongsTo(Module::class);
+        return $this->belongsTo(group_unit::class,"group_id");
     }
 
-    public function exams()
-    {
-        return $this->hasMany(Exam::class);
-    }
+    // public function exams()
+    // {
+    //     return $this->hasMany(Exam::class);
+    // }
 
     /**
      * The users that belong to the unit.

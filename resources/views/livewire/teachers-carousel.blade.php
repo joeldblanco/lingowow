@@ -13,10 +13,12 @@
                                 <div class="bg-red-600">This</div>
                             @endif --}}
                             <div class="gallery-cell">
-                                <div class="relative bg-white py-6 px-6 rounded-3xl w-64 my-4 shadow-xl mt-7 mb-2 mx-10">
+                                <div
+                                    class="relative bg-white py-6 px-6 rounded-3xl w-64 my-4 shadow-xl mt-7 mb-2 mx-10">
                                     <div class="w-32 h-32">
                                         <img src="{{ Storage::url($teacher->profile_photo_path) }}"
-                                        class="flex items-center border-2 rounded-full shadow-xl max-h-32" style="max-width: 8rem" />
+                                            class="flex items-center border-2 rounded-full shadow-xl max-h-32"
+                                            style="max-width: 8rem" />
                                     </div>
                                     <div class="mt-8">
                                         <p class="text-xl font-semibold my-2">{{ $teacher->first_name }}
@@ -34,7 +36,8 @@
                                         <div class="border-t-2"></div>
                                         <div class="flex justify-center">
                                             <button wire:click.prevent="loadSchedule({{ $teacher->id }})"
-                                                class="inline-block bg-blue-800 text-white px-6 py-2 rounded hover:bg-blue-900 hover:text-white mt-5">Select</button>
+                                                class="button-teacher inline-block bg-blue-800 text-white px-6 py-2 rounded hover:bg-blue-900 hover:text-white mt-5">Select</button>
+
                                         </div>
                                     </div>
                                 </div>
@@ -58,5 +61,7 @@
             </div>
         </div>
     @endif
-    @include('components.loading-state')
+    <div wire:loading>
+        @include('components.loading-state')
+    </div>
 </div>

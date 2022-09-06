@@ -17,8 +17,14 @@ class CreateClassCommentsTable extends Migration
             $table->bigIncrements('id');
             $table->text('comment')->nullable();
             $table->bigInteger('class_id',false,true);
+
+            $table->bigInteger('author',false,true);//
+
             $table->timestamps();
-            $table->softDeletes();
+            $table->softDeletes(); 
+
+            $table->foreign('class_id')->references('id')->on('classes');//
+            $table->foreign('author')->references('id')->on('users');//
         });
     }
 

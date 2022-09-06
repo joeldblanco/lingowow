@@ -30,7 +30,7 @@ class Notifications extends Component
                     $this->notification_data[$key] = "The student " . $user->first_name . " " . $user->last_name . " has booked a class " . $data_array['schedule_string'];
                     break;
 
-                case "ClassRescheduled":
+                case "ClassRescheduledToTeacher":
                     $this->notification_icon[$key] = "fas fa-calendar-alt";
                     $this->notification_data[$key] = "The student " . $user->first_name . " " . $user->last_name . " has rescheduled a class. New scheduled classes " . $data_array['schedule_string'];
                     break;

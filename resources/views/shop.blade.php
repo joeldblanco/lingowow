@@ -2,7 +2,7 @@
 
     {{-- MENSAJE --}}
 
-   
+
 
     {{-- FIN MENSAJE --}}
 
@@ -11,11 +11,7 @@
         <div class="max-w-lg mx-auto sm:px-6 lg:px-8">
             @if (!empty($response['code']))
                 <div x-show="open" x-transition.duration.200ms x-data="open" x-init="setTimeout(() => open = false, 3000)"
-                    class="py-4 px-4 text-white font-semibold rounded-lg text-center @if ($response['code'] == 'success')
-bg-green-500
-@else
-bg-red-500
-@endif">
+                    class="py-4 px-4 text-white font-semibold rounded-lg text-center @if ($response['code'] == 'success') bg-green-500 @else bg-red-500 @endif">
                     <span class="font-bold">{{ $response['message'] }}</span>
                 </div>
             @endif
@@ -39,7 +35,8 @@ bg-red-500
     <a href="{{ route('cart') }}"
         class="bg-green-500 rounded-full w-20 h-20 flex justify-center items-center fixed bottom-5 right-5 z-10">
         @if (Cart::count() > 0)
-            <div class="absolute top-0 right-0 rounded-full bg-red-600 w-7 h-7 text-white font-bold flex justify-center">
+            <div
+                class="absolute top-0 right-0 rounded-full bg-red-600 w-7 h-7 text-white font-bold flex justify-center">
                 {{ Cart::count() }}
             </div>
         @endif

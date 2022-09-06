@@ -9,6 +9,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 use App\Models\Comment;
+use App\Models\Meeting;
 
 class ClassController extends Controller
 {
@@ -19,7 +20,7 @@ class ClassController extends Controller
      */
     public function index()
     {
-
+        // dd("hola");
         // $posts = auth()->user()->posts()->orderBy('updated_at', 'DESC');
 
         // $posts = auth()->user()->posts->sortByDesc('updated_at');
@@ -106,14 +107,17 @@ class ClassController extends Controller
         $class_date = $class->start_date;
         $class_date = new Carbon($class_date);
         $class_date = $class_date->toCookieString();
-        //dd($class_date);
+        // dd($class_date);
 
         $teacher_schedule = Schedule::where('user_id', $teacher_id)->select('selected_schedule')->get()->toArray();
+        
         foreach ($teacher_schedule as $key => $value) {
-            $teacher_schedule[$key] = json_decode($value["selected_schedule"], 1);
+            // dd($value["selected_schedule"]);
+            // $teacher_schedule[$key] = json_decode($value["selected_schedule"], 1);
+            $teacher_schedule[$key] = $value["selected_schedule"];
         }
         $teacher_schedule = array_merge(...$teacher_schedule);
-
+        // dd($teacher_schedule);
 
 
         // $students = [];
@@ -149,7 +153,9 @@ class ClassController extends Controller
             $students[$key][1] = Schedule::select('selected_schedule')
                 ->where('user_id', $value->id)
                 ->get();
-            $students[$key][1] = json_decode($students[$key][1][0]->selected_schedule);
+            // $students[$key][1] = json_decode($students[$key][1][0]->selected_schedule);
+            // dd($students[$key][1][0]->selected_schedule);
+            $students[$key][1] = $students[$key][1][0]->selected_schedule;
         }
         
         foreach ($students as $student) {
@@ -157,7 +163,12 @@ class ClassController extends Controller
         }
         $students_schedules = array_merge(...$students_schedules);
 
-        return view('classes.edit', compact('id', 'class_date', 'student_id', 'teacher_id', 'teacher_schedule', 'students_schedules', 'students'));
+
+        //HORARIO DE LA UNIVERSIDAD
+
+        $university_schedule = Schedule::university_schedule();
+
+        return view('classes.edit', compact('university_schedule', 'id', 'class_date', 'student_id', 'teacher_id', 'teacher_schedule', 'students_schedules', 'students'));
     }
 
     /**
@@ -263,5 +274,18 @@ class ClassController extends Controller
     public function destroy(Classes $classes)
     {
         //
+    }
+
+    public static function getRecordingUrl($class)
+    {
+        // $meeting = Meeting::where('atendee_id',$class->student()->id)->where('host_id',$class->teacher()->id)->first();
+        $recordings = (new MeetingController)->getRecordings($class);
+        dump($recordings);
+        // if(isset($recordings["code"]) && ($recordings["code"] == 3301 || $recordings["code"] === 1001 || $recordings["code"] === 1010))
+        // {
+        //     return $recordings["message"];
+        // }else{
+    
+        // }
     }
 }

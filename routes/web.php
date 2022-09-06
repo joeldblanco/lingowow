@@ -15,6 +15,7 @@ use App\Http\Controllers\SchedulingCalendarController;
 use App\Http\Livewire\CartComponent;
 use App\Invoice;
 use App\Http\Controllers\CourseController;
+use App\Http\Controllers\EnrolmentController;
 use App\Http\Controllers\ExamController;
 use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\ModuleController;
@@ -29,6 +30,8 @@ use App\Models\User;
 use App\Notifications\BookedClass;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Notification;
+use App\Http\Controllers\MeetingController;
+use App\Models\Enrolment;
 
 /*
 |--------------------------------------------------------------------------
@@ -101,7 +104,7 @@ Route::middleware(['web', 'auth', 'verified', 'impersonate'])->group(function ()
     //ROUTES FOR EXAMS//
     Route::get('/exam/{id}', [ExamController::class, 'display'])->name('exam.display');
     //ROUTES FOR ATTEMPTS//
-    Route::get('/attempts/{user_id}', [AttemptController::class, 'index'])->name('attempt.index');
+    Route::get('/attempts/{user}', [AttemptController::class, 'index'])->name('attempt.index');
     Route::get('/attempt/{id}', [AttemptController::class, 'show'])->name('attempt.show');
     Route::get('/attempt/{attempt_id}/question/{question_id}', [AttemptController::class, 'show_question'])->name('attempt.show_question');
 
@@ -112,7 +115,7 @@ Route::middleware(['web', 'auth', 'verified', 'impersonate'])->group(function ()
         Route::get('/admin/dashboard', [AnalyticsController::class, 'index'])->name('admin.dashboard');
 
         //USERS//
-        Route::get('/admin/users/{role}', [UsersController::class, 'index'])->name('admin.users');
+        Route::get('/admin/users/{role}', [UsersController::class, 'index'])->name('users');
 
         //INVOICES//
         Route::get('/admin/invoices', [InvoiceController::class, 'adminIndex'])->name('admin.invoices');
@@ -164,6 +167,28 @@ Route::middleware(['web', 'auth', 'verified', 'impersonate'])->group(function ()
 
         //ROUTES FOR IMPERSONATION//
         Route::get('/users/impersonate/{id}', [UsersController::class, 'impersonate'])->name('impersonate');
+
+        //ROUTES FOR MEETINGS//
+        Route::resource('/meetings', MeetingController::class);
+
+        //ROUTES FOR ENROLMENTS//
+        Route::resource('photos', EnrolmentController::class);
+
+        //USER RESET//
+        Route::get('/reset/{users}', function (User ...$users) {
+            foreach ($users as $user) {
+
+                $user->studentClasses->each(function ($class) {
+                    // $deleted_class = $class->delete();
+                    $class->delete();
+                });
+                $user->schedules->where('enrolment_id', $user->enrolments->first()->id)->first()->delete();
+                $user->enrolments->first()->delete();
+                $user->removeRole('student');
+                $user->assignRole('guest');
+            }
+            return redirect()->route('users', 4);
+        });
     });
 
     Route::get('/admin/exam/result/{id}', [ExamController::class, 'correct'])->name('exam.result');
