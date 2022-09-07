@@ -85,6 +85,9 @@ Route::middleware(['web', 'auth', 'verified', 'impersonate'])->group(function ()
     // //ROUTES FOR UNITS//
     Route::middleware(['role:student|teacher|admin'])->get('/unit/{id}', [UnitController::class, "show"])->name('unit.show');
 
+    //ROUTES FOR ACTIVITY//
+    Route::middleware(['role:student|teacher|admin'])->get('/unit/{id_unit}/activity/{id}', [ActivityController::class, 'show_activity'])->name('activity.show'); ///Cree, esta nueva
+
     //ROUTES FOR SHOP//
     Route::middleware(['role:guest|student|admin'])->get('/shop', [PayPalPaymentController::class, 'getIndex'])->name('shop');
     Route::middleware(['role:guest|student|admin'])->get('/shop/cart', function () {
@@ -160,7 +163,7 @@ Route::middleware(['web', 'auth', 'verified', 'impersonate'])->group(function ()
         Route::resource('/activities', ActivityController::class);
         // Route::get('/admin/activities/create', [ActivityController::class, 'create'])->name('admin.activities.create');
         // Route::post('/admin/activities', [ActivityController::class, 'store'])->name('admin.activities.store');
-        // Route::get('/admin/activities/{id}', [ActivityController::class, 'show'])->name('admin.activities.show');
+        Route::get('activities/{id}', [ActivityController::class, 'show'])->name('admin.activities.show');
         // Route::get('/admin/activities/{id}/edit', [ActivityController::class, 'edit'])->name('admin.activities.edit');
         // Route::patch('/admin/activities/{id}', [ActivityController::class, 'update'])->name('admin.activities.update');
         // Route::post('/admin/activities/{id}', [ActivityController::class, 'destroy'])->name('admin.activities.destroy');

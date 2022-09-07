@@ -57,6 +57,7 @@
                         <i class="fas fa-tasks"></i>
                         <h2>Activities</h2>
                     </div>
+                    <a href="{{$unit->id}}/activity/1">Actividad asignada prueba</a>
                     <div>
                         
                     </div>

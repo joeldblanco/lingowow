@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateActivityUserTable extends Migration
+class CreateActivityContentTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,13 +13,12 @@ class CreateActivityUserTable extends Migration
      */
     public function up()
     {
-        Schema::create('activity_user', function (Blueprint $table) {
+        Schema::create('activity_content', function (Blueprint $table) {
             $table->bigInteger('activity_id')->unsigned();
-            $table->bigInteger('user_id')->unsigned();
-            $table->tinyInteger('user_type');
+            $table->bigInteger('content_id')->unsigned();
 
             $table->foreign('activity_id')->references('id')->on('activities');
-            $table->foreign('user_id')->references('id')->on('users');
+            $table->foreign('content_id')->references('id')->on('content_of_act');
         });
     }
 
@@ -30,6 +29,6 @@ class CreateActivityUserTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('activity_user');
+        Schema::dropIfExists('activity_content');
     }
 }

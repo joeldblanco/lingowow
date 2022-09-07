@@ -1,3 +1,4 @@
+console.log("Funcionando");
 function saveSchedulee(plan, routeTo, role = 2){ // AQUI TENGO QUE ELIMINAR LA ULTIMA E EN EL NOMBRE DE LA FUNCION POR SI SE ME OLVIDA.
     
     var cells = $(".selected, .selectable .ui-selected");

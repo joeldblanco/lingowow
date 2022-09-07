@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Module;
 use App\Models\User;
-use App\Models\Group_unit;
+use App\Models\GroupUnit;
 use Illuminate\Http\Request;
 
 class ModuleController extends Controller
@@ -136,7 +136,7 @@ class ModuleController extends Controller
 
         if ($nota != null) {
 
-            if (Group_unit::find($id)->priority == 'FIRST') {
+            if (GroupUnit::find($id)->priority == 'FIRST') {
                 return true;
             } else {
                 $nota = $nota->pivot->nota;
@@ -147,7 +147,7 @@ class ModuleController extends Controller
                 }
             }
         } else {
-            if (Group_unit::find($id)->priority == 'FIRST') {
+            if (GroupUnit::find($id)->priority == 'FIRST') {
                 return true;
             } else {
                 return false;
