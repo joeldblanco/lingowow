@@ -24,7 +24,7 @@ class Unit extends Model
      */
     public function group()
     {
-        return $this->belongsTo(group_unit::class,"group_id");
+        return $this->belongsTo(GroupUnit::class,"group_id");
     }
 
     // public function exams()

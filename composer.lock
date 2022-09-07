@@ -6860,7 +6860,7 @@
             "description": "Defines an object-oriented layer for the HTTP specification",
             "homepage": "https://symfony.com",
             "support": {
-                "source": "https://github.com/symfony/http-foundation/tree/v5.4.11"
+                "source": "https://github.com/symfony/http-foundation/tree/v5.4.11,"
             },
             "time": "2022-07-20T13:00:38+00:00"
         },

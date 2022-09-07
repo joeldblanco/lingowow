@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use PHPUnit\TextUI\XmlConfiguration\Group;
 
-class Group_unit extends Model
+class GroupUnit extends Model
 {
     use HasFactory;
 
@@ -40,10 +40,10 @@ class Group_unit extends Model
     public function isPassed($id_user,$id_group){
         // $user = User::find($id);
         $unit_priority = null;
-        if(Group_unit::find($id_group)->priority == 'FIRST'){
-            $unit_priority = Group_unit::find($id_group);
+        if(GroupUnit::find($id_group)->priority == 'FIRST'){
+            $unit_priority = GroupUnit::find($id_group);
         }else{
-            $unit_priority = Group_unit::find(Group_unit::find($id_group)->priority);
+            $unit_priority = GroupUnit::find(GroupUnit::find($id_group)->priority);
         }
         
         // dd($unit_priority);

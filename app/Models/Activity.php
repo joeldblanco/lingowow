@@ -24,4 +24,12 @@ class Activity extends Model
     {
         return $this->belongsTo(Unit::class);
     }
+
+    /**
+     * Get the content that owns the activity.
+     */
+    public function contents()
+    {
+        return $this->belongsToMany(ContentOfAct::class,'activity_content','activity_id','content_id');
+    }
 }
