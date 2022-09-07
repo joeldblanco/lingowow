@@ -30,6 +30,6 @@ class Module extends Model
      */
     public function groups()
     {
-        return $this->hasMany(group_unit::class);
+        return $this->hasMany(GroupUnit::class);
     }
 }

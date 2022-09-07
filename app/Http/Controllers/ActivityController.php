@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 
 class ActivityController extends Controller
 {
+    public $activity;
     /**
      * Display a listing of the resource.
      *
@@ -27,6 +28,7 @@ class ActivityController extends Controller
      */
     public function create()
     {
+        // dd("hola");
         return view('livewire.activity-create');
     }
 
@@ -47,9 +49,29 @@ class ActivityController extends Controller
      * @param  \App\Models\Activity  $activity
      * @return \Illuminate\Http\Response
      */
-    public function show(Activity $activity)
+
+    // Activity $activity REVIEW *************************************************
+    public function show($activity)
     {
+        // dd($id);
+        // return view('livewire.activity-create');
         return view('activities.show', compact('activity'));
+    }
+
+    public function show_activity($id)
+    {
+        // dd($id);
+        // return view('livewire.activity-create');
+        $activity = Activity::find('1');
+        $activity_contents = $activity->contents; 
+        $detalles = [];
+
+        foreach ($activity_contents as $key => $value) {
+            $detalles[] = $value->detalles->first();
+        }
+
+        
+        return view('course.module.unit.activity.show', compact('id', 'activity', 'detalles'), compact('activity_contents'));
     }
 
     /**

@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Course;
 use App\Models\Module;
 use App\Models\User;
-use App\Models\Group_unit;
+use App\Models\GroupUnit;
 use Illuminate\Http\Request;
 
 class CourseController extends Controller
@@ -102,7 +102,7 @@ class CourseController extends Controller
         $modules = $course->modules->where('status', 1); //
         $module_priority = [];
 
-        $group_first = Group_unit::where('priority', 'FIRST')->first();
+        $group_first = GroupUnit::where('priority', 'FIRST')->first();
         $module_first = $group_first->module;
         // dd($module_first->id);
         $module_priority = (new CourseController)->module_priority($modules, $module_priority, $module_first->id);
@@ -186,7 +186,7 @@ class CourseController extends Controller
 
         if ($nota != null) {
 
-            if (Group_unit::find($id)->priority == 'FIRST') {
+            if (GroupUnit::find($id)->priority == 'FIRST') {
                 return true;
             } else {
                 $nota = $nota->pivot->nota;
@@ -197,7 +197,7 @@ class CourseController extends Controller
                 }
             }
         } else {
-            if (Group_unit::find($id)->priority == 'FIRST') {
+            if (GroupUnit::find($id)->priority == 'FIRST') {
                 return true;
             } else {
                 return false;

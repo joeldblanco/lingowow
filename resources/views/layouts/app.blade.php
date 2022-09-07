@@ -5,7 +5,7 @@
     @php
         
         // dd(Auth::user()->canBeImpersonated());
-        $response = (new Illuminate\Http\Client\PendingRequest)->get("http://ipwho.is/".$_SERVER['REMOTE_ADDR']);
+        // $response = (new Illuminate\Http\Client\PendingRequest)->get("http://ipwho.is/".$_SERVER['REMOTE_ADDR']);
         // dump(json_decode($response->getBody(), true));
         
         if (isset($_GET['tz']) && session('tz') == null) {
@@ -44,22 +44,28 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/flickity/2.2.2/flickity.min.css"
         integrity="sha512-BiFZ6oflftBIwm6lYCQtQ5DIRQ6tm02svznor2GYQOfAlT3pnVJ10xCrU3XuXnUrWQ4EG8GKxntXnYEdKY0Ugg=="
         crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link href='https://fonts.googleapis.com/css?family=Poppins' rel='stylesheet'>
 
     @livewireStyles
     @routes
 
     <!-- Scripts -->
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" defer></script>
     <script src="{{ asset('js/app.js') }}" defer></script>
+    
     <script src="https://kit.fontawesome.com/968fe8efd4.js" crossorigin="anonymous" defer></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/flickity/2.2.2/flickity.pkgd.min.js"
         integrity="sha512-cA8gcgtYJ+JYqUe+j2JXl6J3jbamcMQfPe0JOmQGDescd+zqXwwgneDzniOd3k8PcO7EtTW6jA7L4Bhx03SXoA=="
         crossorigin="anonymous" referrerpolicy="no-referrer" defer></script>
+        <script src="https://cdn.jsdelivr.net/npm/@shopify/draggable@1.0.0-beta.12/lib/draggable.bundle.js"></script>
     {{-- <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script> --}}
     {{-- <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script> --}}
     <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
     <script src="https://cdn.tiny.cloud/1/xmua6246us3vdfealnkl1yf7ja0zafr4cttuehqtyz7nen6o/tinymce/5/tinymce.min.js"
         referrerpolicy="origin"></script>
+        <script src="{{ asset('js/wordfind.js') }}" ></script>
+    <script src="{{ asset('js/wordfindgame.js') }}" ></script>
 </head>
 
 <body class="font-sans antialiased">

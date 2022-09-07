@@ -95,7 +95,7 @@
                 <div>
                     {{-- <livewire:scheduled-calendar /> --}}
                     {{-- <livewire:schedule :user_id="auth()->id()" /> --}}
-                    @livewire('schedule', ['user_id' => auth()->id(), 'mode' => 'show'])
+                    @livewire('schedule', ['user_id' => auth()->id(), 'mode' => 'show']) 
                 </div>
 
                 @role('teacher')

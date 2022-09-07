@@ -54,6 +54,7 @@ class MeetingController extends Controller
 
             $path = 'users/' . $host['email'] . '/meetings';
             $url = $this->retrieveZoomUrl();
+            
 
             $body = [
                 'topic'      => $data['topic'],
