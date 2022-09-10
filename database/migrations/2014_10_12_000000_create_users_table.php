@@ -30,7 +30,7 @@ return new class extends Migration
             $table->string('meeting_id',255)->nullable();
             //$table->text('two_factor_secret')->nullable();
             //$table->text('two_factor_recovery_codes')->nullable();
-            $table->string('remember_token',100)->nullable();
+            //$table->string('remember_token',100)->nullable();
             $table->bigInteger('current_team_id',false,true)->nullable();
 
             // $table->text('profile_photo_path')->default('profile-photos/default_pp.jpg');
