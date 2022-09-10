@@ -5,10 +5,11 @@
     @php
         
         // dd(Auth::user()->canBeImpersonated());
-        $response = (new Illuminate\Http\Client\PendingRequest())->get('http://ipwho.is/' . $_SERVER['REMOTE_ADDR']);
-        // dump(json_decode($response->getBody(), true));
+        $session_info = json_decode(((new Illuminate\Http\Client\PendingRequest())->get('http://ipwho.is/' . $_SERVER['REMOTE_ADDR']))->getBody(), true);
+	session(['session_info' => $session_info]);
+        // dump(session('session_info'));
         
-        if (isset($_GET['tz']) && session('tz') == null) {
+        /*if (isset($_GET['tz']) && session('tz') == null) {
             // This is just an example. In application this will come from Javascript (via an AJAX or something)
             $timezone_offset_minutes = $_GET['tz']; // $_GET['timezone_offset_minutes']
         
@@ -26,7 +27,10 @@
             }
         
             // return !isset($_GET['tz']);
-        }
+        }*/
+
+	session(['tz' => session('session_info')['timezone']['id']]);
+
     @endphp
 
     <meta charset="utf-8">
@@ -90,14 +94,14 @@
     </div>
 
     @stack('modals')
-    <script>
+    {{-- <script>
         let _tz = JSON.parse("{{ json_encode(tz()) }}");
         if (_tz) {
             var tz = new Date().getTimezoneOffset();
             tz = tz == 0 ? 0 : -tz;
             window.location.href = window.location.href + "?tz=" + tz;
         }
-    </script>
+    </script> --}}
     <script src="https://cdn.jsdelivr.net/gh/livewire/turbolinks@v0.1.x/dist/livewire-turbolinks.js"
         data-turbolinks-eval="false"></script>
     {{-- @include('components.loading-state') --}}
