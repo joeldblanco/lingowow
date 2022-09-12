@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 
 class ProfileController extends Controller
 {
@@ -67,9 +68,31 @@ class ProfileController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, int $id)
     {
-        //
+        $request->validate([
+            'new_profile_pic' => 'file|mimes:jpg,png,webp|max:10000',
+            'first_name' => 'required|string|max:255',
+            'last_name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255'
+        ]);
+
+        $user = User::find($id);
+
+        $old_profile_pic = explode('/',$user->profile_photo_path);
+        $old_profile_pic = explode('.',end($old_profile_pic))[0];
+        $new_profile_pic = $request->file('new_profile_pic');
+        if($old_profile_pic == "default_pp") $old_profile_pic = Hash::make($user->id);
+        $profile_photo_path = $new_profile_pic == null ? null : $request->file('new_profile_pic')->storeAs('public/profile-photos', $old_profile_pic.'.'.$new_profile_pic->getClientOriginalExtension());
+        if($profile_photo_path != null) $user->profile_photo_path = $profile_photo_path;
+
+        $user->first_name = $request->first_name;
+        $user->last_name = $request->last_name;
+        $user->email = $request->email;
+
+        $user->save();
+
+        return redirect()->route('profile.show',$user->id);
     }
 
     /**

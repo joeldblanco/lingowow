@@ -6,7 +6,7 @@
         }
     @endphp
 
-    <div class="p-12 bg-gray-200 font-sans text-gray-600" x-data="{ profile: true, followers: false, friends: false, gallery: false, friend_requests: false }">
+    <div class="p-12 bg-gray-200 font-sans text-gray-600" x-data="{ profile: true, followers: false, friends: false, gallery: false, friend_requests: false, editProfile: false }" x-cloak>
         <div class="max-w-7xl border rounded-xl bg-white flex flex-col pt-3 px-3 mb-6">
             <div class="border rounded-xl bg-blue-600 h-56"
                 style="background-image: url('https://berrydashboard.io/static/media/img-profile-bg.2b15e931.png'); background-size: cover;">
@@ -14,8 +14,9 @@
             </div>
             <div class="flex flex-row">
                 <div class="w-1/4 relative">
-                    <div class="w-32 h-32 z-10 absolute -top-14 right-5 rounded-xl"
-                        style="background-image: url('{{ Storage::url($user->profile_photo_path) }}'); background-size: cover;">
+                    <div class="w-32 h-32 z-10 absolute -top-14 right-5 rounded-full border-4 border-gray-400 bg-white cursor-pointer" @click="editProfile = true">
+                        {{-- style="background-image: url('{{ Storage::url($user->profile_photo_path) }}')"> --}}
+                        <img src="{{ Storage::url($user->profile_photo_path) }}" class="w-full h-full rounded-full object-cover" alt="">
                     </div>
                 </div>
                 <div class="w-3/4 flex flex-col pl-5 pt-5">
@@ -52,7 +53,7 @@
                                             Request</button>
                                     @endif
                                 @else
-                                    <button
+                                    <button @click="editProfile = true"
                                         class="px-3 rounded h-9 w-30 font-semibold text-white bg-blue-700 hover:border-blue-700 hover:bg-blue-800 shadow-md">Edit
                                         Profile</button>
                                 @endif
@@ -426,6 +427,106 @@
                 </div>
             </div>
         </div>
+
+        <x-modal type="info" name="editProfile">
+            <x-slot name="title">
+                <p class="text-md ">Profile</p>
+            </x-slot>
+
+            <x-slot name="content">
+
+                <div class="bg-white flex space-x-6 mx-4">
+                    <div class="border border-b rounded-xl divide-y w-1/3">
+                        <div class="py-4">
+                            <p>Profile Picture</p>
+                        </div>
+                        <div class="flex flex-col items-center space-y-4 p-4">
+                            <div class="w-32 h-32 border-gray-400 bg-white cursor-pointer">
+                                {{-- style="background-image: url('{{ Storage::url($user->profile_photo_path) }}')"> --}}
+                                <img src="{{ Storage::url($user->profile_photo_path) }}" class="w-full h-full object-cover" alt="">
+                            </div>
+                            {{-- <p class="text-gray-500 text-xs font-light">Upload/Change Your Profile Image</p> --}}
+                            {{-- <button class="bg-blue-400 text-white font-semibold p-2 rounded-md"> --}}
+                            <input type="file" name="new_profile_pic" id="new_profile_pic" class="hidden"
+                                accept=".jpeg,.jpg,.png,.webp" form="update_profile_form">
+
+                            {{-- </button> --}}
+                            <label for="new_profile_pic"
+                                class="bg-blue-400 text-white font-semibold p-2 rounded-md cursor-pointer">
+                                <p>Upload Avatar</p>
+                            </label>
+                        </div>
+                    </div>
+                    <form method="POST" action="{{ route('profile.update', $user->id) }}"
+                        class="bg-white rounded-md w-2/3 p-6 my-4 mx-auto border border-b" id="update_profile_form"
+                        enctype="multipart/form-data">
+                        @csrf
+                        @method('PATCH')
+                        <div class="divide-y mb-5">
+                            <p class="font-bold text-md mb-6 w-full text-left">
+                                Edit Account Details
+                            </p>
+                            <div>
+                                <div class="flex pt-6 space-x-4">
+                                    <div class="space-y-1">
+                                        <input type="text" name="first_name" id="first_name"
+                                            placeholder="First name" required value="{{ $user->first_name }}"
+                                            class="w-full rounded-md p-3 text-gray-600 hover:border-gray-600 @if ($errors->has('first_name')) border-red-600 @else border-gray-300 @endif ">
+                                        @if ($errors->has('first_name'))
+                                            <p class="text-xs font-light text-red-600">Required</p>
+                                        @endif
+                                    </div>
+                                    <div class="space-y-1">
+                                        <input type="text" name="last_name" id="last_name"
+                                            placeholder="Last name" required value="{{ $user->last_name }}"
+                                            class="w-full rounded-md p-3 text-gray-600 hover:border-gray-600 @if ($errors->has('last_name')) border-red-600 @else border-gray-300 @endif ">
+                                        @if ($errors->has('last_name'))
+                                            <p class="text-xs font-light text-red-600">Required</p>
+                                        @endif
+                                    </div>
+                                </div>
+                                <div class="flex pt-6 space-x-4">
+                                    <div class="space-y-1">
+                                        <input type="text" value="{{ $user->username }}" disabled
+                                            class="w-full rounded-md p-3 text-gray-400 border-gray-300">
+                                    </div>
+                                    <div class="space-y-1">
+                                        <input type="text" name="email" id="email" placeholder="Email"
+                                            required value="{{ $user->email }}"
+                                            class="w-full rounded-md p-3 text-gray-600 hover:border-gray-600 @if ($errors->has('email')) border-red-600 @else border-gray-300 @endif ">
+                                        @if ($errors->has('email'))
+                                            <p class="text-xs font-light text-red-600">Required</p>
+                                        @endif
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="w-full flex justify-end">
+                            <button
+                                class="bg-blue-500 py-1 px-3 rounded-md font-semibold text-white shadow-lg text-lg">
+                                Save
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+            </x-slot>
+
+            <x-slot name="footer" class="justify-center">
+                {{-- <button
+                    onclick="saveSchedule({{ isset($plan) ? $plan : 0 }},'schedule.check',{{ Auth::user()->roles->pluck('id')[0] }});toggleCellBlock()"
+                    class="bg-green-600 font-semibold text-white p-2 w-32 mr-1 rounded-full hover:bg-green-700 focus:outline-none focus:ring shadow-lg hover:shadow-none transition-all duration-300"
+                    @click=" showUserInfo = false ">
+                    Save
+                </button>
+                <button
+                    class="bg-red-600 font-semibold text-white p-2 ml-1 w-32 rounded-full hover:bg-red-700 focus:outline-none focus:ring shadow-lg hover:shadow-none transition-all duration-300"
+                    @click=" showUserInfo = false ">
+                    Cancel
+                </button> --}}
+            </x-slot>
+        </x-modal>
+
         <div wire:loading>
             @include('components.loading-state')
         </div>
