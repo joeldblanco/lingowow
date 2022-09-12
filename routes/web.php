@@ -224,7 +224,7 @@ Route::middleware(['web', 'auth', 'verified', 'impersonate'])->group(function ()
     // Route::get('/profile', function () {
     //     // Only verified users may access this route...
     // });
-    Route::get('/profile/{id}', [ProfileController::class, 'show'])->name("profile.show");
+    Route::resource('/profile', ProfileController::class);
 });
 
 
