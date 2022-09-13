@@ -52,4 +52,9 @@ class Schedule extends Model
 
         return $U_S;
     }
+
+    public function enrolment()
+    {
+        return $this->belongsTo(Enrolment::class);
+    }
 }
