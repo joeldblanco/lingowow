@@ -3,6 +3,8 @@
 namespace App\Http\Livewire;
 
 use App\Http\Controllers\ApportionmentController;
+use App\Jobs\StudentClassCheck;
+use App\Jobs\TeacherClassCheck;
 use App\Models\Classes;
 use App\Models\Comment;
 use App\Models\Enrolment;
@@ -36,32 +38,12 @@ class ClassesComponent extends Component
 
     public function studentClassCheck($class_id)
     {
-        if (auth()->user()->roles[0]->name == "student" || auth()->user()->roles[0]->name == "admin") {
-            $student_check = Classes::select('student_check')->where('id', $class_id)->first()->student_check;
-            $student_check = intval(!$student_check);
-            try {
-                $class = Classes::find($class_id);
-                $class->student_check = $student_check;
-                $class->save();
-                $this->current_class = $class;
-            } catch (\Throwable $th) {
-                dd($th->getCode());
-            }
-        }
+        StudentClassCheck::dispatch($class_id);
     }
 
     public function teacherClassCheck($class_id)
     {
-        if (auth()->user()->roles[0]->name == "teacher" || auth()->user()->roles[0]->name == "admin") {
-            $teacher_check = Classes::select('teacher_check')->where('id', $class_id)->first()->teacher_check;
-            $teacher_check = intval(!$teacher_check);
-            try {
-                Classes::where('id', $class_id)->update(['teacher_check' => $teacher_check]);
-                $this->current_class = Classes::find($class_id);
-            } catch (\Throwable $th) {
-                dd($th->getCode());
-            }
-        }
+        TeacherClassCheck::dispatch($class_id);
     }
 
     public function loadComment($id)
