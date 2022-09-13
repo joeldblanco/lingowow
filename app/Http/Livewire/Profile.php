@@ -45,6 +45,12 @@ class Profile extends Component
         $friend_request->delete();
     }
 
+    public function sendMessage($id)
+    {
+        $friend_request = Friend::withTrashed()->where('friend_id',$id)->where('user_id', auth()->id())->first();
+        $friend_request->delete();
+    }
+
     public function render()
     {
         $user = User::find($this->user_id);

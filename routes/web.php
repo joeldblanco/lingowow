@@ -218,6 +218,7 @@ Route::middleware(['web', 'auth', 'verified', 'impersonate'])->group(function ()
 
     //ROUTES FOR CHAT//
     Route::get('/chat', [ChatController::class, 'index'])->name('chat.index');
+    Route::post('/chat', [ChatController::class, 'sendMessage'])->name('chat.message');
     Route::get('/chat/{num}', [ChatController::class, 'show'])->name('chat.show');
 
     //ROUTES FOR PROFILE//
