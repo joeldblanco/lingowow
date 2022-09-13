@@ -115,7 +115,7 @@
             </div>
         </div>
     </div>
-    <div wire:loading wire:target="nextPeriod,previousPeriod,clearComment,saveComment,showClass,loadComment">
+    <div wire:loading wire:target="clearComment,saveComment,showClass,loadComment">
         @include('components.loading-state')
     </div>
     <div
