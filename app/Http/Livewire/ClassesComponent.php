@@ -112,11 +112,20 @@ class ClassesComponent extends Component
 
 
         if (auth()->user()->getRoleNames()->first() == "student") {
-            $this->current_class = User::find(auth()->user()->id)->studentClasses->whereBetween('start_date', $class_period)->last();
+            $period_classes = User::find(auth()->user()->id)->studentClasses->whereBetween('start_date', $class_period);
+            if ($period_classes->count() > 0) {
+                $this->current_class = User::find(auth()->user()->id)->studentClasses->whereBetween('start_date', $class_period)->last();
+            }
         } else if (auth()->user()->getRoleNames()->first() == "teacher") {
-            $this->current_class = User::find(auth()->user()->id)->teacherClasses->whereBetween('start_date', $class_period)->last();
+            $period_classes = User::find(auth()->user()->id)->teacherClasses->whereBetween('start_date', $class_period);
+            if ($period_classes->count() > 0) {
+                $this->current_class = User::find(auth()->user()->id)->teacherClasses->whereBetween('start_date', $class_period)->last();
+            }
         } else {
-            $this->current_class = Classes::all()->whereBetween('start_date', $class_period)->last();
+            $period_classes = Classes::all()->whereBetween('start_date', $class_period);
+            if ($period_classes->count() > 0) {
+                $this->current_class = $period_classes->last();
+            }
         }
 
         $this->enrolment = Enrolment::withTrashed()->where('id', $this->current_class->enrolment_id)->first();
@@ -132,16 +141,21 @@ class ClassesComponent extends Component
 
 
         if (auth()->user()->getRoleNames()->first() == "student") {
-            // dd(User::find(auth()->user()->id)->studentClasses->whereBetween('start_date', $class_period));
-            $this->current_class = User::find(auth()->user()->id)->studentClasses->whereBetween('start_date', $class_period)->last();
-            dd($this->current_class);
+            $period_classes = User::find(auth()->user()->id)->studentClasses->whereBetween('start_date', $class_period);
+            if ($period_classes->count() > 0) {
+                $this->current_class = User::find(auth()->user()->id)->studentClasses->whereBetween('start_date', $class_period)->last();
+            }
         } else if (auth()->user()->getRoleNames()->first() == "teacher") {
-            $this->current_class = User::find(auth()->user()->id)->teacherClasses->whereBetween('start_date', $class_period)->last();
+            $period_classes = User::find(auth()->user()->id)->teacherClasses->whereBetween('start_date', $class_period);
+            if ($period_classes->count() > 0) {
+                $this->current_class = User::find(auth()->user()->id)->teacherClasses->whereBetween('start_date', $class_period)->last();
+            }
         } else {
-            $this->current_class = Classes::all()->whereBetween('start_date', $class_period)->last();
+            $period_classes = Classes::all()->whereBetween('start_date', $class_period);
+            if ($period_classes->count() > 0) {
+                $this->current_class = $period_classes->last();
+            }
         }
-
-        // dd($this->current_class);
 
         $this->enrolment = Enrolment::withTrashed()->where('id', $this->current_class->enrolment_id)->first();
 
