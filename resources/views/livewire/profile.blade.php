@@ -6,7 +6,7 @@
         }
     @endphp
 
-    <div class="p-12 bg-gray-200 font-sans text-gray-600" x-data="{ profile: true, followers: false, friends: false, gallery: false, friend_requests: false, editProfile: false }" x-cloak>
+    <div class="p-12 bg-gray-200 font-sans text-gray-600" x-data="{ profile: true, followers: false, friends: false, gallery: false, friend_requests: false, editProfile: false, newMessage: false }" x-cloak>
         <div class="max-w-7xl border rounded-xl bg-white flex flex-col pt-3 px-3 mb-6">
             <div class="border rounded-xl bg-blue-600 h-56"
                 style="background-image: url('https://berrydashboard.io/static/media/img-profile-bg.2b15e931.png'); background-size: cover;">
@@ -14,9 +14,11 @@
             </div>
             <div class="flex flex-row">
                 <div class="w-1/4 relative">
-                    <div class="w-32 h-32 z-10 absolute -top-14 right-5 rounded-full border-4 border-gray-400 bg-white cursor-pointer" @click="editProfile = true">
+                    <div class="w-32 h-32 z-10 absolute -top-14 right-5 rounded-full border-4 border-gray-400 bg-white cursor-pointer"
+                        @click="editProfile = true">
                         {{-- style="background-image: url('{{ Storage::url($user->profile_photo_path) }}')"> --}}
-                        <img src="{{ Storage::url($user->profile_photo_path) }}" class="w-full h-full rounded-full object-cover" alt="">
+                        <img src="{{ Storage::url($user->profile_photo_path) }}"
+                            class="w-full h-full rounded-full object-cover" alt="">
                     </div>
                 </div>
                 <div class="w-3/4 flex flex-col pl-5 pt-5">
@@ -304,9 +306,8 @@
                     </div>
                     <hr class="my-6">
                     <div class="grid grid-flow-row grid-cols-4 gap-4">
-                        {{-- {{dd($friends)}} --}}
+
                         @foreach ($friends as $friend)
-                            {{-- {{dd($friend)}} --}}
                             <div class="flex flex-col mx-2 border rounded-xl bg-gray-50 w-full p-3 hover:border-blue-500"
                                 wire:key="friend-{{ $friend->id }}">
                                 <div class="flex justify-between">
@@ -323,17 +324,46 @@
                                     </div>
                                 </div>
                                 <div class="flex space-x-2">
-                                    <button
+                                    {{-- <button
                                         class="transition-colors ease-out delay-75 flex border bg-white rounded my-4 py-2 space-x-3 w-1/2 items-center justify-center text-purple-500 hover:bg-purple-100">
                                         <i class="fas fa-video"></i>
-                                    </button>
-                                    <button
-                                        class="transition-colors ease-out delay-75 flex border bg-white rounded my-4 py-2 space-x-3 w-1/2 items-center justify-center text-blue-500 hover:bg-blue-100">
+                                    </button> --}}
+                                    <button @click="newMessage = true"
+                                        class="transition-colors ease-out delay-75 flex border bg-white rounded my-4 py-2 space-x-3 w-full items-center justify-center text-blue-500 hover:bg-blue-100">
                                         <i class="far fa-comment-alt"></i>
                                     </button>
                                 </div>
                             </div>
-                            {{-- {{ $friends->links() }} --}}
+                            <x-modal type="info" name="newMessage" class="w-1/2 mx-auto">
+                                <x-slot name="title"></x-slot>
+
+                                <x-slot name="content">
+                                    <form method="POST" action="{{ route('chat.message') }}">
+                                        @csrf
+                                        <div class="flex space-x-3 w-full p-3 items-center">
+                                            <img src="{{ Storage::url($friend->profile_photo_path) }}"
+                                                alt="profile_pic" class="w-1/6 rounded-full">
+                                            <p class="w-3/4 font-bold text-xl">{{ $friend->first_name }}
+                                                {{ $friend->last_name }}</p>
+                                                <input type="text" class="hidden" name="friend_id" value="{{$friend->id}}">
+                                        </div>
+                                        <div class="w-full">
+                                            <textarea class="w-full rounded-lg border-gray-300" name="message" id="message" cols="30" rows="10"
+                                                placeholder="Write a message" {{-- wire:model="text_message" --}}></textarea>
+                                            <div class="flex px-3 h-10 cursor-pointer hover:bg-gray-200 border border-gray-300 hover:border-white hover:text-blue-500 rounded-lg"
+                                                {{-- wire:click="send_message" 
+                                                @click="newMessage = false" --}}>
+                                                <button type="submit" class="mx-auto flex space-x-3 items-center font-bold">
+                                                    <p>Send</p>
+                                                    <i class="fas fa-paper-plane"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </x-slot>
+
+                                <x-slot name="footer" class="justify-center"></x-slot>
+                            </x-modal>
                         @endforeach
                     </div>
                 </div>
@@ -443,7 +473,8 @@
                         <div class="flex flex-col items-center space-y-4 p-4">
                             <div class="w-32 h-32 border-gray-400 bg-white cursor-pointer">
                                 {{-- style="background-image: url('{{ Storage::url($user->profile_photo_path) }}')"> --}}
-                                <img src="{{ Storage::url($user->profile_photo_path) }}" class="w-full h-full object-cover" alt="">
+                                <img src="{{ Storage::url($user->profile_photo_path) }}"
+                                    class="w-full h-full object-cover" alt="">
                             </div>
                             {{-- <p class="text-gray-500 text-xs font-light">Upload/Change Your Profile Image</p> --}}
                             {{-- <button class="bg-blue-400 text-white font-semibold p-2 rounded-md"> --}}

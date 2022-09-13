@@ -20,8 +20,41 @@ class Chat extends Component
     public $text_message;
     public $search;
     public $friends;
-    public $show_id;
+    public $show_id = null;
     public $conversation;
+
+    public function mount($participant_id = null, $conversation_id = null)
+    {
+        if ($this->show_id != null) {
+            $this->showConversation($this->show_id);
+        }
+
+        if ($conversation_id != null) {
+            $this->showConversation($conversation_id);
+        }
+
+        if ($participant_id != null) {
+            $this->showConversationByParticipant($participant_id);
+        }
+    }
+
+    public function showConversationByParticipant($participant_id)
+    {
+        $this->show_id = null;
+
+        $conversations = auth()->user()->conversations;
+        foreach ($conversations as $conversation) {
+            if (!$conversation->group_conversation) {
+                foreach ($conversation->users as $user) {
+                    if ($user->id == $participant_id) {
+                        $this->show_id = $conversation->id;
+                    }
+                }
+            }
+        }
+
+        $this->showConversation($this->show_id);
+    }
 
     //LIVEWIRE FUNCTION FOR GETTING LARAVEL ECHO LISTENERS//
     public function getListeners()
@@ -54,12 +87,11 @@ class Chat extends Component
         //VERIFIES IS MESSAGE LENGTH IS GREATER THAN ZERO AFTER DELETING ALL EMPTY SPACES//
         if (strlen($message) > 0) {
 
-            //VERIFIES IF CONVERSATION ID VARIABLE EXISTS AND IS DIFFERENT TO 'NULL'//
-            if ($this->conversation_id) {
+            //SELECT CONVERSATION THAT MATCHES CONVERSATION ID IN DATABASE AND STORES IT IN CONVERSATION VARIABLE//
+            $this->conversation = Conversation::find($this->conversation_id);
 
-                //SELECT CONVERSATION THAT MATCHES CONVERSATION ID IN DATABASE AND STORES IT IN CONVERSATION VARIABLE//
-                $this->conversation = Conversation::find($this->conversation_id);
-            } else {
+            //VERIFIES IF CONVERSATION DOESN'T EXISTS OR IS DIFFERENT TO 'NULL'//
+            if (!$this->conversation) {
 
                 //CREATES NEW CONVERSATION AND STORES IT IN CONVERSATION VARIABLE//
                 $this->conversation = Conversation::create();
@@ -81,10 +113,9 @@ class Chat extends Component
             //SENDS NEW MESSAGE NOTIFICATION TO PARTICIPANT//
             Notification::send($this->users_notifications, new \App\Notifications\NewMessage());
             $this->text_message = "";
+
+            $this->showConversation($this->conversation_id);
         }
-        //  else {
-        //     dd('Impossible!');
-        // }
     }
 
     public function getUsersNotificationsProperty()
@@ -122,7 +153,7 @@ class Chat extends Component
             ]);
             Notification::send($this->users_notifications, new \App\Notifications\MessageRead());
         }
-        
+
         return view('livewire.chat');
     }
 }
