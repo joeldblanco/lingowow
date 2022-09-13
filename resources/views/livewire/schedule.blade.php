@@ -146,37 +146,98 @@
                 @endif
 
                 @if ($role == 'teacher')
-                    <div class="w-full text-center" style="background-color: rgba(255, 255, 255, 0.5)">
-                        <h2 class="text-4xl font-bold text-red-800" style="margin-top: 15%">You haven't
-                            selected a schedule yet.</h2>
-                        <h2 class="text-2xl font-bold text-gray-800">You can select a schedule by clicking the button
-                            below</h2>
-                        <a href="{{ route('shop') }}"
-                            class="inline-block bg-blue-800 text-white px-6 py-4 mt-8 rounded-lg hover:bg-blue-900 hover:text-white hover:no-underline">Select
-                            schedule</a>
+                    <div class="w-full" wire:ignore>
+                        <table class="border" style="width: 100%">
+                            <!--fila de los titulos-->
+                            <tr>
+                                <th class="width border">UTC</th>
+                                <th class="width border" style="">LOCAL</th>
+                                @foreach ($days as $day)
+                                    <th class="border width" style="">
+                                        {{ $day }}
+                                    </th>
+                                @endforeach
+                            </tr>
+
+                            @php
+                                $e = 0;
+                                $i = $university_schedule_start;
+                            @endphp
+
+                            @for ($hour = 0; $hour < $university_schedule_hours; $hour++)
+                                <tr class="border">
+                                    <td class="width border UTC">
+                                        @if ($i < 10)
+                                            0{{ $i }}:00
+                                        @else
+                                            {{ $i }}:00
+                                        @endif
+                                    </td>
+                                    <td class="width border Local">
+                                        {{-- AQUI LA HORA SE LLENA MEDIANTE JAVASCRIPT --}}
+                                    </td>
+                                    @foreach ($days as $day)
+                                        <td id="{{ $i }}-{{ $e }}"
+                                            class="border width selectable preavailable">
+                                        </td>
+                                        @php
+                                            $e++;
+                                        @endphp
+                                    @endforeach
+                                    @php
+                                        $e = 0;
+                                    @endphp
+                                </tr>
+                                @php
+                                    if ($i == 23) {
+                                        $i = 0;
+                                    } else {
+                                        $i++;
+                                    }
+                                @endphp
+                            @endfor
+                        </table>
+                    </div>
+
+                    <div class="flex items-center flex-col  space-y-3 my-5" x-show="edit" x-transition>
+
+                        <button onclick="toggleCellBlock()" @click="edit = false, editBtn = true"
+                            class="bg-red-500 rounded-lg text-white font-bold px-6 py-1 shadow-md h-1/6 width"
+                            wire:click="refresh"><i class="fas fa-times"></i></button>
+                        <button @click="showModal1 = true"
+                            class="bg-green-500 rounded-lg text-white font-bold px-6 py-1 shadow-md h-5/6 width"
+                            wire:click="edit()">Save</button>
+                    </div>
+                    <!-- FIN DEL HORARIO DE JUAN -->
+                    <div class="flex items-center flex-col">
+                        <button onclick="toggleCellBlock()" @click=" edit = true, editBtn = false " wire:click="edit()"
+                            class="inline-block bg-green-800 text-white px-4 py-2 my-5 rounded hover:bg-green-900 hover:text-white hover:no-underline"
+                            x-show="editBtn" x-transition>Edit Schedule
+                        </button>
                     </div>
                 @endif
 
                 @if ($role == 'admin')
                 @endif
             @else
-
-
-                <div class="border-b border-gray-200 dark:border-gray-700">
-                    <ul class="flex flex-wrap -mb-px text-sm font-medium text-center text-gray-500 dark:text-gray-400">
-                        <li class="mr-2">
-                            <a href="#"
-                                class="inline-flex p-4 rounded-t-lg border-b-2 border-transparent hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300 group">
-                                <svg aria-hidden="true"
-                                    class="mr-2 w-5 h-5 text-gray-400 group-hover:text-gray-500 dark:text-gray-500 dark:group-hover:text-gray-300"
-                                    fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                                    <path fill-rule="evenodd"
-                                        d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-6-3a2 2 0 11-4 0 2 2 0 014 0zm-2 4a5 5 0 00-4.546 2.916A5.986 5.986 0 0010 16a5.986 5.986 0 004.546-2.084A5 5 0 0010 11z"
-                                        clip-rule="evenodd"></path>
-                                </svg>Profile
-                            </a>
-                        </li>
-                        <li class="mr-2">
+                {{-- @role('student')
+                    <div class="border-b border-gray-200 dark:border-gray-700">
+                        <ul class="flex flex-wrap -mb-px text-sm font-medium text-center text-gray-500 dark:text-gray-400">
+                            @foreach ($schedules as $schedule)
+                                <li class="mr-2">
+                                    <a href="#"
+                                        class="inline-flex p-4 rounded-t-lg border-b-2 border-transparent hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300 group">
+                                        <svg aria-hidden="true"
+                                            class="mr-2 w-5 h-5 text-gray-400 group-hover:text-gray-500 dark:text-gray-500 dark:group-hover:text-gray-300"
+                                            fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                                            <path fill-rule="evenodd"
+                                                d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-6-3a2 2 0 11-4 0 2 2 0 014 0zm-2 4a5 5 0 00-4.546 2.916A5.986 5.986 0 0010 16a5.986 5.986 0 004.546-2.084A5 5 0 0010 11z"
+                                                clip-rule="evenodd"></path>
+                                        </svg>{{$schedule->enrolment->course->course_name}}
+                                    </a>
+                                </li>
+                            @endforeach --}}
+                {{-- <li class="mr-2">
                             <a href="#"
                                 class="inline-flex p-4 text-blue-600 rounded-t-lg border-b-2 border-blue-600 active dark:text-blue-500 dark:border-blue-500 group"
                                 aria-current="page">
@@ -212,16 +273,17 @@
                                         clip-rule="evenodd"></path>
                                 </svg>Contacts
                             </a>
-                        </li>
-                        <li>
+                        </li> --}}
+                {{-- <li>
                             <a
                                 class="inline-block p-4 text-gray-400 rounded-t-lg cursor-not-allowed dark:text-gray-500">Disabled</a>
-                        </li>
-                    </ul>
-                </div>
+                        </li> --}}
+                {{-- </ul>
+                    </div>
+                @endrole --}}
 
 
-                @foreach ($user_schedules as $schedule)
+                @foreach ($schedules as $schedule)
                     <div class="w-full" wire:ignore>
                         <table class="border" style="width: 100%">
                             <!--fila de los titulos-->

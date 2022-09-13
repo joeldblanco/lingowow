@@ -145,7 +145,7 @@
                     <input type="text" class="hidden" name="friend_id" value="{{ $user->id }}">
                 </div>
                 <div class="w-full">
-                    <textarea class="w-full rounded-lg border-gray-300" name="message" id="message" cols="30" rows="10"
+                    <textarea class="w-full rounded-lg border-gray-300" name="message" cols="30" rows="10"
                         placeholder="Write a message"></textarea>
                     <div
                         class="flex px-3 h-10 cursor-pointer hover:bg-gray-200 border border-gray-300 hover:border-white hover:text-blue-500 rounded-lg">

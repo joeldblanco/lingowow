@@ -45,6 +45,7 @@ class Schedule extends Component
     public $showModalAbsence = false;
     public $data_selected = [];
     public $data_selected_format = [];
+    public $schedules;
 
     protected $listeners = ['showTeacherInfo', 'loadSelectingSchedule', 'checkForClass'];
 
@@ -67,6 +68,8 @@ class Schedule extends Component
             $this->loadGuestSchedule($this->user->id);
         } else if ($this->role == "student") {
 
+            $this->schedules = User::find($this->user->id)->schedules;
+
             if ($this->user->enrolments->count() > 0) {
 
                 $this->teacher_id = Enrolment::select("teacher_id")
@@ -88,7 +91,7 @@ class Schedule extends Component
             }
         } else if ($this->role == "teacher") {
 
-            $this->teacher_schedule = User::find($this->user->id)->schedules->first()->selected_schedule;
+            $this->schedules = User::find($this->user->id)->schedules;
 
             $this->loadTeacherSchedule($this->user->id);
         } else if ($this->role == "admin") {
@@ -284,6 +287,7 @@ class Schedule extends Component
 
     public function loadTeacherSchedule($user_id)
     {
+        $this->teacher_schedule = $this->schedules->first()->selected_schedule;
         $this->user_schedules = $this->user->schedules->first()->selected_schedule;
         $this->user_schedules == null ? $this->user_schedules = [] : array_filter($this->user_schedules);
 
