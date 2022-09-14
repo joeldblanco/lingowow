@@ -152,70 +152,34 @@ array_shift($nav_links);
                             </div>
 
                             @php
-                                $messages = App\Models\Message::where('user_id', auth()->id())
-                                    // ->where('sender_id', auth()->id())
-                                    // ->orWhere('receiver_id', auth()->id())
-                                    ->get();
-                                $conversations = [];
-                                $participants = [];
-                                
-                                foreach ($messages as $key => $value) {
-                                    if (count($conversations) > 7) {
-                                        break;
-                                    }
-                                
-                                    $conversations[$key] = $value->conversation_id;
-                                
-                                    if ($value->user_id == auth()->id()) {
-                                        array_push($participants, $value->user_id);
-                                        // Str::limit($notification_data[$key], 45, '...');
-                                    } else {
-                                        array_push($participants, $value->sender_id);
-                                    }
-                                }
-                                
-                                $conversations = array_values(array_unique($conversations));
-                                $participants = array_values(array_unique($participants));
-                                
-                                // foreach ($conversations as $key => $value) {
-                                $last_messages['created_at'] = 0;
-                                // }
-                                
-                                foreach ($conversations as $key => $conversation_id) {
-                                    foreach ($messages as $message) {
-                                        if ($message->conversation_id == $conversation_id and $message->created_at > new Carbon\Carbon($last_messages['created_at'])) {
-                                            $last_messages[$key] = $message;
-                                            $last_messages_conversation_id[$key] = $message->conversation_id;
-                                        }
-                                    }
-                                }
-                                
-                                unset($last_messages['created_at']);
-                                
-                                foreach ($participants as $key => $value) {
-                                    $participants[$key] = DB::table('users')
-                                        ->where('id', $value)
-                                        ->select('first_name', 'last_name')
-                                        ->get();
-                                
-                                    $participants[$key] = $participants[$key][0];
-                                }
-                                
+                                $messages = App\Models\Message::where('user_id', auth()->id())->get();
+                                $conversations = auth()->user()->conversations;
                             @endphp
 
-                            @if (count($messages) > 0)
+                            @if (count($conversations) > 0)
 
-                                @for ($i = 0; $i < count($participants); $i++)
-                                    <x-jet-dropdown-link
-                                        href="{{ route('chat.show', $last_messages_conversation_id[$i]) }}">
-                                        {{-- <p class="@if ($notification_read_at[$key] == null) font-bold @endif"> --}}
+                                @foreach ($conversations as $conversation)
+                                    <x-jet-dropdown-link href="{{ route('chat.show', $conversation->id) }}">
                                         <p class="font-bold">
-                                            {{ $participants[$i]->first_name }} {{ $participants[$i]->last_name }}
+                                            @if ($conversation->group_conversation)
+                                                {{ $conversation->name }}
+                                            @else
+                                                @php
+                                                    $participants = $conversation->users;
+                                                @endphp
+                                                @foreach ($participants as $participant)
+                                                    @if ($participant->id != auth()->id())
+                                                        {{ $participant->first_name }}
+                                                        {{ $participant->last_name }}
+                                                    @endif
+                                                @endforeach
+                                            @endif
                                         </p>
                                         <p class="text-xs text-gray-400">
-                                            {{ Str::limit($last_messages[$i]->message_content, 25, '...') }}</p>
+                                            {{ Str::limit($conversation->last_message->message_content, 25, '...') }}
+                                        </p>
                                     </x-jet-dropdown-link>
-                                @endfor
+                                @endforeach
                             @else
                                 <p class="p-1 text-sm text-center">There are no messages</p>
                             @endif
@@ -271,8 +235,6 @@ array_shift($nav_links);
                                     $notification_created_at[$key] = $notification_created_at[$key]->diffForHumans();
                                 
                                     $notification_id[$key] = $value->id;
-
-                                    // dump($value->type);
                                 
                                     switch ($value->type) {
                                         case 'BookedClass':
@@ -286,7 +248,6 @@ array_shift($nav_links);
                                             break;
                                 
                                         case 'StudentUnrolment':
-
                                             $notification_icon = 'fas fa-calendar-alt';
                                             if (auth()->user()->roles[0]->name == 'student' || auth()->user()->roles[0]->name == 'guest') {
                                                 $notification_data[$key] = 'You have been automatically unenroled from the course ' . $data_array['course_name'];
@@ -337,7 +298,8 @@ array_shift($nav_links);
                                 <button
                                     class="flex text-sm border-2 border-transparent rounded-full focus:outline-none focus:border-gray-300 transition">
                                     <img class="h-8 w-8 rounded-full object-cover"
-                                        src="{{ Storage::url(Auth::user()->profile_photo_path) }}" alt="{{ Auth::user()->name }}" />
+                                        src="{{ Storage::url(Auth::user()->profile_photo_path) }}"
+                                        alt="{{ Auth::user()->name }}" />
                                 </button>
                             @else
                                 <span class="inline-flex rounded-md">
@@ -422,7 +384,8 @@ array_shift($nav_links);
             <div class="flex items-center px-4">
                 @if (Laravel\Jetstream\Jetstream::managesProfilePhotos())
                     <div class="flex-shrink-0 mr-3">
-                        <img class="h-10 w-10 rounded-full object-cover" src="{{ Storage::url(Auth::user()->profile_photo_path) }}"
+                        <img class="h-10 w-10 rounded-full object-cover"
+                            src="{{ Storage::url(Auth::user()->profile_photo_path) }}"
                             alt="{{ Auth::user()->name }}" />
                     </div>
                 @endif
