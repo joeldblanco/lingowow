@@ -76,6 +76,13 @@ class Chat extends Component
 
         //SCROLLING TO VIEW//
         $this->emit("scrollIntoView");
+
+        if ($this->conversation) {
+            $this->conversation->messages()->where('user_id', '!=', auth()->id())->where('read', null)->update([
+                'read' => now()
+            ]);
+            Notification::send($this->users_notifications, new \App\Notifications\MessageRead());
+        }
     }
 
     //FUNCTION FOR SENDING MESSAGES (TRIGGERED WHEN 'SEND' BUTTON IS CLICKED)//
@@ -146,13 +153,6 @@ class Chat extends Component
         $this->friends = $user->friends();
         $this->conversations = $user->conversations;
         $this->conversations_id = [];
-
-        if ($this->conversation) {
-            $this->conversation->messages()->where('user_id', '!=', auth()->id())->where('read', null)->update([
-                'read' => now()
-            ]);
-            Notification::send($this->users_notifications, new \App\Notifications\MessageRead());
-        }
 
         return view('livewire.chat');
     }
