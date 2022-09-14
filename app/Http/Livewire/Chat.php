@@ -78,10 +78,13 @@ class Chat extends Component
         $this->emit("scrollIntoView");
 
         if ($this->conversation) {
-            $this->conversation->messages()->where('user_id', '!=', auth()->id())->where('read', null)->update([
+            $read = $this->conversation->messages()->where('user_id', '!=', auth()->id())->where('read', null)->update([
                 'read' => now()
             ]);
-            Notification::send($this->users_notifications, new \App\Notifications\MessageRead());
+            
+            if ($read) {
+                Notification::send($this->users_notifications, new \App\Notifications\MessageRead());
+            }
         }
     }
 
