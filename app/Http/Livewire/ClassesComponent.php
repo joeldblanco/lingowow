@@ -38,12 +38,12 @@ class ClassesComponent extends Component
 
     public function studentClassCheck($class_id)
     {
-        StudentClassCheck::dispatch($class_id);
+        dispatch(new StudentClassCheck($class_id));
     }
 
     public function teacherClassCheck($class_id)
     {
-        TeacherClassCheck::dispatch($class_id);
+        dispatch(new TeacherClassCheck($class_id));
     }
 
     public function loadComment($id)
