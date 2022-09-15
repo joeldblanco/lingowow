@@ -142,6 +142,19 @@ array_shift($nav_links);
                             <button
                                 class="flex text-sm border-2 border-transparent rounded-full focus:outline-none focus:border-gray-300 transition p-2">
                                 <i class="fas fa-envelope text-gray-500 text-lg w-full"></i>
+                                @php
+                                    $unread_messages = 0;
+                                    $messages = App\Models\Message::where('user_id', auth()->id())->get();
+                                    $conversations = auth()->user()->conversations;
+                                    foreach ($conversations as $conversation) {
+                                        if ($conversation->unread_messages > 0) {
+                                            $unread_messages++;
+                                        }
+                                    }
+                                @endphp
+
+                                <p class="inline-flex absolute -top-1 -right-1 justify-center items-center w-5 h-5 text-xs font-bold text-white bg-red-500 rounded-full border-2 border-white dark:border-gray-900 @if ($unread_messages <= 0) hidden @endif"
+                                    id="unread_messages">{{ $unread_messages }}</p>
                             </button>
                         </x-slot>
 
@@ -151,31 +164,31 @@ array_shift($nav_links);
                                 {{ __('Messages') }}
                             </div>
 
-                            @php
-                                $messages = App\Models\Message::where('user_id', auth()->id())->get();
-                                $conversations = auth()->user()->conversations;
-                            @endphp
-
                             @if (count($conversations) > 0)
 
                                 @foreach ($conversations as $conversation)
                                     <x-jet-dropdown-link href="{{ route('chat.show', $conversation->id) }}">
-                                        <p class="font-bold">
-                                            @if ($conversation->group_conversation)
-                                                {{ $conversation->name }}
-                                            @else
-                                                @php
-                                                    $participants = $conversation->users;
-                                                @endphp
-                                                @foreach ($participants as $participant)
-                                                    @if ($participant->id != auth()->id())
-                                                        {{ $participant->first_name }}
-                                                        {{ $participant->last_name }}
-                                                    @endif
-                                                @endforeach
-                                            @endif
-                                        </p>
-                                        <p class="text-xs text-gray-400">
+                                        <div class="flex justify-between items-center">
+                                            <p class="text-md @if ($conversation->unreadMessages > 0) font-bold @else font-normal text-gray-500 @endif"
+                                                id="conversation_{{ $conversation->id }}">
+                                                @if ($conversation->group_conversation)
+                                                    {{ $conversation->name }}
+                                                @else
+                                                    @php
+                                                        $participants = $conversation->users;
+                                                    @endphp
+                                                    @foreach ($participants as $participant)
+                                                        @if ($participant->id != auth()->id())
+                                                            {{ $participant->first_name }}
+                                                            {{ $participant->last_name }}
+                                                        @endif
+                                                    @endforeach
+                                                @endif
+                                            </p>
+                                            <span class="inline-flex w-3 h-3 bg-blue-500 rounded-full mr-3 @if ($conversation->unreadMessages <= 0) hidden @endif" id="unread_conversation_{{$conversation->id}}"></span>
+                                        </div>
+                                        <p class="text-xs text-gray-400 @if ($conversation->unreadMessages > 0) font-bold @else font-normal @endif"
+                                            id="last_message">
                                             {{ Str::limit($conversation->last_message->message_content, 25, '...') }}
                                         </p>
                                     </x-jet-dropdown-link>
@@ -453,4 +466,7 @@ array_shift($nav_links);
             </div>
         </div>
     </div>
+    <script>
+        window.user_id = {{ auth()->id() }};
+    </script>
 </nav>

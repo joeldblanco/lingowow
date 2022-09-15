@@ -13,14 +13,17 @@ class NewMessage extends Notification implements ShouldQueue
 {
     use Queueable;
 
+    public $text_message, $conversation_id;
+
     /**
      * Create a new notification instance.
      *
      * @return void
      */
-    public function __construct()
+    public function __construct($text_message, $conversation_id)
     {
-        //
+        $this->text_message = $text_message;
+        $this->conversation_id = $conversation_id;
     }
 
     /**
@@ -56,19 +59,28 @@ class NewMessage extends Notification implements ShouldQueue
      */
     public function toArray($notifiable)
     {
-        return [
-            //
-        ];
+        //
     }
 
     /**
-     * Get the array representation of the notification.
+     * Get the broadcastable representation of the notification.
      *
      * @param  mixed  $notifiable
-     * @return array
+     * @return BroadcastMessage
      */
     public function toBroadcast($notifiable)
     {
-        return new BroadcastMessage([]);
+        $unread_messages = 0;
+        foreach ($notifiable->conversations as $conversation) {
+            if ($conversation->unreadMessages > 0) {
+                $unread_messages += 1;
+            }
+        }
+
+        return new BroadcastMessage([
+            'unread_messages' => $unread_messages,
+            'text_message' => $this->text_message,
+            'conversation_id' => $this->conversation_id,
+        ]);
     }
 }

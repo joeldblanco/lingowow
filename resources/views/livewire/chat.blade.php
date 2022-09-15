@@ -24,7 +24,7 @@ $last_conn = $last_conn->diffForHumans();
             <div class="flex space-x-3 items-center">
                 <img src="{{ Storage::url(auth()->user()->profile_photo_path) }}" alt="profile_pic"
                     class="w-1/6 rounded-full">
-                <p class="w-5/6 font-bold text-lg">{{auth()->user()->first_name}} {{auth()->user()->last_name}}</p>
+                <p class="w-5/6 font-bold text-lg">{{ auth()->user()->first_name }} {{ auth()->user()->last_name }}</p>
             </div>
             <div class="relative">
                 <input type="search"
@@ -140,7 +140,8 @@ $last_conn = $last_conn->diffForHumans();
                                 <p class="float-right text-xs text-gray-500 message-created-at-{{ $message->id }}">
                                     {{ $message->created_at }}
                                     @if ($message->user_id == auth()->id())
-                                        <i class="fas fa-check-double ml-2 {{ $message->read ? 'text-blue-500' : 'text-gray-600' }}"></i>
+                                        <i
+                                            class="fas fa-check-double ml-2 {{ $message->read ? 'text-blue-500' : 'text-gray-600' }}"></i>
                                     @endif
                                 </p>
                             </div>
