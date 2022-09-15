@@ -81,7 +81,7 @@ class Chat extends Component
             $read = $this->conversation->messages()->where('user_id', '!=', auth()->id())->where('read', null)->update([
                 'read' => now()
             ]);
-            
+
             if ($read) {
                 Notification::send($this->users_notifications, new \App\Notifications\MessageRead());
             }
@@ -121,7 +121,7 @@ class Chat extends Component
             ]);
 
             //SENDS NEW MESSAGE NOTIFICATION TO PARTICIPANT//
-            Notification::send($this->users_notifications, new \App\Notifications\NewMessage());
+            Notification::send($this->users_notifications, new \App\Notifications\NewMessage($this->text_message, $this->conversation_id));
             $this->text_message = "";
 
             $this->showConversation($this->conversation_id);
@@ -143,12 +143,12 @@ class Chat extends Component
         $this->participant = User::find($participant_id);
     }
 
-    public function updatedTextMessage($value)
-    {
-        if ($value && $this->conversation) {
-            Notification::send($this->users_notifications, new \App\Notifications\UserTyping($this->conversation->id));
-        }
-    }
+    // public function updatedTextMessage($value)
+    // {
+    //     if ($value && $this->conversation) {
+    // Notification::send($this->users_notifications, new \App\Notifications\UserTyping($this->conversation->id));
+    //     }
+    // }
 
     public function render()
     {
