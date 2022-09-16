@@ -171,6 +171,18 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->belongsToMany(Conversation::class)->withPivot('color', 'active')->withTimestamps();
     }
 
+    public function UnreadConversations()
+    {
+        $unread_conversations = 0;
+        foreach ($this->conversations as $conversation) {
+            if ($conversation->unread_messages > 0) {
+                $unread_conversations++;
+            }
+        }
+
+        return $unread_conversations;
+    }
+
     /**
      * Get all the user's friend requests.
      */

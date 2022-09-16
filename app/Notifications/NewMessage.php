@@ -70,15 +70,17 @@ class NewMessage extends Notification implements ShouldQueue
      */
     public function toBroadcast($notifiable)
     {
-        $unread_messages = 0;
-        foreach ($notifiable->conversations as $conversation) {
-            if ($conversation->unread_messages > 0) {
-                $unread_messages += 1;
-            }
-        }
+        // $unread_messages = 0;
+        // foreach ($notifiable->conversations as $conversation) {
+        //     if ($conversation->unread_messages > 0) {
+        //         $unread_messages += 1;
+        //     }
+        // }
+
+        dump($notifiable->UnreadConversations());
 
         return new BroadcastMessage([
-            'unread_messages' => $unread_messages,
+            'unread_messages' => $notifiable->UnreadConversations(),
             'text_message' => $this->text_message,
             'conversation_id' => $this->conversation_id,
         ]);
