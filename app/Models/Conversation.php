@@ -48,11 +48,15 @@ class Conversation extends Model
         );
     }
 
-    public function unreadMessages(): Attribute
+    public function unreadMessages($user_id = null): Attribute
     {
+        if($user_id == null){
+            $user_id = auth()->id();
+        }
+
         return new Attribute(
-            get: function(){
-                return $this->messages()->where('user_id', '!=', auth()->id())->where('read', null)->count();
+            get: function() use($user_id){
+                return $this->messages()->where('user_id', '!=', $user_id)->where('read', null)->count();
             }
         );
     }

@@ -72,7 +72,7 @@ class NewMessage extends Notification implements ShouldQueue
     {
         $unread_messages = 0;
         foreach ($notifiable->conversations as $conversation) {
-            if ($conversation->unreadMessages > 0) {
+            if ($conversation->unreadMessages($notifiable->id) > 0) {
                 $unread_messages += 1;
             }
         }
