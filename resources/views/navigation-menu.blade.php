@@ -143,18 +143,18 @@ array_shift($nav_links);
                                 class="flex text-sm border-2 border-transparent rounded-full focus:outline-none focus:border-gray-300 transition p-2">
                                 <i class="fas fa-envelope text-gray-500 text-lg w-full"></i>
                                 @php
-                                    // $unread_messages = 0;
+                                    $unread_messages = 0;
                                     $messages = App\Models\Message::where('user_id', auth()->id())->get();
                                     $conversations = auth()->user()->conversations;
-                                    // foreach ($conversations as $conversation) {
-                                    //     if ($conversation->unread_messages > 0) {
-                                    //         $unread_messages++;
-                                    //     }
-                                    // }
+                                    foreach ($conversations as $conversation) {
+                                        if ($conversation->unread_messages > 0) {
+                                            $unread_messages++;
+                                        }
+                                    }
                                 @endphp
 
-                                <p class="hidden absolute -top-1 -right-1 justify-center items-center w-5 h-5 text-xs font-bold text-white bg-red-500 rounded-full border-2 border-white dark:border-gray-900 {{--@if ($unread_messages <= 0) hidden @endif--}}"
-                                    id="unread_messages">{{-- $unread_messages --}}</p>
+                                <p class="inline-flex absolute -top-1 -right-1 justify-center items-center w-5 h-5 text-xs font-bold text-white bg-red-500 rounded-full border-2 border-white dark:border-gray-900 @if ($unread_messages <= 0) hidden @endif"
+                                    id="unread_messages">{{ $unread_messages }}</p>
                             </button>
                         </x-slot>
 

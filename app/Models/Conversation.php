@@ -21,8 +21,8 @@ class Conversation extends Model
     public function name(): Attribute
     {
         return new Attribute(
-            get: function($value){
-                if($this->group_conversation){
+            get: function ($value) {
+                if ($this->group_conversation) {
                     return $value;
                 }
 
@@ -36,9 +36,9 @@ class Conversation extends Model
     public function image(): Attribute
     {
         return new Attribute(
-            get: function(){
-                if($this->group_conversation){
-                    return Storage::url($this->image_url);//"profile-photos/default_group_pp.jpg";
+            get: function () {
+                if ($this->group_conversation) {
+                    return Storage::url($this->image_url); //"profile-photos/default_group_pp.jpg";
                 }
 
                 $user = $this->users->where('id', '!=', auth()->id())->first();
@@ -51,10 +51,15 @@ class Conversation extends Model
     public function unreadMessages(): Attribute
     {
         return new Attribute(
-            get: function(){
+            get: function () {
                 return $this->messages()->where('user_id', '!=', auth()->id())->where('read', null)->count();
             }
         );
+    }
+
+    public function unread_messages()
+    {
+        return $this->messages()->where('user_id', '!=', auth()->id())->where('read', null)->count();
     }
 
     public function messages()
