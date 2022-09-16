@@ -18,6 +18,10 @@ class Conversation extends Model
         'status'
     ];
 
+    protected $appends = [
+        "unreadMessages"
+    ];
+
     public function name(): Attribute
     {
         return new Attribute(
