@@ -2,7 +2,7 @@ Echo.private('App.Models.User.' + window.user_id)
     .notification((notification) => {
 
         if (notification.type == "App\\Notifications\\NewMessage") {
-            // console.log(notification);
+            console.log(notification);
             unread_messages = document.getElementById('unread_messages');
             unread_messages.innerHTML = notification.unread_messages;
             unread_messages.style.display = "inline-flex";
