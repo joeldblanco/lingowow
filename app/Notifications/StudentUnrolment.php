@@ -8,6 +8,7 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
+use Illuminate\Notifications\Messages\BroadcastMessage;
 
 class StudentUnrolment extends Notification implements ShouldQueue
 {
@@ -34,7 +35,7 @@ class StudentUnrolment extends Notification implements ShouldQueue
      */
     public function via($notifiable)
     {
-        return ['mail','database'];
+        return ['mail', 'database', 'broadcast'];
     }
 
     /**
@@ -46,12 +47,12 @@ class StudentUnrolment extends Notification implements ShouldQueue
     public function toMail($notifiable)
     {
         return (new MailMessage)
-                    ->subject('Unenrollment notice!')
-                    ->line('Greetings, dear '.$notifiable->first_name.' '.$notifiable->last_name.'.')
-                    ->line('We are writing to notify you that you have been unenroled from '.$this->course->course_name)
-                    ->line('Click the button below to purchase another package and continue enjoying our services.')
-                    ->action('Shop', url('/shop'))
-                    ->line('If you have any questions, please contact us through the regular channels.');
+            ->subject('Unenrollment notice!')
+            ->line('Greetings, dear ' . $notifiable->first_name . ' ' . $notifiable->last_name . '.')
+            ->line('We are writing to notify you that you have been unenroled from ' . $this->course->course_name)
+            ->line('Click the button below to purchase another package and continue enjoying our services.')
+            ->action('Shop', url('/shop'))
+            ->line('If you have any questions, please contact us through the regular channels.');
     }
 
     public function toDatabase()
@@ -73,5 +74,16 @@ class StudentUnrolment extends Notification implements ShouldQueue
         return [
             //
         ];
+    }
+
+    /**
+     * Get the broadcastable representation of the notification.
+     *
+     * @param  mixed  $notifiable
+     * @return BroadcastMessage
+     */
+    public function toBroadcast($notifiable)
+    {
+        return new BroadcastMessage([]);
     }
 }

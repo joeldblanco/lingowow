@@ -6,9 +6,8 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
-use Illuminate\Notifications\Messages\BroadcastMessage;
 
-class ClassRescheduledToStudent extends Notification implements ShouldQueue
+class NewNotification extends Notification
 {
     use Queueable;
 
@@ -30,7 +29,7 @@ class ClassRescheduledToStudent extends Notification implements ShouldQueue
      */
     public function via($notifiable)
     {
-        return ['mail', 'broadcast'];
+        return ['mail'];
     }
 
     /**
@@ -42,17 +41,9 @@ class ClassRescheduledToStudent extends Notification implements ShouldQueue
     public function toMail($notifiable)
     {
         return (new MailMessage)
-            ->subject('Class Rescheduled!')
-            ->line('Greetings, dear ' . $notifiable->first_name . ' ' . $notifiable->last_name . '.')
-            ->line('We are writing to notify you that your schedule has been successfully updated.')
-            ->line('Click the button below to check your current schedule.')
-            ->action('Check Schedule', url('/dashboard'))
-            ->line('If you have any questions, please contact us through the regular channels.');
-    }
-
-    public function toDatabase()
-    {
-        //
+                    ->line('The introduction to the notification.')
+                    ->action('Notification Action', url('/'))
+                    ->line('Thank you for using our application!');
     }
 
     /**
@@ -66,16 +57,5 @@ class ClassRescheduledToStudent extends Notification implements ShouldQueue
         return [
             //
         ];
-    }
-
-    /**
-     * Get the broadcastable representation of the notification.
-     *
-     * @param  mixed  $notifiable
-     * @return BroadcastMessage
-     */
-    public function toBroadcast($notifiable)
-    {
-        return new BroadcastMessage([]);
     }
 }

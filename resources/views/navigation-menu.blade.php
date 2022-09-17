@@ -143,18 +143,12 @@ array_shift($nav_links);
                                 class="flex text-sm border-2 border-transparent rounded-full focus:outline-none focus:border-gray-300 transition p-2">
                                 <i class="fas fa-envelope text-gray-500 text-lg w-full"></i>
                                 @php
-                                    $unread_messages = 0;
                                     $messages = App\Models\Message::where('user_id', auth()->id())->get();
                                     $conversations = auth()->user()->conversations;
-                                    foreach ($conversations as $conversation) {
-                                        if ($conversation->unread_messages > 0) {
-                                            $unread_messages++;
-                                        }
-                                    }
                                 @endphp
 
-                                <p class="inline-flex absolute -top-1 -right-1 justify-center items-center w-5 h-5 text-xs font-bold text-white bg-red-500 rounded-full border-2 border-white dark:border-gray-900 @if ($unread_messages <= 0) hidden @endif"
-                                    id="unread_messages">{{ $unread_messages }}</p>
+                                <p class="absolute top-1 right-1 justify-center items-center w-3 h-3 text-xs font-bold text-white bg-red-500 rounded-full border-2 border-white dark:border-gray-900 hidden"
+                                    id="unread_messages"></p>
                             </button>
                         </x-slot>
 
@@ -169,7 +163,7 @@ array_shift($nav_links);
                                 @foreach ($conversations as $conversation)
                                     <x-jet-dropdown-link href="{{ route('chat.show', $conversation->id) }}">
                                         <div class="flex justify-between items-center">
-                                            <p class="text-md @if ($conversation->unreadMessages > 0) font-bold @else font-normal text-gray-500 @endif"
+                                            <p class="text-md font-normal text-gray-500"
                                                 id="conversation_{{ $conversation->id }}">
                                                 @if ($conversation->group_conversation)
                                                     {{ $conversation->name }}
@@ -185,9 +179,11 @@ array_shift($nav_links);
                                                     @endforeach
                                                 @endif
                                             </p>
-                                            <span class="inline-flex w-3 h-3 bg-blue-500 rounded-full mr-3 @if ($conversation->unreadMessages <= 0) hidden @endif" id="unread_conversation_{{$conversation->id}}"></span>
+                                            <span
+                                                class="w-3 h-3 bg-blue-500 rounded-full mr-3 hidden"
+                                                id="unread_conversation_{{ $conversation->id }}"></span>
                                         </div>
-                                        <p class="text-xs text-gray-400 @if ($conversation->unreadMessages > 0) font-bold @else font-normal @endif"
+                                        <p class="text-xs text-gray-400 font-normal"
                                             id="last_message">
                                             {{ Str::limit($conversation->last_message->message_content, 25, '...') }}
                                         </p>
@@ -215,6 +211,66 @@ array_shift($nav_links);
                             <button
                                 class="flex text-sm border-2 border-transparent rounded-full focus:outline-none focus:border-gray-300 transition p-2">
                                 <i class="fas fa-bell text-gray-500 text-lg w-full"></i>
+
+                                @php
+                                    $notifications = DB::table('notifications')
+                                        ->where('notifiable_id', auth()->id())
+                                        ->select('id', 'data', 'read_at', 'type', 'created_at')
+                                        ->limit(7)
+                                        ->get();
+                                    
+                                    foreach ($notifications as $key => $value) {
+                                        $data_array = json_decode($value->data, 1);
+                                    
+                                        $value->type = explode('\\', $value->type);
+                                        $value->type = end($value->type);
+                                    
+                                        if (count($data_array) > 0) {
+                                            $user = App\Models\User::find($data_array['user_id']);
+                                        } else {
+                                            $user = App\Models\User::find(auth()->id());
+                                        }
+                                    
+                                        $notification_read_at[$key] = $value->read_at;
+                                    
+                                        $notification_created_at[$key] = new Carbon\Carbon($value->created_at);
+                                        $notification_created_at[$key] = $notification_created_at[$key]->diffForHumans();
+                                    
+                                        $notification_id[$key] = $value->id;
+                                    
+                                        switch ($value->type) {
+                                            case 'BookedClass':
+                                                $notification_icon = 'fas fa-bookmark';
+                                                $notification_data[$key] = 'The student ' . $user->first_name . ' ' . $user->last_name . ' has booked a class ' . $data_array['schedule_string'];
+                                                break;
+                                    
+                                            case 'ClassRescheduledToTeacher':
+                                                $notification_icon = 'fas fa-calendar-alt';
+                                                $notification_data[$key] = 'The student ' . $user->first_name . ' ' . $user->last_name . ' has rescheduled a class. New schedule: ' . $data_array['schedule_string'];
+                                                break;
+                                    
+                                            case 'StudentUnrolment':
+                                                $notification_icon = 'fas fa-calendar-alt';
+                                                if (auth()->user()->roles[0]->name == 'student' || auth()->user()->roles[0]->name == 'guest') {
+                                                    $notification_data[$key] = 'You have been automatically unenroled from the course ' . $data_array['course_name'];
+                                                }
+                                                break;
+                                    
+                                            case 'StudentUnrolmentToTeacher':
+                                                $notification_icon = 'fas fa-calendar-alt';
+                                                $notification_data[$key] = 'The student ' . $user->first_name . ' ' . $user->last_name . ' has been automatically unenroled from course ' . $data_array['schedule_string'];
+                                                break;
+                                    
+                                            default:
+                                                $notification_icon = 'fas fa-bell';
+                                                $notification_data[$key] = 'You have a new notification.';
+                                                break;
+                                        }
+                                    }
+                                @endphp
+
+                                <p class="absolute top-1 right-1 justify-center items-center w-3 h-3 text-xs font-bold text-white bg-red-500 rounded-full border-2 border-white dark:border-gray-900 hidden"
+                                    id="unread_notifications"></p>
                             </button>
                         </x-slot>
 
@@ -223,71 +279,19 @@ array_shift($nav_links);
                                 {{ __('Notifications') }}
                             </div>
 
-                            @php
-                                $notifications = DB::table('notifications')
-                                    ->where('notifiable_id', auth()->id())
-                                    ->select('id', 'data', 'read_at', 'type', 'created_at')
-                                    ->limit(7)
-                                    ->get();
-                                
-                                foreach ($notifications as $key => $value) {
-                                    $data_array = json_decode($value->data, 1);
-                                
-                                    $value->type = explode('\\', $value->type);
-                                    $value->type = end($value->type);
-                                
-                                    if (count($data_array) > 0) {
-                                        $user = App\Models\User::find($data_array['user_id']);
-                                    } else {
-                                        $user = App\Models\User::find(auth()->id());
-                                    }
-                                
-                                    $notification_read_at[$key] = $value->read_at;
-                                
-                                    $notification_created_at[$key] = new Carbon\Carbon($value->created_at);
-                                    $notification_created_at[$key] = $notification_created_at[$key]->diffForHumans();
-                                
-                                    $notification_id[$key] = $value->id;
-                                
-                                    switch ($value->type) {
-                                        case 'BookedClass':
-                                            $notification_icon = 'fas fa-bookmark';
-                                            $notification_data[$key] = 'The student ' . $user->first_name . ' ' . $user->last_name . ' has booked a class ' . $data_array['schedule_string'];
-                                            break;
-                                
-                                        case 'ClassRescheduledToTeacher':
-                                            $notification_icon = 'fas fa-calendar-alt';
-                                            $notification_data[$key] = 'The student ' . $user->first_name . ' ' . $user->last_name . ' has rescheduled a class. New schedule: ' . $data_array['schedule_string'];
-                                            break;
-                                
-                                        case 'StudentUnrolment':
-                                            $notification_icon = 'fas fa-calendar-alt';
-                                            if (auth()->user()->roles[0]->name == 'student' || auth()->user()->roles[0]->name == 'guest') {
-                                                $notification_data[$key] = 'You have been automatically unenroled from the course ' . $data_array['course_name'];
-                                            }
-                                            break;
-                                
-                                        case 'StudentUnrolmentToTeacher':
-                                            $notification_icon = 'fas fa-calendar-alt';
-                                            $notification_data[$key] = 'The student ' . $user->first_name . ' ' . $user->last_name . ' has been automatically unenroled from course ' . $data_array['schedule_string'];
-                                            break;
-                                
-                                        default:
-                                            $notification_icon = 'fas fa-bell';
-                                            $notification_data[$key] = 'You have a new notification.';
-                                            break;
-                                    }
-                                }
-                                
-                            @endphp
-
                             @if (count($notifications) > 0)
                                 @foreach ($notifications as $key => $value)
                                     <x-jet-dropdown-link
                                         href="{{ route('notifications.show', $notification_id[$key]) }}">
-                                        <p class="@if ($notification_read_at[$key] == null) font-bold @endif">
-                                            {{ Str::limit($notification_data[$key], 40, '...') }}
-                                        </p>
+                                        <div class="flex justify-between items-center space-x-1" id="{{ $value->id }}">
+                                            <p class="@if ($notification_read_at[$key] == null) font-bold @endif">
+                                                {{ Str::limit($notification_data[$key], 40, '...') }}
+                                            </p>
+                                            <span
+                                                class="inline-flex w-3 h-3 bg-blue-500 rounded-full mr-3 @if ($value->read_at != null) hidden @endif"
+                                                id="unread_notification_{{ $value->id }}"></span>
+                                        </div>
+
                                     </x-jet-dropdown-link>
                                 @endforeach
                             @else

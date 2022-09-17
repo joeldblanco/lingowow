@@ -8,6 +8,7 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
+use Illuminate\Notifications\Messages\BroadcastMessage;
 
 class BookedClass extends Notification implements ShouldQueue
 {
@@ -22,7 +23,7 @@ class BookedClass extends Notification implements ShouldQueue
      */
     public function __construct($student_id)
     {
-        
+
         $this->student = User::find($student_id)->first();
         // dd($this->student);
         // $schedule = $this->student->schedules->first()->selected_schedule;
@@ -30,24 +31,24 @@ class BookedClass extends Notification implements ShouldQueue
         // dd($schedule);
         // $schedule = json_decode($schedule);
         $schedule_string = "";
-        $days = ["Sundays","Mondays","Tuesdays","Wednesdays","Thursdays","Fridays","Saturdays"];
-        
-        if($schedule != null){
-            for($i = 0; $i < count($schedule); $i++){
-                $schedule[$i][0] = $schedule[$i][0].':00';
+        $days = ["Sundays", "Mondays", "Tuesdays", "Wednesdays", "Thursdays", "Fridays", "Saturdays"];
+
+        if ($schedule != null) {
+            for ($i = 0; $i < count($schedule); $i++) {
+                $schedule[$i][0] = $schedule[$i][0] . ':00';
                 $schedule[$i][1] = $days[intval($schedule[$i][1])];
-    
-                
-                if($i == (count($schedule)-1)){
-                    $schedule_string = substr_replace($schedule_string,"", -2);
-                    $schedule_string .= " and ".$schedule[$i][1]." at ".$schedule[$i][0].", ";
-                }else{
-                    $schedule_string .= "on ".$schedule[$i][1]." at ".$schedule[$i][0].", ";
+
+
+                if ($i == (count($schedule) - 1)) {
+                    $schedule_string = substr_replace($schedule_string, "", -2);
+                    $schedule_string .= " and " . $schedule[$i][1] . " at " . $schedule[$i][0] . ", ";
+                } else {
+                    $schedule_string .= "on " . $schedule[$i][1] . " at " . $schedule[$i][0] . ", ";
                 }
             }
-            $schedule_string = substr_replace($schedule_string,"", -2);
+            $schedule_string = substr_replace($schedule_string, "", -2);
             $schedule_string .= ".";
-    
+
             $this->schedule_string = $schedule_string;
         }
     }
@@ -60,7 +61,7 @@ class BookedClass extends Notification implements ShouldQueue
      */
     public function via($notifiable)
     {
-        return ['mail','database'];
+        return ['mail', 'database', 'broadcast'];
     }
 
     /**
@@ -72,12 +73,12 @@ class BookedClass extends Notification implements ShouldQueue
     public function toMail($notifiable)
     {
         return (new MailMessage)
-                    ->subject('New Class Booked: '.$this->student->first_name.' '.$this->student->last_name)
-                    ->line('Greetings, dear '.$notifiable->first_name.' '.$notifiable->last_name.'.')
-                    ->line('We are writing to notify you that a new class has been scheduled by student '.$this->student->first_name.' '.$this->student->last_name.' '.$this->schedule_string)
-                    ->line('Click the button below to check your current schedule.')
-                    ->action('Check Schedule', url('/dashboard'))
-                    ->line('If you have any questions, please contact us through the regular channels.');
+            ->subject('New Class Booked: ' . $this->student->first_name . ' ' . $this->student->last_name)
+            ->line('Greetings, dear ' . $notifiable->first_name . ' ' . $notifiable->last_name . '.')
+            ->line('We are writing to notify you that a new class has been scheduled by student ' . $this->student->first_name . ' ' . $this->student->last_name . ' ' . $this->schedule_string)
+            ->line('Click the button below to check your current schedule.')
+            ->action('Check Schedule', url('/dashboard'))
+            ->line('If you have any questions, please contact us through the regular channels.');
     }
 
     public function toDatabase()
@@ -99,5 +100,16 @@ class BookedClass extends Notification implements ShouldQueue
         return [
             //
         ];
+    }
+
+    /**
+     * Get the broadcastable representation of the notification.
+     *
+     * @param  mixed  $notifiable
+     * @return BroadcastMessage
+     */
+    public function toBroadcast($notifiable)
+    {
+        return new BroadcastMessage([]);
     }
 }

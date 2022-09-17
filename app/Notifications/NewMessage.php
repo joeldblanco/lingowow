@@ -13,7 +13,7 @@ class NewMessage extends Notification implements ShouldQueue
 {
     use Queueable;
 
-    public $text_message, $conversation_id, $unread_messages;
+    public $text_message, $conversation_id;
 
     /**
      * Create a new notification instance.
@@ -24,14 +24,6 @@ class NewMessage extends Notification implements ShouldQueue
     {
         $this->text_message = $text_message;
         $this->conversation_id = $conversation_id;
-
-        $this->unread_messages = 0;
-        $conversations = auth()->user()->conversations;
-        foreach ($conversations as $conversation) {
-            if ($conversation->unread_messages > 0) {
-                $this->unread_messages++;
-            }
-        }
     }
 
     /**
@@ -79,7 +71,6 @@ class NewMessage extends Notification implements ShouldQueue
     public function toBroadcast($notifiable)
     {
         return new BroadcastMessage([
-            'unread_messages' => $this->unread_messages,
             'text_message' => $this->text_message,
             'conversation_id' => $this->conversation_id,
         ]);
