@@ -121,7 +121,7 @@ class Chat extends Component
             ]);
 
             //SENDS NEW MESSAGE NOTIFICATION TO PARTICIPANT//
-            dd($this->users_notifications);
+            // dd($this->users_notifications);
             Notification::send($this->users_notifications, new \App\Notifications\NewMessage($this->text_message, $this->conversation_id));
             $this->text_message = "";
 
