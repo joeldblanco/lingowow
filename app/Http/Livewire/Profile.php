@@ -2,14 +2,26 @@
 
 namespace App\Http\Livewire;
 
+use App\Models\Comment;
 use App\Models\Friend;
+use App\Models\Post;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Livewire\Component;
+use Illuminate\Support\Facades\Notification;
 
 class Profile extends Component
 {
-    public $user_id, $posts;
+    public $user_id, $comment_content;
+
+    //LIVEWIRE FUNCTION FOR GETTING LARAVEL ECHO LISTENERS//
+    public function getListeners()
+    {
+        $user_id = auth()->user()->id;
+        return [
+            "echo-notification:App.Models.User.{$user_id},FriendRequest" => 'render',
+        ];
+    }
 
     public function confirmRequest($id)
     {
@@ -27,7 +39,7 @@ class Profile extends Component
 
     public function sendRequest($id)
     {
-        $friend_request = Friend::withTrashed()->where('friend_id',$id)->where('user_id', auth()->id())->first();
+        $friend_request = Friend::withTrashed()->where('friend_id', $id)->where('user_id', auth()->id())->first();
 
         if ($friend_request == null) {
             $friend_request = Friend::create([
@@ -37,18 +49,53 @@ class Profile extends Component
         } else if ($friend_request->trashed()) {
             $friend_request->restore();
         }
+
+        $friend = User::find($id);
+
+        Notification::send($friend, new \App\Notifications\FriendRequest(auth()->id(), $id));
     }
 
     public function cancelRequest($id)
     {
-        $friend_request = Friend::withTrashed()->where('friend_id',$id)->where('user_id', auth()->id())->first();
+        $friend_request = Friend::withTrashed()->where('friend_id', $id)->where('user_id', auth()->id())->first();
         $friend_request->delete();
+
+        $notifications = DB::table('notifications')
+            ->where('type', 'App\Notifications\FriendRequest')
+            ->where('data', 'like', '%"user_id":' . auth()->id() . '%')
+            ->where('data', 'like', '%"friend_id":' . $id . '%')
+            ->delete();
     }
 
     public function sendMessage($id)
     {
-        $friend_request = Friend::withTrashed()->where('friend_id',$id)->where('user_id', auth()->id())->first();
+        $friend_request = Friend::withTrashed()->where('friend_id', $id)->where('user_id', auth()->id())->first();
         $friend_request->delete();
+    }
+
+    public function getPostsProperty()
+    {
+        return User::find($this->user_id)->posts->sortByDesc('created_at');
+    }
+
+    public function getSentRequestProperty()
+    {
+        return Friend::where('user_id', auth()->id())->where('friend_id', $this->user_id)->first();
+    }
+
+    public function getReceivedRequestProperty()
+    {
+        return Friend::where('user_id', $this->user_id)->where('friend_id', auth()->id())->first();
+    }
+
+    public function getFriendRequestsProperty()
+    {
+        return Friend::where('friend_id', $this->user_id)->where('status', 0)->get();
+    }
+
+    public function getFriendsProperty()
+    {
+        return User::find($this->user_id)->friends();
     }
 
     public function render()
@@ -58,20 +105,8 @@ class Profile extends Component
             abort(404);
         }
 
-        $friends = $user->friends();
-        $friend_requests = Friend::where('friend_id',$this->user_id)->where('status', 0)->get();
-        $this->posts = $user->posts;
-
-        // dd($friends);
-
-        $request_sent = Friend::where('user_id',auth()->id())->where('friend_id',$this->user_id)->first();
-        // dd($friend_requests);
-
         return view('livewire.profile', [
-            'friends' => $friends,
-            'friend_requests' => $friend_requests,
-            'user' => $user,
-            'request_sent' => $request_sent,
+            'user' => $user
         ]);
     }
 }

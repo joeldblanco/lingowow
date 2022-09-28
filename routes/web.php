@@ -32,6 +32,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Notification;
 use App\Http\Controllers\MeetingController;
 use App\Models\Enrolment;
+use App\Models\Post;
 
 /*
 |--------------------------------------------------------------------------
@@ -53,9 +54,7 @@ Route::get('/', function () {
 Route::middleware(['web', 'auth', 'verified', 'impersonate'])->group(function () {
 
     Route::get('/home', function () {
-        return redirect('dashboard');
 
-        //TO DELETE//
         return view('home');
     })->name('home');
 
@@ -76,14 +75,14 @@ Route::middleware(['web', 'auth', 'verified', 'impersonate'])->group(function ()
     // })->name('pages');
 
     //ROUTES FOR COURSES//
-    Route::middleware(['role:student|teacher|admin'])->get('/courses/{id}', [CourseController::class, "show"])->name('course.show');
-    Route::middleware(['role:student|teacher|admin'])->get('/courses', [CourseController::class, "index"])->name('course.index');
+    Route::get('/courses/{id}', [CourseController::class, "show"])->name('course.show');
+    Route::get('/courses', [CourseController::class, "index"])->name('course.index');
 
     //ROUTES FOR MODULES//
-    Route::middleware(['role:student|teacher|admin'])->get('/module/{id}', [ModuleController::class, "show"])->name('module.show');
+    Route::get('/module/{id}', [ModuleController::class, "show"])->name('module.show');
 
     // //ROUTES FOR UNITS//
-    Route::middleware(['role:student|teacher|admin'])->get('/unit/{id}', [UnitController::class, "show"])->name('unit.show');
+    Route::get('/unit/{id}', [UnitController::class, "show"])->name('unit.show');
 
     //ROUTES FOR SHOP//
     Route::middleware(['role:guest|student|admin'])->get('/shop', [PayPalPaymentController::class, 'getIndex'])->name('shop');
@@ -226,6 +225,8 @@ Route::middleware(['web', 'auth', 'verified', 'impersonate'])->group(function ()
     //     // Only verified users may access this route...
     // });
     Route::resource('/profile', ProfileController::class);
+
+    Route::resource('/admin/enrolments', EnrolmentController::class);
 });
 
 

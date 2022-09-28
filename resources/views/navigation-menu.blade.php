@@ -8,6 +8,12 @@ $nav_links = [
         'roles' => ['student', 'guest', 'teacher', 'admin'],
     ],
     [
+        'name' => 'Dashboard',
+        'route' => auth()->user()->roles[0]->name == 'admin' ? route('admin.dashboard') : route('dashboard'),
+        'status' => auth()->user()->roles[0]->name == 'admin' ? request()->routeIs('admin.dashboard') : request()->routeIs('dashboard'),
+        'roles' => auth()->user()->roles[0]->name == 'admin' ? ['admin'] : ['student', 'guest', 'teacher'],
+    ],
+    [
         'name' => 'Courses',
         'route' => route('course.index'),
         'status' => request()->is('courses', 'courses/*'),
@@ -26,32 +32,6 @@ $nav_links = [
         'roles' => ['student', 'guest', 'admin'],
     ],
 ];
-
-if (auth()->user()->roles[0]->name == 'admin') {
-    $dashboard = [
-        [
-            'name' => 'Dashboard',
-            'route' => route('admin.dashboard'),
-            'status' => request()->routeIs('admin.dashboard'),
-            'roles' => ['admin'],
-        ],
-    ];
-} else {
-    $dashboard = [
-        [
-            'name' => 'Dashboard',
-            'route' => route('dashboard'),
-            'status' => request()->routeIs('dashboard'),
-            'roles' => ['student', 'guest', 'teacher'],
-        ],
-    ];
-}
-
-// array_push($nav_links, $dashboard);
-array_splice($nav_links, 1, 0, $dashboard);
-
-//TO DELETE//
-array_shift($nav_links);
 
 @endphp
 
@@ -179,12 +159,10 @@ array_shift($nav_links);
                                                     @endforeach
                                                 @endif
                                             </p>
-                                            <span
-                                                class="w-3 h-3 bg-blue-500 rounded-full mr-3 hidden"
+                                            <span class="w-3 h-3 bg-blue-500 rounded-full mr-3 hidden"
                                                 id="unread_conversation_{{ $conversation->id }}"></span>
                                         </div>
-                                        <p class="text-xs text-gray-400 font-normal"
-                                            id="last_message">
+                                        <p class="text-xs text-gray-400 font-normal" id="last_message">
                                             {{ Str::limit($conversation->last_message->message_content, 25, '...') }}
                                         </p>
                                     </x-jet-dropdown-link>
@@ -261,6 +239,11 @@ array_shift($nav_links);
                                                 $notification_data[$key] = 'The student ' . $user->first_name . ' ' . $user->last_name . ' has been automatically unenroled from course ' . $data_array['schedule_string'];
                                                 break;
                                     
+                                            case 'FriendRequest':
+                                                $notification_icon = 'fas fa-user-friends';
+                                                $notification_data[$key] = $user->first_name . ' ' . $user->last_name . ' has sent you a friend request.';
+                                                break;
+                                    
                                             default:
                                                 $notification_icon = 'fas fa-bell';
                                                 $notification_data[$key] = 'You have a new notification.';
@@ -283,7 +266,8 @@ array_shift($nav_links);
                                 @foreach ($notifications as $key => $value)
                                     <x-jet-dropdown-link
                                         href="{{ route('notifications.show', $notification_id[$key]) }}">
-                                        <div class="flex justify-between items-center space-x-1" id="{{ $value->id }}">
+                                        <div class="flex justify-between items-center space-x-1"
+                                            id="{{ $value->id }}">
                                             <p class="@if ($notification_read_at[$key] == null) font-bold @endif">
                                                 {{ Str::limit($notification_data[$key], 40, '...') }}
                                             </p>

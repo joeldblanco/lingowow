@@ -23,9 +23,11 @@ class CourseController extends Controller
         if ($role == "admin") {
             $courses = Course::all();
             $courses = $courses->unique();
+        } else if ($role == "guest") {
+            $courses = Course::all();
         } else {
             $courses = [];
-            
+
             if ($role == "teacher") {
                 $user->enrolments_teacher->each(function ($enrolment, $key) use (&$courses) {
                     $courses[] = $enrolment->course;
@@ -111,6 +113,8 @@ class CourseController extends Controller
 
         if ($role == "admin") {
             $user_modules = $course->modules;
+        } else if ($role == "guest") {
+            // $user_modules = [];
         } else {
             /*VERSION ANTERIOR*/
             $user_modules = [];
@@ -202,23 +206,23 @@ class CourseController extends Controller
         }
     }
 
-    public function module_priority($modules,$module_priority,$module_id){
-        
+    public function module_priority($modules, $module_priority, $module_id)
+    {
+
         // $modules[] = Module::where('priority', $module_id);
         $id = $module_id;
         foreach ($modules as $key => $value) {
-            
-            
-            
+
+
+
             foreach ($modules as $key2 => $value2) {
-                if($value2->priority == $id){
+                if ($value2->priority == $id) {
                     $module_priority[] = $value2;
                     $id = $value2->id;
                     break;
                 }
             }
-        }  
-        return $module_priority; 
+        }
+        return $module_priority;
     }
-
 }

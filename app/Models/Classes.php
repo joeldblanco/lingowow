@@ -21,7 +21,7 @@ class Classes extends Model
      *
      * @var array
      */
-    protected $fillable = ['start_date','end_date','enrolment_id'];
+    protected $fillable = ['start_date', 'end_date', 'enrolment_id'];
 
     /**
      * Get the student associated with the class.
@@ -40,11 +40,10 @@ class Classes extends Model
     }
 
     /**
-     * Get the comments for class.
+     * Get all of the class' comments.
      */
     public function comments()
     {
-        return $this->hasMany(Comment::class, 'class_id');
+        return $this->morphMany(Comment::class, 'commentable');
     }
-
 }

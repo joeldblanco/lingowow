@@ -9,7 +9,7 @@
     </div>
 
     {{-- @if ($role != 'admin') --}}
-    <div class="container mx-auto mt-10" x-data="{ editBtn: true, edit: false, showModal1: false, showModal2: false, showModal3: false, showModalAbsence: @entangle('showModalAbsence'), event: {{ $event }}, loadingState: false }" x-cloak>
+    <div class="container mx-auto mt-10 text-gray-600" x-data="{ editBtn: true, edit: false, showModal1: false, showModal2: false, showModal3: false, showModalAbsence: @entangle('showModalAbsence'), event: {{ $event }}, loadingState: false }" x-cloak>
         <div class="wrapper bg-white rounded w-full">
             {{-- <p x-show="event">Event</p> --}}
 
@@ -43,9 +43,9 @@
                                 <!--fila de los titulos-->
                                 <tr>
                                     <th class="width border">UTC</th>
-                                    <th class="" style="">LOCAL</th>
+                                    <th>LOCAL</th>
                                     @foreach ($days as $day)
-                                        <th class="border width" style="">
+                                        <th class="border width">
                                             {{ $day }}
                                         </th>
                                     @endforeach
@@ -151,9 +151,9 @@
                             <!--fila de los titulos-->
                             <tr>
                                 <th class="width border">UTC</th>
-                                <th class="width border" style="">LOCAL</th>
+                                <th class="width border">LOCAL</th>
                                 @foreach ($days as $day)
-                                    <th class="border width" style="">
+                                    <th class="border width">
                                         {{ $day }}
                                     </th>
                                 @endforeach
@@ -289,9 +289,9 @@
                             <!--fila de los titulos-->
                             <tr>
                                 <th class="width border">UTC</th>
-                                <th class="width border" style="">LOCAL</th>
+                                <th class="width border">LOCAL</th>
                                 @foreach ($days as $day)
-                                    <th class="border width" style="">
+                                    <th class="border width">
                                         {{ $day }}
                                     </th>
                                 @endforeach

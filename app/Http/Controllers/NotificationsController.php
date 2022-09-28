@@ -81,6 +81,11 @@ class NotificationsController extends Controller
                 $notification_data = 'The student ' . $user->first_name . ' ' . $user->last_name . ' has been automatically unenroled from course ' . $notification_data['course_name'] . ', which leaves your blocks ' . $notification_data['schedule_string'] . ' free.';
                 break;
 
+            case 'FriendRequest':
+                $notification_icon = 'fas fa-user-friends';
+                $notification_data = $user->first_name . ' ' . $user->last_name . ' has sent you a friend request.';
+                break;
+
             default:
                 $notification_icon = 'fas fa-bell';
                 $notification_data = 'You have a new notification.';
@@ -89,7 +94,7 @@ class NotificationsController extends Controller
 
         $friends = auth()->user()->friends();
 
-        return view('notification', compact('id','notification_icon', 'notification_data', 'friends', 'notification_type', 'notification', 'user'));
+        return view('notification', compact('id', 'notification_icon', 'notification_data', 'friends', 'notification_type', 'notification', 'user'));
     }
 
     /**

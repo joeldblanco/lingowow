@@ -106,6 +106,11 @@ class User extends Authenticatable implements MustVerifyEmail
     //     return app(ImpersonateManager::class)->take($this, $user, $guardName);
     // }
 
+    public function likes()
+    {
+        return $this->belongsToMany(Post::class, 'post_like');
+    }
+
     /**
      * @return  bool
      */

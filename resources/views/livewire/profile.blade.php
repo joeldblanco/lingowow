@@ -6,7 +6,7 @@
         }
     @endphp
 
-    <div class="p-12 bg-gray-200 font-sans text-gray-600" x-data="{ profile: true, followers: false, friends: false, gallery: false, friend_requests: false, editProfile: false, newMessage: false }" x-cloak>
+    <div class="p-12 bg-gray-200 font-sans text-gray-600" x-data="{ profile: true, followers: false, friends: false, gallery: false, friend_requests: false, editProfile: false, newMessage: false, showPost: false }" x-cloak>
         <div class="max-w-7xl border rounded-xl bg-white flex flex-col pt-3 px-3 mb-6">
             <div class="border rounded-xl bg-blue-600 h-56"
                 style="background-image: url('https://berrydashboard.io/static/media/img-profile-bg.2b15e931.png'); background-size: cover;">
@@ -14,16 +14,16 @@
             </div>
             <div class="flex flex-row">
                 <div class="w-1/4 relative">
-                    <div class="w-32 h-32 z-10 absolute -top-14 right-5 rounded-full border-4 border-gray-400 bg-white cursor-pointer"
-                        @click="editProfile = true">
+                    <div class="w-32 h-32 z-10 absolute -top-14 right-5 rounded-full border-4 border-gray-400 bg-white @if ($user->id == auth()->id()) cursor-pointer @endif"
+                        @if ($user->id == auth()->id()) @click="editProfile = true" @endif>
                         {{-- style="background-image: url('{{ Storage::url($user->profile_photo_path) }}')"> --}}
                         <img src="{{ Storage::url($user->profile_photo_path) }}"
                             class="w-full h-full rounded-full object-cover" alt="">
                     </div>
                 </div>
-                <div class="w-3/4 flex flex-col pl-5 pt-5">
+                <div class="w-3/4 flex flex-col pt-5">
                     <div class="flex flex-row">
-                        <div class="w-1/4 font-semibold">{{ $user->first_name }} {{ $user->last_name }}</div>
+                        <p class="w-1/4 font-bold text-2xl">{{ $user->first_name }} {{ $user->last_name }}</p>
                         <div class="w-3/4 flex justify-end">
 
                             <div class="flex space-x-4">
@@ -36,23 +36,50 @@
                                         class="border border-green-500 rounded h-9 w-24 text-green-500 hover:text-green-700 hover:border-green-700 hover:bg-green-50 flex justify-center items-center">Classroom</a>
                                 @endhasanyrole
                                 @if ($user->id != auth()->id())
-                                    @if ($request_sent != null)
-                                        @if ($request_sent->status == 0 || $request_sent->status == 2)
+                                    @if ($this->sent_request != null)
+                                        @if ($this->sent_request->status == 0 || $this->sent_request->status == 2)
                                             {{-- <button
                                                 class="border border-blue-500 rounded h-9 w-24 text-blue-500 hover:text-blue-700 hover:border-blue-700 hover:bg-blue-50">Message</button> --}}
                                             <button wire:click="cancelRequest({{ $user->id }})"
-                                                class="px-3 rounded h-9 w-30 font-semibold text-white bg-red-700 hover:border-red-700 hover:bg-red-800 shadow-md">Cancel
-                                                Request</button>
+                                                class="flex items-center px-3 rounded h-9 w-30 font-semibold text-white bg-red-700 hover:border-red-700 hover:bg-red-800 shadow-md">
+                                                <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+                                                    xmlns="http://www.w3.org/2000/svg" fill="none"
+                                                    viewBox="0 0 24 24" wire:loading wire:target="cancelRequest">
+                                                    <circle class="opacity-25" cx="12" cy="12"
+                                                        r="10" stroke="currentColor" stroke-width="4"></circle>
+                                                    <path class="opacity-75" fill="currentColor"
+                                                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                                                    </path>
+                                                </svg>
+                                                Cancel Request
+                                            </button>
                                         @else
                                             <button
                                                 class="border border-blue-500 rounded h-9 w-24 text-blue-500 hover:text-blue-700 hover:border-blue-700 hover:bg-blue-50">Message</button>
                                         @endif
                                     @else
-                                        {{-- <button
-                                            class="border border-blue-500 rounded h-9 w-24 text-blue-500 hover:text-blue-700 hover:border-blue-700 hover:bg-red-50">Message</button> --}}
-                                        <button wire:click="sendRequest({{ $user->id }})"
-                                            class="px-3 rounded h-9 w-30 font-semibold text-white bg-blue-700 hover:border-blue-700 hover:bg-blue-800 shadow-md">Send
-                                            Request</button>
+                                        @if ($this->received_request != null)
+                                            @if ($this->received_request->status == 0)
+                                                <button wire:click="confirmRequest({{ $user->id }})"
+                                                    class="px-3 rounded h-9 w-30 font-semibold text-white bg-green-700 hover:border-green-700 hover:bg-green-800 shadow-md">Confirm</button>
+                                                <button wire:click="deleteRequest({{ $user->id }})"
+                                                    class="px-3 rounded h-9 w-30 font-semibold text-white bg-red-700 hover:border-red-700 hover:bg-red-800 shadow-md">Delete</button>
+                                            @endif
+                                        @else
+                                            <button wire:click="sendRequest({{ $user->id }})"
+                                                class="flex items-center px-3 rounded h-9 w-max font-semibold text-white bg-blue-700 hover:border-blue-700 hover:bg-blue-800 shadow-md">
+                                                <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+                                                    xmlns="http://www.w3.org/2000/svg" fill="none"
+                                                    viewBox="0 0 24 24" wire:loading wire:target="sendRequest">
+                                                    <circle class="opacity-25" cx="12" cy="12"
+                                                        r="10" stroke="currentColor" stroke-width="4"></circle>
+                                                    <path class="opacity-75" fill="currentColor"
+                                                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                                                    </path>
+                                                </svg>
+                                                Send Request
+                                            </button>
+                                        @endif
                                     @endif
                                 @else
                                     <button @click="editProfile = true"
@@ -112,8 +139,8 @@
         </div>
 
         {{-- PROFILE --}}
-        <div class="flex flex-row space-x-10" x-show="profile" x-transition>
-            <div class="flex flex-col w-1/3">
+        <div class="flex flex-row space-x-10 w-5/6 mx-auto" x-show="profile" x-transition>
+            <div class="flex flex-col w-2/6">
                 <div class="w-full border rounded-xl bg-white flex flex-col p-5 mb-6">
                     <div class="flex flex-col space-y-4">
                         <button class="flex justify-between items-center"
@@ -123,7 +150,7 @@
                                     <i class="fas fa-user-friends"></i>
                                 </div>
                                 <div class="flex flex-col items-start">
-                                    <span class="font-black text-xl">{{ count($friends) }}</span>
+                                    <span class="font-black text-xl">{{ count($this->friends) }}</span>
                                     <span class="text-gray-600">Friends</span>
                                 </div>
                             </div>
@@ -148,7 +175,7 @@
                         </button> --}}
                     </div>
                 </div>
-                <div class="w-full border rounded-xl bg-white flex flex-col p-5 mb-6">
+                {{-- <div class="w-full border rounded-xl bg-white flex flex-col p-5 mb-6">
                     <div class="flex flex-col space-y-4">
                         <h4 class="font-bold">About</h4>
                         <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit.</p>
@@ -170,92 +197,10 @@
                             </a>
                         </div>
                     </div>
-                </div>
+                </div> --}}
             </div>
-            <div class="flex flex-col w-2/3">
-                @if ($user->id == auth()->id())
-                    <div class="w-full border rounded-xl bg-white flex flex-col p-5 mb-6">
-                        <form action="{{ route('post.store') }}" enctype="multipart/form-data" method="POST"
-                            id="post-form">
-                            @csrf
-                            <textarea class="rounded-xl resize-none w-full" name="post_text" id="post_text" cols="30" rows="4"
-                                placeholder="What's on your mind, {{ $user->first_name }}"></textarea>
-                            <div class="flex flex-row justify-between items-center mt-2">
-                                <input type="file" name="post_image" id="post_image" class="hidden"
-                                    accept=".jpeg,.jpg,.png,.webp">
-                                <label for="post_image"
-                                    class="flex flex-row items-center space-x-2 text-blue-800 cursor-pointer">
-                                    <i class="fas fa-file-image"></i>
-                                    <p>Gallery</p>
-                                </label>
-
-                                <input id="submit" type="submit" value="Comment" class="hidden">
-                                <label for="submit">
-                                    <button
-                                        class="inline-block bg-blue-800 text-white px-4 py-2 rounded hover:bg-blue-900 hover:text-white hover:no-underline">Comment</button>
-                                </label>
-                            </div>
-                        </form>
-                    </div>
-                @endif
-                @foreach ($posts as $post)
-                    <div class="w-full border rounded-xl bg-white flex flex-col p-5 mb-6">
-                        <div class="flex justify-between mb-5 relative" x-data="{ editDelete: false }">
-                            <div class="flex space-x-3 items-center">
-                                <img class="rounded-full w-16" src="{{ Storage::url($user->profile_photo_path) }}"
-                                    alt="profile_pic">
-                                <p>{{ $user->first_name }} {{ $user->last_name }}</p>
-                                <i class="fas fa-dot-circle"></i>
-                                <p class="text-gray-400 text-xs">
-                                    {{ (new Carbon\Carbon($post->created_at))->diffForHumans() }}</p>
-                            </div>
-                            <button @click=" editDelete = !editDelete ">
-                                ...
-                            </button>
-                            <div class="absolute right-4 top-8" x-show="editDelete"
-                                @click.outside="editDelete = false">
-                                <div
-                                    class="flex flex-col border border-gray-400 rounded-xl divide-y divide-opacity-100 divide-gray-300">
-                                    <button class="hover:bg-gray-200 p-2 rounded-t-xl">Edit</button>
-                                    <button class="hover:bg-gray-200 p-2 rounded-b-xl">Delete</button>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="mb-5">
-                            <p>{{ json_decode($post->content, 1)['text'] }}</p>
-                            @if (json_decode($post->content, 1)['photo_path'] != null)
-                                <img class="rounded-lg w-3/4 shadow-xl {{-- transform hover:scale-105 transition duration-500 --}}"
-                                    src="{{ Storage::url(json_decode($post->content, 1)['photo_path']) }}"
-                                    alt="profile_pic">
-                            @endif
-                        </div>
-                        <div>
-                            <div class="flex justify-between">
-                                <div class="flex space-x-6">
-                                    <button class="flex space-x-2 items-center">
-                                        <i class="fas fa-thumbs-up"></i>
-                                        <p>0 Likes</p>
-                                    </button>
-                                    <button class="flex space-x-2 items-center">
-                                        <i class="far fa-comment-alt"></i>
-                                        <p>0 Comments</p>
-                                    </button>
-                                </div>
-                                <button>
-                                    <i class="fas fa-share-alt"></i>
-                                </button>
-                            </div>
-                            <div class="flex items-center space-x-3 mt-3">
-                                <img class="rounded-full w-10" src="{{ Storage::url($user->profile_photo_path) }}"
-                                    alt="profile_pic">
-                                <textarea class="rounded-xl resize-none w-5/6" name="" id="" cols="30" rows="1"
-                                    placeholder="Write a comment"></textarea>
-                                <button
-                                    class="inline-block bg-blue-800 text-white px-4 py-2 rounded hover:bg-blue-900 hover:text-white hover:no-underline">Comment</button>
-                            </div>
-                        </div>
-                    </div>
-                @endforeach
+            <div class="flex flex-col w-4/6">
+                @livewire('posts-component', ['user' => $user], key($user->id))
             </div>
         </div>
 
@@ -306,65 +251,71 @@
                     </div>
                     <hr class="my-6">
                     <div class="grid grid-flow-row grid-cols-4 gap-4">
-
-                        @foreach ($friends as $friend)
-                            <div class="flex flex-col mx-2 border rounded-xl bg-gray-50 w-full p-3 hover:border-blue-500"
-                                wire:key="friend-{{ $friend->id }}">
-                                <div class="flex justify-between">
-                                    <div class="flex items-center space-x-3">
-                                        <img class="rounded-full w-12"
-                                            src="{{ Storage::url($friend->profile_photo_path) }}" alt="profile_pic">
-                                        <p class="text-sm font-bold">{{ $friend->first_name }}
-                                            {{ $friend->last_name }}</p>
+                        @if (count($this->friends) > 0)
+                            @foreach ($this->friends as $friend)
+                                <div class="flex flex-col mx-2 border rounded-xl bg-gray-50 w-full p-3 hover:border-blue-500"
+                                    wire:key="friend-{{ $friend->id }}">
+                                    <div class="flex justify-between">
+                                        <div class="flex items-center space-x-3">
+                                            <img class="rounded-full w-12"
+                                                src="{{ Storage::url($friend->profile_photo_path) }}"
+                                                alt="profile_pic">
+                                            <p class="text-sm font-bold">{{ $friend->first_name }}
+                                                {{ $friend->last_name }}</p>
+                                        </div>
+                                        <div class="flex flex-col items-start mx-4">
+                                            <button class="font-bold text-lg text-indigo-400">
+                                                ...
+                                            </button>
+                                        </div>
                                     </div>
-                                    <div class="flex flex-col items-start mx-4">
-                                        <button class="font-bold text-lg text-indigo-400">
-                                            ...
-                                        </button>
-                                    </div>
-                                </div>
-                                <div class="flex space-x-2">
-                                    {{-- <button
+                                    <div class="flex space-x-2">
+                                        {{-- <button
                                         class="transition-colors ease-out delay-75 flex border bg-white rounded my-4 py-2 space-x-3 w-1/2 items-center justify-center text-purple-500 hover:bg-purple-100">
                                         <i class="fas fa-video"></i>
                                     </button> --}}
-                                    <button @click="newMessage = true"
-                                        class="transition-colors ease-out delay-75 flex border bg-white rounded my-4 py-2 space-x-3 w-full items-center justify-center text-blue-500 hover:bg-blue-100">
-                                        <i class="far fa-comment-alt"></i>
-                                    </button>
+                                        <button @click="newMessage = true"
+                                            class="transition-colors ease-out delay-75 flex border bg-white rounded my-4 py-2 space-x-3 w-full items-center justify-center text-blue-500 hover:bg-blue-100">
+                                            <i class="far fa-comment-alt"></i>
+                                        </button>
+                                    </div>
                                 </div>
-                            </div>
-                            <x-modal type="info" name="newMessage" class="w-1/2 mx-auto">
-                                <x-slot name="title"></x-slot>
+                                <x-modal type="info" name="newMessage" class="w-1/2 mx-auto">
+                                    <x-slot name="title"></x-slot>
 
-                                <x-slot name="content">
-                                    <form method="POST" action="{{ route('chat.message') }}">
-                                        @csrf
-                                        <div class="flex space-x-3 w-full p-3 items-center">
-                                            <img src="{{ Storage::url($friend->profile_photo_path) }}"
-                                                alt="profile_pic" class="w-1/6 rounded-full">
-                                            <p class="w-3/4 font-bold text-xl">{{ $friend->first_name }}
-                                                {{ $friend->last_name }}</p>
-                                                <input type="text" class="hidden" name="friend_id" value="{{$friend->id}}">
-                                        </div>
-                                        <div class="w-full">
-                                            <textarea class="w-full rounded-lg border-gray-300" name="message" id="message" cols="30" rows="10"
-                                                placeholder="Write a message" {{-- wire:model="text_message" --}}></textarea>
-                                            <div class="flex px-3 h-10 cursor-pointer hover:bg-gray-200 border border-gray-300 hover:border-white hover:text-blue-500 rounded-lg"
-                                                {{-- wire:click="send_message" 
-                                                @click="newMessage = false" --}}>
-                                                <button type="submit" class="mx-auto flex space-x-3 items-center font-bold">
-                                                    <p>Send</p>
-                                                    <i class="fas fa-paper-plane"></i>
-                                                </button>
+                                    <x-slot name="content">
+                                        <form method="POST" action="{{ route('chat.message') }}">
+                                            @csrf
+                                            <div class="flex space-x-3 w-full p-3 items-center">
+                                                <img src="{{ Storage::url($friend->profile_photo_path) }}"
+                                                    alt="profile_pic" class="w-1/6 rounded-full">
+                                                <p class="w-3/4 font-bold text-xl">{{ $friend->first_name }}
+                                                    {{ $friend->last_name }}</p>
+                                                <input type="text" class="hidden" name="friend_id"
+                                                    value="{{ $friend->id }}">
                                             </div>
-                                        </div>
-                                    </form>
-                                </x-slot>
+                                            <div class="w-full">
+                                                <textarea class="w-full rounded-lg border-gray-300" name="message" id="message" cols="30" rows="10"
+                                                    placeholder="Write a message" {{-- wire:model="text_message" --}}></textarea>
+                                                <div class="flex px-3 h-10 cursor-pointer hover:bg-gray-200 border border-gray-300 hover:border-white hover:text-blue-500 rounded-lg"
+                                                    {{-- wire:click="send_message" 
+                                                @click="newMessage = false" --}}>
+                                                    <button type="submit"
+                                                        class="mx-auto flex space-x-3 items-center font-bold">
+                                                        <p>Send</p>
+                                                        <i class="fas fa-paper-plane"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </form>
+                                    </x-slot>
 
-                                <x-slot name="footer" class="justify-center"></x-slot>
-                            </x-modal>
-                        @endforeach
+                                    <x-slot name="footer" class="justify-center"></x-slot>
+                                </x-modal>
+                            @endforeach
+                        @else
+                            <p class="col-span-4 text-center text-2xl font-bold my-6">No friends to show</p>
+                        @endif
                     </div>
                 </div>
             </div>
@@ -382,25 +333,33 @@
                     </div>
                     <hr class="my-6">
                     <div class="grid grid-flow-row grid-cols-4 gap-4">
-                        @foreach ($randomizer as $randomized)
-                            <div class="flex rounded-xl rounded-b-2xl h-48 bg-white w-full items-end"
-                                style="background-image: url('https://picsum.photos/200?random={{ $loop->index }}'); background-size: cover">
-                                {{-- <img class="rounded-t-lg max-h-36" src="https://picsum.photos/200?random={{$loop->index}}" style="background-size: cover" alt="profile_pic"> --}}
-                                <div
-                                    class="flex space-x-2 bg-white w-full rounded-b-xl border border-gray-200 p-3 justify-between">
-                                    <div class="flex flex-col space-y-1">
-                                        <p class="text-black font-bold">random_name.jpg</p>
-                                        <p class="text-xs text-gray-400">
-                                            <i class="far fa-calendar-alt"></i>
-                                            Sun Sep 5 2021
-                                        </p>
-                                    </div>
-                                    <button
-                                        class="transition-colors ease-out delay-75 flex border bg-purple-50 rounded-lg py-2 w-2/12 items-center justify-center text-purple-500 hover:bg-purple-800 hover:text-white text-sm">
-                                        <i class="fas fa-ellipsis-v"></i>
-                                    </button>
+                        @foreach ($this->posts as $post)
+                            @if (json_decode($post->content, 1)['photo_path'] != null)
+                                {{-- <img class="rounded-lg m-auto w-auto max-h-96 shadow-xl transform hover:scale-105 transition duration-500 cursor-pointer"
+                                    src="{{ Storage::url(json_decode($post->content, 1)['photo_path']) }}"
+                                    alt="profile_pic"> --}}
+
+                                <div class="flex rounded-xl rounded-b-2xl h-48 bg-white w-full items-end border cursor-pointer"
+                                    {{-- style="background-image: url('{{ Storage::url(json_decode($post->content, 1)["photo_path"]) }}'); background-size: cover" --}}>
+                                    <img class="rounded-t-lg object-cover h-full mx-auto"
+                                        src="{{ Storage::url(json_decode($post->content, 1)['photo_path']) }}"
+                                        alt="profile_pic">
+                                    {{-- <div
+                                        class="flex space-x-2 bg-white w-full rounded-b-xl border border-gray-200 p-3 justify-between">
+                                        <div class="flex flex-col space-y-1">
+                                            <p class="text-black font-bold">random_name.jpg</p>
+                                            <p class="text-xs text-gray-400">
+                                                <i class="far fa-calendar-alt"></i>
+                                                {{ (new Carbon\Carbon($comment->created_at))->diffForHumans() }}
+                                            </p>
+                                        </div>
+                                        <button
+                                            class="transition-colors ease-out delay-75 flex border bg-purple-50 rounded-lg py-2 w-2/12 items-center justify-center text-purple-500 hover:bg-purple-800 hover:text-white text-sm">
+                                            <i class="fas fa-ellipsis-v"></i>
+                                        </button>
+                                    </div> --}}
                                 </div>
-                            </div>
+                            @endif
                         @endforeach
                     </div>
                 </div>
@@ -419,40 +378,45 @@
                     </div>
                     <hr class="my-6">
                     <div class="grid grid-flow-row grid-cols-4 gap-4">
-                        @foreach ($friend_requests as $friend_request)
-                            @php
-                                $friend = App\Models\User::find($friend_request->user_id);
-                            @endphp
-                            <div
-                                class="flex flex-col mx-2 border rounded-xl bg-gray-50 w-full p-3 hover:border-blue-500">
-                                <div class="flex justify-between">
-                                    <div class="flex items-center space-x-3">
-                                        <img class="rounded-full w-12"
-                                            src="{{ Storage::url($friend->profile_photo_path) }}" alt="profile_pic">
-                                        <div>
-                                            <p class="text-sm font-bold">{{ $friend->first_name }}
-                                                {{ $friend->last_name }}</p>
-                                            <p class="text-xs text-gray-400">10 mutual friends</p>
+                        @if ($this->friend_requests->count() > 0)
+                            @foreach ($this->friend_requests as $friend_request)
+                                @php
+                                    $friend = App\Models\User::find($friend_request->user_id);
+                                @endphp
+                                <div
+                                    class="flex flex-col mx-2 border rounded-xl bg-gray-50 w-full p-3 hover:border-blue-500">
+                                    <div class="flex justify-between">
+                                        <div class="flex items-center space-x-3">
+                                            <img class="rounded-full w-12"
+                                                src="{{ Storage::url($friend->profile_photo_path) }}"
+                                                alt="profile_pic">
+                                            <div>
+                                                <p class="text-sm font-bold">{{ $friend->first_name }}
+                                                    {{ $friend->last_name }}</p>
+                                                <p class="text-xs text-gray-400">10 mutual friends</p>
+                                            </div>
+                                        </div>
+                                        <div class="flex flex-col items-start mx-4">
+                                            <button class="font-bold text-lg text-indigo-400">
+                                                ...
+                                            </button>
                                         </div>
                                     </div>
-                                    <div class="flex flex-col items-start mx-4">
-                                        <button class="font-bold text-lg text-indigo-400">
-                                            ...
+                                    <div class="flex space-x-2">
+                                        <button wire:click="confirmRequest({{ $friend_request->id }})"
+                                            class="transition-colors ease-out delay-75 flex border bg-white rounded my-4 py-2 space-x-3 w-1/2 items-center justify-center text-blue-500 hover:bg-blue-100 font-bold">
+                                            Confirm
+                                        </button>
+                                        <button wire:click="deleteRequest({{ $friend_request->id }})"
+                                            class="transition-colors ease-out delay-75 flex border bg-white rounded my-4 py-2 space-x-3 w-1/2 items-center justify-center text-red-500 hover:bg-red-400 font-bold hover:text-white">
+                                            Delete
                                         </button>
                                     </div>
                                 </div>
-                                <div class="flex space-x-2">
-                                    <button wire:click="confirmRequest({{ $friend_request->id }})"
-                                        class="transition-colors ease-out delay-75 flex border bg-white rounded my-4 py-2 space-x-3 w-1/2 items-center justify-center text-blue-500 hover:bg-blue-100 font-bold">
-                                        Confirm
-                                    </button>
-                                    <button wire:click="deleteRequest({{ $friend_request->id }})"
-                                        class="transition-colors ease-out delay-75 flex border bg-white rounded my-4 py-2 space-x-3 w-1/2 items-center justify-center text-red-500 hover:bg-red-400 font-bold hover:text-white">
-                                        Delete
-                                    </button>
-                                </div>
-                            </div>
-                        @endforeach
+                            @endforeach
+                        @else
+                            <p class="col-span-4 text-center text-2xl font-bold my-6">No friend requests</p>
+                        @endif
                     </div>
                 </div>
             </div>
@@ -558,9 +522,109 @@
             </x-slot>
         </x-modal>
 
-        <div wire:loading>
+        <x-modal type="info" name="showPost">
+            <x-slot name="title">
+                <p class="text-md ">Profile</p>
+            </x-slot>
+
+            <x-slot name="content">
+
+                <div class="bg-white flex space-x-6 mx-4">
+                    <div class="border border-b rounded-xl divide-y w-1/3">
+                        <div class="py-4">
+                            <p>Profile Picture</p>
+                        </div>
+                        <div class="flex flex-col items-center space-y-4 p-4">
+                            <div class="w-32 h-32 border-gray-400 bg-white cursor-pointer">
+                                {{-- style="background-image: url('{{ Storage::url($user->profile_photo_path) }}')"> --}}
+                                <img src="{{ Storage::url($user->profile_photo_path) }}"
+                                    class="w-full h-full object-cover" alt="">
+                            </div>
+                            {{-- <p class="text-gray-500 text-xs font-light">Upload/Change Your Profile Image</p> --}}
+                            {{-- <button class="bg-blue-400 text-white font-semibold p-2 rounded-md"> --}}
+                            <input type="file" name="new_profile_pic" id="new_profile_pic" class="hidden"
+                                accept=".jpeg,.jpg,.png,.webp" form="update_profile_form">
+
+                            {{-- </button> --}}
+                            <label for="new_profile_pic"
+                                class="bg-blue-400 text-white font-semibold p-2 rounded-md cursor-pointer">
+                                <p>Upload Avatar</p>
+                            </label>
+                        </div>
+                    </div>
+                    <form method="POST" action="{{ route('profile.update', $user->id) }}"
+                        class="bg-white rounded-md w-2/3 p-6 my-4 mx-auto border border-b" id="update_profile_form"
+                        enctype="multipart/form-data">
+                        @csrf
+                        @method('PATCH')
+                        <div class="divide-y mb-5">
+                            <p class="font-bold text-md mb-6 w-full text-left">
+                                Edit Account Details
+                            </p>
+                            <div>
+                                <div class="flex pt-6 space-x-4">
+                                    <div class="space-y-1">
+                                        <input type="text" name="first_name" id="first_name"
+                                            placeholder="First name" required value="{{ $user->first_name }}"
+                                            class="w-full rounded-md p-3 text-gray-600 hover:border-gray-600 @if ($errors->has('first_name')) border-red-600 @else border-gray-300 @endif ">
+                                        @if ($errors->has('first_name'))
+                                            <p class="text-xs font-light text-red-600">Required</p>
+                                        @endif
+                                    </div>
+                                    <div class="space-y-1">
+                                        <input type="text" name="last_name" id="last_name"
+                                            placeholder="Last name" required value="{{ $user->last_name }}"
+                                            class="w-full rounded-md p-3 text-gray-600 hover:border-gray-600 @if ($errors->has('last_name')) border-red-600 @else border-gray-300 @endif ">
+                                        @if ($errors->has('last_name'))
+                                            <p class="text-xs font-light text-red-600">Required</p>
+                                        @endif
+                                    </div>
+                                </div>
+                                <div class="flex pt-6 space-x-4">
+                                    <div class="space-y-1">
+                                        <input type="text" value="{{ $user->username }}" disabled
+                                            class="w-full rounded-md p-3 text-gray-400 border-gray-300">
+                                    </div>
+                                    <div class="space-y-1">
+                                        <input type="text" name="email" id="email" placeholder="Email"
+                                            required value="{{ $user->email }}"
+                                            class="w-full rounded-md p-3 text-gray-600 hover:border-gray-600 @if ($errors->has('email')) border-red-600 @else border-gray-300 @endif ">
+                                        @if ($errors->has('email'))
+                                            <p class="text-xs font-light text-red-600">Required</p>
+                                        @endif
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="w-full flex justify-end">
+                            <button
+                                class="bg-blue-500 py-1 px-3 rounded-md font-semibold text-white shadow-lg text-lg">
+                                Save
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+            </x-slot>
+
+            <x-slot name="footer" class="justify-center">
+                {{-- <button
+                    onclick="saveSchedule({{ isset($plan) ? $plan : 0 }},'schedule.check',{{ Auth::user()->roles->pluck('id')[0] }});toggleCellBlock()"
+                    class="bg-green-600 font-semibold text-white p-2 w-32 mr-1 rounded-full hover:bg-green-700 focus:outline-none focus:ring shadow-lg hover:shadow-none transition-all duration-300"
+                    @click=" showUserInfo = false ">
+                    Save
+                </button>
+                <button
+                    class="bg-red-600 font-semibold text-white p-2 ml-1 w-32 rounded-full hover:bg-red-700 focus:outline-none focus:ring shadow-lg hover:shadow-none transition-all duration-300"
+                    @click=" showUserInfo = false ">
+                    Cancel
+                </button> --}}
+            </x-slot>
+        </x-modal>
+
+        {{-- <div wire:loading wire:target="clearComment,saveComment,showClass,loadComment">
             @include('components.loading-state')
-        </div>
+        </div> --}}
     </div>
 
     <script type="text/javascript">
