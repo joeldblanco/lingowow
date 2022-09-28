@@ -39,9 +39,10 @@ class PostController extends Controller
         $user_id = auth()->id();
         $request->validate([
             'post_image' => 'file|mimes:jpg,png,webp|max:10000',
+            'post_content' => 'required_if:post_image,No|max:255',
         ]);
 
-        $post_text = $request->post_text;
+        $post_content = $request->post_content;
         $post_image = $request->file('post_image');
         $hashed_user_id = Hash::make($user_id);
         $path_to_file = $post_image == null ? null : $request->file('post_image')->storeAs('public/photos/users/'.$hashed_user_id, time().'.'.$post_image->getClientOriginalExtension());
@@ -49,12 +50,12 @@ class PostController extends Controller
         $post = new Post;
         $post->author_id = $user_id;
         $post->content = json_encode([
-            'text' => $post_text,
+            'text' => $post_content,
             'photo_path' => $path_to_file,
         ]);
         $post->save();
 
-        return redirect()->route('profile.show',$user_id);
+        return back();
     }
 
     /**

@@ -10,24 +10,18 @@ class Comment extends Model
     use HasFactory;
 
     /**
-     * The table associated with the model.
-     *
-     * @var string
-     */
-    protected $table = 'class_comments';
-
-    /**
      * Get the teacher associated with the class.
      */
     public function author()
     {
-        // dd($this->author);
-        return User::find($this->author);
+        return $this->hasOne(User::class, 'id', 'author_id');
     }
 
-    protected $fillable = [
-        'comment',
-        'class_id',
-        'author'
-    ];
+    /**
+     * Get the parent commentable model (post or class).
+     */
+    public function commentable()
+    {
+        return $this->morphTo();
+    }
 }

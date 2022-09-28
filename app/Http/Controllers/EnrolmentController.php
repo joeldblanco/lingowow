@@ -14,7 +14,7 @@ class EnrolmentController extends Controller
      */
     public function index()
     {
-        //
+        return Enrolment::all();
     }
 
     /**

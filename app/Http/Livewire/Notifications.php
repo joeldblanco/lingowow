@@ -47,6 +47,11 @@ class Notifications extends Component
                     $this->notification_data[$key] = "The student " . $user->first_name . " " . $user->last_name . " has been automatically unenroled from the course " . $data_array['course_name'] . ', which leaves your blocks ' . $data_array['schedule_string'] . ' free.';
                     break;
 
+                case 'FriendRequest':
+                    $this->notification_icon[$key] = 'fas fa-user-friends';
+                    $this->notification_data[$key] = $user->first_name . ' ' . $user->last_name . ' has sent you a friend request.';
+                    break;
+
                 default:
                     $this->notification_icon[$key] = "fas fa-bell";
                     $this->notification_data[$key] = "You have a new notification.";

@@ -12,11 +12,19 @@ class Post extends Model
     use SoftDeletes;
 
     /**
-     * Get the comments for the post.
+     * Get all of the post's comments.
      */
     public function comments()
     {
-        return $this->hasMany(PostComment::class);
+        return $this->morphMany(Comment::class, 'commentable');
+    }
+
+    /**
+     * Get all of the post's comments.
+     */
+    public function author()
+    {
+        return User::find($this->author_id);
     }
 
     /**
@@ -24,6 +32,6 @@ class Post extends Model
      */
     public function likes()
     {
-        return $this->hasMany(User::class);
+        return $this->belongsToMany(User::class, 'post_like');
     }
 }
