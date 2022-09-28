@@ -437,8 +437,8 @@
                         <div class="flex flex-col items-center space-y-4 p-4">
                             <div class="w-32 h-32 border-gray-400 bg-white cursor-pointer">
                                 {{-- style="background-image: url('{{ Storage::url($user->profile_photo_path) }}')"> --}}
-                                <img src="{{ Storage::url($user->profile_photo_path) }}"
-                                    class="w-full h-full object-cover" alt="">
+                                <img id="profile_pic_preview" src="{{ Storage::url($user->profile_photo_path) }}"
+                                    class="w-full h-full object-cover rounded-full" alt="">
                             </div>
                             {{-- <p class="text-gray-500 text-xs font-light">Upload/Change Your Profile Image</p> --}}
                             {{-- <button class="bg-blue-400 text-white font-semibold p-2 rounded-md"> --}}
@@ -542,14 +542,14 @@
                             </div>
                             {{-- <p class="text-gray-500 text-xs font-light">Upload/Change Your Profile Image</p> --}}
                             {{-- <button class="bg-blue-400 text-white font-semibold p-2 rounded-md"> --}}
-                            <input type="file" name="new_profile_pic" id="new_profile_pic" class="hidden"
-                                accept=".jpeg,.jpg,.png,.webp" form="update_profile_form">
+                            {{-- <input type="file" name="new_profile_pic" id="new_profile_pic" class="hidden"
+                                accept=".jpeg,.jpg,.png,.webp" form="update_profile_form"> --}}
 
                             {{-- </button> --}}
-                            <label for="new_profile_pic"
+                            {{-- <label for="new_profile_pic"
                                 class="bg-blue-400 text-white font-semibold p-2 rounded-md cursor-pointer">
                                 <p>Upload Avatar</p>
-                            </label>
+                            </label> --}}
                         </div>
                     </div>
                     <form method="POST" action="{{ route('profile.update', $user->id) }}"
@@ -648,6 +648,27 @@
                    the window or to reload the referenced resource. */
             };
         }
+    </script>
+    <script type="text/javascript">
+        $(document).ready(function(e) {
+
+            $('#new_profile_pic').change(function() {
+
+                let reader = new FileReader();
+
+                reader.onload = (e) => {
+
+                    $('#profile_pic_preview').attr('src', e.target.result);
+                }
+
+                reader.readAsDataURL(this.files[0]);
+
+                // $("#profile_pic_preview").toggleClass("hidden");
+                // $("#post_content").attr('required', false);
+
+            });
+
+        });
     </script>
 
 
