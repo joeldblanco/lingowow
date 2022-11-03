@@ -11,7 +11,7 @@
 
                 @foreach ($courses as $course)
                     {{-- <x-course_card id="{{$course->id}}" name="{{$course->course_name}}" image="https://img.pixers.pics/pho_wat(s3:700/FO/60/89/19/91/700_FO60891991_9eb8248aebe7688d0b16c848c91d86e9.jpg,700,467,cms:2018/10/5bd1b6b8d04b8_220x50-watermark.png,over,480,417,jpg)/almohadas-largas-ee-uu-y-el-reino-unido-de-la-bandera.jpg.jpg"/> --}}
-                    <div onclick="location.href='{{route('course.show',$course->id)}}';"
+                    <div onclick="location.href='{{route('courses.show',$course->id)}}';"
                         class="group flex flex-row bg-gray-100 rounded-lg w-full justify-between mb-10 shadow-md hover:shadow-xl cursor-pointer h-40 items-center">
 
                         <div class="w-3/12 m-5">

@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Module;
 use App\Models\Unit;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 
 class UnitController extends Controller
@@ -25,7 +27,8 @@ class UnitController extends Controller
      */
     public function create()
     {
-        //
+        $modules = Module::all();
+        return view('course.module.unit.create', compact('modules'));
     }
 
     /**
@@ -67,7 +70,8 @@ class UnitController extends Controller
      */
     public function edit(Unit $unit)
     {
-        //
+        $modules = Module::all();
+        return view('course.module.unit.edit', compact('modules', 'unit'));
     }
 
     /**
@@ -79,9 +83,8 @@ class UnitController extends Controller
     {
         $unit = Unit::find($unit_id);
         $users = $unit->users;
-        $participants = count($users);
 
-        return view('course.module.unit.details', compact('participants', 'users'));
+        return view('course.module.unit.details', compact('users','unit_id'));
     }
 
     /**
@@ -93,7 +96,16 @@ class UnitController extends Controller
      */
     public function update(Request $request, Unit $unit)
     {
-        //
+        $unit_image = $request->file('unit_image');
+        $path_to_file = $unit_image == null ? null : $request->file('unit_image')->storeAs('public/images/units/covers', $unit->id . '.' . $unit_image->getClientOriginalExtension());
+        $unit->update([
+            "module_id" => $request->module_id,
+            "unit_name" => $request->unit_name,
+            "status" => $request->status,
+            'unit_image' => $path_to_file,
+        ]);
+
+        return redirect()->route('modules.details', $unit->module_id);
     }
 
     /**
@@ -104,6 +116,28 @@ class UnitController extends Controller
      */
     public function destroy(Unit $unit)
     {
-        //
+        $module_id = $unit->module->id;
+        $unit->delete();
+
+        return redirect()->route('modules.details', $module_id);
+    }
+
+    /**
+     * Sort units in module
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function sort(Request $request)
+    {
+        $newUnitsOrder = json_decode($request->data);
+        foreach ($newUnitsOrder as $key => $value) {
+            if ($value != null) {
+                $unit = Unit::find($key);
+                $unit->order = (int)$value;
+                $unit->save();
+            }
+        }
+        return redirect()->route('modules.details', $request->module_id);
     }
 }

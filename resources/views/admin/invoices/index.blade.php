@@ -10,6 +10,7 @@
     @endphp
     <div class="w-4/5 mx-auto">
         <div class="bg-white shadow-md rounded my-6">
+            {{ $invoices->links() }}
             @foreach ($date as $month_year)
                 <div class="text-3xl font-bold w-full p-2 text-center bg-gray-100">
                     <p class="bg-white p-4">{{ $month_year }}</p>
@@ -58,7 +59,7 @@
                     </tbody>
                 </table>
             @endforeach
+            {{ $invoices->links() }}
         </div>
     </div>
-
 </x-app-layout>

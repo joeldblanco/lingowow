@@ -9,25 +9,25 @@
 	    // session(['session_info' => $session_info]);
         // dump(session('session_info'));
         
-        if (isset($_GET['tz']) && session('tz') == null) {
-            // This is just an example. In application this will come from Javascript (via an AJAX or something)
-            $timezone_offset_minutes = $_GET['tz']; // $_GET['timezone_offset_minutes']
+        // if (isset($_GET['tz']) && session('tz') == null) {
+        //     // This is just an example. In application this will come from Javascript (via an AJAX or something)
+        //     $timezone_offset_minutes = $_GET['tz']; // $_GET['timezone_offset_minutes']
         
-            // Convert minutes to seconds
-            $timezone_name = timezone_name_from_abbr('', $timezone_offset_minutes * 60, false);
-            session(['tz' => $timezone_name]);
-        }
+        //     // Convert minutes to seconds
+        //     $timezone_name = timezone_name_from_abbr('', $timezone_offset_minutes * 60, false);
+        //     session(['tz' => $timezone_name]);
+        // }
         
-        function tz()
-        {
-            if (session('tz') == null) {
-                return true;
-            } else {
-                return false;
-            }
+        // function tz()
+        // {
+        //     if (session('tz') == null) {
+        //         return true;
+        //     } else {
+        //         return false;
+        //     }
         
-            // return !isset($_GET['tz']);
-        }
+        //     // return !isset($_GET['tz']);
+        // }
 
 	// session(['tz' => session('session_info')['timezone']['id']]);
 
@@ -76,13 +76,13 @@
     <div class="min-h-screen bg-white flex flex-col">
 
         @if (Auth::user()->isImpersonated())
-            <div class="bg-green-500 text-center py-3">
+            <div class="bg-lw-blue text-center py-3">
                 <p class="text-white font-semibold">Impersonating</p>
                 <a href="{{ route('stopImpersonation') }}" class="text-sm hover:font-bold">Stop Impersonation</a>
             </div>
         @endif
 
-        @livewire('navigation-menu')
+        @livewire('first-navigation-menu')
         @include('second-navigation-menu')
 
         <!-- Page Content -->
@@ -95,14 +95,14 @@
     </div>
 
     @stack('modals')
-    <script>
+    {{-- <script>
         let _tz = JSON.parse("{{ json_encode(tz()) }}");
         if (_tz) {
             var tz = new Date().getTimezoneOffset();
             tz = tz == 0 ? 0 : -tz;
             window.location.href = window.location.href + "?tz=" + tz;
         }
-    </script>
+    </script> --}}
     <script src="https://cdn.jsdelivr.net/gh/livewire/turbolinks@v0.1.x/dist/livewire-turbolinks.js"
         data-turbolinks-eval="false"></script>
     {{-- @include('components.loading-state') --}}

@@ -6,6 +6,7 @@ use App\Http\Controllers\AttemptController;
 use App\Http\Controllers\ChatController;
 use App\Http\Controllers\ClassController;
 use App\Http\Controllers\ClassroomController;
+use App\Http\Controllers\ContentController;
 use App\Http\Controllers\CouponController;
 use App\Http\Controllers\PayPalPaymentController;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
@@ -33,6 +34,7 @@ use Illuminate\Support\Facades\Notification;
 use App\Http\Controllers\MeetingController;
 use App\Models\Enrolment;
 use App\Models\Post;
+use App\Models\Unit;
 
 /*
 |--------------------------------------------------------------------------
@@ -75,14 +77,23 @@ Route::middleware(['web', 'auth', 'verified', 'impersonate'])->group(function ()
     // })->name('pages');
 
     //ROUTES FOR COURSES//
-    Route::get('/courses/{id}', [CourseController::class, "show"])->name('course.show');
-    Route::get('/courses', [CourseController::class, "index"])->name('course.index');
+    Route::resource('courses', CourseController::class);
+    Route::get('courses/{id}/details', function ($id) {
+        $course = App\Models\Course::find($id);
+        return view('course.details', compact('course'));
+    })->name('courses.details');
 
     //ROUTES FOR MODULES//
-    Route::get('/module/{id}', [ModuleController::class, "show"])->name('module.show');
+    Route::resource('modules', ModuleController::class);
+    Route::post('modules/sort', [ModuleController::class, 'sort'])->name('modules.sort');
+    Route::get('modules/{id}/details', function ($id) {
+        $module = App\Models\Module::find($id);
+        return view('course.module.details', compact('module'));
+    })->name('modules.details');
 
-    // //ROUTES FOR UNITS//
-    Route::get('/unit/{id}', [UnitController::class, "show"])->name('unit.show');
+    //ROUTES FOR UNITS//
+    Route::resource('units', UnitController::class);
+    Route::post('units/sort', [UnitController::class, 'sort'])->name('units.sort');
 
     //ROUTES FOR SHOP//
     Route::middleware(['role:guest|student|admin'])->get('/shop', [PayPalPaymentController::class, 'getIndex'])->name('shop');
@@ -149,8 +160,16 @@ Route::middleware(['web', 'auth', 'verified', 'impersonate'])->group(function ()
         Route::post('/admin/exam/question/import', [QuestionController::class, 'import'])->name('question.import');
 
         //ROUTES FOR UNITS//
-        Route::get('/unit/{id}/details', [UnitController::class, "details"])->name('unit.details');
+        Route::get('/units/{id}/details', [UnitController::class, "details"])->name('units.details');
         Route::get('/exam/{id}/details', [ExamController::class, "details"])->name('exam.details');
+        Route::get('units/{unit_id}/unenrol/{user_id}', function ($unit_id, $user_id) {
+            Unit::find($unit_id)->users()->detach($user_id);
+            return redirect()->route('units.details', $unit_id);
+        })->name('units.unenrol');
+
+        //ROUTES FOR CONTENTS//
+        Route::resource('/contents', ContentController::class);
+        Route::post('contents/sort', [ContentController::class, 'sort'])->name('contents.sort');
 
         //ROUTES FOR CLASSES//
         Route::get('/admin/classes', [ClassController::class, 'index'])->name('admin.classes.index');
@@ -171,7 +190,7 @@ Route::middleware(['web', 'auth', 'verified', 'impersonate'])->group(function ()
         Route::resource('/meetings', MeetingController::class);
 
         //ROUTES FOR ENROLMENTS//
-        Route::resource('photos', EnrolmentController::class);
+        Route::resource('enrolments', EnrolmentController::class);
 
         //USER RESET//
         Route::get('/reset/{users}', function (User ...$users) {

@@ -15,7 +15,7 @@ module.exports = {
             },
             colors: {
                 lw: {
-                    blue: '#575ff2',
+                    blue: '#3246ba',
                     light_blue: '#229dff',
                     lighter_blue: '#02e2ff',
                     lightest_blue: '#01ffe9',

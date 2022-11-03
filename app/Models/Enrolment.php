@@ -24,7 +24,23 @@ class Enrolment extends Model
      */
     public function course()
     {
-        return $this->belongsTo(Course::class,'course_id');
+        return $this->belongsTo(Course::class, 'course_id');
+    }
+
+    /**
+     * Get the course associated with the enrolment.
+     */
+    public function teacher()
+    {
+        return $this->belongsTo(User::class, 'teacher_id');
+    }
+
+    /**
+     * Get the course associated with the enrolment.
+     */
+    public function student()
+    {
+        return $this->belongsTo(User::class, 'student_id');
     }
 
     /**
@@ -32,5 +48,5 @@ class Enrolment extends Model
      *
      * @var array
      */
-    protected $fillable = ['student_id','teacher_id','course_id','deleted_at'];
+    protected $fillable = ['student_id', 'teacher_id', 'course_id', 'deleted_at'];
 }
