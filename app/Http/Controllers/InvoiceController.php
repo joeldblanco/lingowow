@@ -14,14 +14,14 @@ class InvoiceController extends Controller
      */
     public function index()
     {
-        $invoices = Invoice::all()->where('user_id',auth()->id())->reverse();
+        $invoices = Invoice::where('user_id',auth()->id())->latest()->paginate(20);
 
         return view('components.invoices-component',compact('invoices'));
     }
 
     public function adminIndex()
     {
-        $invoices = Invoice::all()->reverse();
+        $invoices = Invoice::latest()->paginate(20);
 
         return view('admin.invoices.index',compact('invoices'));
     }

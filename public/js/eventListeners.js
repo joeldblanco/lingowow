@@ -17,11 +17,6 @@ Echo.private('App.Models.User.' + window.user_id)
             unread_conversation.style.display = "inline-flex";
         }
 
-    });
-
-Echo.private('App.Models.User.' + window.user_id)
-    .notification((notification) => {
-
         if ((notification.type == "App\\Notifications\\BookedClass") || (notification.type == "App\\Notifications\\ClassRescheduledToTeacher") || (notification.type == "App\\Notifications\\ClassRescheduledToStudent") || (notification.type == "App\\Notifications\\StudentUnrolment") || (notification.type == "App\\Notifications\\StudentUnrolmentToTeacher") || (notification.type == "App\\Notifications\\FriendRequest")) {
             // console.log(notification);
             unread_notifications = document.getElementById('unread_notifications');

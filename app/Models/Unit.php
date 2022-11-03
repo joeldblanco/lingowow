@@ -11,6 +11,13 @@ class Unit extends Model
     use HasFactory;
     use SoftDeletes;
 
+    protected $fillable = [
+        'module_id',
+        'unit_name',
+        'status',
+        'unit_image',
+    ];
+
     /**
      * Get the module that owns the unit.
      */
@@ -24,13 +31,21 @@ class Unit extends Model
      */
     public function group()
     {
-        return $this->belongsTo(Group_unit::class,"group_id");
+        return $this->belongsTo(Group_unit::class, "group_id");
     }
 
-    // public function exams()
-    // {
-    //     return $this->hasMany(Exam::class);
-    // }
+    /**
+     * Get the module that owns the unit.
+     */
+    public function module()
+    {
+        return $this->belongsTo(Module::class);
+    }
+
+    public function exams()
+    {
+        return $this->hasMany(Exam::class);
+    }
 
     /**
      * The users that belong to the unit.
@@ -46,6 +61,14 @@ class Unit extends Model
     public function activities()
     {
         return $this->hasMany(Activity::class);
+    }
+
+    /**
+     * Get all unit contents.
+     */
+    public function contents()
+    {
+        return $this->hasMany(Content::class);
     }
 }
 //

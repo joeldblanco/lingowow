@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Course;
 use App\Models\Module;
 use App\Models\User;
 use App\Models\Group_unit;
@@ -16,7 +17,8 @@ class ModuleController extends Controller
      */
     public function index()
     {
-        //
+        // $courses = Course::all();
+        // return view('course.module.index', compact('courses'));
     }
 
     /**
@@ -26,7 +28,8 @@ class ModuleController extends Controller
      */
     public function create()
     {
-        //
+        $courses = Course::all();
+        return view('course.module.create', compact('courses'));
     }
 
     /**
@@ -37,7 +40,16 @@ class ModuleController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $order = Module::where('course_id',$request->course_id)->latest()->first()->order + 1;
+        $module = Module::create([
+            "course_id" => $request->course_id,
+            "module_name" => $request->module_name,
+            "module_description" => $request->module_description,
+            "status" => $request->status,
+            "order" => $order
+        ]);
+
+        return redirect()->route('courses.show', $module->course_id);
     }
 
     /**
@@ -46,12 +58,11 @@ class ModuleController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show(Module $module)
     {
         $user = User::find(auth()->id());
         $role = $user->roles->first()->name;
-        $module = Module::find($id);
-        $units_module  = $module->groups;
+        $units_module  = $module->units;
         //dd($units_module);
 
         // $units_module = [];
@@ -94,6 +105,7 @@ class ModuleController extends Controller
         // dd($units[0]->exams);
         // dd($units_module, $user_units, $units);
         // dd($user->id);
+        // dd($user_units);
         return view('course.module.show', compact('user', 'role', 'units', 'user_units'));
     }
 
@@ -105,7 +117,8 @@ class ModuleController extends Controller
      */
     public function edit(Module $module)
     {
-        //
+        $courses = Course::all();
+        return view('course.module.edit', compact('courses','module'));
     }
 
     /**
@@ -117,7 +130,17 @@ class ModuleController extends Controller
      */
     public function update(Request $request, Module $module)
     {
-        //
+        $module_image = $request->file('module_image');
+        $path_to_file = $module_image == null ? null : $request->file('module_image')->storeAs('public/images/modules/covers', $module->id.'.'.$module_image->getClientOriginalExtension());
+        $module->update([
+            "course_id" => $request->course_id,
+            "module_name" => $request->module_name,
+            "module_description" => $request->module_description,
+            "status" => $request->status,
+            'module_image' => $path_to_file,
+        ]);
+
+        return redirect()->route('courses.details', $module->course_id);
     }
 
     /**
@@ -128,7 +151,29 @@ class ModuleController extends Controller
      */
     public function destroy(Module $module)
     {
-        //
+        $course_id = $module->course->id;
+        $module->delete();
+
+        return redirect()->route('courses.details', $course_id);
+    }
+
+    /**
+     * Sort modules in course
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function sort(Request $request)
+    {
+        $newModulesOrder = json_decode($request->data);
+        foreach ($newModulesOrder as $key => $value) {
+            if ($value != null){
+                $module = Module::find($key);
+                $module->order = (int)$value;
+                $module->save();
+            }
+        }
+        return redirect()->route('courses.details', $request->course_id);
     }
 
     static function is_passed($nota, $id)

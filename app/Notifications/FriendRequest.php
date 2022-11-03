@@ -49,8 +49,8 @@ class FriendRequest extends Notification
         return (new MailMessage)
             ->subject($this->sender->first_name . ' ' . $this->sender->last_name . ' sent you a friend request!')
             ->line(new HtmlString('<strong>'.$this->sender->first_name . ' ' . $this->sender->last_name . '</strong> sent you a friend request!'))
-            ->line('Click the button below to purchase another package and continue enjoying our services.')
-            ->action('Profile', url('/profile/'.$this->receiver->id))
+            ->line('Click the button below to see their profile.')
+            ->action('Profile', url('/profile/'.$this->sender->id))
             ->line('If you have any questions, please contact us through the regular channels.');
     }
 

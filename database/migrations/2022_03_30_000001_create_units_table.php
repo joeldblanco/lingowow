@@ -16,6 +16,7 @@ return new class extends Migration
         Schema::create('units', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->string('unit_name',40);
+            $table->string('unit_image',200)->default('images/image_preview.png');
             $table->string('slide_url',255);
             $table->string('doc_url',255);
             $table->string('audio_url',255);

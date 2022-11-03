@@ -6,6 +6,7 @@ use App\Models\Course;
 use App\Models\Module;
 use App\Models\User;
 use App\Models\Group_unit;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
 
 class CourseController extends Controller
@@ -97,42 +98,21 @@ class CourseController extends Controller
         $user = User::find(auth()->id());
         $role = $user->roles->first()->name;
         $course = Course::find($id);
-
-        $modules = $course->modules->where('status', 1); //
-        $module_priority = [];
-
-        $group_first = Group_unit::where('priority', 'FIRST')->first();
-        $module_first = $group_first->module;
-        // dd($module_first->id);
-        $module_priority = (new CourseController)->module_priority($modules, $module_priority, $module_first->id);
-
-        // dd($module_priority);
-        $module_first = collect([$module_first]);
-
-
-
-        if ($role == "admin") {
-            $user_modules = $course->modules;
-        } else if ($role == "guest") {
-            // $user_modules = [];
-        } else {
-            /*VERSION ANTERIOR*/
+        $modules = $course->modules->where('status', 1)->sortBy('order');
+        $user_modules = $course->modules->sortBy('order');
+        if ($role == "guest") {
             $user_modules = [];
-            $user->units->each(function ($unit, $key) use (&$user_modules) {
-                $user_modules[] = $unit->group->module;
-            });
-            $user_modules = array_unique($user_modules);
-            // dd($user_modules);
-            /*VERSION NUEVA*/
+        } else if ($role == "student") {
+            $user_modules = new Collection();
+            foreach ($modules as $module) {
+                if ($module->id <= $user->units->first()->module->id) {   //TO DO: use $module->order instead of $module->id *URGENT*
+                    $user_modules->push($module);
+                }
+            }
+            $user_modules = $user_modules->unique();
         }
 
-        // dd($modules, $user_modules, $modules->intersect($user_modules));
-
-        // $modules = $modules->diff($module_first);
-        $modules = $module_priority;
-
-        // dd($group_first,$module_first,$modules);
-        return view('course.show', compact('user', 'role', 'module_first', 'modules'));
+        return view('course.show', compact('user_modules', 'modules'));
     }
 
     /**

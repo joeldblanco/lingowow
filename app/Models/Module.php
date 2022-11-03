@@ -9,6 +9,15 @@ class Module extends Model
 {
     use HasFactory;
 
+    protected $fillable = [
+        'module_name',
+        'module_description',
+        'course_id',
+        'order',
+        'status',
+        'module_image'
+    ];
+
     /**
      * Get the course that owns the module.
      */
@@ -20,10 +29,10 @@ class Module extends Model
     /**
      * Get the units for the module.
      */
-    // public function units()
-    // {
-    //     return $this->hasMany(Unit::class);
-    // }
+    public function units()
+    {
+        return $this->hasMany(Unit::class);
+    }
 
     /**
      * Get the units for the module by groups.
@@ -33,4 +42,3 @@ class Module extends Model
         return $this->hasMany(Group_unit::class);
     }
 }
-//

@@ -83,12 +83,12 @@
                 <div class="mt-10">
                     @role('student')
                         <a href="{{ route('classroom', auth()->id()) }}"
-                            class="inline-block bg-blue-800 text-white px-6 py-4 rounded hover:bg-blue-900 hover:text-white hover:no-underline">Classroom</a>
+                            class="inline-block bg-lw-blue text-white px-6 py-4 rounded hover:bg-blue-900 hover:text-white hover:no-underline">Classroom</a>
                     @endrole
 
                     @hasanyrole('student|teacher')
                         <a href="{{ route('classes.index') }}"
-                            class="inline-block bg-blue-500 text-white px-6 py-4 rounded hover:bg-blue-600 hover:text-white hover:no-underline">Classes</a>
+                            class="inline-block bg-lw-light_blue text-white px-6 py-4 rounded hover:bg-lw-light_blue hover:text-white hover:no-underline">Classes</a>
                     @endhasanyrole
                 </div>
 
