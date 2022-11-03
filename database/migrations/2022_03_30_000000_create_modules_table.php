@@ -16,7 +16,7 @@ return new class extends Migration
         Schema::create('modules', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->string('module_name',40);
-            $table->string('module_description',200);
+            $table->text('module_description');
             $table->string('module_image',200)->default('images/image_preview.png');
             $table->string('priority',10);
             $table->tinyInteger('status');
