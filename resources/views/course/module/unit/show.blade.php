@@ -49,7 +49,7 @@
 
                                             @if ($unit_content->type == 'embeddable')
                                                 <div class="flex justify-center">
-                                                    <iframe src="{{ $unit->slide_url }}" allowfullscreen="true"
+                                                    <iframe src="{{ $unit_content->embeddable }}" allowfullscreen="true"
                                                         mozallowfullscreen="true" webkitallowfullscreen="true"
                                                         width="960" height="540" frameborder="0"></iframe>
                                                 </div>
