@@ -49,9 +49,9 @@
 
                                             @if ($unit_content->type == 'embeddable')
                                                 <div class="flex justify-center">
-                                                    <iframe src="{{ $unit_content->embeddable }}" allowfullscreen="true"
-                                                        mozallowfullscreen="true" webkitallowfullscreen="true"
-                                                        width="960" height="540" frameborder="0"></iframe>
+                                                    @php
+                                                        echo $unit_content->embeddable;
+                                                    @endphp
                                                 </div>
                                             @endif
 
@@ -91,8 +91,8 @@
                                         </div>
                                         @role('admin')
                                             <div class="flex space-x-4">
-                                                <button @click="trash = false, deleteConfirmation = true" title="Delete" x-show="trash"><i
-                                                        class="fas fa-trash m-1"></i></button>
+                                                <button @click="trash = false, deleteConfirmation = true" title="Delete"
+                                                    x-show="trash"><i class="fas fa-trash m-1"></i></button>
                                                 <form action="{{ route('contents.destroy', $content->id) }}"
                                                     x-show="deleteConfirmation" method="POST">
                                                     @csrf
