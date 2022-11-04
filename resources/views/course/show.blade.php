@@ -11,7 +11,7 @@
                     @endrole
                 </div>
                 <hr class="mb-10">
-                @foreach ($modules as $module)
+                @forelse ($modules as $module)
                     <div class="flex items-center mb-10">
                         <div @if ($user_modules->contains($module)) onclick="location.href='{{ route('modules.show', $module->id) }}';" @endif
                             class="group flex flex-row bg-gray-100 rounded-lg w-full justify-between items-center @if (!$user_modules->contains($module)) shadow-inner opacity-50 filter saturate-0 @else shadow-md hover:shadow-xl cursor-pointer @endif">
@@ -39,7 +39,11 @@
                             </div>
                         @endrole
                     </div>
-                @endforeach
+                @empty
+                    <div class="flex justify-center items-center">
+                        <h1 class="text-2xl text-gray-500">No modules found</h1>
+                    </div>
+                @endforelse
 
             </div>
         </div>

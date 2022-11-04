@@ -62,13 +62,13 @@ class ModuleController extends Controller
     {
         $user = User::find(auth()->id());
         $role = $user->roles->first()->name;
-        $units_module  = $module->units;
-        //dd($units_module);
+        $module_units  = $module->units;
+        //dd($module_units);
 
-        // $units_module = [];
-        // $module->groups->each(function($group, $key) use (&$units_module){
-        //     $group->units->each(function($unit, $key2) use (&$units_module){
-        //         array_push($units_module,$unit);
+        // $module_units = [];
+        // $module->groups->each(function($group, $key) use (&$module_units){
+        //     $group->units->each(function($unit, $key2) use (&$module_units){
+        //         array_push($module_units,$unit);
         //     });
         // });
 
@@ -86,27 +86,27 @@ class ModuleController extends Controller
 
         if ($role == "admin") {
             // $user_units = $module->units;
-            $user_units = $units_module;
+            $user_units = $module_units;
         } else {
-            $user_units = $units_module;
-            // $user_units = $user->units->where('status', 1);
+            $user_units = $module_units;
+            $user_units = $user->units->where('status', 1);
             // $user_units = $user_units->diff($user_units->diff($module->units->where('status', 1)));
 
             // $user_units = $user->units->intersect($units)->sort();
         }
 
         // $units = $units->diff($user_units);
-        // dd($units_module->first()->isPassed);
-        // foreach ($units_module->first()->isPassed($user->id) as $key => $value) {
-        // dd($units_module->first()->isPassed($user->id)->first()->pivot->nota);
+        // dd($module_units->first()->isPassed);
+        // foreach ($module_units->first()->isPassed($user->id) as $key => $value) {
+        // dd($module_units->first()->isPassed($user->id)->first()->pivot->nota);
         // }
-        // $units = array_diff($units_module,$user_units);
-        $units = [];
+        // $units = array_diff($module_units,$user_units);
+        // $units = $module_units;
         // dd($units[0]->exams);
-        // dd($units_module, $user_units, $units);
+        // dd($module_units, $user_units, $units);
         // dd($user->id);
         // dd($user_units);
-        return view('course.module.show', compact('user', 'role', 'units', 'user_units'));
+        return view('course.module.show', compact('user', 'role', 'module_units', 'user_units'));
     }
 
     /**

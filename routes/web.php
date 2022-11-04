@@ -146,10 +146,10 @@ Route::middleware(['web', 'auth', 'verified', 'impersonate'])->group(function ()
         })->name('mail.test');
 
         //ROUTES FOR EXAMS//
-        Route::get('/admin/exam', [ExamController::class, 'index'])->name('exam.index');
-        Route::get('/admin/exam/store', [ExamController::class, 'store'])->name('exam.store');
-        Route::get('/admin/exam/show/{id}', [ExamController::class, 'show'])->name('exam.show');
-        Route::post('/admin/exam/edit/{id}', [ExamController::class, 'edit'])->name('exam.edit');
+        Route::resource('/admin/exam', ExamController::class);
+        // Route::get('/admin/exam/store', [ExamController::class, 'store'])->name('exam.store');
+        // Route::get('/admin/exam/show/{id}', [ExamController::class, 'show'])->name('exam.show');
+        // Route::post('/admin/exam/edit/{id}', [ExamController::class, 'edit'])->name('exam.edit');
 
         //ROUTES FOR QUESTIONS//
         Route::post('/admin/exam/{id}/question/store', [QuestionController::class, 'store'])->name('question.store');
