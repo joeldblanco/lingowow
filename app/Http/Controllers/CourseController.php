@@ -95,9 +95,9 @@ class CourseController extends Controller
      */
     public function show($id)
     {
+        $course = Course::findOrFail($id);
         $user = User::find(auth()->id());
         $role = $user->roles->first()->name;
-        $course = Course::find($id);
         $modules = $course->modules->where('status', 1)->sortBy('order');
         $user_modules = $course->modules->sortBy('order');
         if ($role == "guest") {

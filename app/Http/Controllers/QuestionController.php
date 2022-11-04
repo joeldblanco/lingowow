@@ -23,9 +23,10 @@ class QuestionController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
+    public function create(Request $request)
     {
-        //
+        $method = $request->method();
+        return view('admin.exams.questions.create', compact('method'));
     }
 
     /**

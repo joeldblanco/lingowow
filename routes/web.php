@@ -152,12 +152,13 @@ Route::middleware(['web', 'auth', 'verified', 'impersonate'])->group(function ()
         // Route::post('/admin/exam/edit/{id}', [ExamController::class, 'edit'])->name('exam.edit');
 
         //ROUTES FOR QUESTIONS//
-        Route::post('/admin/exam/{id}/question/store', [QuestionController::class, 'store'])->name('question.store');
-        Route::get('/admin/exam/{exam_id}/question/show/{question_id}', [QuestionController::class, 'show'])->name('question.show');
-        Route::get('/admin/exam/{exam_id}/question/edit/{question_id}', [QuestionController::class, 'edit'])->name('question.edit');
-        Route::get('/admin/exam/{exam_id}/question/delete/{question_id}', [QuestionController::class, 'destroy'])->name('question.destroy');
-        Route::post('/admin/exam/{exam_id}/question/update/{question_id}', [QuestionController::class, 'update'])->name('question.update');
-        Route::post('/admin/exam/question/import', [QuestionController::class, 'import'])->name('question.import');
+        // Route::post('/exam/{id}/question/store', [QuestionController::class, 'store'])->name('question.store');
+        // Route::get('/exam/{exam_id}/question/show/{question_id}', [QuestionController::class, 'show'])->name('question.show');
+        // Route::get('/exam/{exam_id}/question/edit/{question_id}', [QuestionController::class, 'edit'])->name('question.edit');
+        // Route::get('/exam/{exam_id}/question/delete/{question_id}', [QuestionController::class, 'destroy'])->name('question.destroy');
+        // Route::post('/exam/{exam_id}/question/update/{question_id}', [QuestionController::class, 'update'])->name('question.update');
+        Route::resource('/questions', QuestionController::class);
+        Route::post('/questions/import', [QuestionController::class, 'import'])->name('questions.import');
 
         //ROUTES FOR UNITS//
         Route::get('/units/{id}/details', [UnitController::class, "details"])->name('units.details');

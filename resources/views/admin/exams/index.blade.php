@@ -2,7 +2,7 @@
     <div class="bg-white font-sans">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="p-6 sm:px-20 bg-white border-b border-gray-200">
-                <a href="{{ route('exam.store') }}"
+                <a href="{{ route('exam.create') }}"
                     class="p-2 m-2 block border w-20 text-center rounded-md bg-gray-200 font-semibold hover:bg-gray-500 hover:text-white">
                     New
                 </a>
