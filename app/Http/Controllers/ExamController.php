@@ -29,15 +29,7 @@ class ExamController extends Controller
      */
     public function create()
     {
-        $last_exam = Exam::latest()->first();
-
-        if ($last_exam == null) {
-            $last_exam = 1;
-        } else {
-            $last_exam = $last_exam->id + 1;
-        }
-
-        return view('admin.exams.create', compact('last_exam'));
+        return view('admin.exams.create');
     }
 
     /**
@@ -139,7 +131,7 @@ class ExamController extends Controller
         if ($exam != null) {
             $attempts = $exam->attempts->sortDesc();
             return view('exams.details', compact('attempts'));
-        }else{
+        } else {
             abort(404);
         }
     }
@@ -151,7 +143,6 @@ class ExamController extends Controller
      */
     public static function manually_correct($attempt_id, $question_id)
     {
-        
     }
 
     /**

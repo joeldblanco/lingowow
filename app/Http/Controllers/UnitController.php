@@ -54,9 +54,9 @@ class UnitController extends Controller
         $role = $user->roles->first()->name;
 
         if ($role == "admin") {
-            $unit = Unit::find($id);
+            $unit = Unit::findOrFail($id);
         } else {
-            $unit = Unit::find($id)->where('status', 1)->first();
+            $unit = Unit::findOrFail($id)->where('status', 1)->first();
         }
 
         return view('course.module.unit.show', compact('unit'));
