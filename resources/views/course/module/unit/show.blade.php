@@ -1,5 +1,5 @@
 <x-app-layout>
-    <div class="bg-gray-50 font-sans" x-data="{ showTypes: false, trash: true, deleteConfirmation: false }" x-cloak>
+    <div class="bg-gray-50 font-sans" x-data="{ showTypes: false }" x-cloak>
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="p-6 sm:px-20 bg-gray-50 border-b border-gray-200">
 
@@ -36,7 +36,7 @@
                         <tbody>
                             @foreach ($unit->contents->sortBy('order') as $content)
                                 <tr class="w-full flex justify-around my-10 shadow-2xl p-4 rounded-lg bg-white content"
-                                    id="{{ $content->id }}-{{ $content->order }}">
+                                    x-data="{ trash: true, deleteConfirmation: false }" x-cloak id="{{ $content->id }}-{{ $content->order }}">
                                     <td class="flex w-full justify-around items-center">
                                         <div class="w-10/12">
                                             @php
@@ -91,6 +91,7 @@
                                         </div>
                                         @role('admin')
                                             <div class="flex space-x-4">
+                                                <a href="{{route('contents.edit', $content->id)}}" title="Edit"><i class="fas fa-pen m-1"></i></a>
                                                 <button @click="trash = false, deleteConfirmation = true" title="Delete"
                                                     x-show="trash"><i class="fas fa-trash m-1"></i></button>
                                                 <form action="{{ route('contents.destroy', $content->id) }}"

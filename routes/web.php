@@ -18,6 +18,7 @@ use App\Invoice;
 use App\Http\Controllers\CourseController;
 use App\Http\Controllers\EnrolmentController;
 use App\Http\Controllers\ExamController;
+use App\Http\Controllers\GradingController;
 use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\ModuleController;
 use App\Http\Controllers\NotificationsController;
@@ -32,6 +33,7 @@ use App\Notifications\BookedClass;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Notification;
 use App\Http\Controllers\MeetingController;
+use App\Models\Attempt;
 use App\Models\Enrolment;
 use App\Models\Post;
 use App\Models\Unit;
@@ -50,8 +52,6 @@ use App\Models\Unit;
 Route::get('/', function () {
     return redirect()->route('login');
 });
-
-
 
 Route::middleware(['web', 'auth', 'verified', 'impersonate'])->group(function () {
 
@@ -120,6 +120,8 @@ Route::middleware(['web', 'auth', 'verified', 'impersonate'])->group(function ()
 
     //ROUTES FOR ADMINISTRATION//
     Route::middleware(['role:admin'])->group(function () {
+
+        Route::resource('/gradings', GradingController::class);
 
         //DASHBOARD//
         Route::get('/admin/dashboard', [AnalyticsController::class, 'index'])->name('admin.dashboard');

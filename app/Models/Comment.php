@@ -9,6 +9,12 @@ class Comment extends Model
 {
     use HasFactory;
 
+    protected $fillable = [
+        'commentable_id',
+        'content',
+        'author_id',
+    ];
+
     /**
      * Get the teacher associated with the class.
      */

@@ -18,7 +18,7 @@
                                     <option value="" selected disabled hidden>Select a module</option>
                                     @foreach ($modules->sortBy('order') as $module)
                                         <option value="{{ $module->id }}">
-                                            {{ $module->module_name }}
+                                            {{ $module->name }}
                                         </option>
                                     @endforeach
                                 </select>
@@ -29,10 +29,10 @@
                             </div>
                             <div class="py-4 space-y-1">
                                 <p class="font-bold text-gray-600 mb-1">Name</p>
-                                <input type="text" name="unit_name" id="unit_name"
+                                <input type="text" name="name" id="name"
                                     placeholder="Enter unit name" required
-                                    class="w-full rounded-md p-3 text-gray-600 hover:border-gray-600 @if ($errors->has('unit_name')) border-red-600 @else border-gray-300 @endif ">
-                                @if ($errors->has('unit_name'))
+                                    class="w-full rounded-md p-3 text-gray-600 hover:border-gray-600 @if ($errors->has('name')) border-red-600 @else border-gray-300 @endif ">
+                                @if ($errors->has('name'))
                                     <p class="text-xs font-light text-red-600">Required</p>
                                 @endif
                                 <p class="text-gray-500 text-sm font-light">Please enter unit name</p>

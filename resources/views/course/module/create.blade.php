@@ -18,7 +18,7 @@
                                     <option value="" selected disabled hidden>Select a course</option>
                                     @foreach ($courses as $course)
                                         <option value="{{ $course->id }}">
-                                            {{ $course->course_name }}
+                                            {{ $course->name }}
                                         </option>
                                     @endforeach
                                 </select>
@@ -29,20 +29,20 @@
                             </div>
                             <div class="py-4 space-y-1">
                                 <p class="font-bold text-gray-600 mb-1">Name</p>
-                                <input type="text" name="module_name" id="module_name"
+                                <input type="text" name="name" id="name"
                                     placeholder="Enter module name" required
-                                    class="w-full rounded-md p-3 text-gray-600 hover:border-gray-600 @if ($errors->has('module_name')) border-red-600 @else border-gray-300 @endif ">
-                                @if ($errors->has('module_name'))
+                                    class="w-full rounded-md p-3 text-gray-600 hover:border-gray-600 @if ($errors->has('name')) border-red-600 @else border-gray-300 @endif ">
+                                @if ($errors->has('name'))
                                     <p class="text-xs font-light text-red-600">Required</p>
                                 @endif
                                 <p class="text-gray-500 text-sm font-light">Please enter module name</p>
                             </div>
                             <div class="py-4 pt-3 space-y-1">
                                 <p class="font-bold text-gray-600 mb-1">Description</p>
-                                <textarea name="module_description" id="module_description" placeholder="Enter module description" required
+                                <textarea name="description" id="description" placeholder="Enter module description" required
                                     rows="4"
-                                    class="resize-none w-full rounded-md p-3 text-gray-600 hover:border-gray-600 @if ($errors->has('module_description')) border-red-600 @else border-gray-300 @endif"></textarea>
-                                @if ($errors->has('module_description'))
+                                    class="resize-none w-full rounded-md p-3 text-gray-600 hover:border-gray-600 @if ($errors->has('description')) border-red-600 @else border-gray-300 @endif"></textarea>
+                                @if ($errors->has('description'))
                                     <p class="text-xs font-light text-red-600">Required</p>
                                 @endif
                                 <p class="text-gray-500 text-sm font-light">Please enter module description</p>

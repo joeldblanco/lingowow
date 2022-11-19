@@ -73,7 +73,7 @@ class CourseController extends Controller
      */
     public function create()
     {
-        //
+        return view('course.create');
     }
 
     /**
@@ -84,7 +84,21 @@ class CourseController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        dd($request);
+        $request->validate([
+            'name' => 'required',
+            'description' => 'required',
+            'image' => 'required|image|mimes:jpeg,png,jpg|max:2048',
+            'modality' => 'required|in:synchronous,asynchronous',
+            'category' => 'required|in:spanish,english',
+        ]);
+
+        $course = new Course();
+        $course->name = $request->name;
+        $course->description = $request->description;
+        $course->modality = $request->modality;
+        $course->category = $request->category;
+        $course->image = $request->image;
     }
 
     /**

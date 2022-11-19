@@ -156,7 +156,7 @@
                             $current_class_teacher = $current_class->teacher();
                             $current_class_student = $current_class->student();
                         @endphp
-                        <p><span class="font-bold">Course:</span> {{$enrolment->course->course_name}}</p>
+                        <p><span class="font-bold">Course:</span> {{$enrolment->course->name}}</p>
                         <p><span class="font-bold">Teacher:</span> {{$current_class_teacher->first_name}} {{$current_class_teacher->last_name}}</p>
                         <p><span class="font-bold">Student:</span> {{$current_class_student->first_name}} {{$current_class_student->last_name}}</p>
                         <p><span class="font-bold">Class Date:</span> {{$current_class->start_date}}</p>
@@ -182,13 +182,12 @@
                 </footer>
                 <div>
                     @foreach ($comments as $comment)
-                        {{-- {{dd($comment->author()->profile_photo_path)}} --}}
                         <div class="flex space-x-3 p-4">
-                            <img class="rounded-full w-10 h-10" src="{{Storage::url($comment->author()->profile_photo_path)}}" alt="profile_picture">
+                            <img class="rounded-full w-10 h-10" src="{{Storage::url($comment->author->profile_photo_path)}}" alt="profile_picture">
                             <div class="flex flex-col items-start w-full">
-                                <p class="font-bold text-sm mb-2">{{$comment->author()->first_name}} {{$comment->author()->last_name}}</p>
+                                <p class="font-bold text-sm mb-2">{{$comment->author->first_name}} {{$comment->author->last_name}}</p>
                                 <div class="border rounded-md px-3 py-2 w-full bg-gray-200">
-                                    <p>{{$comment->comment}}</p>
+                                    <p>{{$comment->content}}</p>
                                     <p class="text-xs mt-2 w-full text-right">{{$comment->updated_at}}</p>
                                 </div>
                             </div>
@@ -252,11 +251,11 @@
                 <div>
                     @foreach ($comments as $comment)
                         <div class="flex space-x-3 p-4">
-                            <img class="rounded-full w-10 h-10" src="{{Storage::url($comment->author()->profile_photo_path)}}" alt="profile_picture">
+                            <img class="rounded-full w-10 h-10" src="{{Storage::url($comment->author->profile_photo_path)}}" alt="profile_picture">
                             <div class="flex flex-col items-start w-full">
-                                <p class="font-bold text-sm mb-2">{{$comment->author()->first_name}} {{$comment->author()->last_name}}</p>
+                                <p class="font-bold text-sm mb-2">{{$comment->author->first_name}} {{$comment->author->last_name}}</p>
                                 <div class="border rounded-md px-3 py-2 w-full bg-gray-200">
-                                    <p>{{$comment->comment}}</p>
+                                    <p>{{$comment->content}}</p>
                                     <p class="text-xs mt-2 w-full text-right">{{$comment->updated_at}}</p>
                                 </div>
                             </div>

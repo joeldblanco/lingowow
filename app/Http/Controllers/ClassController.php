@@ -20,29 +20,21 @@ class ClassController extends Controller
      */
     public function index()
     {
-        // dd("hola");
-        // $posts = auth()->user()->posts()->orderBy('updated_at', 'DESC');
-
-        // $posts = auth()->user()->posts->sortByDesc('updated_at');
-
         $teachers = [];
         $students = [];
 
         if (auth()->user()->roles[0]->name == "teacher") {
             $classes = User::find(auth()->id())->teacherClasses()->orderBy('start_date', 'ASC')->get();
-            // dd($classes);
             foreach ($classes as $key => $value) {
 
                 $students[$key] = $value->student();
 
                 if ($value->enrolment_id == 2) {
-                    // dd($students);
                 }
             }
         } else if (auth()->user()->roles[0]->name == "student") {
 
             $classes = User::find(auth()->id())->studentClasses;
-            // dd($classes);
             foreach ($classes as $key => $value) {
                 $teachers[$key] = $value->teacher();
             }
@@ -110,7 +102,7 @@ class ClassController extends Controller
         // dd($class_date);
 
         $teacher_schedule = Schedule::where('user_id', $teacher_id)->select('selected_schedule')->get()->toArray();
-        
+
         foreach ($teacher_schedule as $key => $value) {
             // dd($value["selected_schedule"]);
             // $teacher_schedule[$key] = json_decode($value["selected_schedule"], 1);
@@ -136,19 +128,19 @@ class ClassController extends Controller
         // $students_schedules = array_merge(...$students_schedules);
 
         $user = auth()->user()->id;
-        $scheduled_classes =[];
+        $scheduled_classes = [];
         $students = [];
         $students_schedules = [];
         $scheduled_classes = Enrolment::select('student_id')
             ->where('teacher_id', $teacher_id)
-            ->where('student_id','!=',$user)
+            ->where('student_id', '!=', $user)
             ->get();
-            
+
         foreach ($scheduled_classes as $key => $value) {
             $students[$key] = $value->student_id;
         }
         $students = User::find($students);
-        
+
         foreach ($students as $key => $value) {
             $students[$key][1] = Schedule::select('selected_schedule')
                 ->where('user_id', $value->id)
@@ -157,7 +149,7 @@ class ClassController extends Controller
             // dd($students[$key][1][0]->selected_schedule);
             $students[$key][1] = $students[$key][1][0]->selected_schedule;
         }
-        
+
         foreach ($students as $student) {
             $students_schedules[] = $student[1];
         }
@@ -243,7 +235,7 @@ class ClassController extends Controller
                 'comment' => $message,
                 'author' => $admin
             ]);
-        }else{
+        } else {
             switch ($request->error) {
                 case "not_enough_days":
                     $error_message .= ". Make sure to select the rescheduled date.";
@@ -285,7 +277,7 @@ class ClassController extends Controller
         // {
         //     return $recordings["message"];
         // }else{
-    
+
         // }
     }
 }

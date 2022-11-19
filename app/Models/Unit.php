@@ -13,9 +13,9 @@ class Unit extends Model
 
     protected $fillable = [
         'module_id',
-        'unit_name',
+        'name',
         'status',
-        'unit_image',
+        'image',
     ];
 
     /**
@@ -42,6 +42,9 @@ class Unit extends Model
         return $this->belongsTo(Module::class);
     }
 
+    /**
+     * Get unit exams.
+     */
     public function exams()
     {
         return $this->hasMany(Exam::class);

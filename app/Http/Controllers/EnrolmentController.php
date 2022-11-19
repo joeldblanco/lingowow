@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Course;
 use App\Models\Enrolment;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -27,7 +28,17 @@ class EnrolmentController extends Controller
      */
     public function create()
     {
-        //
+        $teachers = User::whereHas('roles', function ($query) {
+            $query->where('name', 'teacher');
+        })->orderBy('first_name')->orderBy('last_name')->get();
+
+        $students = User::whereHas('roles', function ($query) {
+            $query->where('name', 'student');
+        })->orderBy('first_name')->orderBy('last_name')->get();
+
+        $courses = Course::orderBy('name')->get();
+
+        return view('enrolments.create', compact('teachers', 'courses', 'students'));
     }
 
     /**
@@ -38,7 +49,20 @@ class EnrolmentController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'teacher_id' => 'required',
+            // 'student_id' => 'required',
+            'course_id' => 'required',
+        ]);
+
+        $enrolment = new Enrolment([
+            'teacher_id' => $request->get('teacher_id'),
+            'student_id' => $request->get('student_id'),
+            'course_id' => $request->get('course_id'),
+        ]);
+        $enrolment->save();
+
+        return redirect()->route('enrolments.index');
     }
 
     /**
@@ -60,7 +84,17 @@ class EnrolmentController extends Controller
      */
     public function edit(Enrolment $enrolment)
     {
-        return view('enrolments.edit', compact('enrolment'));
+        $teachers = User::whereHas('roles', function ($query) {
+            $query->where('name', 'teacher');
+        })->orderBy('first_name')->orderBy('last_name')->get();
+
+        $students = User::whereHas('roles', function ($query) {
+            $query->where('name', 'student');
+        })->orderBy('first_name')->orderBy('last_name')->get();
+
+        $courses = Course::orderBy('name')->get();
+
+        return view('enrolments.edit', compact('enrolment', 'teachers', 'students', 'courses'));
     }
 
     /**
@@ -72,17 +106,19 @@ class EnrolmentController extends Controller
      */
     public function update(Request $request, Enrolment $enrolment)
     {
-        $user_units = User::find($request->user_id)->units;
-        foreach ($user_units as $unit) {
-            if ($unit->module->course->id == $request->course_id) {
-                DB::table('unit_user')->upsert(
-                    ['user_id' => $request->user_id, 'unit_id' => $request->unit_id],
-                    ['user_id'],
-                    ['unit_id']
-                );
-            }
-        }
-        $enrolment->course_id = $request->course_id;
+        // $user_units = User::find($request->user_id)->units;
+        // foreach ($user_units as $unit) {
+        //     if ($unit->module->course->id == $request->course_id) {
+        //         DB::table('unit_user')->upsert(
+        //             ['user_id' => $request->user_id, 'unit_id' => $request->unit_id],
+        //             ['user_id'],
+        //             ['unit_id']
+        //         );
+        //     }
+        // }
+        $enrolment->teacher_id = $request->get('teacher_id');
+        $enrolment->student_id = $request->get('student_id');
+        $enrolment->course_id = $request->get('course_id');
         $enrolment->save();
         return redirect()->route('enrolments.index');
     }
@@ -95,6 +131,7 @@ class EnrolmentController extends Controller
      */
     public function destroy(Enrolment $enrolment)
     {
-        //
+        $enrolment->delete();
+        return redirect()->route('enrolments.index');
     }
 }

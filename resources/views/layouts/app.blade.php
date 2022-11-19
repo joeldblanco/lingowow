@@ -6,7 +6,7 @@
         
         // dd(Auth::user()->canBeImpersonated());
         // $session_info = json_decode(((new Illuminate\Http\Client\PendingRequest())->get('http://ipwho.is/' . $_SERVER['REMOTE_ADDR']))->getBody(), true);
-	    // session(['session_info' => $session_info]);
+        // session(['session_info' => $session_info]);
         // dump(session('session_info'));
         
         // if (isset($_GET['tz']) && session('tz') == null) {
@@ -28,9 +28,8 @@
         
         //     // return !isset($_GET['tz']);
         // }
-
-	// session(['tz' => session('session_info')['timezone']['id']]);
-
+        
+        // session(['tz' => session('session_info')['timezone']['id']]);
     @endphp
 
     <meta charset="utf-8">
@@ -103,8 +102,21 @@
             window.location.href = window.location.href + "?tz=" + tz;
         }
     </script> --}}
-    <script src="https://cdn.jsdelivr.net/gh/livewire/turbolinks@v0.1.x/dist/livewire-turbolinks.js"
-        data-turbolinks-eval="false"></script>
+    {{-- <script src="https://cdn.jsdelivr.net/gh/livewire/turbolinks@v0.1.x/dist/livewire-turbolinks.js"
+        data-turbolinks-eval="false"></script> --}}
+    @role('student')
+        {{-- <script src='//fw-cdn.com/2207350/2881175.js' chat='true'></script>
+        <script>
+            var new_contact = {
+                "First name": "{{auth()->user()->first_name}}", //Replace with first name of the user
+                "Last name": "{{auth()->user()->last_name}}", //Replace with last name of the user
+                "Email": "{{auth()->user()->email}}", //Replace with email of the user
+                "ID": "{{auth()->user()->id}}", //Replace with a custom field
+            };
+            var identifier = "{{auth()->user()->id}}";
+            fwcrm.identify(identifier, new_contact)
+        </script> --}}
+    @endrole
     {{-- @include('components.loading-state') --}}
 </body>
 

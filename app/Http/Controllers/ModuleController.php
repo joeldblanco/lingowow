@@ -40,11 +40,11 @@ class ModuleController extends Controller
      */
     public function store(Request $request)
     {
-        $order = Module::where('course_id',$request->course_id)->latest()->first()->order + 1;
+        $order = Module::where('course_id', $request->course_id)->max('order') + 1;
         $module = Module::create([
             "course_id" => $request->course_id,
-            "module_name" => $request->module_name,
-            "module_description" => $request->module_description,
+            "name" => $request->name,
+            "description" => $request->description,
             "status" => $request->status,
             "order" => $order
         ]);
@@ -118,7 +118,7 @@ class ModuleController extends Controller
     public function edit(Module $module)
     {
         $courses = Course::all();
-        return view('course.module.edit', compact('courses','module'));
+        return view('course.module.edit', compact('courses', 'module'));
     }
 
     /**
@@ -130,14 +130,14 @@ class ModuleController extends Controller
      */
     public function update(Request $request, Module $module)
     {
-        $module_image = $request->file('module_image');
-        $path_to_file = $module_image == null ? null : $request->file('module_image')->storeAs('public/images/modules/covers', $module->id.'.'.$module_image->getClientOriginalExtension());
+        $image = $request->file('image');
+        $path_to_file = $image == null ? 'images/image_preview.png' : $request->file('image')->storeAs('public/images/modules/covers', $module->id . '.' . $image->getClientOriginalExtension());
         $module->update([
             "course_id" => $request->course_id,
-            "module_name" => $request->module_name,
-            "module_description" => $request->module_description,
+            "name" => $request->name,
+            "description" => $request->description,
             "status" => $request->status,
-            'module_image' => $path_to_file,
+            "image" => $path_to_file,
         ]);
 
         return redirect()->route('courses.details', $module->course_id);
@@ -167,7 +167,7 @@ class ModuleController extends Controller
     {
         $newModulesOrder = json_decode($request->data);
         foreach ($newModulesOrder as $key => $value) {
-            if ($value != null){
+            if ($value != null) {
                 $module = Module::find($key);
                 $module->order = (int)$value;
                 $module->save();

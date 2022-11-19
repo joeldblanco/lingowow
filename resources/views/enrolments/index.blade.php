@@ -3,42 +3,61 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden py-5">
                 @if (count($enrolments) > 0)
-                    <div class="flex flex-col">
+                    <div class="flex">
                         <p class="text-2xl font-bold w-full text-center">Enrolments</p>
+                        <a href="{{ route('enrolments.create') }}"
+                            class="bg-lw-blue text-white py-2 px-4 rounded-md font-semibold hover:bg-blue-800">New</a>
                     </div>
                     <table class="flex flex-col w-full space-y-5 border border-gray-200 p-5 my-5 rounded-lg">
                         <thead>
                             <tr class="flex text-md justify-around">
                                 <th class="flex justify-center w-full">Teacher</th>
                                 <th class="flex justify-center w-full">Student</th>
+                                <th class="flex justify-center w-full">Course</th>
                                 <th class="flex justify-center w-full">Enrolment Date</th>
                                 <th class="flex justify-center w-full"></th>
                             </tr>
                         </thead>
                         <tbody class="space-y-4">
 
-                            @foreach ($enrolments as $key => $value)
+                            @foreach ($enrolments as $key => $enrolment)
                                 <tr class="flex justify-around">
                                     <td class="flex w-full justify-center">
-                                        <a href="{{ route('profile.show', $value->teacher->id) }}"
-                                            class="hover:underline hover:text-blue-500">{{ $value->teacher->first_name }}
-                                            {{ $value->teacher->last_name }}</a>
+                                        <a href="{{ route('profile.show', $enrolment->teacher->id) }}"
+                                            class="hover:underline hover:text-blue-500">{{ $enrolment->teacher->first_name }}
+                                            {{ $enrolment->teacher->last_name }}</a>
                                     </td>
+                                    @if ($enrolment->student)
+                                        <td class="flex w-full justify-center">
+                                            <a href="{{ route('profile.show', $enrolment->student->id) }}"
+                                                class="hover:underline hover:text-blue-500">{{ $enrolment->student->first_name }}
+                                                {{ $enrolment->student->last_name }}</a>
+                                        </td>
+                                    @else
+                                        <td class="flex w-full justify-center">
+                                            {{-- <a href="{{ route('profile.show', $enrolment->student->id) }}"
+                                                class="hover:underline hover:text-blue-500">{{ $enrolment->student->first_name }}
+                                                {{ $enrolment->student->last_name }}</a> --}}
+                                            -
+                                        </td>
+                                    @endif
                                     <td class="flex w-full justify-center">
-                                        <a href="{{ route('profile.show', $value->student->id) }}"
-                                            class="hover:underline hover:text-blue-500">{{ $value->student->first_name }}
-                                            {{ $value->student->last_name }}</a>
+                                        <a href="{{ route('courses.show', $enrolment->course->id) }}"
+                                            class="hover:underline hover:text-blue-500">
+                                            {{ $enrolment->course->name }}</a>
                                     </td>
                                     <td class="flex w-full justify-center cursor-pointer hover:underline">
-                                        {{ $value->updated_at->format('d/m/Y - h:00 a') }}
+                                        {{ $enrolment->updated_at->format('d/m/Y - h:00 a') }}
                                     </td>
                                     <td class="flex w-full justify-center space-x-5">
-                                        <a href="{{route('enrolments.edit', $value->id)}}">
+                                        <a href="{{ route('enrolments.edit', $enrolment->id) }}">
                                             <i class="fas fa-edit text-gray-600"></i>
                                         </a>
-                                        <a href="{{route('enrolments.destroy', $value->id)}}">
-                                            <i class="fas fa-trash text-gray-600"></i>
-                                        </a>
+                                        <form action="{{ route('enrolments.destroy', $enrolment->id) }}" method="POST">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit"><i class="fas fa-trash text-gray-600"></i></button>
+                                        </form>
                                     </td>
                                 </tr>
                             @endforeach

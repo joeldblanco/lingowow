@@ -22,7 +22,7 @@ class StudentUnrolmentToTeacher extends Notification implements ShouldQueue
      */
     public function __construct($student, $course_id, $deleted_schedule)
     {
-        $this->course = Course::find($course_id)->select('course_name')->first();
+        $this->course = Course::find($course_id)->select('name')->first();
         $this->student = $student;
         $schedule = json_decode($deleted_schedule->selected_schedule);
         $schedule_string = "";
@@ -70,7 +70,7 @@ class StudentUnrolmentToTeacher extends Notification implements ShouldQueue
         return (new MailMessage)
             ->subject('New Available Block!')
             ->line('Greetings, dear ' . $notifiable->first_name . ' ' . $notifiable->last_name . '.')
-            ->line('We are writing to notify you that student ' . $this->student->first_name . ' ' . $this->student->last_name . ' have been automatically unenroled from the course ' . $this->course->course_name . ', which leaves your blocks ' . $this->schedule_string . ' free.')
+            ->line('We are writing to notify you that student ' . $this->student->first_name . ' ' . $this->student->last_name . ' have been automatically unenroled from the course ' . $this->course->name . ', which leaves your blocks ' . $this->schedule_string . ' free.')
             ->line('Click the button below to check your current schedule.')
             ->action('Check Schedule', url('/dashboard'))
             ->line('If you have any questions, please contact us through the regular channels.');
@@ -81,7 +81,7 @@ class StudentUnrolmentToTeacher extends Notification implements ShouldQueue
         return [
             "user_id" => $this->student->id,
             "schedule_string" => $this->schedule_string,
-            "course_name" => $this->course->course_name
+            "course_name" => $this->course->name
         ];
     }
 

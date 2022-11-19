@@ -32,6 +32,7 @@ module.exports = {
             opacity: ['disabled'],
             backgroundColor: ['active'],
             visibility: ['group-hover'],
+            brightness: ['hover'],
         },
     },
 

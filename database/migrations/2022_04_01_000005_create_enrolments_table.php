@@ -15,7 +15,7 @@ class CreateEnrolmentsTable extends Migration
     {
         Schema::create('enrolments', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->bigInteger('student_id',false,true);
+            $table->bigInteger('student_id',false,true)->nullable();
             $table->bigInteger('teacher_id',false,true);
             $table->bigInteger('course_id',false,true);
             $table->timestamps();

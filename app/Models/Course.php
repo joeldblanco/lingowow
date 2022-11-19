@@ -11,12 +11,20 @@ class Course extends Model
     use HasFactory;
     use SoftDeletes;
 
+    protected $fillable = [
+        'name',
+        'description',
+        'image',
+        'modality',
+        'category',
+    ];
+
     /**
      * Get the products associated with the course.
      */
     public function products()
     {
-        return $this->belongsToMany(Product::class,'course_product','course_id','product_id');
+        return $this->belongsToMany(Product::class, 'course_product', 'course_id', 'product_id');
     }
 
     /**

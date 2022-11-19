@@ -23,7 +23,14 @@
                 </div>
                 <div class="w-3/4 flex flex-col pt-5">
                     <div class="flex flex-row">
-                        <p class="w-1/4 font-bold text-2xl">{{ $user->first_name }} {{ $user->last_name }}</p>
+                        <div class="w-full">
+                            <p class="font-bold text-2xl">{{ $user->first_name }} {{ $user->last_name }}</p>
+                            {{-- <button onclick="copyToClipboard('id')"
+                                class="font-semibold text-gray-400 cursor-pointer hover:text-blue-500 flex space-x-1 items-center">
+                                <p id="id">{{ md5($user->id) }}</p>
+                                <i class="far fa-copy text-xs"></i>
+                            </button> --}}
+                        </div>
                         <div class="w-3/4 flex justify-end">
 
                             <div class="flex space-x-4">
@@ -669,6 +676,11 @@
             });
 
         });
+
+        // function copyToClipboard(id) {
+        //     let text = document.getElementById(id).innerHTML;
+        //     navigator.clipboard.writeText(text);
+        // }
     </script>
 
 

@@ -15,12 +15,12 @@ return new class extends Migration
     {
         Schema::create('modules', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->string('module_name',40);
-            $table->text('module_description');
-            $table->string('module_image',200)->default('images/image_preview.png');
-            $table->string('priority',10);
+            $table->string('name', 40);
+            $table->text('description');
+            $table->string('image', 200)->default('images/image_preview.png');
             $table->tinyInteger('status');
-            $table->bigInteger('course_id',false,true);
+            $table->bigInteger('course_id', false, true);
+            $table->tinyInteger('order');
             $table->timestamps();
         });
     }

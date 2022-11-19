@@ -47,7 +47,7 @@
                                 <td class="py-4 px-6 border-b border-gray-400 text-center">
                                     {{ $activity->unit_id }}</td>
                                 <td class="py-4 px-6 border-b border-gray-400 text-center">
-                                    {{ $activity->unit->module->course->course_name }}</td>
+                                    {{ $activity->unit->module->course->name }}</td>
                                 <td class="py-4 px-6 border-b border-gray-400 text-center">
                                     {{ $activity->type }}</td>
                                 <td class="py-4 px-6 border-b border-gray-400 text-center">

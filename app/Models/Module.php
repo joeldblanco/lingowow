@@ -10,12 +10,12 @@ class Module extends Model
     use HasFactory;
 
     protected $fillable = [
-        'module_name',
-        'module_description',
+        'name',
+        'description',
         'course_id',
         'order',
         'status',
-        'module_image'
+        'image'
     ];
 
     /**
@@ -32,6 +32,14 @@ class Module extends Model
     public function units()
     {
         return $this->hasMany(Unit::class);
+    }
+
+    /**
+     * Get the exams for the module.
+     */
+    public function exams()
+    {
+        return $this->units->pluck('exams');
     }
 
     /**

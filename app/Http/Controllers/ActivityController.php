@@ -16,7 +16,7 @@ class ActivityController extends Controller
     public function index()
     {
         $activities = Activity::all();
-        
+
         return view('activities.index', compact('activities'));
     }
 
@@ -38,7 +38,7 @@ class ActivityController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        dd($request);
     }
 
     /**

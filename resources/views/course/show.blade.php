@@ -17,15 +17,15 @@
                             class="group flex flex-row bg-gray-100 rounded-lg w-full justify-between items-center @if (!$user_modules->contains($module)) shadow-inner opacity-50 filter saturate-0 @else shadow-md hover:shadow-xl cursor-pointer @endif">
 
                             <div class="w-3/12 m-5">
-                                <img class="rounded-lg rounded-b-none" src="{{ Storage::url($module->module_image) }}"
+                                <img class="rounded-lg rounded-b-none" src="{{ Storage::url($module->image) }}"
                                     alt="thumbnail" loading="lazy" />
                             </div>
                             <div class="w-full flex flex-col justify-start">
                                 <div class="my-5 px-5 space-y-4">
                                     <h1 class="text-2xl leading-6 text-blue-800 font-semibold">
-                                        {{ $module->module_name }}
+                                        {{ $module->name }}
                                     </h1>
-                                    <p class="text-justify pr-10">{{ $module->module_description }}</p>
+                                    <p class="text-justify pr-10">{{ $module->description }}</p>
                                 </div>
                             </div>
                             <div class="text-3xl text-gray-400 w-1/12">

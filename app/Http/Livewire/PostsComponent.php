@@ -58,9 +58,9 @@ class PostsComponent extends Component
     {
         if ($this->comment_content != null) {
 
-            $this->comment_content[$post_id] = preg_replace('/\s+/', '', $this->comment_content[$post_id]);
+            $aux = preg_replace('/\s+/', '', $this->comment_content[$post_id]);
 
-            if (strlen($this->comment_content[$post_id]) > 0) {
+            if (strlen($aux) > 0) {
 
                 $comment = new Comment();
                 $comment->author_id = auth()->user()->id;
@@ -83,8 +83,12 @@ class PostsComponent extends Component
     public function editComment($comment_id)
     {
         $comment = Comment::find($comment_id);
-        $comment->content = $this->comment_content[$comment->commentable_id];
-        $comment->save();
+        if($this->comment_content && strlen($this->comment_content[$comment->commentable_id])){
+            $comment->content = $this->comment_content[$comment->commentable_id];
+            $comment->save();
+        }else{
+            dd("Can't edit");
+        }
 
         $this->comment_content = '';
     }
