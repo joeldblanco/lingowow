@@ -159,7 +159,7 @@ $last_conn = $last_conn->diffForHumans();
                     <div class="flex w-full">
                         <input type="text"
                             class="w-full pr-4 py-3 rounded-xl shadow focus:outline-none focus:shadow-outline text-gray-600 font-medium mr-3 border-gray-400 hover:border-gray-700"
-                            placeholder="Type a Message" wire:model="text_message">
+                            placeholder="Type a Message" wire:model="text_message" wire:keydown.enter="send_message">
                     </div>
                     <div
                         class="flex px-3 h-10 cursor-pointer hover:bg-gray-200 items-center hover:text-purple-500 rounded-lg">
@@ -257,7 +257,7 @@ $last_conn = $last_conn->diffForHumans();
                         </div>
                         <div class="w-full">
                             <textarea class="w-full rounded-lg border-gray-300" name="message" id="message" cols="30" rows="10"
-                                placeholder="Write a message" wire:model="text_message"></textarea>
+                                placeholder="Write a message" wire:model="text_message" wire:keydown.enter="send_message"></textarea>
                             <div class="flex px-3 h-10 cursor-pointer hover:bg-gray-200 border border-gray-300 hover:border-white hover:text-blue-500 rounded-lg"
                                 wire:click="send_message" @click="newMessage = false, newConversation = false">
                                 <div class="mx-auto flex space-x-3 items-center font-bold">

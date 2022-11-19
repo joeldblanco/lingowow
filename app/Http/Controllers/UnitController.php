@@ -96,13 +96,13 @@ class UnitController extends Controller
      */
     public function update(Request $request, Unit $unit)
     {
-        $unit_image = $request->file('unit_image');
-        $path_to_file = $unit_image == null ? null : $request->file('unit_image')->storeAs('public/images/units/covers', $unit->id . '.' . $unit_image->getClientOriginalExtension());
+        $image = $request->file('image');
+        $path_to_file = $image == null ? 'images/image_preview.png' : $request->file('image')->storeAs('public/images/units/covers', $unit->id . '.' . $image->getClientOriginalExtension());
         $unit->update([
             "module_id" => $request->module_id,
-            "unit_name" => $request->unit_name,
+            "name" => $request->name,
             "status" => $request->status,
-            'unit_image' => $path_to_file,
+            'image' => $path_to_file,
         ]);
 
         return redirect()->route('modules.details', $unit->module_id);

@@ -161,7 +161,7 @@ class Schedule extends Component
         foreach ($this->user_schedules as $key => $value) {
             $this->user_schedules[$key] = $value->selected_schedule;
             if (auth()->user()->roles[0]->name == "student")
-                $this->user_courses[$key] = Enrolment::find($value->enrolment_id)->course->course_name;
+                $this->user_courses[$key] = Enrolment::find($value->enrolment_id)->course->name;
         }
         // }
 

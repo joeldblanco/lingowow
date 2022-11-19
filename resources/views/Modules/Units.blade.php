@@ -7,10 +7,10 @@
                 <ul class="bg-gray-200 sticky top-5 p-5 rounded-lg" style="height: calc(100vh - 2.25rem)">
                     @foreach ($units as $unit)
                         @php
-                            $name_unit = strtolower(str_replace(' ', '', $unit->unit_name));
+                            $name_unit = strtolower(str_replace(' ', '', $unit->name));
                         @endphp
                         <li class="font-bold text-lg @if (!$unit->status) opacity-25 @endif">
-                            {{ $unit->unit_name }}</li>
+                            {{ $unit->name }}</li>
                         <li class="mb-5 @if (!$unit->status) text-gray-400 @endif">
                             <ul class="list-inside pl-5">
                                 <li class="w-full">
@@ -32,11 +32,11 @@
                 @foreach ($units as $unit)
                     <div class="w-full @if (!$unit->status) opacity-25 @endif">
                         @php
-                            $name_unit = strtolower(str_replace(' ', '', $unit->unit_name));
+                            $name_unit = strtolower(str_replace(' ', '', $unit->name));
                         @endphp
-                        {{-- <x-unit name="{{$unit->unit_name}}" slide="{{$unit->slide_url}}" doc="{{$unit->doc_url}}" audio="{{$unit->audio_url}}" nameforo="{{$unit->forum_name}}" foro="{{$unit->forum_url}}"/> --}}
+                        {{-- <x-unit name="{{$unit->name}}" slide="{{$unit->slide_url}}" doc="{{$unit->doc_url}}" audio="{{$unit->audio_url}}" nameforo="{{$unit->forum_name}}" foro="{{$unit->forum_url}}"/> --}}
                         {{-- <br><br><br><hr><br> --}}
-                        <h1 class="titulounit mb-3" id="{{ $name_unit }}-slide">{{ $unit->unit_name }}</h1>
+                        <h1 class="titulounit mb-3" id="{{ $name_unit }}-slide">{{ $unit->name }}</h1>
                         <hr class="separatortittle-b">
 
                         <br><br>
@@ -54,7 +54,7 @@
                                 <img src="https://campus.theuttererscorner.com/theme/image.php/moove/url/1627123195/icon"
                                     class="iconlarge activityicon mr-2" width="24" height="24" alt=""
                                     role="presentation" aria-hidden="true">
-                                <span class="instancename">{{ $unit->unit_name }} - Self-study Material<span
+                                <span class="instancename">{{ $unit->name }} - Self-study Material<span
                                         class="accesshide "></span></span>
                             </a>
                         </div>
@@ -63,7 +63,7 @@
                             and you can check it with your tutor on the following lesson.<br></p>
                         <br>
 
-                        <h2 style="text-align: center;">Audio - Self-Study Material - {{ $unit->unit_name }}</h2>
+                        <h2 style="text-align: center;">Audio - Self-Study Material - {{ $unit->name }}</h2>
                         <br>
                         <div class="flex justify-center">
                             <audio controls="controls" controlslist="nodownload" __idm_id__="921248769">
@@ -79,7 +79,7 @@
                                 <img src="https://campus.theuttererscorner.com/theme/image.php/moove/forum/1627123195/icon"
                                     class="iconlarge activityicon mr-2" width="24" height="24" alt=""
                                     role="presentation" aria-hidden="true">
-                                <span class="instancename">{{ $unit->forum_name }} - {{ $unit->unit_name }}<span
+                                <span class="instancename">{{ $unit->forum_name }} - {{ $unit->name }}<span
                                         class="accesshide "></span></span>
                             </a>
                         </div>

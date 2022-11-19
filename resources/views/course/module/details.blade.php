@@ -38,21 +38,22 @@
                         </thead>
                         <tbody>
                             @foreach ($module->units->sortBy('order') as $unit)
-                                <tr class="hover:bg-gray-200 unit" id="{{ $unit->id }}-{{ $unit->order }}">
+                                <tr class="hover:bg-gray-200 unit bg-white" id="{{ $unit->id }}-{{ $unit->order }}">
                                     <td class="py-4 px-6 border-b border-gray-400">
                                         <div class="w-full text-gray-600">
-                                            <img src="{{ Storage::url($unit->unit_image) }}" alt="Unit Image">
+                                            <img src="{{ Storage::url($unit->image) }}" alt="Unit Image">
                                         </div>
                                     </td>
                                     <td class="py-4 px-6 border-b border-gray-400 text-gray-500">
                                         <div class="flex space-x-8 w-full items-center justify-evenly">
                                             <div class="w-full text-gray-600">
-                                                <p class="text-xl font-bold">{{ $unit->unit_name }}</p>
+                                                <p class="text-xl font-bold">{{ $unit->name }}</p>
                                             </div>
                                             <div class="flex justify-end items-center">
-                                                <a href="{{ route('units.details', $unit->id) }}" title="Edit"><i
+                                                <a href="{{ route('units.edit', $unit->id) }}" title="Edit"><i
+                                                        class="fas fa-pen m-1"></i></a>
+                                                <a href="{{ route('units.details', $unit->id) }}" title="Details"><i
                                                         class="fas fa-cog m-1"></i></a>
-
                                                 <form action="{{ route('units.destroy', $unit->id) }}" method="POST">
                                                     @csrf
                                                     @method('DELETE')

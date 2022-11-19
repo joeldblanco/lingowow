@@ -194,7 +194,7 @@ insert  into `course_product`(`product_id`,`course_id`) values
 
 /*Data for the table `courses` */
 
-insert  into `courses`(`id`,`course_name`,`course_description`,`course_category`,`course_modality`,`course_image_url`,`created_at`,`updated_at`,`deleted_at`) values 
+insert  into `courses`(`id`,`name`,`description`,`category`,`modality`,`image_url`,`created_at`,`updated_at`,`deleted_at`) values 
 (1,'Regular English Program','Nuestro programa de Inglés está fundamentado en los estándares del Marco de Referencia Europeo, trabajamos con funciones comunicativas evocando contextos reales y experiencias funcionales de aprendizaje, a la par de encuentros interactivos con otros aprendices y hablantes nativos.','English','synchronous','images/courses/covers/regular_english_program.jpeg','2021-11-27 14:48:06','2021-11-27 14:48:06',NULL),
 (2,'Conversational English Program','Clases con entornos totalmente personalizados, enfocadas en la necesidad específica de cada estudiante y en desarrollo de sus destrezas comunicativas. Además de las clases regulares, este paquete incluye otras prácticas conversacionales donde el estudiante interactúa con otros aprendices y nativo hablantes.','English','synchronous','images/courses/covers/conversational_english_program.jpeg','2021-11-27 14:48:06','2021-11-27 14:48:06',NULL),
 (3,'Regular Spanish Program','Nuestro programa en línea de español esta basado en los estándares del Marco de Referencia Europeo. El programa busca ayudar a los aprendices a comunicarse y desarrollar destrezas en contextos reales haciéndoles vivir experiencias de aprendizaje asertivas y con propósito en sus lecciones, a través del desarrollo de tareas y encuentros interactivos con otros aprendices y nativo hablantes.','Spanish','synchronous','images/courses/covers/regular_spanish_program.jpeg','2021-11-27 14:48:06','2021-11-27 14:48:06',NULL),
@@ -1247,7 +1247,7 @@ insert  into `model_has_roles`(`role_id`,`model_type`,`model_id`) values
 
 /*Data for the table `modules` */
 
-insert  into `modules`(`id`,`module_name`,`module_description`,`module_image`,`priority`,`status`,`course_id`,`created_at`,`updated_at`) values 
+insert  into `modules`(`id`,`name`,`description`,`image`,`priority`,`status`,`course_id`,`created_at`,`updated_at`) values 
 (1,'Module 1','This is the first level of your journey. \r\n\r\nPlease, feel free to go around revise the material to get started. \r\n\r\nYou will find here the material used during your lessons, handouts to practice, audi','images/image_preview.png','FIRST',1,1,NULL,NULL),
 (2,'Module 2','Welcome to the second step in your journey to learn English.   As it was mentioned in your module 1, these spaces are for you to find material that you can use to review and reinforce the knowledge yo','images/image_preview.png','1',1,1,NULL,NULL),
 (3,'Module 3','Dear, utterer.   Welcome to your level three in this path you have started with us.   As previously mentioned in other classrooms, this space contains materials that will be of help for you to review ','images/image_preview.png','2',1,1,NULL,NULL),
@@ -1598,7 +1598,7 @@ insert  into `unit_user`(`id`,`user_id`,`unit_id`) values
 
 /*Data for the table `units` */
 
-insert  into `units`(`id`,`unit_name`,`unit_image`,`slide_url`,`doc_url`,`audio_url`,`forum_name`,`forum_url`,`status`,`module_id`,`created_at`,`updated_at`,`deleted_at`) values 
+insert  into `units`(`id`,`name`,`image`,`slide_url`,`doc_url`,`audio_url`,`forum_name`,`forum_url`,`status`,`module_id`,`created_at`,`updated_at`,`deleted_at`) values 
 (1,'Unit 1','images/image_preview.png','https://docs.google.com/presentation/d/e/2PACX-1vR6qonh5bQBqrnz3MmQDuOAPNPm0MYzeDcBHWo2Cid_w1u9hBKtb-BjXRwuEuPjjw/embed?start=false&amp;loop=false&amp;delayms=3000','https://campus.theuttererscorner.com/mod/url/view.php?id=346','https://campus.theuttererscorner.com/draftfile.php/5/user/draft/967533140/Unit%201%20-%20This%20is%20me%21.mp3','This is me!','https://campus.theuttererscorner.com/mod/forum/view.php?id=113',1,1,'2022-04-08 11:14:18','2022-04-08 11:14:18',NULL),
 (2,'Unit 2','images/image_preview.png','https://docs.google.com/presentation/d/e/2PACX-1vRWGfVMrqnyaAJBOaexmCHwOzyv26_YoADyileU5iN8cv9KQwQ5FiElQqjVGLYneg/embed?start=false&amp;loop=false&amp;delayms=3000','https://drive.google.com/file/d/1BjbebKfpqbU_Gg6iay7p8JKt7WdA45QF/view?usp=sharing','https://campus.theuttererscorner.com/draftfile.php/5/user/draft/872955533/Unit%202%20-%20I%20come%20from....mp3','I come from...','https://campus.theuttererscorner.com/mod/forum/view.php?id=121',1,1,'2022-04-08 11:14:18','2022-04-08 11:14:18',NULL),
 (3,'Unit 3','images/image_preview.png','https://docs.google.com/presentation/d/e/2PACX-1vQZD_yEu7BqadWPb9vuZA3gzbu1YbGWjXxNmgLcmNerMU4LScFt1bcYPmBLHKAK0A/embed?start=false&amp;loop=false&amp;delayms=3000','https://drive.google.com/file/d/1a3Ev9wEw1lxZ5sxYxIWtfL0Zixt3YadS/view?usp=sharing','https://campus.theuttererscorner.com/draftfile.php/5/user/draft/429845237/Unit%203%20-%20Everyday%20I....mp3','Every day I...','https://campus.theuttererscorner.com/mod/forum/view.php?id=122',1,1,'2022-04-08 11:14:18','2022-04-08 11:14:18',NULL),

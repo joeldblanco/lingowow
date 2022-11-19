@@ -34,13 +34,13 @@
                             <div onclick="location.href='{{ route('units.show', $unit->id) }}';"
                                 class="group flex flex-row bg-gray-100 rounded-lg w-full justify-between shadow-md hover:shadow-xl cursor-pointer items-center">
                                 <div class="w-3/12 m-5">
-                                    <img class="rounded-lg rounded-b-none" src="{{ Storage::url($unit->unit_image) }}"
+                                    <img class="rounded-lg rounded-b-none" src="{{ Storage::url($unit->image) }}"
                                         alt="thumbnail" loading="lazy" />
                                 </div>
                                 <div class="w-full flex flex-col justify-start">
                                     <div class="my-5 px-5 space-y-4">
                                         <h1 class="text-2xl leading-6 text-blue-800 font-semibold">
-                                            {{ $unit->unit_name }}
+                                            {{ $unit->name }}
                                         </h1>
                                         <p class="text-justify pr-10">{{ $unit->unit_description }}</p>
                                     </div>
@@ -101,7 +101,7 @@
                             <div class="w-full flex flex-col justify-start">
                                 <div class="my-5 px-5 space-y-4">
                                     <h1 class="text-2xl leading-6 text-blue-800 font-semibold">
-                                        {{ $unit->unit_name }}
+                                        {{ $unit->name }}
                                     </h1>
                                     <p class="text-justify pr-10">{{ $unit->unit_description }}</p>
                                 </div>
@@ -162,7 +162,7 @@
                         <div class="w-full flex flex-col justify-start">
                             <div class="my-5 px-5 space-y-4">
                                 <h1 class="text-2xl leading-6 text-blue-800 font-semibold">
-                                    {{ $unit->unit_name }}
+                                    {{ $unit->name }}
                                 </h1>
                                 <p class="text-justify pr-10">{{ $unit->unit_description }}</p>
                             </div>

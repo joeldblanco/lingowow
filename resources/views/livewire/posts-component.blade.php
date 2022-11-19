@@ -5,10 +5,8 @@
                 @csrf
                 <textarea class="rounded-xl resize-none w-full" name="post_content" id="post_content" cols="30" rows="4"
                     placeholder="What's on your mind, {{ $user->first_name }}" required></textarea>
-                <img id="preview-image-before-upload"
-                    src="{{ Storage::url('images/image_preview.png') }}" alt="preview image"
-                    class="mt-2 object-cover hidden"
-                    style="max-height: 150px; max-width: 150px;">
+                <img id="preview-image-before-upload" src="{{ Storage::url('images/image_preview.png') }}"
+                    alt="preview image" class="mt-2 object-cover hidden" style="max-height: 150px; max-width: 150px;">
                 <div class="flex flex-row justify-between items-center mt-2">
                     <input type="file" name="post_image" id="post_image" class="hidden"
                         accept=".jpeg,.jpg,.png,.webp">
@@ -47,9 +45,13 @@
                 @if ($post->author()->id == auth()->id())
                     <div class="flex justify-between mb-5 relative" x-data="{ editDelete: false }">
                         <div class="flex space-x-3 items-center">
-                            <img class="rounded-full w-16" src="{{ Storage::url($user->profile_photo_path) }}"
-                                alt="profile_pic">
-                            <p>{{ $user->first_name }} {{ $user->last_name }}</p>
+                            <a href="{{ route('profile.show', $post->author()->id) }}">
+                                <img class="rounded-full w-16" src="{{ Storage::url($user->profile_photo_path) }}"
+                                    alt="profile_pic">
+                            </a>
+                            <a href="{{ route('profile.show', $post->author()->id) }}">
+                                <p class="hover:underline">{{ $user->first_name }} {{ $user->last_name }}</p>
+                            </a>
                             {{-- <i class="fas fa-dot-circle"></i> --}}
                             <p class="text-gray-400 text-xs">
                                 {{ (new Carbon\Carbon($post->created_at))->diffForHumans() }}</p>
@@ -63,7 +65,8 @@
                                 <button class="hover:bg-gray-200 p-2 rounded-t-xl"
                                     wire:click="editPost({{ $post->id }})" @click="editDelete = false">Edit</button>
                                 <button class="hover:bg-gray-200 p-2 rounded-b-xl"
-                                    wire:click="deletePost({{ $post->id }})" @click="editDelete = false">Delete</button>
+                                    wire:click="deletePost({{ $post->id }})"
+                                    @click="editDelete = false">Delete</button>
                             </div>
                         </div>
                     </div>
@@ -131,11 +134,16 @@
                     @foreach ($post->comments as $comment)
                         <div class="mt-7 group">
                             <div class="flex items-center space-x-3 mt-3 text-sm">
-                                <img class="rounded-full w-8"
-                                    src="{{ Storage::url($comment->author->profile_photo_path) }}" alt="profile_pic">
-                                <p class="text-gray-600">
-                                    {{ $comment->author->first_name }} {{ $comment->author->last_name }}
-                                </p>
+                                <a href="{{ route('profile.show', $comment->author->id) }}">
+                                    <img class="rounded-full w-8"
+                                        src="{{ Storage::url($comment->author->profile_photo_path) }}"
+                                        alt="profile_pic">
+                                </a>
+                                <a href="{{ route('profile.show', $comment->author->id) }}">
+                                    <p class="text-gray-600 hover:underline">
+                                        {{ $comment->author->first_name }} {{ $comment->author->last_name }}
+                                    </p>
+                                </a>
                                 {{-- <i class="fas fa-dot-circle"></i> --}}
                                 <p class="text-gray-400 text-xs">
                                     {{ (new Carbon\Carbon($comment->created_at))->diffForHumans() }}</p>

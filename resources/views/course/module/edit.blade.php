@@ -15,11 +15,11 @@
                             <div class="pt-6 pb-2 space-y-1">
 
                                 <p class="font-bold text-gray-600 mb-1">Cover</p>
-                                <input type="file" name="module_image" id="module_image" class="hidden"
+                                <input type="file" name="image" id="image" class="hidden"
                                     accept=".jpeg,.jpg,.png,.webp">
-                                <label for="module_image" class="flex items-center text-blue-800 cursor-pointer">
+                                <label for="image" class="flex items-center text-blue-800 cursor-pointer">
                                     <img id="preview-image-before-upload"
-                                        src="{{ Storage::url($module->module_image) }}" alt="preview image"
+                                        src="{{ Storage::url($module->image) }}" alt="preview image"
                                         class="object-none w-full max-h-56">
                                 </label>
                                 <p class="text-gray-500 text-sm font-light">Please select an image for the module</p>
@@ -33,7 +33,7 @@
                                     @foreach ($courses as $course)
                                         <option value="{{ $course->id }}"
                                             @if ($module->course->id == $course->id) selected @endif>
-                                            {{ $course->course_name }}
+                                            {{ $course->name }}
                                         </option>
                                     @endforeach
                                 </select>
@@ -44,20 +44,20 @@
                             </div>
                             <div class="py-4 space-y-1">
                                 <p class="font-bold text-gray-600 mb-1">Name</p>
-                                <input type="text" name="module_name" id="module_name"
-                                    value="{{ $module->module_name }}" placeholder="Enter module name" required
-                                    class="w-full rounded-md p-3 text-gray-600 hover:border-gray-600 @if ($errors->has('module_name')) border-red-600 @else border-gray-300 @endif ">
-                                @if ($errors->has('module_name'))
+                                <input type="text" name="name" id="name"
+                                    value="{{ $module->name }}" placeholder="Enter module name" required
+                                    class="w-full rounded-md p-3 text-gray-600 hover:border-gray-600 @if ($errors->has('name')) border-red-600 @else border-gray-300 @endif ">
+                                @if ($errors->has('name'))
                                     <p class="text-xs font-light text-red-600">Required</p>
                                 @endif
                                 <p class="text-gray-500 text-sm font-light">Please enter module name</p>
                             </div>
                             <div class="py-4 pt-3 space-y-1">
                                 <p class="font-bold text-gray-600 mb-1">Description</p>
-                                <textarea name="module_description" id="module_description" placeholder="Enter module description" required
+                                <textarea name="description" id="description" placeholder="Enter module description" required
                                     rows="4"
-                                    class="w-full rounded-md p-3 text-gray-600 hover:border-gray-600 @if ($errors->has('module_description')) border-red-600 @else border-gray-300 @endif">{{ $module->module_description }}</textarea>
-                                @if ($errors->has('module_description'))
+                                    class="w-full rounded-md p-3 text-gray-600 hover:border-gray-600 @if ($errors->has('description')) border-red-600 @else border-gray-300 @endif">{{ $module->description }}</textarea>
+                                @if ($errors->has('description'))
                                     <p class="text-xs font-light text-red-600">Required</p>
                                 @endif
                                 <p class="text-gray-500 text-sm font-light">Please enter module description</p>
@@ -94,7 +94,7 @@
     <script type="text/javascript">
         $(document).ready(function(e) {
 
-            $('#module_image').change(function() {
+            $('#image').change(function() {
 
                 let reader = new FileReader();
 

@@ -23,7 +23,7 @@ class StudentUnrolment extends Notification implements ShouldQueue
      */
     public function __construct($student_id, $course_id)
     {
-        $this->course = Course::find($course_id)->select('course_name')->first();
+        $this->course = Course::find($course_id)->select('name')->first();
         $this->student = User::find($student_id);
     }
 
@@ -49,7 +49,7 @@ class StudentUnrolment extends Notification implements ShouldQueue
         return (new MailMessage)
             ->subject('Unenrollment notice!')
             ->line('Greetings, dear ' . $notifiable->first_name . ' ' . $notifiable->last_name . '.')
-            ->line('We are writing to notify you that you have been unenroled from ' . $this->course->course_name)
+            ->line('We are writing to notify you that you have been unenroled from ' . $this->course->name)
             ->line('Click the button below to purchase another package and continue enjoying our services.')
             ->action('Shop', url('/shop'))
             ->line('If you have any questions, please contact us through the regular channels.');
@@ -59,7 +59,7 @@ class StudentUnrolment extends Notification implements ShouldQueue
     {
         return [
             "user_id" => $this->student->id,
-            "course_name" => $this->course->course_name
+            "course_name" => $this->course->name
         ];
     }
 

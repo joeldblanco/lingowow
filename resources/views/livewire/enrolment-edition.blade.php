@@ -33,7 +33,7 @@
                                 wire:model="course">
                                 @foreach ($courses as $course)
                                     <option value="{{ $course->id }}">
-                                        {{ $course->course_name }}
+                                        {{ $course->name }}
                                     </option>
                                 @endforeach
                             </select>
@@ -50,7 +50,7 @@
                                 @foreach ($this->modules as $module)
                                     <option value="{{ $module->id }}"
                                         @if ($module->id == $this->default_module->id) selected @endif>
-                                        {{ $module->module_name }}
+                                        {{ $module->name }}
                                     </option>
                                 @endforeach
                             </select>
@@ -68,7 +68,7 @@
                                 @foreach ($this->units as $unit)
                                     <option value="{{ $unit->id }}"
                                         @if ($unit->id == $this->default_unit->id) selected @endif>
-                                        {{ $unit->unit_name }}
+                                        {{ $unit->name }}
                                     </option>
                                 @endforeach
                             </select>

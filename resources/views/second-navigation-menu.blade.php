@@ -43,6 +43,18 @@ $nav_links = [
         'parent_link' => request()->is('admin', 'admin/*'),
     ],
     [
+        'name' => 'Enrolments',
+        'route' => route('enrolments.index'),
+        'status' => request()->routeIs('enrolments.index'),
+        'parent_link' => request()->is('admin', 'admin/*'),
+    ],
+    [
+        'name' => 'Grades',
+        'route' => route('gradings.index'),
+        'status' => request()->routeIs('gradings.index'),
+        'parent_link' => request()->is('admin', 'admin/*'),
+    ],
+    [
         'name' => 'Classes',
         'route' => route('admin.classes.index'),
         'status' => request()->routeIs('admin.classes.index'),

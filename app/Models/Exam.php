@@ -25,4 +25,11 @@ class Exam extends Model
         return $this->hasMany(Attempt::class);
     }
 
+    /**
+     * Get exam unit.
+     */
+    public function unit()
+    {
+        return $this->belongsTo(Unit::class);
+    }
 }

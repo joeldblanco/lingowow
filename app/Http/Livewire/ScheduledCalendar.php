@@ -40,7 +40,7 @@ class ScheduledCalendar extends Component
                 $this->user_schedules[$key] = json_decode($value->selected_schedule);
                 $this->user_courses[$key] = Enrolment::find($value->enrolment_id);
                 if ($this->user_courses[$key] != null)
-                    $this->user_courses[$key] = $this->user_courses[$key]->course->course_name;
+                    $this->user_courses[$key] = $this->user_courses[$key]->course->name;
             }
         }
         //$this->teacher_id = Enrolment::select("teacher_id")
@@ -97,7 +97,7 @@ class ScheduledCalendar extends Component
         foreach ($this->user_schedules as $key => $value) {
             $this->user_schedules[$key] = json_decode($value->selected_schedule);
             if (auth()->user()->roles[0]->name == "student")
-                $this->user_courses[$key] = Enrolment::find($value->enrolment_id)->course->course_name;
+                $this->user_courses[$key] = Enrolment::find($value->enrolment_id)->course->name;
         }
         // }
 
@@ -147,7 +147,7 @@ class ScheduledCalendar extends Component
         // if(count($this->user_schedules) > 0){
         //     foreach ($this->user_schedules as $key => $value) {
         //         // $this->user_schedule[$key] = json_decode($value->selected_schedule);
-        //         $this->user_courses[$key] = Enrolment::find($value->enrolment_id)->course->course_name;
+        //         $this->user_courses[$key] = Enrolment::find($value->enrolment_id)->course->name;
         //     }
         // }
         

@@ -57,14 +57,15 @@ class ContentController extends Controller
 
         if ($request->type == 'media') {
 
-            $file = $request->file('media_file');
-            $path_to_file = $file == null ? null : $request->file('media_file')->storeAs('public/content/files', time() . '.' . $file->getClientOriginalExtension());
-
+            $file = $request->file('new_media_file');
+            $path_to_file = $file == null ? null : $request->file('new_media_file')->storeAs('public/content/files', time() . '.' . $file->getClientOriginalExtension());
+            // dd($path_to_file);
             $content->content = json_encode([
                 'type' => $request->type,
                 'media_url' => $path_to_file
             ]);
         }
+
         $content->unit_id = $request->unit_id;
         $content->save();
         return redirect()->route('units.show', ['unit' => $content->unit_id]);
@@ -108,7 +109,8 @@ class ContentController extends Controller
      */
     public function edit(Content $content)
     {
-        //
+        $content->content = json_decode($content->content);
+        return view('contents.edit', compact('content'));
     }
 
     /**
@@ -120,7 +122,32 @@ class ContentController extends Controller
      */
     public function update(Request $request, Content $content)
     {
-        //
+        if ($request->type == 'url') {
+            $content->content = json_encode([
+                'type' => $request->type,
+                'link_title' => $request->link_title,
+                'link_url' => $request->link_url
+            ]);
+        }
+
+        if ($request->type == 'embeddable') {
+            $content->content = json_encode([
+                'type' => $request->type,
+                'embeddable' => $request->embeddable_data
+            ]);
+        }
+
+        if ($request->type == 'media') {
+            
+            $content->content = json_encode([
+                'type' => $request->type,
+                'media_url' => 'public/'.$request->data,
+            ]);
+        }
+
+        $content->unit_id = $content->unit_id;
+        $content->save();
+        return redirect()->route('units.show', ['unit' => $content->unit_id]);
     }
 
     /**

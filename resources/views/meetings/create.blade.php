@@ -58,7 +58,7 @@
                                 @if ($errors->has('atendee_id'))
                                     <p class="text-xs font-light text-red-600">Required</p>
                                 @endif
-                                <p class="text-gray-500 text-sm font-light">Please select a atendee for the meeting</p>
+                                <p class="text-gray-500 text-sm font-light">Please select an atendee for the meeting</p>
                             </div>
                             <div class="pt-6 pb-2 space-y-1">
                                 <p class="font-bold text-gray-600 mb-1">Date & Time (UTC)</p>

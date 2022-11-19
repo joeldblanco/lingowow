@@ -33,7 +33,9 @@ class ClassesComponent extends Component
             $this->current_class = Classes::all()->last();
         }
 
-        $this->enrolment = Enrolment::withTrashed()->where('id', $this->current_class->enrolment_id)->first();
+        if ($this->current_class) {
+            $this->enrolment = Enrolment::withTrashed()->where('id', $this->current_class->enrolment_id)->first();
+        }
     }
 
     public function studentClassCheck($class_id)
@@ -52,7 +54,6 @@ class ClassesComponent extends Component
         $this->enrolment = Enrolment::withTrashed()->where('id', $this->current_class->enrolment_id)->first();
 
         $this->comment = $this->current_class->comments;
-
         if ($this->comment == NULL) {
             $this->comment = "";
         }
@@ -66,18 +67,13 @@ class ClassesComponent extends Component
 
     public function saveComment()
     {
-
-        // $class_comment = Comment::where('claid',$this->current_class)->first();
-        // $class_comment->comments = $this->comment;
-
-        // if($class_comment->comments == "")
-        //     $class_comment->comments = NULL;
-        // $class_comment->save();
-
-        Comment::create([
-            'class_id' => $this->current_class->id,
-            'comment' => $this->comment,
+        $comment = new Comment([
+            'commentable_id' => $this->current_class->id,
+            'content' => $this->comment,
+            'author_id' => auth()->user()->id,
         ]);
+
+        $class = Classes::find($this->current_class->id)->comments()->save($comment);
     }
 
     public function clearComment()
@@ -150,20 +146,21 @@ class ClassesComponent extends Component
         // $this->students = [];
         $this->to_review_classes = [];
         $role = auth()->user()->roles[0]->name;
+        $classes = [];
 
-        if ($role == "teacher") {
+        if ($role == "teacher" && $this->current_class) {
             $classes = User::find(auth()->id())->teacherClasses()->whereBetween('start_date', ApportionmentController::getPeriod($this->current_class->start_date, true))->orderBy('start_date')->paginate(10);
             // $classes = User::find(auth()->id())->teacherClasses->sortBy('start_date', 'ASC')->get();
             // $classes = $classes->sortBy('start_date');
             // foreach ($classes as $key => $value) {
             //     $this->students[$key] = $value->student();
             // }
-        } else if ($role == "student") {
+        } else if ($role == "student" && $this->current_class) {
             $classes = User::find(auth()->id())->studentClasses()->whereBetween('start_date', ApportionmentController::getPeriod($this->current_class->start_date, true))->orderBy('start_date')->paginate(10);
             // foreach ($classes as $key => $value) {
             //     // $this->teachers[$key] = $value->teacher();
             // }
-        } else if ($role == "admin") {
+        } else if ($role == "admin" && $this->current_class) {
             // dd(ApportionmentController::getPeriod($this->current_class->start_date, true));
             $classes = Classes::whereBetween('start_date', ApportionmentController::getPeriod($this->current_class->start_date, true))->orderBy('start_date')->paginate(10);
             // $classes = $classes->sortBy('start_date');

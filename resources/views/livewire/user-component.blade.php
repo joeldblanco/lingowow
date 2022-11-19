@@ -2,7 +2,9 @@
     style="width: 32%" x-data="{ showUserInfo: false, editUser: false, newMessage: false }">
     <div class="flex justify-between">
         <div class="w-2/12">
-            <img src="{{ Storage::url($user->profile_photo_path) }}" alt="profile_pic" class="rounded-full">
+            <a href="{{ route('profile.show', $user->id) }}">
+                <img src="{{ Storage::url($user->profile_photo_path) }}" alt="profile_pic" class="rounded-full">
+            </a>
         </div>
         <button class="rounded-full w-10 h-10 bg-white active:bg-gray-200 transition duration-100 ease-in-out"
             wire:click="show" @click="showUserInfo = true">
@@ -10,7 +12,9 @@
         </button>
     </div>
     <div class="flex flex-col space-y-8 mt-0">
-        <p class="font-bold text-2xl">{{ $user->first_name }} {{ $user->last_name }}</p>
+        <a href="{{ route('profile.show', $user->id) }}">
+            <p class="font-bold text-2xl">{{ $user->first_name }} {{ $user->last_name }}</p>
+        </a>
         <div class="flex flex-row w-full flex-wrap gap-y-4 gap-x-8">
             <div class="text-gray-700 text-sm">
                 <p class="text-gray-500">Email</p>

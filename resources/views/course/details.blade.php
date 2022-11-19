@@ -42,21 +42,22 @@
                                     {{-- <td class="py-4 px-6 border-b border-gray-400"><a
                                             href="{{ route('profile.show', $module->id) }}"
                                             class="hover:text-blue-600 hover:underline">{{ $module->id }}</a></td> --}}
-                                    <td class="py-4 px-6 border-b border-gray-400 text-gray-500">
+                                    <td class="py-4 px-6 border-b border-gray-400 text-gray-500 bg-white">
                                         <div class="flex space-x-8 w-full items-center justify-evenly">
-                                            <div class="w-2/12 text-gray-600">
-                                                <img src="{{ Storage::url($module->module_image) }}" alt="Module Image">
-                                            </div>
+                                            <a href="{{ route('modules.show', $module->id) }}"
+                                                class="w-2/12 text-gray-600">
+                                                <img src="{{ Storage::url($module->image) }}" alt="Module Image">
+                                            </a>
                                             <div class="w-full text-gray-600">
-                                                <p class="text-lg font-bold">{{ $module->module_name }}</p>
-                                                <p class="text-sm">{{ $module->module_description }}</p>
+                                                <a href="{{ route('modules.show', $module->id) }}"
+                                                    class="text-lg font-bold">{{ $module->name }}</a>
+                                                <p class="text-sm">{{ $module->description }}</p>
                                             </div>
                                             <div class="flex justify-end items-center">
                                                 <a href="{{ route('modules.edit', $module->id) }}" title="Edit"><i
+                                                        class="fas fa-pen m-1"></i></a>
+                                                <a href="{{ route('modules.details', $module->id) }}" title="Details"><i
                                                         class="fas fa-cog m-1"></i></a>
-                                                {{-- <a href="{{ route('modules.destroy', $module->id) }}" title="Delete"><i
-                                                        class="fas fa-trash m-1"></i></a> --}}
-
                                                 <form action="{{ route('modules.destroy', $module->id) }}"
                                                     method="POST">
                                                     @csrf
