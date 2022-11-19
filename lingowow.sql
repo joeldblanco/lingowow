@@ -144,9 +144,30 @@ insert  into `classes`(`id`,`description`,`start_date`,`end_date`,`enrolment_id`
 
 insert  into `comments`(`id`,`author_id`,`content`,`commentable_id`,`commentable_type`,`created_at`,`updated_at`,`deleted_at`) values 
 (1,9,'Comment 1',3,'App\\Models\\Post','2022-09-21 12:03:47','2022-09-21 12:03:51',NULL),
-(2,6,'Editar un comentario',3,'App\\Models\\Post','2022-09-21 17:54:47','2022-09-21 19:21:44',NULL);
+(2,6,'Editar un comentario',3,'App\\Models\\Post','2022-09-21 17:54:47','2022-09-21 19:21:44',NULL),
+(3,6,'Comment',654,'App\\Models\\Classes','2022-11-14 05:48:59','2022-11-14 05:48:59',NULL),
+(4,5,'Edition',23,'App\\Models\\Post','2022-11-14 05:57:42','2022-11-14 06:03:35',NULL),
+(5,7,'Cooment',24,'App\\Models\\Post','2022-11-15 20:52:47','2022-11-15 20:52:47',NULL);
 
 /*Data for the table `contents` */
+
+insert  into `contents`(`id`,`content`,`unit_id`,`status`,`order`,`created_at`,`updated_at`) values 
+(2,'{\"type\":\"embeddable\",\"embeddable\":\"<iframe src=\\\"https:\\/\\/docs.google.com\\/presentation\\/d\\/e\\/2PACX-1vR6qonh5bQBqrnz3MmQDuOAPNPm0MYzeDcBHWo2Cid_w1u9hBKtb-BjXRwuEuPjjw\\/embed?start=false&amp;loop=false&amp;delayms=3000\\\" allowfullscreen=\\\"true\\\" mozallowfullscreen=\\\"true\\\" webkitallowfullscreen=\\\"true\\\" width=\\\"860\\\" height=\\\"469\\\" frameborder=\\\"0\\\"><\\/iframe>\"}',1,1,2,'2022-11-03 07:06:45','2022-11-15 20:55:40'),
+(3,'{\"type\":\"url\",\"link_title\":\"Unit 1 - Self-study Material\",\"link_url\":\"https:\\/\\/drive.google.com\\/file\\/d\\/17elJeQkbi_uYW_O5A8BIM9eWsJAEap0O\\/view?usp=sharing\\\"\"}',1,1,3,'2022-11-18 20:22:26','2022-11-18 20:22:26'),
+(4,'{\"type\":\"media\",\"media_url\":\"public\\/content\\\\files\\\\1668821555.mp3\"}',1,1,4,'2022-11-19 01:32:35','2022-11-19 17:55:48'),
+(5,'{\"type\":\"embeddable\",\"embeddable\":\"<iframe width=\\\"853\\\" height=\\\"480\\\" src=\\\"https:\\/\\/www.youtube.com\\/embed\\/-UGRkuEURrs\\\" frameborder=\\\"0\\\" allow=\\\"accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture\\\" allowfullscreen=\\\"\\\"><\\/iframe>\"}',1,1,5,'2022-11-19 18:36:27','2022-11-19 18:36:27'),
+(6,'{\"type\":\"embeddable\",\"embeddable\":\"<iframe src=\\\"https:\\/\\/docs.google.com\\/presentation\\/d\\/e\\/2PACX-1vRWGfVMrqnyaAJBOaexmCHwOzyv26_YoADyileU5iN8cv9KQwQ5FiElQqjVGLYneg\\/embed?start=false&amp;loop=false&amp;delayms=3000\\\" allowfullscreen=\\\"true\\\" mozallowfullscreen=\\\"true\\\" webkitallowfullscreen=\\\"true\\\" width=\\\"860\\\" height=\\\"469\\\" frameborder=\\\"0\\\"><\\/iframe>\"}',2,1,1,'2022-11-19 18:37:01','2022-11-19 18:37:01'),
+(7,'{\"type\":\"url\",\"link_title\":\"Unit 2 - Self-study Material\",\"link_url\":\"https:\\/\\/drive.google.com\\/file\\/d\\/1BjbebKfpqbU_Gg6iay7p8JKt7WdA45QF\\/view?usp=sharing\"}',2,1,2,'2022-11-19 18:37:35','2022-11-19 18:37:35'),
+(8,'{\"type\":\"embeddable\",\"embeddable\":\"<iframe width=\\\"853\\\" height=\\\"480\\\" src=\\\"https:\\/\\/www.youtube.com\\/embed\\/QQavoMYmMVE\\\" frameborder=\\\"0\\\" allow=\\\"accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture\\\" allowfullscreen=\\\"\\\"><\\/iframe>\"}',2,1,5,'2022-11-19 18:38:05','2022-11-19 20:24:11'),
+(10,'{\"type\":\"media\",\"media_url\":\"public\\/content\\/files\\/1668889220.mp3\"}',2,1,3,'2022-11-19 20:20:20','2022-11-19 20:24:11'),
+(12,'{\"type\":\"embeddable\",\"embeddable\":\"<iframe src=\\\"https:\\/\\/docs.google.com\\/presentation\\/d\\/e\\/2PACX-1vQZD_yEu7BqadWPb9vuZA3gzbu1YbGWjXxNmgLcmNerMU4LScFt1bcYPmBLHKAK0A\\/embed?start=false&amp;loop=false&amp;delayms=3000\\\" allowfullscreen=\\\"true\\\" mozallowfullscreen=\\\"true\\\" webkitallowfullscreen=\\\"true\\\" width=\\\"860\\\" height=\\\"469\\\" frameborder=\\\"0\\\"><\\/iframe>\"}',3,1,1,'2022-11-19 20:30:55','2022-11-19 20:30:55'),
+(13,'{\"type\":\"url\",\"link_title\":\"Unit 3 - Self-study Material\",\"link_url\":\"https:\\/\\/drive.google.com\\/file\\/d\\/1a3Ev9wEw1lxZ5sxYxIWtfL0Zixt3YadS\\/view?usp=sharing\"}',3,1,2,'2022-11-19 20:31:18','2022-11-19 20:31:18'),
+(16,'{\"type\":\"media\",\"media_url\":\"public\\/content\\/files\\/1668891120.mp3\"}',3,1,3,'2022-11-19 20:52:00','2022-11-19 20:52:00'),
+(17,'{\"type\":\"embeddable\",\"embeddable\":\"<iframe width=\\\"853\\\" height=\\\"480\\\" src=\\\"https:\\/\\/www.youtube.com\\/embed\\/JwGnCIsLOpU\\\" frameborder=\\\"0\\\" allow=\\\"accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture\\\" allowfullscreen=\\\"\\\"><\\/iframe>\"}',3,1,4,'2022-11-19 20:53:44','2022-11-19 20:53:44'),
+(18,'{\"type\":\"embeddable\",\"embeddable\":\"<iframe src=\\\"https:\\/\\/docs.google.com\\/presentation\\/d\\/e\\/2PACX-1vRgxWtL8xzbN0T7LRq8z5zMOsGQcnyml5D5_7MoEgmVdUagXY305wQscCvI0sD4AA\\/embed?start=false&amp;loop=false&amp;delayms=3000\\\" allowfullscreen=\\\"true\\\" mozallowfullscreen=\\\"true\\\" webkitallowfullscreen=\\\"true\\\" width=\\\"860\\\" height=\\\"469\\\" frameborder=\\\"0\\\"><\\/iframe>\"}',4,1,1,'2022-11-19 21:00:09','2022-11-19 21:00:09'),
+(19,'{\"type\":\"url\",\"link_title\":\"Unit 4 - Self-study Material\",\"link_url\":\"https:\\/\\/drive.google.com\\/file\\/d\\/1GQ52VuEMXt4R7FR7itetpN_30jV9zuOj\\/view?usp=sharing\"}',4,1,2,'2022-11-19 21:00:22','2022-11-19 21:00:22'),
+(20,'{\"type\":\"embeddable\",\"embeddable\":\"<iframe width=\\\"853\\\" height=\\\"480\\\" src=\\\"https:\\/\\/www.youtube.com\\/embed\\/oQNbTNY5amQ\\\" frameborder=\\\"0\\\" allow=\\\"accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture\\\" allowfullscreen=\\\"\\\"><\\/iframe>\"}',4,1,4,'2022-11-19 21:00:42','2022-11-19 21:04:32'),
+(21,'{\"type\":\"media\",\"media_url\":\"public\\/content\\/files\\/1668891858.mp3\"}',4,1,3,'2022-11-19 21:04:18','2022-11-19 21:04:33');
 
 /*Data for the table `conversation_user` */
 
@@ -212,7 +233,10 @@ insert  into `enrolments`(`id`,`student_id`,`teacher_id`,`course_id`,`created_at
 (9,5,7,2,'2022-01-06 15:49:29','2022-01-06 15:49:29','2022-01-21 18:37:58'),
 (10,5,7,3,'2022-01-07 18:49:46','2022-01-07 18:49:46','2022-01-21 18:38:08'),
 (11,9,7,1,'2022-06-24 03:26:33','2022-08-02 19:52:21',NULL),
-(12,183,7,1,'2022-07-29 06:20:02','2022-09-27 19:21:32','2022-09-27 19:21:32');
+(12,183,7,1,'2022-07-29 06:20:02','2022-09-27 19:21:32','2022-09-27 19:21:32'),
+(13,NULL,7,3,'2022-11-15 03:29:34','2022-11-15 03:36:59','2022-11-15 03:36:59'),
+(17,NULL,7,2,'2022-11-15 03:37:19','2022-11-15 20:58:25',NULL),
+(18,NULL,7,6,'2022-11-15 20:58:44','2022-11-15 20:58:58','2022-11-15 20:58:58');
 
 /*Data for the table `evaluation_module` */
 
@@ -273,7 +297,7 @@ insert  into `exam_question`(`exam_id`,`question_id`) values
 /*Data for the table `exams` */
 
 insert  into `exams`(`id`,`unit_id`,`type`,`min_score`,`created_at`,`updated_at`,`deleted_at`) values 
-(8,1,NULL,10,'2022-02-01 21:31:07','2022-02-01 21:31:07',NULL),
+(8,4,NULL,10,'2022-02-01 21:31:07','2022-02-01 21:31:07',NULL),
 (9,2,NULL,10,'2022-02-07 17:42:30','2022-02-07 17:42:30',NULL),
 (10,0,NULL,10,'2022-02-09 21:23:20','2022-02-09 21:23:20',NULL);
 
@@ -989,6 +1013,11 @@ insert  into `items`(`id`,`invoice_id`,`item_name`,`item_price`,`item_qty`,`crea
 
 /*Data for the table `jobs` */
 
+insert  into `jobs`(`id`,`queue`,`payload`,`attempts`,`reserved_at`,`available_at`,`created_at`) values 
+(1,'default','{\"uuid\":\"799355eb-2553-4a4e-b783-de5d07cfc95a\",\"displayName\":\"App\\\\Notifications\\\\NewMessage\",\"job\":\"Illuminate\\\\Queue\\\\CallQueuedHandler@call\",\"maxTries\":null,\"maxExceptions\":null,\"failOnTimeout\":false,\"backoff\":null,\"timeout\":null,\"retryUntil\":null,\"data\":{\"commandName\":\"Illuminate\\\\Notifications\\\\SendQueuedNotifications\",\"command\":\"O:48:\\\"Illuminate\\\\Notifications\\\\SendQueuedNotifications\\\":16:{s:11:\\\"notifiables\\\";O:45:\\\"Illuminate\\\\Contracts\\\\Database\\\\ModelIdentifier\\\":4:{s:5:\\\"class\\\";s:15:\\\"App\\\\Models\\\\User\\\";s:2:\\\"id\\\";a:1:{i:0;i:7;}s:9:\\\"relations\\\";a:0:{}s:10:\\\"connection\\\";s:5:\\\"mysql\\\";}s:12:\\\"notification\\\";O:28:\\\"App\\\\Notifications\\\\NewMessage\\\":13:{s:12:\\\"text_message\\\";s:4:\\\"Test\\\";s:15:\\\"conversation_id\\\";i:13;s:2:\\\"id\\\";s:36:\\\"ebc335f7-563d-41c4-8208-fd2e1635ffb6\\\";s:6:\\\"locale\\\";N;s:10:\\\"connection\\\";N;s:5:\\\"queue\\\";N;s:15:\\\"chainConnection\\\";N;s:10:\\\"chainQueue\\\";N;s:19:\\\"chainCatchCallbacks\\\";N;s:5:\\\"delay\\\";N;s:11:\\\"afterCommit\\\";N;s:10:\\\"middleware\\\";a:0:{}s:7:\\\"chained\\\";a:0:{}}s:8:\\\"channels\\\";a:1:{i:0;s:9:\\\"broadcast\\\";}s:5:\\\"tries\\\";N;s:7:\\\"timeout\\\";N;s:17:\\\"shouldBeEncrypted\\\";b:0;s:3:\\\"job\\\";N;s:10:\\\"connection\\\";N;s:5:\\\"queue\\\";N;s:15:\\\"chainConnection\\\";N;s:10:\\\"chainQueue\\\";N;s:19:\\\"chainCatchCallbacks\\\";N;s:5:\\\"delay\\\";N;s:11:\\\"afterCommit\\\";N;s:10:\\\"middleware\\\";a:0:{}s:7:\\\"chained\\\";a:0:{}}\"}}',0,NULL,1668442302,1668442302),
+(2,'default','{\"uuid\":\"75d7121d-ea29-4327-9716-6e3ff75b451c\",\"displayName\":\"App\\\\Notifications\\\\NewMessage\",\"job\":\"Illuminate\\\\Queue\\\\CallQueuedHandler@call\",\"maxTries\":null,\"maxExceptions\":null,\"failOnTimeout\":false,\"backoff\":null,\"timeout\":null,\"retryUntil\":null,\"data\":{\"commandName\":\"Illuminate\\\\Notifications\\\\SendQueuedNotifications\",\"command\":\"O:48:\\\"Illuminate\\\\Notifications\\\\SendQueuedNotifications\\\":16:{s:11:\\\"notifiables\\\";O:45:\\\"Illuminate\\\\Contracts\\\\Database\\\\ModelIdentifier\\\":4:{s:5:\\\"class\\\";s:15:\\\"App\\\\Models\\\\User\\\";s:2:\\\"id\\\";a:1:{i:0;i:7;}s:9:\\\"relations\\\";a:0:{}s:10:\\\"connection\\\";s:5:\\\"mysql\\\";}s:12:\\\"notification\\\";O:28:\\\"App\\\\Notifications\\\\NewMessage\\\":13:{s:12:\\\"text_message\\\";s:0:\\\"\\\";s:15:\\\"conversation_id\\\";i:13;s:2:\\\"id\\\";s:36:\\\"d3e861f3-b33a-4869-8026-4e6d9b8c3297\\\";s:6:\\\"locale\\\";N;s:10:\\\"connection\\\";N;s:5:\\\"queue\\\";N;s:15:\\\"chainConnection\\\";N;s:10:\\\"chainQueue\\\";N;s:19:\\\"chainCatchCallbacks\\\";N;s:5:\\\"delay\\\";N;s:11:\\\"afterCommit\\\";N;s:10:\\\"middleware\\\";a:0:{}s:7:\\\"chained\\\";a:0:{}}s:8:\\\"channels\\\";a:1:{i:0;s:9:\\\"broadcast\\\";}s:5:\\\"tries\\\";N;s:7:\\\"timeout\\\";N;s:17:\\\"shouldBeEncrypted\\\";b:0;s:3:\\\"job\\\";N;s:10:\\\"connection\\\";N;s:5:\\\"queue\\\";N;s:15:\\\"chainConnection\\\";N;s:10:\\\"chainQueue\\\";N;s:19:\\\"chainCatchCallbacks\\\";N;s:5:\\\"delay\\\";N;s:11:\\\"afterCommit\\\";N;s:10:\\\"middleware\\\";a:0:{}s:7:\\\"chained\\\";a:0:{}}\"}}',0,NULL,1668442463,1668442463),
+(3,'default','{\"uuid\":\"e5f5eea1-8f0c-4600-bae3-b35f4e355df1\",\"displayName\":\"App\\\\Notifications\\\\NewMessage\",\"job\":\"Illuminate\\\\Queue\\\\CallQueuedHandler@call\",\"maxTries\":null,\"maxExceptions\":null,\"failOnTimeout\":false,\"backoff\":null,\"timeout\":null,\"retryUntil\":null,\"data\":{\"commandName\":\"Illuminate\\\\Notifications\\\\SendQueuedNotifications\",\"command\":\"O:48:\\\"Illuminate\\\\Notifications\\\\SendQueuedNotifications\\\":16:{s:11:\\\"notifiables\\\";O:45:\\\"Illuminate\\\\Contracts\\\\Database\\\\ModelIdentifier\\\":4:{s:5:\\\"class\\\";s:15:\\\"App\\\\Models\\\\User\\\";s:2:\\\"id\\\";a:1:{i:0;i:7;}s:9:\\\"relations\\\";a:0:{}s:10:\\\"connection\\\";s:5:\\\"mysql\\\";}s:12:\\\"notification\\\";O:28:\\\"App\\\\Notifications\\\\NewMessage\\\":13:{s:12:\\\"text_message\\\";s:7:\\\"message\\\";s:15:\\\"conversation_id\\\";i:13;s:2:\\\"id\\\";s:36:\\\"54c6a2e9-b4ba-4e06-a522-55e42dad7ee4\\\";s:6:\\\"locale\\\";N;s:10:\\\"connection\\\";N;s:5:\\\"queue\\\";N;s:15:\\\"chainConnection\\\";N;s:10:\\\"chainQueue\\\";N;s:19:\\\"chainCatchCallbacks\\\";N;s:5:\\\"delay\\\";N;s:11:\\\"afterCommit\\\";N;s:10:\\\"middleware\\\";a:0:{}s:7:\\\"chained\\\";a:0:{}}s:8:\\\"channels\\\";a:1:{i:0;s:9:\\\"broadcast\\\";}s:5:\\\"tries\\\";N;s:7:\\\"timeout\\\";N;s:17:\\\"shouldBeEncrypted\\\";b:0;s:3:\\\"job\\\";N;s:10:\\\"connection\\\";N;s:5:\\\"queue\\\";N;s:15:\\\"chainConnection\\\";N;s:10:\\\"chainQueue\\\";N;s:19:\\\"chainCatchCallbacks\\\";N;s:5:\\\"delay\\\";N;s:11:\\\"afterCommit\\\";N;s:10:\\\"middleware\\\";a:0:{}s:7:\\\"chained\\\";a:0:{}}\"}}',0,NULL,1668646525,1668646525);
+
 /*Data for the table `meetings` */
 
 insert  into `meetings`(`id`,`topic`,`host_id`,`atendee_id`,`start_date`,`join_url`,`created_at`,`updated_at`,`deleted_at`) values 
@@ -1145,7 +1174,10 @@ insert  into `messages`(`id`,`conversation_id`,`user_id`,`message_content`,`mess
 (125,13,7,'8847',1,'2022-09-16 03:34:54','2022-09-16 03:31:01','2022-09-16 03:34:54'),
 (126,13,7,'8854',1,'2022-09-16 03:34:54','2022-09-16 03:32:20','2022-09-16 03:34:54'),
 (127,13,7,'Test 5504',1,'2022-09-16 03:34:54','2022-09-16 03:32:57','2022-09-16 03:34:54'),
-(128,13,7,'Test 5505',1,'2022-09-16 03:34:54','2022-09-16 03:34:37','2022-09-16 03:34:54');
+(128,13,7,'Test 5505',1,'2022-09-16 03:34:54','2022-09-16 03:34:37','2022-09-16 03:34:54'),
+(129,13,6,'Test',1,NULL,'2022-11-14 16:11:40','2022-11-14 16:11:40'),
+(130,13,6,'',1,NULL,'2022-11-14 16:14:23','2022-11-14 16:14:23'),
+(131,13,6,'message',1,NULL,'2022-11-17 00:55:23','2022-11-17 00:55:23');
 
 /*Data for the table `model_has_permissions` */
 
@@ -1247,12 +1279,19 @@ insert  into `model_has_roles`(`role_id`,`model_type`,`model_id`) values
 
 /*Data for the table `modules` */
 
-insert  into `modules`(`id`,`name`,`description`,`image`,`priority`,`status`,`course_id`,`created_at`,`updated_at`) values 
-(1,'Module 1','This is the first level of your journey. \r\n\r\nPlease, feel free to go around revise the material to get started. \r\n\r\nYou will find here the material used during your lessons, handouts to practice, audi','images/image_preview.png','FIRST',1,1,NULL,NULL),
-(2,'Module 2','Welcome to the second step in your journey to learn English.   As it was mentioned in your module 1, these spaces are for you to find material that you can use to review and reinforce the knowledge yo','images/image_preview.png','1',1,1,NULL,NULL),
-(3,'Module 3','Dear, utterer.   Welcome to your level three in this path you have started with us.   As previously mentioned in other classrooms, this space contains materials that will be of help for you to review ','images/image_preview.png','2',1,1,NULL,NULL),
-(4,'Module 4','Dear, utterer.   Welcome to your level four in this path you have started with us.   As previously mentioned in other classrooms, this space contains materials that will be of help for you to review t','images/image_preview.png','3',1,1,NULL,NULL),
-(5,'Module 5','Dear, utterer.   Welcome to your level five in this path you have started with us.   As previously mentioned in other classrooms, this space contains materials that will be of help for you to review t','images/image_preview.png','4',1,1,NULL,NULL);
+insert  into `modules`(`id`,`name`,`description`,`image`,`status`,`course_id`,`order`,`created_at`,`updated_at`) values 
+(1,'Module 1','This is the first level of your journey. \r\n\r\nPlease, feel free to go around revising the material to get started. \r\n\r\nYou will find the material used during your lessons, handouts to practice, audio files, and videos here. \r\n\r\nAll the best in your journey.','public/images/modules/covers/1.png',1,1,1,NULL,'2022-11-18 23:53:29'),
+(2,'Module 2','Welcome to the second step in your journey to learn English. \r\n\r\nAs it was mentioned in your module 1, these spaces are for you to find material that you can use to review and reinforce the knowledge you have acquired during your lessons. \r\n\r\nWe hope you can enjoy to the fullest your experience with us and remember that we are working to make your dream come true.','public/images/modules/covers/2.png',1,1,2,NULL,'2022-11-18 23:53:36'),
+(3,'Module 3','Welcome to level three in this path you have started with us. \r\n\r\nAs previously mentioned in other classrooms, this space contains materials that will be of help for you to review the content studied during your lesson time. \r\n\r\nTake advantage of all the resources provided and increase the opportunity of using the language you are learning.','public/images/modules/covers/3.png',1,1,2,NULL,'2022-11-18 23:53:44'),
+(4,'Module 4','Welcome to level four on this path you have started with us. \r\n\r\nAs previously mentioned in other classrooms, this space contains materials that will be of help for you to review the content studied during your lesson time. \r\n\r\nTake advantage of all the resources provided and increase the opportunity of using the language you are learning.','public/images/modules/covers/4.png',1,1,3,NULL,'2022-11-18 23:53:51'),
+(5,'Module 5','Welcome to your level five in this path you have started with us. \r\n\r\nAs previously mentioned in other classrooms, this space contains materials that will be of help for you to review the content studied during your lesson time. \r\n\r\nTake advantage of all the resources provided and increase the opportunity of using the language you are learning.','public/images/modules/covers/5.png',1,1,4,NULL,'2022-11-18 23:53:58'),
+(6,'Module 6','Welcome to level six on this path you have started with us. \r\n\r\nAs previously mentioned in other classrooms, this space contains materials that will be of help for you to review the content studied during your lesson time. \r\n\r\nTake advantage of all the resources provided and increase the opportunity of using the language you are learning.','public/images/modules/covers/6.png',1,1,5,'2022-11-18 14:50:19','2022-11-18 23:54:09'),
+(7,'Module 7','Welcome to level seven in this path you have started with us. \r\n\r\nAs previously mentioned in other classrooms, this space contains materials that will be of help for you to review the content studied during your lesson time. \r\n\r\nTake advantage of all the resources provided and increase the opportunity of using the language you are learning.','public/images/modules/covers/7.png',1,1,6,'2022-11-18 14:54:50','2022-11-18 23:54:22'),
+(8,'Module 8','Welcome to level eight in this path you have started with us. \r\n\r\nAs previously mentioned in other classrooms, this space contains materials that will be of help for you to review the content studied during your lesson time. \r\n\r\nTake advantage of all the resources provided and increase the opportunity of using the language you are learning.','public/images/modules/covers/8.png',1,1,7,'2022-11-18 14:55:25','2022-11-18 23:55:09'),
+(9,'Module 9','Welcome to level nine on this path you have started with us. \r\n\r\nAs previously mentioned in other classrooms, this space contains materials that will be of help for you to review the content studied during your lesson time. \r\n\r\nTake advantage of all the resources provided and increase the opportunity of using the language you are learning.','public/images/modules/covers/9.png',1,1,8,'2022-11-18 14:55:28','2022-11-18 23:55:01'),
+(10,'Module 10','Welcome to level ten in this path you have started with us. \r\n\r\nAs previously mentioned in other classrooms, this space contains materials that will be of help for you to review the content studied during your lesson time. \r\n\r\nTake advantage of all the resources provided and increase the opportunity of using the language you are learning.','public/images/modules/covers/10.png',1,1,9,'2022-11-18 14:56:50','2022-11-18 23:54:52'),
+(11,'Module 11','Welcome to level eleven in this path you have started with us. \r\n\r\nAs previously mentioned in other classrooms, this space contains materials that will be of help for you to review the content studied during your lesson time. \r\n\r\nTake advantage of all the resources provided and increase the opportunity of using the language you are learning.','public/images/modules/covers/11.png',1,1,10,'2022-11-18 14:57:13','2022-11-18 23:54:43'),
+(12,'Module 12','Welcome to level twelve in this path you have started with us. \r\n\r\nAs previously mentioned in other classrooms, this space contains materials that will be of help for you to review the content studied during your lesson time. \r\n\r\nTake advantage of all the resources provided and increase the opportunity of using the language you are learning.','public/images/modules/covers/12.png',1,1,11,'2022-11-18 14:57:34','2022-11-18 23:54:34');
 
 /*Data for the table `notifications` */
 
@@ -1273,7 +1312,7 @@ insert  into `notifications`(`id`,`type`,`notifiable_type`,`notifiable_id`,`data
 ('279a767b-8518-4cbb-9a10-87ed2e5676a0','App\\Notifications\\BookedClass','App\\Models\\User',7,'{\"user_id\":5,\"schedule_string\":\"on Mondays at 7:00, on Tuesdays at 7:00 and Wednesdays at 7:00.\"}',NULL,'2022-09-01 02:40:43','2022-09-01 02:40:43'),
 ('2809bff7-5dc5-4371-ab9c-41f941b8e75a','App\\Notifications\\BookedClass','App\\Models\\User',7,'{\"user_id\":9,\"schedule_string\":\"on Thursdays at 6:00 and Thursdays at 7:00.\"}',NULL,'2022-07-21 22:57:08','2022-07-21 22:57:08'),
 ('2f824a5a-16c8-4a9c-9e65-f3a493dc1a4f','App\\Notifications\\BookedClass','App\\Models\\User',7,'{\"user_id\":9,\"schedule_string\":\"on Tuesdays at 18:00, on Mondays at 21:00 and Wednesdays at 21:00.\"}',NULL,'2022-07-11 04:04:24','2022-07-11 04:04:24'),
-('324e265c-9fc5-41af-857f-070b0e459a0d','App\\Notifications\\BookedClass','App\\Models\\User',7,'{\"user_id\":5,\"schedule_string\":\"on Thursdays at 11:00 and Thursdays at 12:00.\"}',NULL,'2022-08-08 21:33:03','2022-08-08 21:33:03'),
+('324e265c-9fc5-41af-857f-070b0e459a0d','App\\Notifications\\BookedClass','App\\Models\\User',7,'{\"user_id\":5,\"schedule_string\":\"on Thursdays at 11:00 and Thursdays at 12:00.\"}','2022-11-14 16:09:00','2022-08-08 21:33:03','2022-11-14 16:09:00'),
 ('3870d003-71bd-4582-bcc4-69f906210fed','App\\Notifications\\BookedClass','App\\Models\\User',7,'{\"user_id\":5,\"schedule_string\":\"on Mondays at 10:00, on Wednesdays at 10:00 and Fridays at 10:00.\"}',NULL,'2022-04-09 16:46:00','2022-04-09 16:46:00'),
 ('392cd967-e49b-4f05-9ed1-8ddd32b5c6c3','App\\Notifications\\BookedClass','App\\Models\\User',7,'{\"user_id\":9,\"schedule_string\":\"on Sundays at 6:00, on Sundays at 7:00 and Sundays at 8:00.\"}',NULL,'2022-07-14 21:21:04','2022-07-14 21:21:04'),
 ('3c9d8f39-aa09-4125-a4d8-f3dc9f130339','App\\Notifications\\ClassRescheduledToTeacher','App\\Models\\User',7,'{\"user_id\":9,\"schedule_string\":\".\"}',NULL,'2022-07-23 03:38:53','2022-07-23 03:38:53'),
@@ -1282,7 +1321,7 @@ insert  into `notifications`(`id`,`type`,`notifiable_type`,`notifiable_id`,`data
 ('41895788-9bb2-488d-a0fe-4df41a7760dc','App\\Notifications\\BookedClass','App\\Models\\User',7,'{\"user_id\":5,\"schedule_string\":\"on Wednesdays at 6:00 and Wednesdays at 7:00.\"}',NULL,'2022-07-29 06:29:10','2022-07-29 06:29:10'),
 ('4b4f3f07-de9c-46f3-8104-cc7229fe49de','App\\Notifications\\BookedClass','App\\Models\\User',7,'{\"user_id\":9,\"schedule_string\":\"on Tuesdays at 15:00, on Tuesdays at 16:00 and Tuesdays at 17:00.\"}',NULL,'2022-07-08 04:54:56','2022-07-08 04:54:56'),
 ('4c1d0ed7-c222-4c65-bb80-17efd2bd53d9','App\\Notifications\\BookedClass','App\\Models\\User',241,'{\"user_id\":5,\"schedule_string\":\"on Tuesdays at 6:00 and Wednesdays at 6:00.\"}',NULL,'2022-04-07 17:49:30','2022-04-07 17:49:30'),
-('4c9942aa-519b-4078-9a2d-7e45a2bbe097','App\\Notifications\\ClassRescheduledToTeacher','App\\Models\\User',7,'{\"user_id\":9,\"schedule_string\":\"on Wednesdays at 11:00, on Wednesdays at 12:00 and Wednesdays at 13:00.\"}',NULL,'2022-09-23 04:28:35','2022-09-23 04:28:35'),
+('4c9942aa-519b-4078-9a2d-7e45a2bbe097','App\\Notifications\\ClassRescheduledToTeacher','App\\Models\\User',7,'{\"user_id\":9,\"schedule_string\":\"on Wednesdays at 11:00, on Wednesdays at 12:00 and Wednesdays at 13:00.\"}','2022-11-14 16:08:36','2022-09-23 04:28:35','2022-11-14 16:08:36'),
 ('4db68ffe-16fa-4f78-b9f9-ec41efbeaa7c','App\\Notifications\\BookedClass','App\\Models\\User',7,'{\"user_id\":5,\"schedule_string\":\"on Sundays at 12:00, on Mondays at 12:00 and Tuesdays at 12:00.\"}',NULL,'2022-08-30 01:31:38','2022-08-30 01:31:38'),
 ('50b7dae8-f3ea-4030-9600-1439ab27e5e5','App\\Notifications\\ClassRescheduledToTeacher','App\\Models\\User',7,'{\"user_id\":5,\"schedule_string\":\"on Mondays at 18:00 and Mondays at 19:00.\"}',NULL,'2022-09-17 04:24:00','2022-09-17 04:24:00'),
 ('51ea6a84-2f84-44f5-b3c0-6e458f059a3e','App\\Notifications\\BookedClass','App\\Models\\User',241,'{\"user_id\":5,\"schedule_string\":\"on Tuesdays at 6:00 and Wednesdays at 6:00.\"}',NULL,'2022-04-07 17:49:14','2022-04-07 17:49:14'),
@@ -1328,7 +1367,7 @@ insert  into `notifications`(`id`,`type`,`notifiable_type`,`notifiable_id`,`data
 ('d19b506a-618f-41a2-a5fb-37619e41e0e8','App\\Notifications\\ClassRescheduledToTeacher','App\\Models\\User',7,'{\"user_id\":5,\"schedule_string\":\"on Mondays at 18:00 and Mondays at 19:00.\"}',NULL,'2022-09-17 04:21:22','2022-09-17 04:21:22'),
 ('d384a259-21e7-49ed-89fb-cc74beabcd35','App\\Notifications\\ClassRescheduledToTeacher','App\\Models\\User',7,'{\"user_id\":5,\"schedule_string\":\"on Mondays at 18:00 and Mondays at 19:00.\"}',NULL,'2022-09-17 04:11:52','2022-09-17 04:11:52'),
 ('d61cee98-58a5-4397-bdd2-d25c8196a8d1','App\\Notifications\\BookedClass','App\\Models\\User',7,'{\"user_id\":9,\"schedule_string\":\"on Thursdays at 6:00, on Thursdays at 7:00, on Thursdays at 8:00 and Thursdays at 9:00.\"}','2022-07-26 07:21:21','2022-07-24 03:25:51','2022-07-26 07:21:21'),
-('d75660f0-d26a-439d-afc4-c58dda4af945','App\\Notifications\\ClassRescheduledToTeacher','App\\Models\\User',7,'{\"user_id\":5,\"schedule_string\":\"on Mondays at 18:00 and Mondays at 19:00.\"}',NULL,'2022-09-17 04:24:48','2022-09-17 04:24:48'),
+('d75660f0-d26a-439d-afc4-c58dda4af945','App\\Notifications\\ClassRescheduledToTeacher','App\\Models\\User',7,'{\"user_id\":5,\"schedule_string\":\"on Mondays at 18:00 and Mondays at 19:00.\"}','2022-11-14 16:08:43','2022-09-17 04:24:48','2022-11-14 16:08:43'),
 ('e802f550-ec19-4d1a-946a-ecf54a2a48bd','App\\Notifications\\ClassRescheduledToTeacher','App\\Models\\User',7,'{\"user_id\":5,\"schedule_string\":\"on Mondays at 18:00 and Mondays at 19:00.\"}',NULL,'2022-09-17 04:22:49','2022-09-17 04:22:49'),
 ('e9804305-1a9a-423f-9788-5f7ffe0051ed','App\\Notifications\\BookedClass','App\\Models\\User',7,'{\"user_id\":5,\"schedule_string\":\"on Sundays at [[\\\"6\\\":00, on Sundays at [\\\"6\\\":00, on Sundays at [\\\"6\\\":00 and Sundays at [\\\"6\\\":00.\"}',NULL,'2022-05-07 01:57:38','2022-05-07 01:57:38'),
 ('eb4e790b-1e17-4bef-a90d-47c899d0f012','App\\Notifications\\BookedClass','App\\Models\\User',7,'{\"user_id\":5,\"schedule_string\":\"on Mondays at 6:00 and Wednesdays at 6:00.\"}',NULL,'2022-05-07 02:23:23','2022-05-07 02:23:23'),
@@ -1372,7 +1411,8 @@ insert  into `plans_products`(`plan_id`,`product_id`) values
 /*Data for the table `post_like` */
 
 insert  into `post_like`(`user_id`,`post_id`) values 
-(6,6);
+(6,6),
+(6,26);
 
 /*Data for the table `post_user` */
 
@@ -1399,7 +1439,12 @@ insert  into `posts`(`id`,`author_id`,`content`,`created_at`,`updated_at`,`delet
 (18,6,'{\"text\":\"Redirect back?\",\"photo_path\":\"public\\/photos\\/users\\/$2y$10$BKfDagVDpRy59FZ59bzIKu5NP1L.96nlAb26nffxeSSwrRJZq4Lri\\/1663959269.png\"}','2022-09-23 18:54:29','2022-09-23 18:54:59','2022-09-23 18:54:59'),
 (19,6,'{\"text\":\"Well, let\'s try!\",\"photo_path\":\"public\\/photos\\/users\\/$2y$10$4itDlv16k2HGbOxY1Xu7WOoaZlxLzLe\\/WL9Gq8tg6\\/2U1bdMabDH2\\/1663959292.jpg\"}','2022-09-23 18:54:52','2022-09-23 18:54:57','2022-09-23 18:54:57'),
 (20,6,'{\"text\":\"This is the new logo!\",\"photo_path\":\"public\\/photos\\/users\\/$2y$10$cljuViyrvyE2OhhS5dCf8ulL4uc83ASIRVnqo58U5yN7rJzWYFgTS\\/1664049403.png\"}','2022-09-24 19:56:43','2022-09-24 20:05:33','2022-09-24 20:05:33'),
-(21,6,'{\"text\":null,\"photo_path\":\"public\\/photos\\/users\\/$2y$10$nAIkJaj8ftSTFM38mZBKw.Rrw5KXlpgYfp5zAWLr5FUlp1DUdLmoa\\/1664050429.jpg\"}','2022-09-24 20:13:49','2022-09-24 20:14:01','2022-09-24 20:14:01');
+(21,6,'{\"text\":null,\"photo_path\":\"public\\/photos\\/users\\/$2y$10$nAIkJaj8ftSTFM38mZBKw.Rrw5KXlpgYfp5zAWLr5FUlp1DUdLmoa\\/1664050429.jpg\"}','2022-09-24 20:13:49','2022-09-24 20:14:01','2022-09-24 20:14:01'),
+(22,6,'{\"text\":\"My mind?\",\"photo_path\":null}','2022-11-14 05:56:35','2022-11-14 05:56:44','2022-11-14 05:56:44'),
+(23,6,'{\"text\":\"My mind?\",\"photo_path\":null}','2022-11-14 05:57:30','2022-11-14 16:16:33','2022-11-14 16:16:33'),
+(24,6,'{\"text\":\"Hello\",\"photo_path\":null}','2022-11-15 20:52:37','2022-11-15 20:52:56','2022-11-15 20:52:56'),
+(25,6,'{\"text\":\"Publicar algo\",\"photo_path\":null}','2022-11-16 02:31:20','2022-11-16 02:31:29','2022-11-16 02:31:29'),
+(26,6,'{\"text\":\"On my mind!\",\"photo_path\":null}','2022-11-17 00:54:15','2022-11-17 00:54:40','2022-11-17 00:54:40');
 
 /*Data for the table `products` */
 
@@ -1578,7 +1623,7 @@ insert  into `schedules`(`id`,`selected_schedule`,`next_schedule`,`user_id`,`enr
 /*Data for the table `sessions` */
 
 insert  into `sessions`(`id`,`user_id`,`ip_address`,`user_agent`,`payload`,`last_activity`) values 
-('IkmTGUIOJdphMeDc88u908O47btown8j6521m09q',6,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36','YTo2OntzOjY6Il90b2tlbiI7czo0MDoiNTRZcDNUUVBoS3I5VXp0NEN4QnN0TDl6WjZiaU9WOWhrNVJxdmFpaCI7czozOiJ1cmwiO2E6MDp7fXM6OToiX3ByZXZpb3VzIjthOjE6e3M6MzoidXJsIjtzOjI5OiJodHRwOi8vMTI3LjAuMC4xOjgwMDAvdW5pdHMvMSI7fXM6NjoiX2ZsYXNoIjthOjI6e3M6Mzoib2xkIjthOjA6e31zOjM6Im5ldyI7YTowOnt9fXM6NTA6ImxvZ2luX3dlYl8zZGM3YTkxM2VmNWZkNGI4OTBlY2FiZTM0ODcwODU1NzNlMTZjZjgyIjtpOjY7czoxNzoicGFzc3dvcmRfaGFzaF93ZWIiO3M6NjA6IiQyeSQxMCRRM2h4cVo5dVpjLk5sRlRaQ01Jc3JPcVRvLlA4LmZPa0tuVlZmRGxXNmw2OGtyNVhxU2xxTyI7fQ==',1667456868);
+('kjmOzeHKsbJiZ41RD2B6g6JNtaQCDjk1w8I5dzTW',6,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36','YTo2OntzOjY6Il90b2tlbiI7czo0MDoiT0M1eXZ6dk1pNndsUFg2b05xZFdtTjBtbHBvVmhudm9jb0tYWFJUTSI7czo2OiJfZmxhc2giO2E6Mjp7czozOiJuZXciO2E6MDp7fXM6Mzoib2xkIjthOjA6e319czozOiJ1cmwiO2E6MDp7fXM6OToiX3ByZXZpb3VzIjthOjE6e3M6MzoidXJsIjtzOjI5OiJodHRwOi8vMTI3LjAuMC4xOjgwMDAvdW5pdHMvMCI7fXM6NTA6ImxvZ2luX3dlYl8zZGM3YTkxM2VmNWZkNGI4OTBlY2FiZTM0ODcwODU1NzNlMTZjZjgyIjtpOjY7czoxNzoicGFzc3dvcmRfaGFzaF93ZWIiO3M6NjA6IiQyeSQxMCRRM2h4cVo5dVpjLk5sRlRaQ01Jc3JPcVRvLlA4LmZPa0tuVlZmRGxXNmw2OGtyNVhxU2xxTyI7fQ==',1668892902);
 
 /*Data for the table `shoppingcart` */
 
@@ -1592,18 +1637,18 @@ insert  into `unit_user`(`id`,`user_id`,`unit_id`) values
 (5,7,4),
 (6,6,1),
 (14,5,3),
-(15,5,4),
+(15,9,4),
 (18,9,1),
 (21,5,1);
 
 /*Data for the table `units` */
 
-insert  into `units`(`id`,`name`,`image`,`slide_url`,`doc_url`,`audio_url`,`forum_name`,`forum_url`,`status`,`module_id`,`created_at`,`updated_at`,`deleted_at`) values 
-(1,'Unit 1','images/image_preview.png','https://docs.google.com/presentation/d/e/2PACX-1vR6qonh5bQBqrnz3MmQDuOAPNPm0MYzeDcBHWo2Cid_w1u9hBKtb-BjXRwuEuPjjw/embed?start=false&amp;loop=false&amp;delayms=3000','https://campus.theuttererscorner.com/mod/url/view.php?id=346','https://campus.theuttererscorner.com/draftfile.php/5/user/draft/967533140/Unit%201%20-%20This%20is%20me%21.mp3','This is me!','https://campus.theuttererscorner.com/mod/forum/view.php?id=113',1,1,'2022-04-08 11:14:18','2022-04-08 11:14:18',NULL),
-(2,'Unit 2','images/image_preview.png','https://docs.google.com/presentation/d/e/2PACX-1vRWGfVMrqnyaAJBOaexmCHwOzyv26_YoADyileU5iN8cv9KQwQ5FiElQqjVGLYneg/embed?start=false&amp;loop=false&amp;delayms=3000','https://drive.google.com/file/d/1BjbebKfpqbU_Gg6iay7p8JKt7WdA45QF/view?usp=sharing','https://campus.theuttererscorner.com/draftfile.php/5/user/draft/872955533/Unit%202%20-%20I%20come%20from....mp3','I come from...','https://campus.theuttererscorner.com/mod/forum/view.php?id=121',1,1,'2022-04-08 11:14:18','2022-04-08 11:14:18',NULL),
-(3,'Unit 3','images/image_preview.png','https://docs.google.com/presentation/d/e/2PACX-1vQZD_yEu7BqadWPb9vuZA3gzbu1YbGWjXxNmgLcmNerMU4LScFt1bcYPmBLHKAK0A/embed?start=false&amp;loop=false&amp;delayms=3000','https://drive.google.com/file/d/1a3Ev9wEw1lxZ5sxYxIWtfL0Zixt3YadS/view?usp=sharing','https://campus.theuttererscorner.com/draftfile.php/5/user/draft/429845237/Unit%203%20-%20Everyday%20I....mp3','Every day I...','https://campus.theuttererscorner.com/mod/forum/view.php?id=122',1,1,'2022-04-08 11:14:18','2022-04-08 11:14:18',NULL),
-(4,'Unit 4','images/image_preview.png','https://docs.google.com/presentation/d/e/2PACX-1vRgxWtL8xzbN0T7LRq8z5zMOsGQcnyml5D5_7MoEgmVdUagXY305wQscCvI0sD4AA/embed?start=false&amp;loop=false&amp;delayms=3000','https://drive.google.com/file/d/1GQ52VuEMXt4R7FR7itetpN_30jV9zuOj/view?usp=sharing','https://campus.theuttererscorner.com/draftfile.php/5/user/draft/54396995/Unit%204%20-%20I%20love%20it%21.mp3','I love it!','https://campus.theuttererscorner.com/mod/forum/view.php?id=123',1,1,'2022-04-08 11:14:18','2022-04-08 11:14:18',NULL),
-(5,'Unit 5','images/image_preview.png','https://docs.google.com/presentation/d/e/2PACX-1vRgxWtL8xzbN0T7LRq8z5zMOsGQcnyml5D5_7MoEgmVdUagXY305wQscCvI0sD4AA/embed?start=false&amp;loop=false&amp;delayms=3000','https://drive.google.com/file/d/1GQ52VuEMXt4R7FR7itetpN_30jV9zuOj/view?usp=sharing','https://campus.theuttererscorner.com/draftfile.php/5/user/draft/54396995/Unit%204%20-%20I%20love%20it%21.mp3','About us and relatives','https://campus.theuttererscorner.com/mod/forum/view.php?id=123',1,2,'2022-04-08 15:12:40','2022-04-08 15:12:44',NULL);
+insert  into `units`(`id`,`name`,`image`,`slide_url`,`doc_url`,`audio_url`,`forum_name`,`forum_url`,`status`,`module_id`,`order`,`created_at`,`updated_at`,`deleted_at`) values 
+(0,'Unit 5','images/image_preview.png','https://docs.google.com/presentation/d/e/2PACX-1vRgxWtL8xzbN0T7LRq8z5zMOsGQcnyml5D5_7MoEgmVdUagXY305wQscCvI0sD4AA/embed?start=false&amp;loop=false&amp;delayms=3000','https://drive.google.com/file/d/1GQ52VuEMXt4R7FR7itetpN_30jV9zuOj/view?usp=sharing','https://campus.theuttererscorner.com/draftfile.php/5/user/draft/54396995/Unit%204%20-%20I%20love%20it%21.mp3','About us and relatives','https://campus.theuttererscorner.com/mod/forum/view.php?id=123',1,2,5,'2022-04-08 15:12:40','2022-04-08 15:12:44',NULL),
+(1,'Unit 1','public/images/units/covers/1.png','https://docs.google.com/presentation/d/e/2PACX-1vR6qonh5bQBqrnz3MmQDuOAPNPm0MYzeDcBHWo2Cid_w1u9hBKtb-BjXRwuEuPjjw/embed?start=false&amp;loop=false&amp;delayms=3000','https://campus.theuttererscorner.com/mod/url/view.php?id=346','https://campus.theuttererscorner.com/draftfile.php/5/user/draft/967533140/Unit%201%20-%20This%20is%20me%21.mp3','This is me!','https://campus.theuttererscorner.com/mod/forum/view.php?id=113',1,1,1,'2022-04-08 11:14:18','2022-11-18 21:19:39',NULL),
+(2,'Unit 2','public/images/units/covers/2.png','https://docs.google.com/presentation/d/e/2PACX-1vRWGfVMrqnyaAJBOaexmCHwOzyv26_YoADyileU5iN8cv9KQwQ5FiElQqjVGLYneg/embed?start=false&amp;loop=false&amp;delayms=3000','https://drive.google.com/file/d/1BjbebKfpqbU_Gg6iay7p8JKt7WdA45QF/view?usp=sharing','https://campus.theuttererscorner.com/draftfile.php/5/user/draft/872955533/Unit%202%20-%20I%20come%20from....mp3','I come from...','https://campus.theuttererscorner.com/mod/forum/view.php?id=121',1,1,2,'2022-04-08 11:14:18','2022-11-18 23:52:33',NULL),
+(3,'Unit 3','public/images/units/covers/3.png','https://docs.google.com/presentation/d/e/2PACX-1vQZD_yEu7BqadWPb9vuZA3gzbu1YbGWjXxNmgLcmNerMU4LScFt1bcYPmBLHKAK0A/embed?start=false&amp;loop=false&amp;delayms=3000','https://drive.google.com/file/d/1a3Ev9wEw1lxZ5sxYxIWtfL0Zixt3YadS/view?usp=sharing','https://campus.theuttererscorner.com/draftfile.php/5/user/draft/429845237/Unit%203%20-%20Everyday%20I....mp3','Every day I...','https://campus.theuttererscorner.com/mod/forum/view.php?id=122',1,1,3,'2022-04-08 11:14:18','2022-11-18 23:52:46',NULL),
+(4,'Unit 4','public/images/units/covers/4.png','https://docs.google.com/presentation/d/e/2PACX-1vRgxWtL8xzbN0T7LRq8z5zMOsGQcnyml5D5_7MoEgmVdUagXY305wQscCvI0sD4AA/embed?start=false&amp;loop=false&amp;delayms=3000','https://drive.google.com/file/d/1GQ52VuEMXt4R7FR7itetpN_30jV9zuOj/view?usp=sharing','https://campus.theuttererscorner.com/draftfile.php/5/user/draft/54396995/Unit%204%20-%20I%20love%20it%21.mp3','I love it!','https://campus.theuttererscorner.com/mod/forum/view.php?id=123',1,1,4,'2022-04-08 11:14:18','2022-11-18 23:52:53',NULL);
 
 /*Data for the table `users` */
 
