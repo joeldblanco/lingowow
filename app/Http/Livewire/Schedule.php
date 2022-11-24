@@ -185,7 +185,7 @@ class Schedule extends Component
         }
         $this->user_schedules = $this->user_schedules->first();
 
-        
+
 
         $this->edit();
     }
@@ -276,7 +276,7 @@ class Schedule extends Component
                     array_push($next_students_schedule, $student->schedules->first()->next_schedule);
                 }
             }
-            
+
             $this->students_schedules = array_merge(...$this->students_schedules);
             $next_students_schedule = array_merge(...$next_students_schedule);
 
@@ -310,8 +310,6 @@ class Schedule extends Component
             $this->students_schedules[] = $student->schedules->first()->selected_schedule;
         }
         $this->students_schedules = array_merge(...$this->students_schedules);
-        
-        
     }
 
     public function loadAdminSchedule()

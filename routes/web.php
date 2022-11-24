@@ -33,10 +33,12 @@ use App\Notifications\BookedClass;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Notification;
 use App\Http\Controllers\MeetingController;
+use App\Http\Controllers\ProductController;
 use App\Models\Attempt;
 use App\Models\Enrolment;
 use App\Models\Post;
 use App\Models\Unit;
+use Illuminate\Support\Facades\DB;
 
 /*
 |--------------------------------------------------------------------------
@@ -121,7 +123,11 @@ Route::middleware(['web', 'auth', 'verified', 'impersonate'])->group(function ()
     //ROUTES FOR ADMINISTRATION//
     Route::middleware(['role:admin'])->group(function () {
 
+        //ROUTES FOR GRADINGS//
         Route::resource('/gradings', GradingController::class);
+
+        //ROUTES FOR PRODUCTS//
+        Route::resource('/products', ProductController::class);
 
         //DASHBOARD//
         Route::get('/admin/dashboard', [AnalyticsController::class, 'index'])->name('admin.dashboard');
@@ -203,8 +209,15 @@ Route::middleware(['web', 'auth', 'verified', 'impersonate'])->group(function ()
                     // $deleted_class = $class->delete();
                     $class->delete();
                 });
-                $user->schedules->where('enrolment_id', $user->enrolments->first()->id)->first()->delete();
-                $user->enrolments->first()->delete();
+
+                if ($user->enrolments->count()) {
+                    // $user->schedules->where('enrolment_id', $user->enrolments->first()->id)->first()->delete();
+                    $user->schedules->first()->next_schedule = null;
+                    $user->schedules->first()->save();
+                    $user->schedules->first()->delete();
+                    $user->enrolments->first()->delete();
+                }
+
                 $user->removeRole('student');
                 $user->assignRole('guest');
             }
@@ -220,6 +233,17 @@ Route::middleware(['web', 'auth', 'verified', 'impersonate'])->group(function ()
     Route::get('/classes', [ClassController::class, 'index'])->name('classes.index');
     Route::get('/classes/{id}', [ClassController::class, 'edit'])->name('classes.edit');
     Route::post('/classes/update', [ClassController::class, 'update'])->name('classes.update');
+    Route::post('/classes/check', [ClassController::class, 'checkClasses'])->name('classes.check');
+
+    //ROUTES FOR GLOBALS//
+    Route::get('admin/globals', function () {
+        $globals = DB::table('metadata')->get();
+        return view('globals.index', compact('globals'));
+    })->name("globals.index");
+    Route::get('admin/globals/{key}/edit', function ($key) {
+        $globals = DB::table('metadata')->where('key', $key)->first();
+        return view('globals.edit', compact('globals'));
+    })->name("globals.edit");
 
     //ROUTES FOR POSTS//
     Route::post('/post/store', [PostController::class, 'store'])->name('post.store');

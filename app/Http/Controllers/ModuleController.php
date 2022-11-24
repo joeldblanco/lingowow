@@ -88,8 +88,8 @@ class ModuleController extends Controller
             // $user_units = $module->units;
             $user_units = $module_units;
         } else {
-            $user_units = $module_units;
-            $user_units = $user->units->where('status', 1);
+            $user_units = $module_units->where('order', '<', $user->units->first()->order);
+            // $user_units = $user->units->where('status', 1);
             // $user_units = $user_units->diff($user_units->diff($module->units->where('status', 1)));
 
             // $user_units = $user->units->intersect($units)->sort();

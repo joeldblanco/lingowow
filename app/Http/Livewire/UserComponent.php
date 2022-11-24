@@ -70,6 +70,18 @@ class UserComponent extends Component
         }
     }
 
+    public function hideUnhide(User $user)
+    {
+        if ($user->status) {
+            $user->status = 0;
+        } else {
+            $user->status = 1;
+        }
+        $user->save();
+
+        return redirect()->route('users', $this->role);
+    }
+
     public function render()
     {
         return view('livewire.user-component');

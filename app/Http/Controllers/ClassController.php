@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use Carbon\Carbon;
 use App\Models\Comment;
 use App\Models\Meeting;
+use Illuminate\Support\Facades\Auth;
 
 class ClassController extends Controller
 {
@@ -18,37 +19,39 @@ class ClassController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        $teachers = [];
-        $students = [];
+        $start_date = $request->start_date;
+        $end_date = $request->end_date;
+
+        if ($start_date == null || $end_date == null) return redirect()->route('classes.index', ['start_date' => ApportionmentController::currentPeriod(true)[0], 'end_date' => ApportionmentController::currentPeriod(true)[1]]);
 
         if (auth()->user()->roles[0]->name == "teacher") {
-            $classes = User::find(auth()->id())->teacherClasses()->orderBy('start_date', 'ASC')->get();
-            foreach ($classes as $key => $value) {
+            $classes = User::find(auth()->id())->teacherClasses()->where('start_date', '>=', $start_date)->where('end_date', '<=', $end_date)->orderBy('start_date', 'ASC')->paginate(10);
+            // foreach ($classes as $key => $value) {
+            //     $students[$key] = $value->student();
 
-                $students[$key] = $value->student();
-
-                if ($value->enrolment_id == 2) {
-                }
-            }
+            //     if ($value->enrolment_id == 2) {
+            //     }
+            // }
         } else if (auth()->user()->roles[0]->name == "student") {
 
-            $classes = User::find(auth()->id())->studentClasses;
-            foreach ($classes as $key => $value) {
-                $teachers[$key] = $value->teacher();
-            }
+            $classes = User::find(auth()->id())->studentClasses->where('start_date', '>=', $start_date)->where('end_date', '<=', $end_date)->orderBy('start_date', 'ASC')->paginate(10);
+            // foreach ($classes as $key => $value) {
+            //     $teachers[$key] = $value->teacher();
+            // }
         } else if (auth()->user()->roles[0]->name == "admin") {
-            $classes = Classes::all()->sortBy('start_date');
+            $classes = Classes::where('start_date', '>=', $start_date)->where('end_date', '<=', $end_date)->orderBy('start_date', 'ASC')->paginate(10);
 
-            foreach ($classes as $key => $value) {
-                $students[$key] = $value->student();
-                $teachers[$key] = $value->teacher();
-            }
+            // foreach ($classes as $key => $value) {
+            //     $students[$key] = $value->student();
+            //     $teachers[$key] = $value->teacher();
+            // }
         }
+        $classes->appends(['start_date' => $start_date, 'end_date' => $end_date]);
 
 
-        return view('classes.index', compact('classes', 'students', 'teachers'));
+        return view('classes.index', compact('classes'));
     }
 
     /**
@@ -279,5 +282,35 @@ class ClassController extends Controller
         // }else{
 
         // }
+    }
+
+    public function checkClasses(Request $request)
+    {
+        $request = $request->except(['_token', '_method']);
+        // dd($request);
+        $role = Auth::user()->roles()->first()->name;
+        foreach ($request as $key => $value) {
+            $name = explode('_', $key)[0];
+            $id = explode('_', $key)[1];
+
+            if ($name == 'teacher' && ($role == "teacher" || $role == "admin")) {
+                $class = Classes::find($id);
+                $value = boolval($value) == true ? 1 : 0;
+                if ($class->teacher_check != $value) {
+                    $class->teacher_check = $value;
+                    $class->save();
+                }
+            }
+
+            if ($name == 'student' && ($role == "student" || $role == "admin")) {
+                $class = Classes::find($id);
+                $value = boolval($value) == true ? 1 : 0;
+                if ($class->student_check != $value) {
+                    $class->student_check = $value;
+                    $class->save();
+                }
+            }
+        }
+        return redirect()->back();
     }
 }

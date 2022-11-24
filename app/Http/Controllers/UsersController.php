@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class UsersController extends Controller
 {
@@ -100,12 +101,16 @@ class UsersController extends Controller
         return redirect()->route('admin.dashboard');
     }
 
-    public function addUnit($user_id, ...$units_id)
+    public function addUnit($user_id, $unit_id)
     {
         $user = User::find($user_id);
-        foreach($units_id as $unit_id){
-            $unit = $user->units()->updateExistingPivot($unit_id,['unit_id' => $unit_id]);
-            if(!$unit) $user->units()->attach($unit_id);
-        }
+        // foreach($units_id as $unit_id){
+        // $unit = $user->units()->updateExistingPivot($unit_id, ['unit_id' => $unit_id]);
+        $unit = DB::table('unit_user')->where('user_id', $user_id)->update([
+            'unit_id' => $unit_id
+        ]);
+        // dd($unit);
+        if (!$unit) $user->units()->attach($unit_id);
+        // }
     }
 }

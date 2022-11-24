@@ -119,6 +119,7 @@ class EnrolmentController extends Controller
         $enrolment->teacher_id = $request->get('teacher_id');
         $enrolment->student_id = $request->get('student_id');
         $enrolment->course_id = $request->get('course_id');
+        (new UsersController)->addUnit($request->get('student_id'), $request->get('unit_id'));
         $enrolment->save();
         return redirect()->route('enrolments.index');
     }

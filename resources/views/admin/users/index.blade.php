@@ -42,7 +42,10 @@
                 {{ $users->links() }}
                 <div class="flex flex-col space-y-8">
                     <div class="flex flex-row w-full gap-x-4 gap-y-4 flex-wrap justify-evenly items-stretch">
-                        @foreach ($users as $user)
+                        @foreach ($users->where('status',1) as $user)
+                            @livewire('user-component', ['user' => $user, 'role' => $role, 'key' => $user->id])
+                        @endforeach
+                        @foreach ($users->where('status',0) as $user)
                             @livewire('user-component', ['user' => $user, 'role' => $role, 'key' => $user->id])
                         @endforeach
                     </div>

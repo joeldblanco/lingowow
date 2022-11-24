@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Attempt;
 use App\Models\Exam;
 use App\Models\Question;
+use App\Models\Unit;
 use App\Models\User;
 use Illuminate\Http\Request;
 
@@ -110,7 +111,8 @@ class ExamController extends Controller
 
             if ($attempt->score >= $exam->min_score) {
                 $user = new UsersController;
-                $user->addUnit(auth()->id(), auth()->user()->units->last()->id + 1, auth()->user()->units->last()->id + 2);
+                $unit = Unit::where('course_id', $exam->unit->course->id)->where('order','>',$exam->unit->order)->orderBy('order')->first();
+                $user->addUnit(auth()->id(), $unit);
             }
 
             return view('exams.result', compact('result', 'answers', 'questions'));

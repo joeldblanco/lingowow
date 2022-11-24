@@ -32,6 +32,18 @@
                                 </select>
                                 <p class="text-gray-500 text-sm font-light">Please select a teacher</p>
                             </div>
+                            @if ($enrolment->student)
+                                <div class="py-6 space-y-1">
+                                    <p class="font-bold text-gray-600 mb-1">Student</p>
+                                    <select name="student_id" id="student_id" required
+                                        class="w-full rounded-md p-3 text-gray-600 @if ($errors->has('student_id')) border-red-600 @else border-gray-300 @endif">
+                                        <option value="{{ $enrolment->student->id }}" selected hidden>
+                                            {{ $enrolment->student->first_name }} {{ $enrolment->student->last_name }}
+                                        </option>
+                                    </select>
+                                    {{-- <p class="text-gray-500 text-sm font-light">Please select a teacher</p> --}}
+                                </div>
+                            @endif
                             <div class="pb-6 space-y-1">
                                 <p class="font-bold text-gray-600 mb-1">Course</p>
                                 <select name="course_id" id="course_id" required
@@ -51,29 +63,29 @@
                                 </select>
                                 <p class="text-gray-500 text-sm font-light">Please select a course</p>
                             </div>
-                            {{-- NEED TO BE ABLE TO SELECT MODULE & UNIT FOR STUDENTS --}}
-                            {{-- <div class="py-2 space-y-1">
-                                <p class="font-bold text-gray-600 mb-1">Student</p>
-                                <select name="student_id" id="student_id"
-                                    class="w-full rounded-md hover:border-gray-600 p-3 text-gray-600 @if ($errors->has('student_id')) border-red-600 @else border-gray-300 @endif">
-                                    @if ($enrolment->student)
+                            {{-- NEED TO BE ABLE TO SELECT UNIT FOR STUDENTS --}}
+                            <div class="py-2 space-y-1">
+                                <p class="font-bold text-gray-600 mb-1">Unit</p>
+                                <select name="unit_id" id="unit_id"
+                                    class="w-full rounded-md hover:border-gray-600 p-3 text-gray-600 @if ($errors->has('unit_id')) border-red-600 @else border-gray-300 @endif">
+                                    @if ($enrolment->student->units->first())
                                         <option value="{{ $enrolment->student->id }}" selected disabled hidden>
-                                            {{ $enrolment->student->first_name . ' ' . $enrolment->student->last_name }}
+                                            {{ $enrolment->student->units->first()->name }}
                                         </option>
                                     @else
-                                        <option value="none" selected disabled hidden>Select a student</option>
+                                        <option value="none" selected disabled hidden>Select a unit</option>
                                     @endif
-                                    @foreach ($students as $student)
-                                        <option value="{{ $student->id }}">
-                                            {{ $student->first_name . ' ' . $student->last_name }}
+                                    @foreach ($enrolment->course->modules->pluck('units')->flatten() as $unit)
+                                        <option value="{{ $unit->id }}">
+                                            {{ $unit->name }}
                                         </option>
                                     @endforeach
                                 </select>
-                                @if ($errors->has('student_id'))
+                                @if ($errors->has('unit_id'))
                                     <p class="text-xs font-light text-red-600">Required</p>
                                 @endif
-                                <p class="text-gray-500 text-sm font-light">Please select a student</p>
-                            </div> --}}
+                                <p class="text-gray-500 text-sm font-light">Please select a unit</p>
+                            </div>
                         </div>
                     </div>
                     <div class="w-full flex justify-end">
