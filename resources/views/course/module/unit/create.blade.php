@@ -3,7 +3,7 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="p-6 sm:px-20 bg-white border-b border-gray-200">
 
-                <form method="POST" action="{{ route('modules.store') }}"
+                <form method="POST" action="{{ route('units.store') }}"
                     class="bg-white rounded-md w-1/2 p-6 my-4 mx-auto border border-gray-400">
                     @csrf
                     <div class="divide-y">
