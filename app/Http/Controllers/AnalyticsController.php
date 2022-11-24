@@ -63,7 +63,7 @@ class AnalyticsController extends Controller
         // dd('2022-01-06 12:00:00' >= $current_period[0],'2022-01-06 12:00:00' <= $current_period[1]);
 
         foreach ($teachers as $key => $value) {
-            $enrolments = Enrolment::where('teacher_id', $value->id)->select('id', 'course_id')->get();
+            $enrolments = Enrolment::where('teacher_id', $value->id)->get();
 
             foreach ($enrolments as $enrolment) {
                 $n_classes = Classes::where('enrolment_id', $enrolment->id)->whereDate('start_date', '>=', $current_period[0])->where('teacher_check', 1)->where('student_check', 1)->count();

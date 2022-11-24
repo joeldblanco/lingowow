@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Attempt;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class GradingController extends Controller
 {
@@ -19,6 +20,8 @@ class GradingController extends Controller
         foreach ($attempts as $key => $attempt) {
             $attempts[$key] = $attempts[$key]->where('score', $attempt->max('score'))->first();
         }
+
+        $attempts = new LengthAwarePaginator($attempts->groupBy('user_id'), $attempts->groupBy('user_id')->count(), 10);
 
         return view('gradings.index', compact('attempts'));
     }

@@ -84,7 +84,7 @@ class UnitController extends Controller
         $unit = Unit::find($unit_id);
         $users = $unit->users;
 
-        return view('course.module.unit.details', compact('users','unit_id'));
+        return view('course.module.unit.details', compact('users', 'unit_id'));
     }
 
     /**
@@ -97,7 +97,11 @@ class UnitController extends Controller
     public function update(Request $request, Unit $unit)
     {
         $image = $request->file('image');
-        $path_to_file = $image == null ? 'images/image_preview.png' : $request->file('image')->storeAs('public/images/units/covers', $unit->id . '.' . $image->getClientOriginalExtension());
+        $path_to_file = $unit->image;
+        if ($image != null) {
+            $path_to_file = $image->storeAs('public/images/units/covers', $unit->id . '.' . $image->getClientOriginalExtension());
+        }
+
         $unit->update([
             "module_id" => $request->module_id,
             "name" => $request->name,

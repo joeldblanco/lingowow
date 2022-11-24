@@ -2,12 +2,13 @@
     <div class="bg-white font-sans">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden py-5">
+
+                <div class="flex">
+                    <p class="text-2xl font-bold w-full text-center">Enrolments</p>
+                    <a href="{{ route('enrolments.create') }}"
+                        class="bg-lw-blue text-white py-2 px-4 rounded-md font-semibold hover:bg-blue-800">New</a>
+                </div>
                 @if (count($enrolments) > 0)
-                    <div class="flex">
-                        <p class="text-2xl font-bold w-full text-center">Enrolments</p>
-                        <a href="{{ route('enrolments.create') }}"
-                            class="bg-lw-blue text-white py-2 px-4 rounded-md font-semibold hover:bg-blue-800">New</a>
-                    </div>
                     <table class="flex flex-col w-full space-y-5 border border-gray-200 p-5 my-5 rounded-lg">
                         <thead>
                             <tr class="flex text-md justify-around">
@@ -53,7 +54,8 @@
                                         <a href="{{ route('enrolments.edit', $enrolment->id) }}">
                                             <i class="fas fa-edit text-gray-600"></i>
                                         </a>
-                                        <form action="{{ route('enrolments.destroy', $enrolment->id) }}" method="POST">
+                                        <form action="{{ route('enrolments.destroy', $enrolment->id) }}"
+                                            method="POST">
                                             @csrf
                                             @method('DELETE')
                                             <button type="submit"><i class="fas fa-trash text-gray-600"></i></button>
@@ -66,7 +68,9 @@
                         </tbody>
                     </table>
                 @else
-                    <p class="text-2xl font-bold w-full text-center">There are no enrolments</p>
+                    <div class="my-20">
+                        <p class="text-2xl font-bold w-full text-center text-gray-600">There are no enrolments</p>
+                    </div>
                 @endif
             </div>
         </div>

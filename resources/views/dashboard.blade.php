@@ -87,7 +87,7 @@
                     @endrole
 
                     @hasanyrole('student|teacher')
-                        <a href="{{ route('classes.index') }}"
+                        <a href="{{ route('classes.index', ['start_date' => App\Http\Controllers\ApportionmentController::currentPeriod(true)[0], 'end_date' => App\Http\Controllers\ApportionmentController::currentPeriod(true)[1]]) }}"
                             class="inline-block bg-lw-light_blue text-white px-6 py-4 rounded hover:bg-lw-light_blue hover:text-white hover:no-underline">Classes</a>
                     @endhasanyrole
                 </div>

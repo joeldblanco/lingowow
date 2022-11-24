@@ -88,7 +88,6 @@ class ClassesComponent extends Component
         $class_period = (new Carbon($class_period[0]))->subMonth();
         $class_period = ApportionmentController::getPeriod($class_period->toDateTimeString(), true);
 
-
         if (auth()->user()->getRoleNames()->first() == "student") {
             $period_classes = User::find(auth()->user()->id)->studentClasses->whereBetween('start_date', $class_period);
             if ($period_classes->count() > 0) {

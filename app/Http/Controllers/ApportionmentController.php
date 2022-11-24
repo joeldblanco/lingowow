@@ -14,16 +14,17 @@ use Illuminate\Support\Facades\DB;
 class ApportionmentController extends Controller
 {
 
-    public static function calculateApportionment($plan)
+    public static function calculateApportionment($plan, $schedule = null, $course_id = null)
     {
-        $plan = json_decode($plan);
+        // $plan = json_decode($plan);
        
-        $schedule = json_decode(session('user_schedule'));
+        $schedule == null ? session('user_schedule') : $schedule;
+        $schedule = json_decode($schedule);
         
-        $course_id = session("selected_course");
+        $course_id == null ? session("selected_course") : $course_id;
         $product = Course::find($course_id)->products->first();
 
-        $today = Carbon::now()->setTimezone('America/Lima');
+        $today = Carbon::now()->setTimezone('UTC');
         $today->addDays(1);
 
         $current_period_start = new Carbon('first monday of this month');
@@ -80,11 +81,8 @@ class ApportionmentController extends Controller
             }
         }
 
-        $teacher_id = session('teacher_id');
-
-        $teacher_classes = User::find($teacher_id)->teacherClasses;
-
-        // dd($days, $teacher_id, $teacher_classes);
+        // $teacher_id == null ? session("teacher_id") : $teacher_id;
+        // $teacher_classes = User::find($teacher_id)->teacherClasses;
 
         //CONSULTA DE CLASES REAGENDADAS EN EL PERIODO ACTUAL PARA RESTAR AL COBRO
 
@@ -116,7 +114,7 @@ class ApportionmentController extends Controller
         return [$qty_diff, $days_diff, $days, $abcense];
     }
 
-    public static function currentPeriod()
+    public static function currentPeriod($onlyDate = false)
     {
         $first_monday = new Carbon('first monday of this month');
         if ($first_monday < Carbon::now()) {
@@ -130,6 +128,8 @@ class ApportionmentController extends Controller
             $current_period_end->addWeeks(3);
             $current_period_end->addDays(1);
         }
+
+        if($onlyDate) return [$current_period_start->toDateString(), $current_period_end->toDateString()];
 
         return [$current_period_start->toDateTimeString(), $current_period_end->toDateTimeString()];
     }
