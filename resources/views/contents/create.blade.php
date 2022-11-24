@@ -157,10 +157,10 @@
                             <x-slot name="content">
                                 <div class="border">
                                     @php
-                                        $files = File::allFiles(storage_path() . '\app\public');
+                                        $files = File::allFiles(storage_path() . '/app/public');
                                         $relativePaths = [];
                                         foreach ($files as $file) {
-                                            if (!str_contains($file->getRelativePath(), 'photos\users')) {
+                                            if (!str_contains($file->getRelativePath(), 'photos/users')) {
                                                 $relativePaths[] = $file->getRelativePath();
                                             }
                                         }
