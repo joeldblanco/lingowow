@@ -7,6 +7,7 @@ use App\Models\Module;
 use App\Models\User;
 use App\Models\Group_unit;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class ModuleController extends Controller
 {
@@ -131,7 +132,7 @@ class ModuleController extends Controller
     public function update(Request $request, Module $module)
     {
         $image = $request->file('image');
-        $path_to_file = $image == null ? 'images/image_preview.png' : $request->file('image')->storeAs('public/images/modules/covers', $module->id . '.' . $image->getClientOriginalExtension());
+        $path_to_file = $image == null ? DB::table('metadata')->where('key', 'sample_image_url')->first()->value : $request->file('image')->storeAs('public/images/modules/covers', $module->id . '.' . $image->getClientOriginalExtension());
         $module->update([
             "course_id" => $request->course_id,
             "name" => $request->name,

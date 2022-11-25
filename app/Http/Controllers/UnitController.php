@@ -7,6 +7,7 @@ use App\Models\Unit;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class UnitController extends Controller
 {
@@ -39,7 +40,25 @@ class UnitController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        // dd($request);
+        $request->validate([
+            'name' => 'required',
+            'status' => 'required',
+            'module_id' => 'required',
+            'image' => 'required|image|mimes:jpeg,png,jpg|max:2048',
+        ]);
+
+        $unit = new Unit();
+        $unit->name = $request->name;
+        $unit->status = $request->status;
+        $unit->module_id = $request->module_id;
+        $unit->order = Unit::where('module_id', $request->module_id)->max('order') + 1;
+        $image = $request->file('image');
+        $path_to_file = $image == null ? DB::table('metadata')->where('key', 'sample_image_url')->first()->value : $image->storeAs('public/images/units/covers', str_replace(" ", "_", $request->name) . '.' . $image->getClientOriginalExtension());
+        $unit->image = $path_to_file;
+        $unit->save();
+
+        return redirect()->route('modules.show', $request->module_id)->with('success', 'Unit created successfully.');
     }
 
     /**
@@ -109,7 +128,7 @@ class UnitController extends Controller
             'image' => $path_to_file,
         ]);
 
-        return redirect()->route('modules.details', $unit->module_id);
+        return redirect()->route('modules.show', $unit->module_id);
     }
 
     /**
