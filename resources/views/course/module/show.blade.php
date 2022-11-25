@@ -7,8 +7,11 @@
                     <h2 class="text-4xl font-bold text-gray-800 capitalize">My Units</h2>
                     @role('admin')
                         <div class="relative">
+                            <a href="{{ route('modules.details', $module_units->first()->module->id) }}"
+                                class="leading-10 text-xl font-bold text-white capitalize rounded-full p-2 bg-green-600 w-10 mr-5 hover:bg-green-800"><i
+                                    class="fas fa-sort"></i></a>
                             <button @click="unitOrExam = true"
-                                class="text-center leading-10 text-3xl font-bold text-white capitalize rounded-full bg-lw-blue w-10 mr-10 hover:bg-lw-light_blue">+</button>
+                                class="text-center leading-10 text-3xl font-bold text-white capitalize rounded-full bg-lw-blue w-10 mr-10 hover:bg-blue-800">+</button>
                             <div x-show="unitOrExam" @click.outside="unitOrExam = false"
                                 class="right-4 top-8 absolute flex flex-col border border-gray-400 rounded-xl divide-y divide-opacity-100 divide-gray-300 bg-white">
                                 <a href="{{ route('units.create') }}" class="hover:bg-gray-200 p-2 rounded-xl"
@@ -62,7 +65,7 @@
                             @endphp
                             <div class="flex justify-between items-center mb-10">
                                 <div onclick="location.href='{{ route('exam.display', $exam->id) }}';"
-                                    class="group flex flex-row bg-red-100 rounded-lg w-full justify-between mb-10 shadow-md hover:shadow-xl cursor-pointer items-center">
+                                    class="group flex flex-row bg-red-100 rounded-lg w-full justify-between shadow-md hover:shadow-xl cursor-pointer items-center">
 
                                     <div class="w-3/12 m-5">
                                         <img class="rounded-lg rounded-b-none"
