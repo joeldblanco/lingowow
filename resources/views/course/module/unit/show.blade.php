@@ -4,7 +4,7 @@
             <div class="p-6 sm:px-20 bg-gray-50 border-b border-gray-200">
 
                 <div class="mt-10 mb-20">
-                    <h2 class="text-3xl font-bold text-center text-gray-500 mb-3">{{ $unit->unit_name }}</h2>
+                    <h2 class="text-3xl font-bold text-center text-gray-500 mb-3">{{ $unit->name }}</h2>
                     @role('admin')
                         <div class="w-full flex justify-end relative mb-20">
                             <button @click="showTypes = true"
