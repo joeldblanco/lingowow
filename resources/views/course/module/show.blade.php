@@ -7,9 +7,11 @@
                     <h2 class="text-4xl font-bold text-gray-800 capitalize">My Units</h2>
                     @role('admin')
                         <div class="relative">
-                            <a href="{{ route('modules.details', $module_units->first()->module->id) }}"
-                                class="leading-10 text-xl font-bold text-white capitalize rounded-full p-2 bg-green-600 w-10 mr-5 hover:bg-green-800"><i
-                                    class="fas fa-sort"></i></a>
+                            @if (count($module_units))
+                                <a href="{{ route('modules.details', $module_units->first()->module->id) }}"
+                                    class="leading-10 text-xl font-bold text-white capitalize rounded-full p-2 bg-green-600 w-10 mr-5 hover:bg-green-800"><i
+                                        class="fas fa-sort"></i></a>
+                            @endif
                             <button @click="unitOrExam = true"
                                 class="text-center leading-10 text-3xl font-bold text-white capitalize rounded-full bg-lw-blue w-10 mr-10 hover:bg-blue-800">+</button>
                             <div x-show="unitOrExam" @click.outside="unitOrExam = false"
