@@ -14,8 +14,8 @@ class CreatePostLikeTable extends Migration
     public function up()
     {
         Schema::create('post_like', function (Blueprint $table) {
-            $table->bigInteger('author_id', false, true);
-            $table->bigInteger('post_id', false, true);
+            $table->bigInteger('author_id')->unsigned();
+            $table->bigInteger('post_id')->unsigned();
 
             $table->foreign('author_id')->references('id')->on('users');
             $table->foreign('post_id')->references('id')->on('posts');

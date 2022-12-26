@@ -15,8 +15,8 @@ class CreateFriendRequestsTable extends Migration
     {
         Schema::create('friend_requests', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->bigInteger('sender_id');
-            $table->bigInteger('receiver_id');
+            $table->bigInteger('sender_id')->unsigned();
+            $table->bigInteger('receiver_id')->unsigned();
             $table->integer('status');
             $table->timestamps();
         });

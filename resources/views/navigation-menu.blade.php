@@ -13,6 +13,12 @@ $nav_links = [
         'status' => request()->is('courses', 'courses/*'),
         'roles' => ['student', 'guest', 'teacher', 'admin'],
     ],
+    [
+        'name' => 'Activities',
+        'route' => route('activities.index'),
+        'status' => request()->is('activities', 'activities/*'),
+        'roles' => ['teacher', 'admin'],
+    ],
     // [
     //     'name' => 'Pages',
     //     'route' => route('pages'),

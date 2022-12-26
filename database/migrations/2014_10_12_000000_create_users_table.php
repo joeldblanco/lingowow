@@ -22,14 +22,14 @@ return new class extends Migration
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             
-            $table->tinyInteger('status',false,true)->default('1');
+            $table->tinyInteger('status')->unsigned()->default('1');
             $table->text('selected_schedule')->nullable();
             $table->text('available_schedule')->nullable();
             $table->string('meeting_id',255)->nullable();
             //$table->text('two_factor_secret')->nullable();
             //$table->text('two_factor_recovery_codes')->nullable();
             $table->string('remember_token',100)->nullable();
-            $table->bigInteger('current_team_id',false,true)->nullable();
+            $table->bigInteger('current_team_id')->unsigned()->nullable();
 
             $table->text('profile_photo_path')->default('profile-photos/default_pp.jpg');
             // $table->rememberToken();

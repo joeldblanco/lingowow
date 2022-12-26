@@ -17,7 +17,7 @@ class CreateDetallesCardsTable extends Migration
             $table->id();
 
             $table->bigInteger('content_id')->unsigned();       
-            $table->longText('imagen');
+            $table->longText('cards_group'); //[["Direccion de la imagen", "Palabra"]]
             $table->timestamps();
             
             $table->foreign('content_id')->references('id')->on('content_of_act');

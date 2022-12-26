@@ -17,8 +17,8 @@ class CreateConversationsTable extends Migration
             $table->bigIncrements('id');
             $table->string('name',50);
             $table->string('image_url',50)->default("profile-photos/default_group_pp.jpg");
-            $table->tinyInteger('group_conversation')->default(0);
-            $table->tinyInteger('status');
+            $table->tinyInteger('group_conversation')->unsigned()->default(0);
+            $table->tinyInteger('status')->unsigned();
             $table->timestamps();
         });
     }

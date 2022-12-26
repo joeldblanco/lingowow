@@ -21,8 +21,8 @@ return new class extends Migration
             $table->string('audio_url',255);
             $table->string('forum_name',50)->nullable();
             $table->string('forum_url',255)->nullable();
-            $table->tinyInteger('status')->default(1);
-            $table->bigInteger('module_id',false,true);
+            $table->tinyInteger('status')->unsigned()->default(1);
+            $table->bigInteger('module_id')->unsigned();
             $table->timestamps();
             $table->softDeletes();
 

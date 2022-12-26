@@ -15,8 +15,8 @@ class CreateUnitUserTable extends Migration
     {
         Schema::create('unit_user', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->bigInteger('user_id', false, true);
-            $table->bigInteger('unit_id', false, true);
+            $table->bigInteger('user_id')->unsigned();
+            $table->bigInteger('unit_id')->unsigned();
 
             $table->foreign('user_id')->references('id')->on('users');
             $table->foreign('unit_id')->references('id')->on('units');

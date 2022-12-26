@@ -15,7 +15,7 @@ return new class extends Migration
     {
         Schema::create('exams', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->bigInteger('unit_id',false,true);
+            $table->bigInteger('unit_id')->unsigned();
             $table->tinyInteger('type')->nullable();
 
             $table->tinyInteger('min_score',false,true)->default('0');

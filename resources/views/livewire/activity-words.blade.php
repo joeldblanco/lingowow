@@ -1,5 +1,5 @@
 @php
-
+ 
 use App\Models\DetallesWords;
 
 // $data = 'El terreno de juego es rectangular de *césped* natural o artificial, con una portería o arco a cada lado del campo. Se juega mediante una pelota que se debe desplazar a través del campo con cualquier parte del cuerpo que no sean los *brazos* o las manos, y mayoritariamente con los pies (de ahí su nombre). El objetivo es introducirla dentro de la *portería* o arco contrario, acción que se denomina marcar un gol. El equipo que logre más goles al cabo del partido, de una *duración* de 90 minutos, es el que resulta ganador del encuentro.';
@@ -7,6 +7,7 @@ use App\Models\DetallesWords;
 // dd($activity_content->words);
 // dd($activity_content);
 $data = str_replace("\n", " \n ", $activity_content->text);
+// dd($data);
 // dd(DetallesWords::all()->first());
 $texto = explode(' ', $data);
 $cont_palabras = [];
@@ -96,7 +97,7 @@ if ($activity_content->mode == 'find-the-words') {
 
     <br><br><br>
 
-        <div class="grid place-content-center">
+        <div class="grid place-content-center ml-5 mr-5">
           <div>
         <div class="container flex flex-wrap gap-x-1 gap-y-3 drag-and-drop">
 

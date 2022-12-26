@@ -16,7 +16,7 @@ class CreateGroupUnitsTable extends Migration
         Schema::create('group_units', function (Blueprint $table) {
             $table->id();
             $table->string('group_name',40);
-            $table->bigInteger('module_id',false,true);
+            $table->bigInteger('module_id')->unsigned();
             $table->string('priority',10);
             $table->timestamps();
             $table->softDeletes();

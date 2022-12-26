@@ -9,6 +9,9 @@ class Activity extends Model
 {
     use HasFactory;
 
+    
+    
+
     /**
      * The users associated with the activity.
      */

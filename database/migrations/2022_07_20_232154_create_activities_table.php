@@ -16,12 +16,12 @@ class CreateActivitiesTable extends Migration
     {
         Schema::create('activities', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->bigInteger('unit_id',false,true);
+            $table->bigInteger('unit_id')->unsigned();
             $table->string('name', 250);
             // $table->bigInteger('course_id');
             // $table->tinyInteger('type');
             // $table->text('data');
-            $table->tinyInteger('status')->default(1);
+            $table->tinyInteger('status')->unsigned()->default(1);
             $table->timestamp('created_at')->useCurrent();
             $table->timestamp('updated_at')->useCurrent()->useCurrentOnUpdate();
             $table->softDeletes();

@@ -15,9 +15,9 @@ class CreateEnrolmentsTable extends Migration
     {
         Schema::create('enrolments', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->bigInteger('student_id',false,true);
-            $table->bigInteger('teacher_id',false,true);
-            $table->bigInteger('course_id',false,true);
+            $table->bigInteger('student_id')->unsigned();
+            $table->bigInteger('teacher_id')->unsigned();
+            $table->bigInteger('course_id')->unsigned();
             $table->timestamps();
             $table->softDeletes();
         });
