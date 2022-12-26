@@ -26,7 +26,7 @@ class PricingTableComponent extends Component
         $this->emit('loadingState', false);
     }
 
-    public function store($nOfClasses)
+    public function store($nOfClasses = null)
     {
         $enroled = Enrolment::where('student_id', auth()->id())
             // ->where('course_id',session('selected_course'))
@@ -43,8 +43,16 @@ class PricingTableComponent extends Component
             $this->popup_color = "red";
             $this->popup = true;
         } else {
-            session(['plan' => $nOfClasses]);
-            redirect()->route("schedule.create");
+            $course_id = session('selected_course');
+            $product = Course::find($course_id)->products->first();
+            if ($product->recurring) {
+                session(['plan' => $nOfClasses]);
+                redirect()->route("schedule.create");
+            } else {
+                Cart::destroy();
+                Cart::add($product->id, $product->name, 1, ($product->sale_price == null ? $product->regular_price : $product->sale_price), ['editable' => false])->associate('App\Models\Product');
+                return redirect()->route('cart');
+            }
         }
     }
 

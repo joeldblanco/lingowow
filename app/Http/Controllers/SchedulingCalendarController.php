@@ -44,6 +44,8 @@ class SchedulingCalendarController extends Controller
     {
         $plan = session('plan');
 
+        dd($request);
+
         return view('calendar-selection', compact('plan'));
     }
 
@@ -53,35 +55,18 @@ class SchedulingCalendarController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public static function store($student_id = null)
+    public static function store($student_id = null, $enrolment)
     {
         //VARIABLE INITIALIZATION//
-        if ($student_id == null){
+        if ($student_id == null) {
             $student = auth()->user();
-        }else{
+        } else {
             $student = User::find($student_id);
         }
         $teacher = User::find(session('teacher_id'));
-        $course_id = session('course_id');
         $student_schedule = json_decode(session('user_schedule'));
         $classes_dates = session('classes_dates');
         $teacher_students = Enrolment::where('teacher_id', $teacher->id)->select('student_id')->get();
-
-
-        //CREATING STUDENT'S ENROLMENT (OR UPDATING IT, IN CASE IT ALREADY EXISTS BUT IS SOFTDELETED)//
-        // EnrolUser::dispatch($student_id, $teacher->id, $course_id);
-
-        $enrolment = Enrolment::withTrashed()->updateOrCreate(
-            ['student_id' => $student->id, 'course_id' => $course_id],
-            ['teacher_id' => $teacher->id, 'deleted_at' => NULL]
-        );
-
-        // session('enrolment_id', $enrolment->id);
-
-        //CHANGING STUDENT'S ROLE FROM 'GUEST' TO 'STUDENT'//
-        // $student = User::find($student->id);
-        $student->removeRole('guest');
-        $student->assignRole('student');
 
         //CREATING STUDENT'S SCHEDULE (OR UPDATING IT, IN CASE IT ALREADY EXISTS BUT IS SOFTDELETED)//
         // $schedule = Schedule::withTrashed()->updateOrCreate(
@@ -155,7 +140,7 @@ class SchedulingCalendarController extends Controller
      */
     public function update(Request $request)
     {
-        // dd($request->data);
+        dd($request->error);
         if ($request->error == "false") {
             // $request->data = explode(',', $request->data);
             $request->data = json_decode($request->data);
@@ -404,7 +389,7 @@ class SchedulingCalendarController extends Controller
      */
     public function checkForTeachers(Request $request)
     {
-        // dd(session('plan'));
+        // dd($request->error);
         if ($request->error == "false") {
             $cells = json_decode($request->data);
             // $cells = array_chunk($request->data, 2);
@@ -472,7 +457,7 @@ class SchedulingCalendarController extends Controller
             $apportionment = ApportionmentController::calculateApportionment(session('plan'));
             $product_qty = $apportionment[0];
             // dd($apportionment);
-            Cart::add($product->id, $product->name, $product_qty, ($product->sale_price == null ? $product->regular_price : $product->sale_price))->associate('App\Models\Product');
+            Cart::add($product->id, $product->name, $product_qty, ($product->sale_price == null ? $product->regular_price : $product->sale_price), ['editable' => false])->associate('App\Models\Product');
             session([
                 'course_id' => $course_id,
                 'classes_dates' => $apportionment[1]

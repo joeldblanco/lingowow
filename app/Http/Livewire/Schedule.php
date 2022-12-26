@@ -56,7 +56,7 @@ class Schedule extends Component
      */
     public function mount($user_id, $course_id = null, $plan = null, $mode = "show")
     {
-        $course_id = 1;
+        // dd($course_id);
         if (!is_null($course_id)) $this->course = Course::find($course_id);
         $this->hoy = (new Carbon())->toCookieString();
         $this->user = User::find($user_id);

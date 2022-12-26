@@ -780,6 +780,7 @@
     @if ($role == 'guest')
         <script>
             console.log("Inicio Guest")
+            function toggleCellBlock() {}
             $(function() {
 
                 var selectedCells = 0;
