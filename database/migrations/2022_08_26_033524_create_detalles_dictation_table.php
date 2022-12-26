@@ -17,7 +17,8 @@ class CreateDetallesDictationTable extends Migration
             $table->id();
 
             $table->bigInteger('content_id')->unsigned();       
-            
+            $table->longText('dictation_group'); //[["Direccion del audio", "Palabra"]]
+            $table->string('mode',20);
             $table->timestamps();
             
             $table->foreign('content_id')->references('id')->on('content_of_act');

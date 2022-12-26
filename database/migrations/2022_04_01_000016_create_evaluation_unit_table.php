@@ -14,8 +14,8 @@ class CreateEvaluationUnitTable extends Migration
     public function up()
     {
         Schema::create('evaluation_unit', function (Blueprint $table) {
-            $table->bigInteger('user_id', false, true);
-            $table->bigInteger('unit_id', false, true);
+            $table->bigInteger('user_id')->unsigned();
+            $table->bigInteger('unit_id')->unsigned();
             $table->float('nota')->nullable();
 
             $table->foreign('user_id')->references('id')->on('users');

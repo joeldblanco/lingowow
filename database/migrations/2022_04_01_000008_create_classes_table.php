@@ -18,11 +18,11 @@ class CreateClassesTable extends Migration
             $table->string('description',100)->nullable();
             $table->dateTime('start_date');
             $table->dateTime('end_date');
-            $table->bigInteger('enrolment_id',false,true);
+            $table->bigInteger('enrolment_id')->unsigned();
             $table->string('meeting_id')->nullable();
-            $table->tinyInteger('teacher_check', false, true)->default(0);
-            $table->tinyInteger('student_check', false, true)->default(0);
-            $table->tinyInteger('status', false, true)->nullable();
+            $table->tinyInteger('teacher_check')->unsigned()->default(0);
+            $table->tinyInteger('student_check')->unsigned()->default(0);
+            $table->tinyInteger('status')->unsigned()->nullable();
             $table->timestamps();
 
             $table->foreign('enrolment_id')->references('id')->on('enrolments');

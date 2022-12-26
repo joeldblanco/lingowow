@@ -17,8 +17,8 @@ class CreateSchedulesTable extends Migration
             $table->bigIncrements('id');
             $table->longText('selected_schedule')->nullable();
             $table->longText('next_schedule')->nullable();//
-            $table->bigInteger('user_id', false, true)->unique();
-            $table->bigInteger('enrolment_id', false, true)->nullable();
+            $table->bigInteger('user_id')->unsigned()->unique();
+            $table->bigInteger('enrolment_id')->unsigned()->nullable();
             $table->timestamps();
             $table->softDeletes();
         });

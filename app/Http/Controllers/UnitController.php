@@ -56,7 +56,11 @@ class UnitController extends Controller
             $unit = Unit::find($id)->where('status', 1)->first();
         }
 
-        return view('course.module.unit.show', compact('unit'));
+        // $user = User::find(auth()->id());
+        // dd($user->activities()->where('status','1')->get());
+        $activities = $user->activities()->where('status','1')->get();
+
+        return view('course.module.unit.show', compact('unit','activities'));
     }
 
     /**

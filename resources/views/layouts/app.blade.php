@@ -66,26 +66,26 @@
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
     <script src="https://cdn.tiny.cloud/1/xmua6246us3vdfealnkl1yf7ja0zafr4cttuehqtyz7nen6o/tinymce/5/tinymce.min.js"
         referrerpolicy="origin"></script>
-        <script src="{{ asset('js/wordfind.js') }}" ></script>
+    <script src="{{ asset('js/wordfind.js') }}" ></script>
     <script src="{{ asset('js/wordfindgame.js') }}" ></script>
 </head>
 
 <body class="font-sans antialiased">
     <x-jet-banner />
-
+    
     <div class="min-h-screen bg-white flex flex-col">
-
+        
         @if (Auth::user()->isImpersonated())
             <div class="bg-green-500 text-center py-3">
                 <p class="text-white font-semibold">Impersonating</p>
                 <a href="{{ route('stopImpersonation') }}" class="text-sm hover:font-bold">Stop Impersonation</a>
             </div>
-        @endif
-
-        @livewire('navigation-menu')
-        @include('second-navigation-menu')
-
-        <!-- Page Content -->
+            @endif
+            
+            @livewire('navigation-menu')
+            @include('second-navigation-menu')
+            
+            <!-- Page Content -->
         @livewireScripts
 
         <main class="pb-20 w-full">
@@ -93,7 +93,7 @@
         </main>
         @include('footer')
     </div>
-
+    
     @stack('modals')
     <script>
         let _tz = JSON.parse("{{ json_encode(tz()) }}");
@@ -102,9 +102,10 @@
             tz = tz == 0 ? 0 : -tz;
             window.location.href = window.location.href + "?tz=" + tz;
         }
-    </script>
+        </script>
     <script src="https://cdn.jsdelivr.net/gh/livewire/turbolinks@v0.1.x/dist/livewire-turbolinks.js"
-        data-turbolinks-eval="false"></script>
+    data-turbolinks-eval="false"></script>
+    <script src="{{ asset('js/activities.js') }}" ></script>
     {{-- @include('components.loading-state') --}}
 </body>
 

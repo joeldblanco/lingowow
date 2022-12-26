@@ -3,24 +3,90 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="p-6 sm:px-20 bg-white border-b border-gray-200">
 
-                {{-- {{dd("a ver")}} --}}
+                {{-- {{dd($activity_contents)}} --}}
                 {{-- {{dd($detalles)}} --}}
-                <h1 class="activity-title">{{ $activity->name }}</h1>
-                <br><br><br>
+
                 <div class="content-box">
-                    @foreach ($activity_contents as $content)
-                        {{-- {{dd($content)}} --}}
+
+                    <h3 class="activity-title">{{ $activity->name }}</h3>
+                    <br><br><br>
+
+                    {{-- @foreach ($activity_contents as $key => $content)
+                        
                         <br><br>
                         <br><br>
-                        {{-- <div class="content-box"> --}}
-                        <h2 class="content-title">{{ $content->titulo }}</h2>
-                        @livewire('activity-words', ['activity_content' => $content->detalles->first()])
-                        {{-- </div> --}}
+                       
+
+                        @if ($content->type == 'words')
+                            <h2 class="content-title">{{ $content->titulo }}</h2>
+                            @livewire('activity-words', ['activity_content' => $content->detalles->first(), 'num_content' => $key])
+                        @endif
+                        @if ($content->type == 'cards')
+                            <h2 class="content-title">{{ $content->titulo }}</h2>
+                            @livewire('activity-cards', ['activity_content' => $content->detalles->first(), 'num_content' => $key])
+                        @endif
+                        @if ($content->type == 'dictation')
+                            <h2 class="content-title">{{ $content->titulo }}</h2>
+                            @livewire('activity-dictation', ['activity_content' => $content->detalles->first(), 'num_content' => $key])
+                        @endif
+                        
                         <br><br>
                     @endforeach
 
+                    
+
                     <br><br>
-                    <hr><br>
+                    <hr><br> --}}
+
+                    <hr>
+                    <br><br>
+                    <div class="container-slider">
+                        <div class="slider">
+
+
+                            <div class="slides">
+                                @foreach ($activity_contents as $key => $content)
+                                    <div id="slide-{{ $key + 1 }}">
+                                        <div>
+                                            @if ($content->type == 'words')
+                                                <h2 class="content-title">{{ $content->titulo }}</h2>
+                                                @livewire('activity-words', ['activity_content' => $content->detalles->first(), 'num_content' => $key])
+                                            @endif
+                                            @if ($content->type == 'cards')
+                                                <h2 class="content-title">{{ $content->titulo }}</h2>
+                                                @livewire('activity-cards', ['activity_content' => $content->detalles->first(), 'num_content' => $key])
+                                            @endif
+                                            @if ($content->type == 'dictation')
+                                                <h2 class="content-title">{{ $content->titulo }}</h2>
+                                                @livewire('activity-dictation', ['activity_content' => $content->detalles->first(), 'num_content' => $key])
+                                            @endif
+                                        </div>
+                                    </div>
+                                    {{-- <div id="slide-2">
+                                        2
+                                    </div>
+                                    <div id="slide-3">
+                                        3
+                                    </div>
+                                    <div id="slide-4">
+                                        4
+                                    </div>
+                                    <div id="slide-5">
+                                        5
+                                    </div> --}}
+                                @endforeach
+                            </div>
+                            <br>
+                            @foreach ($activity_contents as $key => $content)
+                                <a href="#slide-{{$key+1}}">{{$key+1}}</a>
+                            @endforeach
+                            {{-- <a href="#slide-2">2</a>
+                            <a href="#slide-3">3</a>
+                            <a href="#slide-4">4</a>
+                            <a href="#slide-5">5</a> --}}
+                        </div>
+                    </div><br>
+
                     <div class="flex justify-center">
                         <button class="evaluate-button" onclick="evaluate_activity()">Evaluate</button>
                     </div>
@@ -91,8 +157,10 @@
                     words = JSON.parse(content_detalle.words);
                     // console.log(words)
 
-                    let check_true = `<div class="grid place-content-center check-word-true not_visible"><i class="fa fa-check fa-xs" aria-hidden="true"></i></div>`
-                    let check_false = `<div class="grid place-content-center check-word-false not_visible"><i class="fa fa-times fa-xs" aria-hidden="true"></i></div>`
+                    let check_true =
+                        `<div class="grid place-content-center check-word-true not_visible"><i class="fa fa-check fa-xs" aria-hidden="true"></i></div>`
+                    let check_false =
+                        `<div class="grid place-content-center check-word-false not_visible"><i class="fa fa-times fa-xs" aria-hidden="true"></i></div>`
 
                     // NO ELIMINAR (POSIBLE USO FUTURO);
 

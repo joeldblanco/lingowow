@@ -19,7 +19,7 @@ return new class extends Migration
             $table->string('module_description',200);
             $table->string('priority',10);
             $table->tinyInteger('status');
-            $table->bigInteger('course_id',false,true);
+            $table->bigInteger('course_id')->unsigned();
             $table->timestamps();
         });
     }

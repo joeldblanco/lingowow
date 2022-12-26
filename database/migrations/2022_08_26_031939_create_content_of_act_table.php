@@ -15,10 +15,10 @@ class CreateContentOfActTable extends Migration
     {
         Schema::create('content_of_act', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->bigInteger('unit_id',false,true);
+            $table->bigInteger('unit_id')->unsigned();
             $table->string('titulo',250);
             $table->string('type',40);
-            $table->tinyInteger('status')->default(1);
+            $table->tinyInteger('status')->unsigned()->default(1);
             $table->timestamp('created_at')->useCurrent();
             $table->timestamp('updated_at')->useCurrent()->useCurrentOnUpdate();
             $table->softDeletes();

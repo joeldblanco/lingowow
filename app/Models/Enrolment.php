@@ -11,6 +11,8 @@ class Enrolment extends Model
     use HasFactory;
     use SoftDeletes;
 
+    protected $guarded = ['*'];
+
     /**
      * Get the schedule associated with the enrolment.
      */
