@@ -1,27 +1,27 @@
-function saveSchedulee(plan, routeTo, role = 2){ // AQUI TENGO QUE ELIMINAR LA ULTIMA E EN EL NOMBRE DE LA FUNCION POR SI SE ME OLVIDA.
-    
+function saveSchedulee(plan, routeTo, role = 2) { // AQUI TENGO QUE ELIMINAR LA ULTIMA E EN EL NOMBRE DE LA FUNCION POR SI SE ME OLVIDA.
+
     var cells = $(".selected, .selectable .ui-selected");
     var error = false;
 
-    if(role == 2){
-        for (var i=0; i<cells.length; i++){
+    if (role == 2) {
+        for (var i = 0; i < cells.length; i++) {
             cells[i] = cells[i].id.split("-");
         }
-    
+
         var data = [];
-    
-        for (let i=0; i<cells.length; i++){
-            if(cells[i] != ""){
+
+        for (let i = 0; i < cells.length; i++) {
+            if (cells[i] != "") {
                 data[i] = cells[i];
             }
         }
 
-        
+
         let count = 1;
         loop1:
-        for (let i = 0; i < (data.length-1); i++) {
-            for (let e = i+1; e < data.length; e++) {
-                if(data[i][1] == data[e][1]){
+        for (let i = 0; i < (data.length - 1); i++) {
+            for (let e = i + 1; e < data.length; e++) {
+                if (data[i][1] == data[e][1]) {
                     error = "same_day";
                     console.log('same_day');
                     break loop1;
@@ -30,11 +30,11 @@ function saveSchedulee(plan, routeTo, role = 2){ // AQUI TENGO QUE ELIMINAR LA U
             count++;
         }
 
-        if(data.length < plan){
+        if (data.length < plan) {
             error = "not_enough_days";
         }
 
-        if(data.length > plan){
+        if (data.length > plan) {
             error = "too_much_days";
         }
 
@@ -45,18 +45,18 @@ function saveSchedulee(plan, routeTo, role = 2){ // AQUI TENGO QUE ELIMINAR LA U
             error: error,
             "_token": $("meta[name='csrf-token']").attr("content")
         });
-        
 
-    }else{
 
-        for (var i=0; i<cells.length; i++){
+    } else {
+
+        for (var i = 0; i < cells.length; i++) {
             cells[i] = cells[i].id.split("-");
         }
-    
+
         var data = [];
-    
-        for (let i=0; i<cells.length; i++){
-            if(cells[i] != ""){
+
+        for (let i = 0; i < cells.length; i++) {
+            if (cells[i] != "") {
                 data[i] = cells[i];
             }
         }
@@ -77,117 +77,117 @@ function saveSchedulee(plan, routeTo, role = 2){ // AQUI TENGO QUE ELIMINAR LA U
 
 }
 
-function saveSchedule(plan, routeTo, role = 2){
+function saveSchedule(plan, routeTo, role = 2) {
     //console.log("Hola");
     var cells = $(".selected");
     error = false;
 
-    if(role == 2){
-      for (var i=0; i<cells.length; i++){
-        cells[i] = cells[i].id.split("-");
-    }
-
-    var data = [];
-
-    for (let i=0; i<cells.length; i++){
-        if(cells[i] != ""){
-            data[i] = cells[i];
+    if (role == 2 || role == 1) {
+        for (var i = 0; i < cells.length; i++) {
+            cells[i] = cells[i].id.split("-");
         }
-    }
 
-    //console.log(data,cells);
-    
-    let count = 1;
-    loop1:
-    for (let i = 0; i < (data.length-1); i++) {
-        for (let e = i+1; e < data.length; e++) {
-            // if(data[i][1] == data[e][1]){
-            //     error = "same_day";
-            //     console.log('same_day');
-            //     break loop1;
-            // }
+        var data = [];
+
+        for (let i = 0; i < cells.length; i++) {
+            if (cells[i] != "") {
+                data[i] = cells[i];
+            }
         }
-        count++;
-    }
 
-    if(data.length < plan){
-        error = "not_enough_days";
-    }
+        //console.log(data,cells);
 
-    if(data.length > plan){
-        error = "too_much_days";
-    }
-
-    data = JSON.stringify(data);
-
-    // console.log(plan);
-
-    post(route(routeTo), {
-        data: data,
-        error: error,
-        "_token": $("meta[name='csrf-token']").attr("content")
-    });
-  }else{
-
-    for (var i=0; i<cells.length; i++){
-        cells[i] = cells[i].id.split("-");
-    }
-
-    var data = [];
-
-    for (let i=0; i<cells.length; i++){
-        if(cells[i] != ""){
-            data[i] = cells[i];
+        let count = 1;
+        loop1:
+        for (let i = 0; i < (data.length - 1); i++) {
+            for (let e = i + 1; e < data.length; e++) {
+                // if(data[i][1] == data[e][1]){
+                //     error = "same_day";
+                //     console.log('same_day');
+                //     break loop1;
+                // }
+            }
+            count++;
         }
+
+        if (data.length < plan) {
+            error = "not_enough_days";
+        }
+
+        if (data.length > plan) {
+            error = "too_much_days";
+        }
+
+        data = JSON.stringify(data);
+
+        // console.log(plan);
+
+        post(route(routeTo), {
+            data: data,
+            error: error,
+            "_token": $("meta[name='csrf-token']").attr("content")
+        });
+    } else {
+
+        for (var i = 0; i < cells.length; i++) {
+            cells[i] = cells[i].id.split("-");
+        }
+
+        var data = [];
+
+        for (let i = 0; i < cells.length; i++) {
+            if (cells[i] != "") {
+                data[i] = cells[i];
+            }
+        }
+
+        data = JSON.stringify(data);
+
+        // console.log();
+
+        post(route(routeTo), {
+            data: data,
+            error: error,
+            "_token": $("meta[name='csrf-token']").attr("content")
+        });
+
+        // console.log(data, cells);
+
     }
-
-    data = JSON.stringify(data);
-
-    // console.log();
-
-    post(route(routeTo), {
-        data: data,
-        error: error,
-        "_token": $("meta[name='csrf-token']").attr("content")
-    });
-
-    // console.log(data, cells);
 
 }
 
-}
-
-function saveAbsence(id, routeTo, role = 2){
+function saveAbsence(id, routeTo, role = 2) {
     var cells = $(".selected");
     var message = document.getElementById("absence_reason").value;
     var check = document.getElementById("consent_checkbox").checked;
     console.log(message);
     error = false;
-    console.log(id+" "+routeTo)
+    console.log(id + " " + routeTo)
     //console.log($('.selectable'))
-    for (var i=0; i<cells.length; i++){
+    for (var i = 0; i < cells.length; i++) {
         cells[i] = cells[i].id.split("-");
     }
 
     var data = [];
 
-    for (let i=0; i<cells.length; i++){
-        if(cells[i] != ""){
+    for (let i = 0; i < cells.length; i++) {
+        if (cells[i] != "") {
             data[i] = cells[i];
         }
     }
 
 
-    if(data.length < 1){
+    if (data.length < 1) {
         error = "not_enough_days";
     }
-    if(data.length > 1){
+    if (data.length > 1) {
         error = "too_much_days";
     }
-    if(check == false){
+    if (check == false) {
         error = "not_check";
     }
-    if(message == ""){
+    if (message == "") {
         error = "null";
     }
 
@@ -201,7 +201,7 @@ function saveAbsence(id, routeTo, role = 2){
     post(route(routeTo), {
         data: data,
         error: error,
-        id:id,
+        id: id,
         message: message,
         check: check,
         "_token": $("meta[name='csrf-token']").attr("content")
@@ -210,28 +210,28 @@ function saveAbsence(id, routeTo, role = 2){
 
 }
 
-function checkClass(plan, role = 2){
-    
+function checkClass(plan, role = 2) {
+
     var cells = $(".selected");
     error = false;
     //console.log($('.selectable'))
-    for (var i=0; i<cells.length; i++){
+    for (var i = 0; i < cells.length; i++) {
         cells[i] = cells[i].id.split("-");
     }
 
     var data = [];
 
-    for (let i=0; i<cells.length; i++){
-        if(cells[i] != ""){
+    for (let i = 0; i < cells.length; i++) {
+        if (cells[i] != "") {
             data[i] = cells[i];
         }
     }
 
 
-    if(data.length < 1){
+    if (data.length < 1) {
         error = "not_enough_days";
     }
-    if(data.length > 1){
+    if (data.length > 1) {
         error = "too_much_days";
     }
 
@@ -241,8 +241,8 @@ function checkClass(plan, role = 2){
 
     console.log(data);
 
-    Livewire.emit("checkForClass",data,plan,error);
-    
+    Livewire.emit("checkForClass", data, plan, error);
+
 }
 
 /**
@@ -252,7 +252,7 @@ function checkClass(plan, role = 2){
  * @param {string} [method=post] the method to use on the form
 */
 
-function post(path, params, method='post') {
+function post(path, params, method = 'post') {
 
     // The rest of this code assumes you are not using a library.
     // It can be made less verbose if you use one.
@@ -262,13 +262,13 @@ function post(path, params, method='post') {
 
     for (const key in params) {
         if (params.hasOwnProperty(key)) {
-        const hiddenField = document.createElement('input');
-        hiddenField.type = 'hidden';
-        hiddenField.name = key;
-        hiddenField.value = params[key];
-        hiddenField.setAttribute('required', '');
+            const hiddenField = document.createElement('input');
+            hiddenField.type = 'hidden';
+            hiddenField.name = key;
+            hiddenField.value = params[key];
+            hiddenField.setAttribute('required', '');
 
-        form.appendChild(hiddenField);
+            form.appendChild(hiddenField);
         }
     }
 

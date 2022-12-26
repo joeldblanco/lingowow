@@ -6,6 +6,7 @@ use App\Models\Course;
 use App\Models\Module;
 use App\Models\User;
 use App\Models\Group_unit;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -88,12 +89,14 @@ class ModuleController extends Controller
         if ($role == "admin") {
             // $user_units = $module->units;
             $user_units = $module_units;
-        } else {
+        } else if ($role == "student") {
             $user_units = $module_units->where('order', '<', $user->units->first()->order);
             // $user_units = $user->units->where('status', 1);
             // $user_units = $user_units->diff($user_units->diff($module->units->where('status', 1)));
 
             // $user_units = $user->units->intersect($units)->sort();
+        } else if ($role == "guest") {
+            $user_units = new Collection([$module_units->where('order', 1)->first()]);
         }
 
         // $units = $units->diff($user_units);

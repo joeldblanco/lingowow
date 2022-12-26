@@ -115,7 +115,7 @@ class CourseController extends Controller
         $modules = $course->modules->where('status', 1)->sortBy('order');
         $user_modules = $course->modules->sortBy('order');
         if ($role == "guest") {
-            $user_modules = new Collection();
+            $user_modules = new Collection([$modules->first()]);
         } else if ($role == "student") {
             $user_modules = new Collection();
             foreach ($modules as $module) {

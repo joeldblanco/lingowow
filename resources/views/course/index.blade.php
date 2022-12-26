@@ -5,8 +5,14 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="p-6 sm:px-20 bg-white border-b border-gray-200">
 
-                <h2 class="text-4xl font-bold my-10 text-gray-800">My Courses</h2>
-                <hr class="mb-10 mt-10">
+                <div class="w-full flex justify-between my-10">
+                    <h2 class="text-4xl font-bold text-gray-800 capitalize">My Courses</h2>
+                    @role('admin')
+                        <a href="{{ route('courses.create') }}"
+                            class="text-center leading-10 text-3xl font-bold text-white capitalize rounded-full bg-lw-blue w-10 mr-10 hover:bg-lw-light_blue">+</a>
+                    @endrole
+                </div>
+                <hr class="mb-10">
 
 
                 @foreach ($courses as $course)

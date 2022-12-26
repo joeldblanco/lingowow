@@ -27,29 +27,19 @@ class ClassController extends Controller
         if ($start_date == null || $end_date == null) return redirect()->route('classes.index', ['start_date' => ApportionmentController::currentPeriod(true)[0], 'end_date' => ApportionmentController::currentPeriod(true)[1]]);
 
         if (auth()->user()->roles[0]->name == "teacher") {
-            $classes = User::find(auth()->id())->teacherClasses()->where('start_date', '>=', $start_date)->where('end_date', '<=', $end_date)->orderBy('start_date', 'ASC')->paginate(10);
-            // foreach ($classes as $key => $value) {
-            //     $students[$key] = $value->student();
+            $classes = User::find(auth()->id())->teacherClasses()->where('start_date', '>=', $start_date)->where('end_date', '<=', $end_date)->sortBy('start_date');
+            $classes = Classes::whereIn('id', $classes->pluck('id'))->paginate(10);
 
-            //     if ($value->enrolment_id == 2) {
-            //     }
-            // }
         } else if (auth()->user()->roles[0]->name == "student") {
+            $classes = User::find(auth()->id())->studentClasses->where('start_date', '>=', $start_date)->where('end_date', '<=', $end_date)->sortBy('start_date');
+            $classes = Classes::whereIn('id', $classes->pluck('id'))->paginate(10);
 
-            $classes = User::find(auth()->id())->studentClasses->where('start_date', '>=', $start_date)->where('end_date', '<=', $end_date)->orderBy('start_date', 'ASC')->paginate(10);
-            // foreach ($classes as $key => $value) {
-            //     $teachers[$key] = $value->teacher();
-            // }
         } else if (auth()->user()->roles[0]->name == "admin") {
-            $classes = Classes::where('start_date', '>=', $start_date)->where('end_date', '<=', $end_date)->orderBy('start_date', 'ASC')->paginate(10);
-
-            // foreach ($classes as $key => $value) {
-            //     $students[$key] = $value->student();
-            //     $teachers[$key] = $value->teacher();
-            // }
+            $classes = Classes::where('start_date', '>=', $start_date)->where('end_date', '<=', $end_date)->orderBy('start_date');
+            $classes = Classes::whereIn('id', $classes->pluck('id'))->paginate(10);
+            
         }
         $classes->appends(['start_date' => $start_date, 'end_date' => $end_date]);
-
 
         return view('classes.index', compact('classes'));
     }

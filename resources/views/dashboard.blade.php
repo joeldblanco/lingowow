@@ -93,9 +93,10 @@
                 </div>
 
                 <div>
-                    {{-- <livewire:scheduled-calendar /> --}}
-                    {{-- <livewire:schedule :user_id="auth()->id()" /> --}}
-                    @livewire('schedule', ['user_id' => auth()->id(), 'mode' => 'show'])
+                    @php
+                        $course_id = auth()->user()->enrolments->first()->course->id;
+                    @endphp
+                    @livewire('schedule', ['user_id' => auth()->id(), 'mode' => 'show', 'course_id' => $course_id])
                 </div>
 
                 @role('teacher')

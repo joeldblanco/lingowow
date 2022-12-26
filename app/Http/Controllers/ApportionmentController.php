@@ -17,11 +17,16 @@ class ApportionmentController extends Controller
     public static function calculateApportionment($plan, $schedule = null, $course_id = null)
     {
         // $plan = json_decode($plan);
-       
-        $schedule == null ? session('user_schedule') : $schedule;
+
+        // $schedule == null ? session('user_schedule') : $schedule;
+        if ($schedule == null) {
+            $schedule = session("user_schedule");
+        }
         $schedule = json_decode($schedule);
-        
-        $course_id == null ? session("selected_course") : $course_id;
+
+        if ($course_id == null) {
+            $course_id = session("selected_course");
+        }
         $product = Course::find($course_id)->products->first();
 
         $today = Carbon::now()->setTimezone('UTC');
@@ -66,9 +71,9 @@ class ApportionmentController extends Controller
             foreach ($schedule as $key => $value) {
                 $day = $value[1];
                 $time = $value[0];
-                
+
                 $qty += $next_period_start->diffInDaysFiltered(function (Carbon $date) use (&$day, &$time, &$days) {
-                
+
                     if ($date->isDayOfWeek($day)) {
                         $date->hour = $time;
                         $date->minute = 0;
@@ -129,40 +134,40 @@ class ApportionmentController extends Controller
             $current_period_end->addDays(1);
         }
 
-        if($onlyDate) return [$current_period_start->toDateString(), $current_period_end->toDateString()];
+        if ($onlyDate) return [$current_period_start->toDateString(), $current_period_end->toDateString()];
 
         return [$current_period_start->toDateTimeString(), $current_period_end->toDateTimeString()];
     }
 
-    public static function getPeriod($class, $extended = false){
+    public static function getPeriod($class, $extended = false)
+    {
 
-        if($extended){
+        if ($extended) {
             $today = new Carbon($class);
             $month = $today->isoFormat('MMMM G');
-            $first_monday = new Carbon('first monday of '.$month);
-            if($first_monday < Carbon::now()){
-                $period_start_date = new Carbon('first monday of '.$month);
-                $period_end_date = (new Carbon('first monday of '.$month))->addDays(5);
+            $first_monday = new Carbon('first monday of ' . $month);
+            if ($first_monday < Carbon::now()) {
+                $period_start_date = new Carbon('first monday of ' . $month);
+                $period_end_date = (new Carbon('first monday of ' . $month))->addDays(5);
                 $period_end_date->addWeeks(3);
                 $period_end_date->addDays(1);
-            }else{
-                $period_start_date = new Carbon('first monday of '.$month);
-                $period_end_date = (new Carbon('first monday of '.$month))->addDays(5);
+            } else {
+                $period_start_date = new Carbon('first monday of ' . $month);
+                $period_end_date = (new Carbon('first monday of ' . $month))->addDays(5);
                 $period_end_date->addWeeks(3);
                 $period_end_date->addDays(1);
             }
 
-            return [$period_start_date->toDateTimeString(),$period_end_date->toDateTimeString()];
-
-        }else{
+            return [$period_start_date->toDateTimeString(), $period_end_date->toDateTimeString()];
+        } else {
             $period = CarbonPeriod::between('2022-01-03', now()->addYear())->addFilter(function ($date) {
                 return $date->is('first monday of this month');
             });
-    
+
             $class = new Carbon($class);
-    
+
             foreach ($period as $key => $date) {
-                if($date <= $class){
+                if ($date <= $class) {
                     $class_period = $date->format("F Y");
                 }
             }
@@ -195,16 +200,16 @@ class ApportionmentController extends Controller
     //         $period = CarbonPeriod::between('2022-01-03', now()->addYear())->addFilter(function ($date) {
     //             return $date->is('first monday of this month');
     //         });
-    
+
     //         $class = new Carbon($class);
-    
+
     //         foreach ($period as $key => $date) {
     //             if($date <= $class){
     //                 $class_period = $date->format("F Y");
     //             }
     //         }
     //     }
-        
+
     //     return $class_period;
     // }
 }

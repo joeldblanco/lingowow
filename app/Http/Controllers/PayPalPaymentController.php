@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Invoice;
 use App\IPNStatus;
 use App\Item;
+use App\Models\Course;
+use App\Models\Enrolment;
 use Cart;
 use Illuminate\Http\Request;
 use Srmklive\PayPal\Services\AdaptivePayments;
@@ -108,23 +110,44 @@ class PayPalPaymentController extends Controller
                 // $users = User::all();
                 // $items = Item::all();
 
-                foreach(Cart::content() as $item){
-                    if($item->name === "Enrolment"){
+                foreach (Cart::content() as $item) {
+                    if ($item->name === "Enrolment") {
                         $current_user = User::find(auth()->id());
                         $current_user->removeRole('guest');
                         $current_user->assignRole('student');
                     }
                 }
 
-                // $schedule = new SchedulingCalendarController;
-                // $schedule->store();
+                $student = auth()->user();
+                $course_id = session('selected_course');
 
-                SchedulingCalendarController::store();
+                //CHANGING STUDENT'S ROLE FROM 'GUEST' TO 'STUDENT'//
+                $student->removeRole('guest');
+                $student->assignRole('student');
+
+                $product = Course::find($course_id)->products->first();
+                if ($product->recurring) {
+                    $teacher = User::find(session('teacher_id'));
+
+                    //CREATING STUDENT'S ENROLMENT (OR UPDATING IT, IN CASE IT ALREADY EXISTS BUT IS SOFTDELETED)//
+                    $enrolment = Enrolment::withTrashed()->updateOrCreate(
+                        ['student_id' => $student->id, 'course_id' => $course_id],
+                        ['teacher_id' => $teacher->id, 'deleted_at' => NULL]
+                    );
+
+                    SchedulingCalendarController::store(auth()->user()->id, $enrolment);
+                } else {
+
+                    //CREATING STUDENT'S ENROLMENT (OR UPDATING IT, IN CASE IT ALREADY EXISTS BUT IS SOFTDELETED)//
+                    $enrolment = Enrolment::withTrashed()->updateOrCreate(
+                        ['student_id' => $student->id, 'course_id' => $course_id],
+                        ['teacher_id' => NULL, 'deleted_at' => NULL]
+                    );
+                }
 
                 Cart::destroy();
 
-                return redirect()->route('invoice.show',['id' => $invoice_id]);
-
+                return redirect()->route('invoice.show', ['id' => $invoice_id]);
             } else {
                 session()->put(['code' => 'danger', 'message' => "Error processing PayPal payment for Order $invoice->id!"]);
             }
@@ -203,21 +226,21 @@ class PayPalPaymentController extends Controller
 
         // dd($order_id);
 
-        foreach(Cart::content() as $item){
-            array_push($items,['name'  => $item->name, 'price' => $item->price, 'qty' => $item->qty]);
+        foreach (Cart::content() as $item) {
+            array_push($items, ['name'  => $item->name, 'price' => $item->price, 'qty' => $item->qty]);
         }
 
         if ($recurring === true) {
             $data['items'] = [
                 [
-                    'name'  => 'Monthly Subscription '.config('paypal.invoice_prefix').' #'.$order_id,
+                    'name'  => 'Monthly Subscription ' . config('paypal.invoice_prefix') . ' #' . $order_id,
                     'price' => 0,
                     'qty'   => 1,
                 ],
             ];
 
             $data['return_url'] = url('/payment/ec-checkout-success?mode=recurring');
-            $data['subscription_desc'] = 'Monthly Subscription '.config('paypal.invoice_prefix').' #'.$order_id;
+            $data['subscription_desc'] = 'Monthly Subscription ' . config('paypal.invoice_prefix') . ' #' . $order_id;
         } else {
 
             $data['items'] = $items;
@@ -225,7 +248,7 @@ class PayPalPaymentController extends Controller
             $data['return_url'] = url('/payment/ec-checkout-success');
         }
 
-        $data['invoice_id'] = config('paypal.invoice_prefix').'_'.$order_id;
+        $data['invoice_id'] = config('paypal.invoice_prefix') . '_' . $order_id;
         $data['invoice_description'] = "Invoice #$order_id";
         $data['cancel_url'] = url('/');
 
