@@ -135,7 +135,7 @@
                 @endif
 
                 @if ($role == 'student')
-                    @if ($this->course->modality == 'synchronous')
+                    @if ($course->modality == 'synchronous')
                         <div class="w-full text-center" style="background-color: rgba(255, 255, 255, 0.5)">
                             <h2 class="text-4xl font-bold text-red-800" style="margin-top: 15%">You haven't
                                 selected a schedule yet.</h2>
