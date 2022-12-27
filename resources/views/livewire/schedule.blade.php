@@ -135,14 +135,21 @@
                 @endif
 
                 @if ($role == 'student')
-                    <div class="w-full text-center" style="background-color: rgba(255, 255, 255, 0.5)">
-                        <h2 class="text-4xl font-bold text-red-800" style="margin-top: 15%">You haven't
-                            selected a schedule yet.</h2>
-                        <h2 class="text-2xl font-bold text-gray-800">You can select a schedule after you buy
-                            a plan of classes.</h2>
-                        <a href="{{ route('shop') }}"
-                            class="inline-block bg-blue-800 text-white px-6 py-4 mt-8 rounded-lg hover:bg-blue-900 hover:text-white hover:no-underline">Shop</a>
-                    </div>
+                    @if ($this->course->modality == 'synchronous')
+                        <div class="w-full text-center" style="background-color: rgba(255, 255, 255, 0.5)">
+                            <h2 class="text-4xl font-bold text-red-800" style="margin-top: 15%">You haven't
+                                selected a schedule yet.</h2>
+                            <h2 class="text-2xl font-bold text-gray-800">You can select a schedule after you buy
+                                a plan of classes.</h2>
+                            <a href="{{ route('shop') }}"
+                                class="inline-block bg-blue-800 text-white px-6 py-4 mt-8 rounded-lg hover:bg-blue-900 hover:text-white hover:no-underline">Shop</a>
+                        </div>
+                    @else
+                        <div class="w-full text-center" style="background-color: rgba(255, 255, 255, 0.5)">
+                            <h2 class="text-4xl font-bold text-red-800" style="margin-top: 15%">Stand By</h2>
+                        </div>
+                    @endif
+
                 @endif
 
                 @if ($role == 'teacher')
@@ -444,8 +451,10 @@
                     @if ($data != [])
                         <div class="pl-5 pr-5">
                             <h5 class="text-left">Dear Student:</h5>
-                            <p class="text-left">The following classes will not be added to your schedule, nor added to
-                                your shopping cart, because in this period other students have the rescheduled block.
+                            <p class="text-left">The following classes will not be added to your schedule, nor
+                                added to
+                                your shopping cart, because in this period other students have the rescheduled
+                                block.
                             </p>
                             <br>
                             @php
@@ -780,6 +789,7 @@
     @if ($role == 'guest')
         <script>
             console.log("Inicio Guest")
+
             function toggleCellBlock() {}
             $(function() {
 

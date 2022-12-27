@@ -103,7 +103,13 @@
                 <a href="{{ route('impersonate', $user->id) }}">Impersonate</a>
             </div>
             <div>
-                @livewire('schedule', ['user_id' => $user->id, 'mode' => 'show'])
+                @php
+                    $course_id = auth()
+                        ->user()
+                        ->enrolments->first();
+                    if($course_id != null)  $course_id = $course_id->course->id;
+                @endphp
+                @livewire('schedule', ['user_id' => $user->id, 'mode' => 'show', 'course_id' => $course_id])
             </div>
             @if (count($students) > 0)
                 <table class="flex flex-col w-1/2 space-y-5 border border-gray-200 p-5">
