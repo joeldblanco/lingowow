@@ -90,9 +90,7 @@
                 </div>
                 <div>
                     @php
-                        $course_id = auth()
-                            ->user()
-                            ->enrolments->first();
+                        $course_id = $user->enrolments->first();
                         if ($course_id != null) {
                             $course_id = $course_id->course->id;
                         }
