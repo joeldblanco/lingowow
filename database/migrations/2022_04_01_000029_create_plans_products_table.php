@@ -14,8 +14,8 @@ class CreatePlansProductsTable extends Migration
     public function up()
     {
         Schema::create('plans_products', function (Blueprint $table) {
-            $table->bigInteger('plan_id', false, true);
-            $table->bigInteger('product_id', false, true);
+            $table->bigInteger('plan_id')->unsigned();
+            $table->bigInteger('product_id')->unsigned();
         });
     }
 

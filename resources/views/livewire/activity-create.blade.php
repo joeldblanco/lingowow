@@ -14,7 +14,8 @@
                     <div class="p-5 w-full" id="activities_container">
 
                     </div>
-                    <input type="submit" value="Submit" class="py-2 px-4 rounded-md bg-blue-500 font-semibold text-white">
+                    <input type="submit" value="Submit"
+                        class="py-2 px-4 rounded-md bg-blue-500 font-semibold text-white">
                 </form>
 
                 <x-modal type="info" name="activity_modal">
@@ -57,6 +58,5 @@
             form.appendChild(images);
             form.appendChild(title);
         }
-
     </script>
 </x-app-layout>

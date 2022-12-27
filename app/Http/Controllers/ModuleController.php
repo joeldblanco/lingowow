@@ -185,7 +185,7 @@ class ModuleController extends Controller
 
         if ($nota != null) {
 
-            if (Group_unit::find($id)->priority == 'FIRST') {
+            if (GroupUnit::find($id)->priority == 'FIRST') {
                 return true;
             } else {
                 $nota = $nota->pivot->nota;
@@ -196,7 +196,7 @@ class ModuleController extends Controller
                 }
             }
         } else {
-            if (Group_unit::find($id)->priority == 'FIRST') {
+            if (GroupUnit::find($id)->priority == 'FIRST') {
                 return true;
             } else {
                 return false;

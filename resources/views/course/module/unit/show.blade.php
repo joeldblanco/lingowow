@@ -129,17 +129,34 @@
 
                 </div>
                 <hr />
-                <div class="mt-10 mb-20">
-                    <div class="text-3xl font-bold text-left text-gray-400 flex space-x-6 items-center">
-                        <i class="fas fa-tasks"></i>
-                        <h2>Activities</h2>
-                    </div>
-                    <div>
+                {{-- @php
+                    dd($activities->count());
+                    
+                @endphp --}}
+                @if ($activities->count() > 0)
+                    <div class="mt-10 mb-20">
+                        <div class="text-3xl font-bold text-left text-gray-400 flex space-x-6 items-center">
+                            <i class="fas fa-tasks"></i>
+                            <h2>Activities</h2>
+                        </div>
+                        <br>
+                        <ul class="ul-list-activities">
+                            @foreach ($activities as $key => $activity)
+                                <li class="li-list-activities">
+                                    <a class="list-activity" href="{{ $unit->id }}/activity/{{ $activity->id }}"
+                                        style="color: blueviolet;">{{ $activity->name }}</a>
+                                    <div>
+                                </li>
+                            @endforeach
+                        </ul>
 
                     </div>
-                </div>
-
             </div>
+            @endif
+
+
+            
+
         </div>
     </div>
 

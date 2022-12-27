@@ -14,8 +14,8 @@ class CreateDeletedMessagesTable extends Migration
     public function up()
     {
         Schema::create('deleted_messages', function (Blueprint $table) {
-            $table->bigIncrements('id');
-            $table->bigInteger('user_id');
+            $table->bigIncrements('id')->unsigned();
+            $table->bigInteger('user_id')->unsigned();
             $table->bigInteger('conversation_id');
         });
     }

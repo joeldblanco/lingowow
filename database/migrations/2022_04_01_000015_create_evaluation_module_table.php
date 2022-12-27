@@ -14,8 +14,8 @@ class CreateEvaluationModuleTable extends Migration
     public function up()
     {
         Schema::create('evaluation_module', function (Blueprint $table) {
-            $table->bigInteger('id_user',false,true);
-            $table->bigInteger('id_module',false,true);
+            $table->bigInteger('id_user')->unsigned();
+            $table->bigInteger('id_module')->unsigned();
             $table->float('nota')->nullable();
 
             $table->foreign('id_user')->references('id')->on('users');//

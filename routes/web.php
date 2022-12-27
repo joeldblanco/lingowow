@@ -35,6 +35,7 @@ use Illuminate\Support\Facades\Notification;
 use App\Http\Controllers\MeetingController;
 use App\Http\Controllers\ProductController;
 use App\Models\Attempt;
+use App\Http\Controllers\UploadImages;
 use App\Models\Enrolment;
 use App\Models\Post;
 use App\Models\Unit;
@@ -96,6 +97,11 @@ Route::middleware(['web', 'auth', 'verified', 'impersonate'])->group(function ()
     //ROUTES FOR UNITS//
     Route::resource('units', UnitController::class);
     Route::post('units/sort', [UnitController::class, 'sort'])->name('units.sort');
+
+    //ROUTES FOR ACTIVITY//
+    Route::middleware(['role:student|teacher|admin'])->get('/unit/{id_unit}/activity/{id}', [ActivityController::class, 'show_activity'])->name('activity.show'); ///Cree, esta nueva
+    Route::middleware(['role:student|teacher|admin'])->get('/activity/edit/{id}', [ActivityController::class, 'edit_activity'])->name('activity.edit'); ///Cree, esta nueva
+     ///Cree, esta nueva
 
     //ROUTES FOR SHOP//
     Route::middleware(['role:guest|student|admin'])->get('/shop', [PayPalPaymentController::class, 'getIndex'])->name('shop');
@@ -187,7 +193,11 @@ Route::middleware(['web', 'auth', 'verified', 'impersonate'])->group(function ()
         Route::resource('/activities', ActivityController::class);
         // Route::get('/admin/activities/create', [ActivityController::class, 'create'])->name('admin.activities.create');
         // Route::post('/admin/activities', [ActivityController::class, 'store'])->name('admin.activities.store');
-        // Route::get('/admin/activities/{id}', [ActivityController::class, 'show'])->name('admin.activities.show');
+        // Route::get('activities/{id}', [ActivityController::class, 'show'])->name('admin.activities.show');
+        Route::post('activities/store', [ActivityController::class, 'store'])->name('admin.activities.store');
+        Route::post('activities/store/files', [ActivityController::class, 'storeFiles'])->name('admin.activities.storeFiles');
+        Route::post('activities/update/{id}', [ActivityController::class, 'update'])->name('admin.activities.update');
+
         // Route::get('/admin/activities/{id}/edit', [ActivityController::class, 'edit'])->name('admin.activities.edit');
         // Route::patch('/admin/activities/{id}', [ActivityController::class, 'update'])->name('admin.activities.update');
         // Route::post('/admin/activities/{id}', [ActivityController::class, 'destroy'])->name('admin.activities.destroy');
@@ -224,6 +234,9 @@ Route::middleware(['web', 'auth', 'verified', 'impersonate'])->group(function ()
             return redirect()->route('users', 4);
         });
     });
+
+    Route::get('activities', [ActivityController::class, 'index'])->name('activities.index');
+    Route::get('activities/{id}', [ActivityController::class, 'show'])->name('admin.activities.show');
 
     Route::get('/admin/exam/result/{id}', [ExamController::class, 'correct'])->name('exam.result');
 
@@ -293,3 +306,9 @@ Route::post('/email/verification-notification', function (Request $request) {
 
     return back()->with('message', 'Verification link sent!');
 })->middleware(['auth', 'throttle:6,1'])->name('verification.send');
+
+
+// ROUTES ONLY AJAX//
+
+// Route::post('uploadFileImages',[UploadImages::class,'index']);
+// Route::get('uploadFileImages',[UploadImages::class,'index']);

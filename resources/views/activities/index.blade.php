@@ -12,16 +12,16 @@
                         <tr>
                             <th
                                 class="py-4 px-6 bg-gray-100 font-bold uppercase text-sm text-gray-600 border-b border-gray-400 text-center">
-                                ID</th>
+                                #</th>
                             <th
                                 class="py-4 px-6 bg-gray-100 font-bold uppercase text-sm text-gray-600 border-b border-gray-400 text-center">
-                                UNIT ID</th>
+                                UNIT</th>
                             <th
                                 class="py-4 px-6 bg-gray-100 font-bold uppercase text-sm text-gray-600 border-b border-gray-400 text-center">
                                 COURSE</th>
                             <th
                                 class="py-4 px-6 bg-gray-100 font-bold uppercase text-sm text-gray-600 border-b border-gray-400 text-center">
-                                TYPE</th>
+                                NAME</th>
                             <th
                                 class="py-4 px-6 bg-gray-100 font-bold uppercase text-sm text-gray-600 border-b border-gray-400 text-center">
                                 STATUS</th>
@@ -34,48 +34,68 @@
                             <th
                                 class="py-4 px-6 bg-gray-100 font-bold uppercase text-sm text-gray-600 border-b border-gray-400">
                             </th>
-                            <th
-                                class="py-4 px-6 bg-gray-100 font-bold uppercase text-sm text-gray-600 border-b border-gray-400">
-                            </th>
+                            @if (auth()->user()->getRoleNames()->first() == 'admin')
+                                <th
+                                    class="py-4 px-6 bg-gray-100 font-bold uppercase text-sm text-gray-600 border-b border-gray-400">
+                                </th>
+                                <th
+                                    class="py-4 px-6 bg-gray-100 font-bold uppercase text-sm text-gray-600 border-b border-gray-400">
+                                </th>
+                            @endif
+
+
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach ($activities as $activity)
+                        @foreach ($activities as $key => $activity)
                             <tr class="hover:bg-gray-200">
                                 <td class="py-4 px-6 border-b border-gray-400 text-center">
-                                    {{ $activity->id }}</td>
+                                    {{ $key + 1 }}</td>
                                 <td class="py-4 px-6 border-b border-gray-400 text-center">
-                                    {{ $activity->unit_id }}</td>
+                                    {{ $activity->unit->unit_name }}</td>
                                 <td class="py-4 px-6 border-b border-gray-400 text-center">
                                     {{ $activity->unit->module->course->name }}</td>
                                 <td class="py-4 px-6 border-b border-gray-400 text-center">
-                                    {{ $activity->type }}</td>
+                                    {{ $activity->name }}</td>
                                 <td class="py-4 px-6 border-b border-gray-400 text-center">
                                     {{ $activity->status }}</td>
                                 {{-- <td class="py-4 px-6 border-b border-gray-400 text-center">
                                     {{ $activity->created_at }}</td> --}}
                                 <td class="py-4 px-6 border-b border-gray-400 text-center">
-                                    <a href="{{ route('activities.show', $activity->id) }}">
+                                    <a id="{{ $activity->id }}" href="" class="btn-assign">
+                                        <i class="fas fa-hand-point-left"></i>
+                                    </a>
+                                </td>
+                                <td class="py-4 px-6 border-b border-gray-400 text-center">
+                                    <a href="{{ route('activity.show', ['id_unit' => 1, 'id' => $activity->id]) }}">
                                         <i class="fas fa-eye"></i>
                                     </a>
                                 </td>
-                                <td class="py-4 px-6 border-b border-gray-400">
-                                    <a href="{{ route('activities.edit', $activity->id) }}">
-                                        <i class="fas fa-edit"></i>
-                                    </a>
-                                </td>
-                                <td class="py-4 px-6 border-b border-gray-400">
-                                    <form action="{{ route('activities.destroy', $activity->id) }}" method="POST">
+                                @if (auth()->user()->getRoleNames()->first() == 'admin')
+                                    <td class="py-4 px-6 border-b border-gray-400">
+                                        <a href="{{ route('activity.edit', $activity->id) }}">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                    </td>
+                                    <td class="py-4 px-6 border-b border-gray-400">
+                                        {{-- <form action="{{ route('activities.destroy', $activity->id) }}" method="POST">
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit"><i class="fas fa-trash"></i></button>
-                                    </form>
-                                </td>
+                                    </form> --}}
+                                        <button id="{{ $activity->id }}" class="btn-act-delete"><i
+                                                class="fas fa-trash"></i></button>
+                                    </td>
+                                @endif
                             </tr>
                         @endforeach
 
                     </tbody>
                 </table>
+
+                <div class="grid place-content-center">
+                    @livewire('modal-users-menu')
+                </div>
             </div>
         </div>
     </div>

@@ -14,8 +14,8 @@ class CreateExamUserTable extends Migration
     public function up()
     {
         Schema::create('exam_user', function (Blueprint $table) {
-            $table->bigInteger('exam_id', false, true);
-            $table->bigInteger('user_id', false, true);
+            $table->bigInteger('exam_id')->unsigned();
+            $table->bigInteger('user_id')->unsigned();
 
             $table->foreign('exam_id')->references('id')->on('exams');
             $table->foreign('user_id')->references('id')->on('users');
