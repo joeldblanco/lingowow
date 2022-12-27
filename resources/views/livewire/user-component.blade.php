@@ -104,10 +104,10 @@
             </div>
             <div>
                 @php
-                    $course_id = auth()
-                        ->user()
-                        ->enrolments->first();
-                    if($course_id != null)  $course_id = $course_id->course->id;
+                    $course_id = $user->enrolments->first();
+                    if ($course_id != null) {
+                        $course_id = $course_id->course->id;
+                    }
                 @endphp
                 @livewire('schedule', ['user_id' => $user->id, 'mode' => 'show', 'course_id' => $course_id])
             </div>
