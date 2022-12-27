@@ -94,7 +94,12 @@
 
                 <div>
                     @php
-                        $course_id = auth()->user()->enrolments->first()->course->id;
+                        $course_id = auth()
+                            ->user()
+                            ->enrolments->first();
+                        if ($course_id != null) {
+                            $course_id = $course_id->course->id;
+                        }
                     @endphp
                     @livewire('schedule', ['user_id' => auth()->id(), 'mode' => 'show', 'course_id' => $course_id])
                 </div>
