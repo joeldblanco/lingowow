@@ -8,7 +8,9 @@
                 {{dd($data)}}
 
                 <p>{{$data->text}}</p>
-                {{-- <p>{{$data->}}</p> --}}
+                <p>{{$data->}}</p>
+
+                
 
             </div>
         </div>

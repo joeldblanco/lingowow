@@ -16,7 +16,10 @@ class CreateActivityUserTable extends Migration
         Schema::create('activity_user', function (Blueprint $table) {
             $table->bigInteger('activity_id')->unsigned();
             $table->bigInteger('user_id')->unsigned();
-            $table->tinyInteger('user_type');
+            $table->tinyInteger('user_type')->unsigned();
+
+            $table->foreign('activity_id')->references('id')->on('activities');
+            $table->foreign('user_id')->references('id')->on('users');
         });
     }
 

@@ -54,17 +54,17 @@ class PayPalPaymentController extends Controller
      */
     public function getExpressCheckout(Request $request)
     {
-        // dd($request);
         $recurring = ($request->get('mode') === 'recurring') ? true : false;
         $cart = $this->getCheckoutData($recurring);
 
         try {
+
             $response = $this->provider->setExpressCheckout($cart, $recurring);
-            // dd($response);
+            
             return redirect($response['paypal_link']);
         } catch (\Exception $e) {
             $invoice = $this->createInvoice($cart, 'Invalid');
-
+         
             session()->put(['code' => 'danger', 'message' => "Error processing PayPal payment for Order $invoice->id!"]);
         }
     }

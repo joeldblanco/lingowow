@@ -15,8 +15,8 @@ return new class extends Migration
     {
         Schema::create('attempts', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->bigInteger('user_id',false,true);
-            $table->bigInteger('exam_id',false,true);
+            $table->bigInteger('user_id')->unsigned();
+            $table->bigInteger('exam_id')->unsigned();
             $table->string('data',2000)->nullable();
             $table->tinyInteger('score', false, true)->nullable();
             $table->timestamp('end_timestamp')->nullable();

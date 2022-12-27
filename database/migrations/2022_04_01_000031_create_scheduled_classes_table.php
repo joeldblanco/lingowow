@@ -14,8 +14,8 @@ class CreateScheduledClassesTable extends Migration
     public function up()
     {
         Schema::create('scheduled_classes', function (Blueprint $table) {
-            $table->bigInteger('student_id');
-            $table->bigInteger('teacher_id');
+            $table->bigInteger('student_id')->unsigned();
+            $table->bigInteger('teacher_id')->unsigned();
         });
     }
 

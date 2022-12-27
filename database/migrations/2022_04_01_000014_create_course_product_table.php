@@ -14,8 +14,8 @@ class CreateCourseProductTable extends Migration
     public function up()
     {
         Schema::create('course_product', function (Blueprint $table) {
-            $table->bigInteger('product_id', false, true);
-            $table->bigInteger('course_id', false, true);
+            $table->bigInteger('product_id')->unsigned();
+            $table->bigInteger('course_id')->unsigned();
 
             $table->foreign('product_id')->references('id')->on('products');
             $table->foreign('course_id')->references('id')->on('courses');

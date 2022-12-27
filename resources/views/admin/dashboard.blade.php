@@ -268,8 +268,8 @@
         }
 
         var chart = new ApexCharts(document.querySelector("#chart"), options);
-
-        chart.render();
+        // console.log(chart);
+        chart.render(); //ESTA LINEA ME DA ERROR
     </script>
     {{-- <script src="{{ asset('js/shepherdjs_tours/tour_1.js') }}" defer></script> --}}
 

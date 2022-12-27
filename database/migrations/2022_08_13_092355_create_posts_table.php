@@ -15,7 +15,7 @@ class CreatePostsTable extends Migration
     {
         Schema::create('posts', function (Blueprint $table) {
             $table->id();
-            $table->bigInteger('author_id',false,true);
+            $table->bigInteger('author_id')->unsigned();
             $table->longText('content')->charset('utf8mb4')->collation('utf8mb4_bin');
             $table->timestamps();
             $table->softDeletes();
