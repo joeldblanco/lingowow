@@ -26,7 +26,7 @@ class PricingTableComponent extends Component
         $this->emit('loadingState', false);
     }
 
-    public function store($nOfClasses = null)
+    public function store($nOfClasses = null, $synchronous = false)
     {
         $enroled = Enrolment::where('student_id', auth()->id())
             // ->where('course_id',session('selected_course'))
@@ -45,7 +45,7 @@ class PricingTableComponent extends Component
         } else {
             $course_id = session('selected_course');
             $product = Course::find($course_id)->products->first();
-            if ($product->recurring) {
+            if ($synchronous) {
                 session(['plan' => $nOfClasses]);
                 redirect()->route("schedule.create");
             } else {
