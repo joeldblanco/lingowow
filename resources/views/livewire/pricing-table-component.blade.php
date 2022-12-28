@@ -28,7 +28,7 @@
                     @endif
                 </div>
                 <div class="text-center mb-8 mt-4">
-                    @if ($product->recurring)
+                    @if ($product->courses->first()->modality == "synchronous")
                         <button wire:click="store('{{ $plan->n_classes / 4 }}')"
                             class="inline-block bg-blue-800 text-white px-6 py-4 rounded-lg hover:bg-blue-900 hover:text-white hover:no-underline">Select</button>
                     @else
