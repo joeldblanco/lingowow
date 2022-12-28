@@ -44,8 +44,6 @@ class SchedulingCalendarController extends Controller
     {
         $plan = session('plan');
 
-        dd($request);
-
         return view('calendar-selection', compact('plan'));
     }
 

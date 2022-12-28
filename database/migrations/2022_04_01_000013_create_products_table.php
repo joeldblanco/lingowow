@@ -20,7 +20,7 @@ class CreateProductsTable extends Migration
             $table->text('description');
             $table->decimal('regular_price', 8, 2);
             $table->decimal('sale_price', 8, 2)->nullable();
-            $table->tinyInteger('recurring')->default(0);
+            // $table->tinyInteger('recurring')->default(0);
             $table->string('image',255)->nullable();
             $table->timestamps();
         });
