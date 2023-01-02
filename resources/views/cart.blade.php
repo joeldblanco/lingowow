@@ -2,7 +2,7 @@
     
     <div class="bg-white font-sans">
         
-        <livewire:cart-component />
+        @livewire('cart-component')
         
     </div>
 

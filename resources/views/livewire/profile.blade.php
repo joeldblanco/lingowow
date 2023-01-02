@@ -466,7 +466,7 @@
                         @method('PATCH')
                         <div class="divide-y mb-5">
                             <p class="font-bold text-md mb-6 w-full text-left">
-                                Edit Account Details
+                                Account Details
                             </p>
                             <div>
                                 <div class="flex pt-6 space-x-4">
@@ -497,6 +497,51 @@
                                             required value="{{ $user->email }}"
                                             class="w-full rounded-md p-3 text-gray-600 hover:border-gray-600 @if ($errors->has('email')) border-red-600 @else border-gray-300 @endif ">
                                         @if ($errors->has('email'))
+                                            <p class="text-xs font-light text-red-600">Required</p>
+                                        @endif
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="divide-y mb-5 mt-16">
+                            <p class="font-bold text-md mb-6 w-full text-left">
+                                Billing Information
+                            </p>
+                            <div>
+                                <div class="flex pt-6 space-x-4">
+                                    <div class="space-y-1 w-full">
+                                        <input type="text" name="street" id="street"
+                                            placeholder="Street address" required value="{{ $user->street }}"
+                                            class="w-full rounded-md p-3 text-gray-600 hover:border-gray-600 @if ($errors->has('street')) border-red-600 @else border-gray-300 @endif ">
+                                        @if ($errors->has('street'))
+                                            <p class="text-xs font-light text-red-600">Required</p>
+                                        @endif
+                                    </div>
+                                </div>
+                                <div class="flex pt-6 space-x-4">
+                                    <div class="space-y-1">
+                                        <input type="text" name="city" id="city" placeholder="City"
+                                            required value="{{ $user->city }}"
+                                            class="w-full rounded-md p-3 text-gray-600 hover:border-gray-600 @if ($errors->has('city')) border-red-600 @else border-gray-300 @endif ">
+                                        @if ($errors->has('city'))
+                                            <p class="text-xs font-light text-red-600">Required</p>
+                                        @endif
+                                    </div>
+                                    <div class="space-y-1">
+                                        <input type="text" name="country" id="country" placeholder="Country"
+                                            required value="{{ $user->country }}"
+                                            class="w-full rounded-md p-3 text-gray-600 hover:border-gray-600 @if ($errors->has('country')) border-red-600 @else border-gray-300 @endif ">
+                                        @if ($errors->has('country'))
+                                            <p class="text-xs font-light text-red-600">Required</p>
+                                        @endif
+                                    </div>
+                                </div>
+                                <div class="flex pt-6 space-x-4 w-1/2">
+                                    <div class="space-y-1 mr-2">
+                                        <input type="text" name="zip_code" id="zip_code" placeholder="ZIP Code"
+                                            required value="{{ $user->zip_code }}"
+                                            class="w-full rounded-md p-3 text-gray-600 hover:border-gray-600 @if ($errors->has('zip_code')) border-red-600 @else border-gray-300 @endif ">
+                                        @if ($errors->has('zip_code'))
                                             <p class="text-xs font-light text-red-600">Required</p>
                                         @endif
                                     </div>
