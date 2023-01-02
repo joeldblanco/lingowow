@@ -33,6 +33,7 @@ use App\Notifications\BookedClass;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Notification;
 use App\Http\Controllers\MeetingController;
+use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\ProductController;
 use App\Models\Attempt;
 use App\Http\Controllers\UploadImages;
@@ -265,10 +266,12 @@ Route::middleware(['web', 'auth', 'verified', 'impersonate'])->group(function ()
     Route::get('/classroom/{id}', [ClassroomController::class, 'openRoom'])->name("classroom");
 
     //ROUTES FOR PROCESSING PAYMENTS (PAYPAL)//
-    Route::get('/payment/ec-checkout', [PayPalPaymentController::class, 'getExpressCheckout'])->name("checkout");
+    Route::get('/payment/ec-checkout', [PayPalPaymentController::class, 'getExpressCheckout'])->name("paypal-checkout");
     Route::get('/payment/ec-checkout-success', [PayPalPaymentController::class, 'getExpressCheckoutSuccess'])->name("checkout-success");
     Route::get('/payment/adaptive-pay', [PayPalPaymentController::class, 'getAdaptivePay'])->name("adpative-payment");
     Route::post('/payment/notify', [PayPalPaymentController::class, 'notify'])->name("notify");
+
+    Route::get('/payment/checkout', [PaymentController::class, 'checkout'])->name("checkout");
 
     //ROUTES FOR NOTIFICATIONS//
     Route::get('/notifications', [NotificationsController::class, 'index'])->name('notifications.index');
