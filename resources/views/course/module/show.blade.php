@@ -1,7 +1,7 @@
 <x-app-layout>
     <div class="bg-white font-sans">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="p-6 sm:px-20 bg-white border-b border-gray-200">
+            <div class="p-6 sm:px-20 bg-white border-b border-gray-200 units-list">
 
                 <div class="w-full flex justify-between my-10" x-data="{ unitOrExam: false }">
                     <h2 class="text-4xl font-bold text-gray-800 capitalize">My Units</h2>
@@ -35,7 +35,8 @@
                 {{-- @if ($role == 'admin' || $role == 'teacher' || App\Http\Controllers\ModuleController::is_passed($group->isPassed($user->id, $group->id)->first(), $group->id)) --}}
                 @forelse ($module_units as $unit)
                     @if ($user_units->contains($unit))
-                        <div class="flex justify-between items-center mb-10">
+                        <div
+                            class="flex justify-between items-center mb-10 @if ($loop->first) first-unit @endif">
                             <div onclick="location.href='{{ route('units.show', $unit->id) }}';"
                                 class="group flex flex-row bg-gray-100 rounded-lg w-full justify-between shadow-md hover:shadow-xl cursor-pointer items-center">
                                 <div class="w-3/12 m-5">
@@ -209,4 +210,7 @@
             </div>
         </div>
     </div>
+
+    {{-- FALTA COLOCAR UNA CONDICIÓN PARA QUE SE EJECUTE SOLO LA PRIMERA VEZ QUE EL USUARIO INGRESA AL SITIO --}}
+    <script src="{{ asset('js/shepherdjs_tours/units_preview.js') }}" defer></script>
 </x-app-layout>

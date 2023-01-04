@@ -16,7 +16,7 @@ class UsersController extends Controller
      */
     public function index($role)
     {
-        $users = User::role($role)->orderBy('first_name')->paginate(20);
+        $users = User::withTrashed()->role($role)->orderBy('first_name')->paginate(20);
         return view('admin.users.index', compact('users', 'role'));
     }
 

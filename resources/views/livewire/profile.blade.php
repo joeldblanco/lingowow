@@ -278,9 +278,9 @@
                                     </div>
                                     <div class="flex space-x-2">
                                         {{-- <button
-                                        class="transition-colors ease-out delay-75 flex border bg-white rounded my-4 py-2 space-x-3 w-1/2 items-center justify-center text-purple-500 hover:bg-purple-100">
-                                        <i class="fas fa-video"></i>
-                                    </button> --}}
+                                class="transition-colors ease-out delay-75 flex border bg-white rounded my-4 py-2 space-x-3 w-1/2 items-center justify-center text-purple-500 hover:bg-purple-100">
+                                <i class="fas fa-video"></i>
+                            </button> --}}
                                         <button @click="newMessage = true"
                                             class="transition-colors ease-out delay-75 flex border bg-white rounded my-4 py-2 space-x-3 w-full items-center justify-center text-blue-500 hover:bg-blue-100">
                                             <i class="far fa-comment-alt"></i>
@@ -306,7 +306,7 @@
                                                     placeholder="Write a message" {{-- wire:model="text_message" --}}></textarea>
                                                 <div class="flex px-3 h-10 cursor-pointer hover:bg-gray-200 border border-gray-300 hover:border-white hover:text-blue-500 rounded-lg"
                                                     {{-- wire:click="send_message" 
-                                                @click="newMessage = false" --}}>
+                                        @click="newMessage = false" --}}>
                                                     <button type="submit"
                                                         class="mx-auto flex space-x-3 items-center font-bold">
                                                         <p>Send</p>
@@ -316,7 +316,6 @@
                                             </div>
                                         </form>
                                     </x-slot>
-
                                     <x-slot name="footer" class="justify-center"></x-slot>
                                 </x-modal>
                             @endforeach

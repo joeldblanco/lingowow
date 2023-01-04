@@ -3,7 +3,7 @@
 
     <div class="bg-white font-sans">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="p-6 sm:px-20 bg-white border-b border-gray-200">
+            <div class="p-6 sm:px-20 bg-white border-b border-gray-200 courses-list">
 
                 <div class="w-full flex justify-between my-10">
                     <h2 class="text-4xl font-bold text-gray-800 capitalize">My Courses</h2>
@@ -17,7 +17,8 @@
 
                 @foreach ($courses as $course)
                     {{-- <x-course_card id="{{$course->id}}" name="{{$course->name}}" image="https://img.pixers.pics/pho_wat(s3:700/FO/60/89/19/91/700_FO60891991_9eb8248aebe7688d0b16c848c91d86e9.jpg,700,467,cms:2018/10/5bd1b6b8d04b8_220x50-watermark.png,over,480,417,jpg)/almohadas-largas-ee-uu-y-el-reino-unido-de-la-bandera.jpg.jpg"/> --}}
-                    <div class="flex items-center justify-between mb-10">
+                    <div
+                        class="flex items-center justify-between mb-10 @if ($loop->first) course-div @endif">
                         <div onclick="location.href='{{ route('courses.show', $course->id) }}';"
                             class="group flex flex-row bg-gray-100 rounded-lg w-full justify-between shadow-md hover:shadow-xl cursor-pointer h-40 items-center">
 
@@ -69,4 +70,7 @@
             </div>
         </div>
     </div>
+
+    {{-- FALTA COLOCAR UNA CONDICIÓN PARA QUE SE EJECUTE SOLO LA PRIMERA VEZ QUE EL USUARIO INGRESA AL SITIO --}}
+    <script src="{{ asset('js/shepherdjs_tours/courses_preview.js') }}" defer></script>
 </x-app-layout>

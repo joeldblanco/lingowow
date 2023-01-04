@@ -123,13 +123,13 @@
                             class="bg-green-500 rounded-lg text-white font-bold px-6 py-1 my-3 shadow-md"
                             {{-- onclick="saveSchedule({{ $plan }},'schedule.check')" --}} wire:click="edit()">Save</button>
                     @else
-                        <div class="w-full text-center" style="background-color: rgba(255, 255, 255, 0.5)">
+                        <div class="no-classes-div w-full text-center" style="background-color: rgba(255, 255, 255, 0.5)">
                             <h2 class="text-4xl font-bold text-red-800" style="margin-top: 15%">You haven't
                                 selected a schedule yet.</h2>
                             <h2 class="text-2xl font-bold text-gray-800">You can select a schedule after you buy
                                 a plan of classes.</h2>
                             <a href="{{ route('shop') }}"
-                                class="inline-block bg-blue-800 text-white px-6 py-4 mt-8 rounded-lg hover:bg-blue-900 hover:text-white hover:no-underline">Shop</a>
+                                class="shop-button inline-block bg-blue-800 text-white px-6 py-2 mt-8 rounded-lg hover:bg-blue-900 hover:text-white hover:no-underline">Shop</a>
                         </div>
                     @endif
                 @endif

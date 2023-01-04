@@ -43,6 +43,14 @@ class Unit extends Model
     }
 
     /**
+     * Get the course that owns the unit.
+     */
+    public function course()
+    {
+        return $this->module->course;
+    }
+
+    /**
      * Get unit exams.
      */
     public function exams()

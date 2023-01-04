@@ -57,12 +57,14 @@
     <div style="height: 100%" class="bg-white font-sans">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden">
-                
-                <livewire:teachers-carousel />
-                
+
+                @livewire('teachers-carousel')
+
                 {{-- <livewire:scheduling-calendar plan="{{$plan}}" /> --}}
 
-                @livewire('schedule', ['plan' => $plan, 'user_id' => auth()->id(), 'mode' => 'edit'])
+                @if (Spatie\Permission\Models\Role::findByName('teacher')->users->count() > 0)
+                    @livewire('schedule', ['plan' => $plan, 'user_id' => auth()->id(), 'mode' => 'edit'])
+                @endif
 
             </div>
         </div>

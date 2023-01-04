@@ -6,6 +6,7 @@ use App\Models\Module;
 use App\Models\Unit;
 use App\Models\User;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -72,19 +73,61 @@ class UnitController extends Controller
         $user = User::find(auth()->id());
         $role = $user->roles->first()->name;
 
-        // if ($role == "admin") {
-        //     $unit = Unit::findOrFail($id);
-        // } else {
-        //     $unit = Unit::findOrFail($id)->where('status', 1)->first();
-        // }
+        if ($role == "admin") {
+            $unit = Unit::findOrFail($id);
+        }
 
-        $unit = Unit::find($id);
+        if ($role == "teacher") {
+            $teacher_courses = $user->enrolments_teacher->pluck('course');
+            $teacher_units = new Collection();
+            foreach ($teacher_courses as $course) {
+                if (count($course->units()) > 0) {
+                    $teacher_units->push($course->units());
+                }
+            }
+            $teacher_units = $teacher_units->flatten();
 
-        // $user = User::find(auth()->id());
-        // dd($user->activities()->where('status','1')->get());
-        $activities = $user->activities()->where('status','1')->get();
+            if ($teacher_units->contains(Unit::findOrFail($id))) {
+                $unit = Unit::find($id);
+            } else {
+                abort(403, 'USER DOES NOT HAVE THE RIGHT PERMISSIONS.');
+            }
+        }
 
-        return view('course.module.unit.show', compact('unit','activities'));
+        if ($role == "student") {
+            //REVISAR QUE EL CURSO DE LA UNIDAD SOLICITADA SE ENCUENTRE ENTRE LOS CURSOS A LOS QUE EL ESTUDIANTE ESTÁ INSCRITO
+            $student_courses = $user->enrolments->pluck('course');
+            $unit = Unit::findOrFail($id);
+            $unit_course = $unit->course();
+            if ($student_courses->contains($unit_course)) {
+                //REVISAR QUE EL ORDEN DE LA UNIDAD SOLICITADA SEA IGUAL O MENOR AL ORDEN DE LA UNIDAD DEL ESTUDIANTE
+
+                foreach ($user->units as $user_unit) {
+                    if ($user_unit->course()->id == $unit_course->id) {
+                        if ($unit->order > $user_unit->order) {
+                            abort(403, 'USER DOES NOT HAVE THE RIGHT PERMISSIONS.');
+                        }
+                    }
+                }
+            } else {
+                abort(403, 'USER DOES NOT HAVE THE RIGHT PERMISSIONS.');
+            }
+        }
+
+        if ($role == "guest") {
+            $unit = Unit::findOrFail($id);
+            $unit_course = $unit->course();
+            $course_units = $unit_course->units()->sortBy('order');
+            $first_unit = $course_units->first();
+
+            if ($first_unit->id != $id) {
+                abort(403, 'USER DOES NOT HAVE THE RIGHT ROLES.');
+            }
+        }
+
+        $activities = $user->activities()->where('status', '1')->get();
+
+        return view('course.module.unit.show', compact('unit', 'activities'));
     }
 
     /**

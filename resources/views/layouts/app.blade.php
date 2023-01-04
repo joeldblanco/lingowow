@@ -86,6 +86,22 @@
             </div>
         @endif
 
+        @if (auth()->user()->roles->first()->name == 'guest' &&
+            (Route::currentRouteName() == 'courses.show' ||
+                Route::currentRouteName() == 'modules.show' ||
+                Route::currentRouteName() == 'units.show'))
+            {{-- <div class="bg-lw-blue text-center py-3">
+                <p class="text-black font-semibold">You are previewing a course. If you want to buy it click in the link
+                    below.</p>
+                <a href="{{ route('shop') }}" class="text-sm hover:font-bold text-white hover:underline">Shop</a>
+            </div> --}}
+            <div class="bg-yellow-300 text-center py-3">
+                <p class="text-red-500 font-semibold">You are previewing a course. If you want to buy it click in the link
+                    below.</p>
+                <a href="{{ route('shop') }}" class="text-md font-bold hover:underline">Shop</a>
+            </div>
+        @endif
+
         @livewire('first-navigation-menu')
         @include('second-navigation-menu')
 

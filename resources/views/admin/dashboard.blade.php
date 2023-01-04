@@ -271,6 +271,5 @@
         // console.log(chart);
         chart.render(); //ESTA LINEA ME DA ERROR
     </script>
-    {{-- <script src="{{ asset('js/shepherdjs_tours/tour_1.js') }}" defer></script> --}}
 
 </x-app-layout>

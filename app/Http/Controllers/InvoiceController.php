@@ -14,16 +14,16 @@ class InvoiceController extends Controller
      */
     public function index()
     {
-        $invoices = Invoice::where('user_id',auth()->id())->latest()->paginate(20);
+        $invoices = Invoice::where('user_id', auth()->id())->latest()->paginate(20);
 
-        return view('components.invoices-component',compact('invoices'));
+        return view('components.invoices-component', compact('invoices'));
     }
 
     public function adminIndex()
     {
         $invoices = Invoice::latest()->paginate(20);
 
-        return view('admin.invoices.index',compact('invoices'));
+        return view('admin.invoices.index', compact('invoices'));
     }
 
     /**
@@ -55,12 +55,12 @@ class InvoiceController extends Controller
      */
     public function show($id)
     {
-        $invoice = Invoice::where('id',$id)->first();
-        
-        if(empty($invoice) || ($invoice->user_id != auth()->id() && auth()->user()->roles[0]->name != "admin")){
-            return "403 | USER DOES NOT HAVE THE RIGHT ROLES.";
-        }else{
-            return view('invoice',compact('invoice'));
+        $invoice = Invoice::where('id', $id)->first();
+
+        if (empty($invoice) || ($invoice->user_id != auth()->id() && auth()->user()->roles[0]->name != "admin")) {
+            abort(403, 'USER DOES NOT HAVE THE RIGHT ROLES.');
+        } else {
+            return view('invoice', compact('invoice'));
         }
     }
 
