@@ -217,4 +217,8 @@
             form.submit();
         }
     </script>
+
+    {{-- FALTA COLOCAR UNA CONDICIÓN PARA QUE SE EJECUTE SOLO LA PRIMERA VEZ QUE EL USUARIO INGRESA AL SITIO --}}
+    <script src="{{ asset('js/shepherdjs_tours/contents_preview.js') }}" defer></script>
+
 </x-app-layout>

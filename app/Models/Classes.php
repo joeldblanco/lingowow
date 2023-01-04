@@ -28,7 +28,7 @@ class Classes extends Model
      */
     public function student()
     {
-        return User::find(Enrolment::withTrashed()->find($this->enrolment_id)->student_id);
+        return User::withTrashed()->find(Enrolment::withTrashed()->find($this->enrolment_id)->student_id);
     }
 
     /**
@@ -36,7 +36,7 @@ class Classes extends Model
      */
     public function teacher()
     {
-        return User::find(Enrolment::withTrashed()->find($this->enrolment_id)->teacher_id);
+        return User::withTrashed()->find(Enrolment::withTrashed()->find($this->enrolment_id)->teacher_id);
     }
 
     /**

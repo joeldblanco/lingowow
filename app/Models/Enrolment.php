@@ -30,15 +30,15 @@ class Enrolment extends Model
     }
 
     /**
-     * Get the course associated with the enrolment.
+     * Get the teacher associated with the enrolment.
      */
     public function teacher()
     {
-        return $this->belongsTo(User::class, 'teacher_id');
+        return $this->belongsTo(User::class, 'teacher_id')->withTrashed();
     }
 
     /**
-     * Get the course associated with the enrolment.
+     * Get the student associated with the enrolment.
      */
     public function student()
     {

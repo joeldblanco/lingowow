@@ -1,4 +1,4 @@
-<div class="flex flex-col border space-y-5 border-gray-100 hover:border-blue-500 rounded-xl p-6 bg-gray-50 justify-between @if (!$user->status) opacity-50 filter saturate-0 @endif"
+<div class="flex flex-col border space-y-5 border-gray-100 hover:border-blue-500 rounded-xl p-6 bg-gray-50 justify-between @if ($user->trashed()) opacity-50 filter saturate-0 @endif"
     style="width: 32%" x-data="{ showUserInfo: false, editUser: false, newMessage: false }">
     <div class="flex justify-between">
         <div class="w-2/12">
@@ -7,13 +7,13 @@
             </a>
         </div>
         <div class="w-full flex justify-end items-center">
-            @if ($user->status)
-                <button wire:click="hideUnhide({{ $user->id }})"
+            @if (!$user->trashed())
+                <button wire:click="hide({{ $user->id }})"
                     class="rounded-full my-auto w-10 h-10 bg-white active:bg-gray-200 transition duration-100 ease-in-out flex justify-center items-center">
                     <i class="fas fa-eye m-1 mr-0 text-gray-500"></i>
                 </button>
             @else
-                <button wire:click="hideUnhide({{ $user->id }})"
+                <button wire:click="unhide({{ $user->id }})"
                     class="rounded-full w-10 h-10 bg-white active:bg-gray-200 transition duration-100 ease-in-out flex justify-center items-center">
                     <i class="fas fa-eye-slash m-1 mr-0 text-gray-500"></i>
                 </button>

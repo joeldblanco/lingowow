@@ -111,8 +111,8 @@ Route::middleware(['web', 'auth', 'verified', 'impersonate'])->group(function ()
     })->name("cart");
 
     //ROUTES FOR INVOICES//
-    Route::middleware(['role:student|admin'])->get('/shop/invoices', [InvoiceController::class, 'index'])->name("invoices");
-    Route::middleware(['role:student|admin'])->get('/shop/invoice/{id}', [InvoiceController::class, 'show'])->name('invoice.show');
+    Route::middleware(['role:guest|student|admin'])->get('/shop/invoices', [InvoiceController::class, 'index'])->name("invoices");
+    Route::middleware(['role:guest|student|admin'])->get('/shop/invoice/{id}', [InvoiceController::class, 'show'])->name('invoice.show');
 
     //ROUTES FOR SCHEDULE//
     Route::post('/schedule/check', [SchedulingCalendarController::class, 'checkForTeachers'])->name("schedule.check");
@@ -271,7 +271,8 @@ Route::middleware(['web', 'auth', 'verified', 'impersonate'])->group(function ()
     Route::get('/payment/adaptive-pay', [PayPalPaymentController::class, 'getAdaptivePay'])->name("adpative-payment");
     Route::post('/payment/notify', [PayPalPaymentController::class, 'notify'])->name("notify");
 
-    Route::get('/payment/checkout', [PaymentController::class, 'checkout'])->name("checkout");
+    Route::get('/payment/gateway', [PaymentController::class, 'createButton'])->name("payments.gateway");
+    Route::get('/payment/checkout', [PaymentController::class, 'checkout'])->name("payments.checkout");
 
     //ROUTES FOR NOTIFICATIONS//
     Route::get('/notifications', [NotificationsController::class, 'index'])->name('notifications.index');

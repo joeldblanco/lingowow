@@ -61,7 +61,7 @@ class Schedule extends Component
             $this->course = Course::find($course_id);
         }
         $this->hoy = (new Carbon())->toCookieString();
-        $this->user = User::find($user_id);
+        $this->user = User::withTrashed()->find($user_id);
         $this->role = $this->user->roles->first()->name;
         $this->plan = $plan;
 
@@ -76,32 +76,36 @@ class Schedule extends Component
                 if ($this->course->modality == "asynchronous") {
                     $this->mode = "asynchronous";
                 } else {
-                    $this->schedules = User::find($this->user->id)->schedules;
+                    $this->schedules = $this->user->schedules;
 
                     if ($this->user->enrolments->count() > 0) {
+                        $enrolment = Enrolment::where("student_id", $this->user->id)->first();
 
-                        $this->teacher_id = Enrolment::select("teacher_id")
-                            ->where("student_id", $this->user->id)->first();
+                        if ($enrolment->course->modality == "synchronous") {
 
-                        $this->teacher_id = $this->teacher_id->teacher_id;
+                            $this->teacher_id = Enrolment::select("teacher_id")
+                                ->where("student_id", $this->user->id)->first();
 
-                        $this->teacher_schedule = User::find($this->teacher_id)->schedules;
+                            $this->teacher_id = $this->teacher_id->teacher_id;
 
-                        foreach ($this->teacher_schedule as $key => $value) {
-                            $this->teacher_schedule[$key] = $value->selected_schedule;
+                            $this->teacher_schedule = User::withTrashed()->find($this->teacher_id)->schedules;
+
+                            foreach ($this->teacher_schedule as $key => $value) {
+                                $this->teacher_schedule[$key] = $value->selected_schedule;
+                            }
+
+                            if (!$this->teacher_schedule->first()) $this->teacher_schedule = [];
+
+                            if (count($this->teacher_schedule) > 0) $this->teacher_schedule = json_decode(json_encode($this->teacher_schedule[0]), 1);
+
+                            $this->loadStudentSchedule($this->user->id);
                         }
-
-                        if (!$this->teacher_schedule->first()) $this->teacher_schedule = [];
-
-                        if (count($this->teacher_schedule) > 0) $this->teacher_schedule = json_decode(json_encode($this->teacher_schedule[0]), 1);
-
-                        $this->loadStudentSchedule($this->user->id);
                     }
                 }
             }
         } else if ($this->role == "teacher") {
 
-            $this->schedules = User::find($this->user->id)->schedules;
+            $this->schedules = User::withTrashed()->find($this->user->id)->schedules;
 
             $this->loadTeacherSchedule($this->user->id);
         } else if ($this->role == "admin") {

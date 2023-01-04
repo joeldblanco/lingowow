@@ -128,11 +128,11 @@ class AnalyticsController extends Controller
         }
 
 
-        $total_classes = 0;
-        if (isset($data['classes'][$key]))
-            foreach ($data['classes'][$key] as $classes) {
-                $total_classes += count($classes);
-            };
+        // $total_classes = 0;
+        // if (isset($data['classes'][$key]))
+        //     foreach ($data['classes'][$key] as $classes) {
+        //         $total_classes += count($classes);
+        //     };
 
         $total_users = User::count();
 
