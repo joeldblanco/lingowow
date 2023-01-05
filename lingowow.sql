@@ -152,9 +152,9 @@ insert  into `enrolments`(`id`,`student_id`,`teacher_id`,`course_id`,`created_at
 (10,5,7,3,'2022-01-07 18:49:46','2022-01-07 18:49:46','2022-01-21 18:38:08'),
 (11,9,7,1,'2022-06-24 03:26:33','2022-12-21 03:16:00','2022-12-21 03:16:00'),
 (12,183,7,1,'2022-07-29 06:20:02','2023-01-03 03:04:44','2023-01-03 03:04:44'),
-(13,NULL,7,3,'2022-11-15 03:29:34','2022-11-15 03:36:59',NULL),
+(13,NULL,7,3,'2022-11-15 03:29:34','2022-11-15 03:36:59','2023-01-04 21:02:15'),
 (17,NULL,7,2,'2022-11-15 03:37:19','2022-11-22 03:45:26','2023-01-03 16:46:18'),
-(18,NULL,7,6,'2022-11-15 20:58:44','2022-11-15 20:58:58','2023-01-03 16:46:20'),
+(18,NULL,7,6,'2022-11-15 20:58:44','2022-11-15 20:58:58','2023-01-04 21:03:57'),
 (19,5,NULL,6,'2022-12-26 21:36:53','2022-12-26 21:36:53',NULL),
 (20,NULL,7,1,'2022-11-15 20:58:44','2022-11-15 20:58:58',NULL);
 
@@ -1476,7 +1476,7 @@ insert  into `posts`(`id`,`author_id`,`content`,`created_at`,`updated_at`,`delet
 (25,6,'{\"text\":\"Publicar algo\",\"photo_path\":null}','2022-11-16 02:31:20','2022-11-16 02:31:29','2022-11-16 02:31:29'),
 (26,6,'{\"text\":\"On my mind!\",\"photo_path\":null}','2022-11-17 00:54:15','2022-11-17 00:54:40','2022-11-17 00:54:40'),
 (27,6,'{\"text\":\"Hey\",\"photo_path\":null}','2022-12-07 03:13:53','2022-12-07 03:14:15','2022-12-07 03:14:15'),
-(28,6,'{\"text\":\"\\u00a1Aprovechen las nuevas ofertas de Lingowow!\",\"photo_path\":null}','2022-12-26 20:29:04','2022-12-26 20:29:04',NULL);
+(28,6,'{\"text\":\"\\u00a1Aprovechen las nuevas ofertas de Lingowow!\",\"photo_path\":null}','2022-12-26 20:29:04','2023-01-05 05:16:11','2023-01-05 05:16:11');
 
 /*Data for the table `products` */
 
@@ -1559,7 +1559,7 @@ insert  into `scheduled_classes`(`student_id`,`teacher_id`) values
 
 insert  into `schedules`(`id`,`selected_schedule`,`next_schedule`,`user_id`,`enrolment_id`,`created_at`,`updated_at`,`deleted_at`) values 
 (2,'[\"0\",\"23\"]',NULL,6,NULL,'2021-11-27 10:02:54','2021-11-27 10:02:54',NULL),
-(3,'[[\"0\",\"0\"],[\"0\",\"1\"],[\"0\",\"2\"],[\"0\",\"3\"],[\"0\",\"4\"],[\"1\",\"0\"],[\"1\",\"1\"],[\"1\",\"2\"],[\"1\",\"3\"],[\"1\",\"4\"],[\"2\",\"0\"],[\"2\",\"1\"],[\"2\",\"2\"],[\"2\",\"3\"],[\"2\",\"4\"],[\"3\",\"0\"],[\"3\",\"1\"],[\"3\",\"2\"],[\"3\",\"3\"],[\"3\",\"4\"],[\"4\",\"0\"],[\"4\",\"1\"],[\"4\",\"2\"],[\"4\",\"3\"],[\"4\",\"4\"],[\"5\",\"0\"],[\"5\",\"1\"],[\"5\",\"2\"],[\"5\",\"3\"],[\"5\",\"4\"],[\"6\",\"0\"],[\"6\",\"1\"],[\"6\",\"2\"],[\"6\",\"3\"],[\"6\",\"4\"],[\"7\",\"0\"],[\"7\",\"1\"],[\"7\",\"2\"],[\"7\",\"3\"],[\"7\",\"4\"],[\"8\",\"0\"],[\"8\",\"1\"],[\"8\",\"2\"],[\"8\",\"3\"],[\"8\",\"4\"],[\"9\",\"0\"],[\"9\",\"1\"],[\"9\",\"2\"],[\"9\",\"3\"],[\"9\",\"4\"],[\"10\",\"0\"],[\"10\",\"1\"],[\"10\",\"2\"],[\"10\",\"3\"],[\"10\",\"4\"],[\"11\",\"0\"],[\"11\",\"1\"],[\"11\",\"2\"],[\"11\",\"3\"],[\"11\",\"4\"],[\"12\",\"0\"],[\"12\",\"1\"],[\"12\",\"2\"],[\"12\",\"3\"],[\"12\",\"4\"],[\"13\",\"0\"],[\"13\",\"1\"],[\"13\",\"2\"],[\"13\",\"3\"],[\"13\",\"4\"],[\"14\",\"0\"],[\"14\",\"1\"],[\"14\",\"2\"],[\"14\",\"3\"],[\"14\",\"4\"],[\"15\",\"0\"],[\"15\",\"1\"],[\"15\",\"2\"],[\"15\",\"3\"],[\"15\",\"4\"],[\"16\",\"0\"],[\"16\",\"1\"],[\"16\",\"2\"],[\"16\",\"3\"],[\"16\",\"4\"],[\"17\",\"0\"],[\"17\",\"1\"],[\"17\",\"2\"],[\"17\",\"3\"],[\"17\",\"4\"],[\"18\",\"0\"],[\"18\",\"1\"],[\"18\",\"2\"],[\"18\",\"3\"],[\"18\",\"4\"],[\"19\",\"0\"],[\"19\",\"1\"],[\"19\",\"2\"],[\"19\",\"3\"],[\"19\",\"4\"],[\"20\",\"0\"],[\"20\",\"1\"],[\"20\",\"2\"],[\"20\",\"3\"],[\"20\",\"4\"],[\"21\",\"0\"],[\"21\",\"1\"],[\"21\",\"2\"],[\"21\",\"3\"],[\"21\",\"4\"],[\"22\",\"0\"],[\"22\",\"1\"],[\"22\",\"2\"],[\"22\",\"3\"],[\"22\",\"4\"],[\"23\",\"0\"],[\"23\",\"1\"],[\"23\",\"2\"],[\"23\",\"3\"],[\"23\",\"4\"]]',NULL,7,NULL,'2021-11-27 10:02:54','2022-08-03 07:48:27',NULL),
+(3,'[]',NULL,7,NULL,'2021-11-27 10:02:54','2023-01-05 04:01:03',NULL),
 (6,NULL,NULL,184,NULL,'2021-11-27 10:02:54','2021-11-27 10:02:54',NULL),
 (7,NULL,NULL,185,NULL,'2021-11-27 10:02:54','2021-11-27 10:02:54',NULL),
 (8,NULL,NULL,186,NULL,'2021-11-27 10:02:54','2021-11-27 10:02:54',NULL),
@@ -1655,12 +1655,15 @@ insert  into `schedules`(`id`,`selected_schedule`,`next_schedule`,`user_id`,`enr
 /*Data for the table `sessions` */
 
 insert  into `sessions`(`id`,`user_id`,`ip_address`,`user_agent`,`payload`,`last_activity`) values 
-('9u0rABzin6QlVfZ0pRF7X2OS3MzCNWYOpzNY3vNe',183,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36','YToxMDp7czo2OiJfdG9rZW4iO3M6NDA6IktrYWVoVWtEWGZyQ0x6aFJJUUVlamw4TU5jaDZmY1U3ZXhhUkM4NUUiO3M6NjoiX2ZsYXNoIjthOjI6e3M6MzoibmV3IjthOjA6e31zOjM6Im9sZCI7YTowOnt9fXM6MzoidXJsIjthOjA6e31zOjk6Il9wcmV2aW91cyI7YToxOntzOjM6InVybCI7czozMToiaHR0cDovLzEyNy4wLjAuMTo4MDAwL2Rhc2hib2FyZCI7fXM6MTc6InBhc3N3b3JkX2hhc2hfd2ViIjtzOjYwOiIkMnkkMTAkUTNoeHFaOXVaYy5ObEZUWkNNSXNyT3FUby5QOC5mT2tLblZWZkRsVzZsNjhrcjVYcVNscU8iO3M6MTM6InVzZXJfc2NoZWR1bGUiO2E6MDp7fXM6MTU6ImltcGVyc29uYXRlZF9ieSI7aTo2O3M6MTg6ImltcGVyc29uYXRvcl9ndWFyZCI7czozOiJ3ZWIiO3M6MjQ6ImltcGVyc29uYXRvcl9ndWFyZF91c2luZyI7TjtzOjUwOiJsb2dpbl93ZWJfM2RjN2E5MTNlZjVmZDRiODkwZWNhYmUzNDg3MDg1NTczZTE2Y2Y4MiI7aToxODM7fQ==',1672854441);
+('wV9zHul6Xf3yYxTGDBAOPN9FA6GTGhZpx6plZJuq',7,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36','YToxMDp7czo2OiJfdG9rZW4iO3M6NDA6IlJWOGk0cEZCS0EyMkNzV1RRMmJXNWxReHBFekFNVkUyRktEV0JIN0IiO3M6NjoiX2ZsYXNoIjthOjI6e3M6Mzoib2xkIjthOjA6e31zOjM6Im5ldyI7YTowOnt9fXM6OToiX3ByZXZpb3VzIjthOjE6e3M6MzoidXJsIjtzOjMxOiJodHRwOi8vMTI3LjAuMC4xOjgwMDAvZGFzaGJvYXJkIjt9czoxNzoicGFzc3dvcmRfaGFzaF93ZWIiO3M6NjA6IiQyeSQxMCRmSjkwYWM4amFiTkpocWNETS9JL1V1LnMxTEtTTGd3QjdQaEZWS2VrYmViYXlNTms1TnhqZSI7czoxMzoidXNlcl9zY2hlZHVsZSI7YTowOnt9czoxNToic2VsZWN0ZWRfY291cnNlIjtpOjE7czoxNToiaW1wZXJzb25hdGVkX2J5IjtpOjY7czoxODoiaW1wZXJzb25hdG9yX2d1YXJkIjtzOjM6IndlYiI7czoyNDoiaW1wZXJzb25hdG9yX2d1YXJkX3VzaW5nIjtOO3M6NTA6ImxvZ2luX3dlYl8zZGM3YTkxM2VmNWZkNGI4OTBlY2FiZTM0ODcwODU1NzNlMTZjZjgyIjtpOjc7fQ==',1672903021);
 
 /*Data for the table `shepherd_users` */
 
 insert  into `shepherd_users`(`id`,`user_id`,`tour_name`,`created_at`,`updated_at`) values 
-(2,183,'welcome',NULL,NULL);
+(10,7,'teachers/welcome',NULL,NULL),
+(11,7,'teachers/modules_preview',NULL,NULL),
+(13,7,'teachers/courses_preview',NULL,NULL),
+(14,7,'guests/contents_preview',NULL,NULL);
 
 /*Data for the table `shoppingcart` */
 
@@ -1690,7 +1693,7 @@ insert  into `units`(`id`,`name`,`image`,`status`,`module_id`,`order`,`created_a
 
 insert  into `users`(`id`,`first_name`,`last_name`,`username`,`email`,`email_verified_at`,`password`,`two_factor_secret`,`two_factor_recovery_codes`,`profile_photo_path`,`remember_token`,`status`,`selected_schedule`,`available_schedule`,`meeting_id`,`street`,`city`,`country`,`zip_code`,`current_team_id`,`created_at`,`updated_at`,`deleted_at`) values 
 (5,'Joel','Blanco','joeld.blanco','gosxteam@gmail.com','2021-05-26 02:17:25','$2y$10$Q3hxqZ9uZc.NlFTZCMIsrOqTo.P8.fOkKnVVfDlW6l68kr5XqSlqO',NULL,NULL,'profile-photos/default_pp.jpg',NULL,1,'[]',NULL,'$2y$10$W4ex2z.d34Hkjk9s.2GupO21iVlq5kWdc//G6NxF.bU1VsTJ7DhgS',NULL,NULL,NULL,NULL,NULL,'2021-05-26 02:16:07','2022-12-26 20:25:00',NULL),
-(6,'Lingowow','','lingowow','info@lingowow.com','2021-05-26 02:17:25','$2y$10$Q3hxqZ9uZc.NlFTZCMIsrOqTo.P8.fOkKnVVfDlW6l68kr5XqSlqO',NULL,NULL,'public/profile-photos/$2y$10$a6jD63TJyq3z0bUNikxcauEpRdyRN8rBgsmCiF3ScB9dqiqyOoJuq.png','QENsyG7SuwN8eJMZzqQGmd8Bk0bo5bcWl9E22lC7GxMovmOPCaKu0tKQd9w4',1,NULL,NULL,'$2y$10$W4ex2z.d34Hkjk9s.2GupO21iVlq5kWdc//G6NxF.bU1VsTJ7DhgS','Brisas de Santa Rosa Neighborhood','Lima','Peru','15112',NULL,'2021-05-26 02:16:07','2023-01-03 04:13:04',NULL),
+(6,'Lingowow','','lingowow','info@lingowow.com','2021-05-26 02:17:25','$2y$10$Q3hxqZ9uZc.NlFTZCMIsrOqTo.P8.fOkKnVVfDlW6l68kr5XqSlqO',NULL,NULL,'public/profile-photos/$2y$10$a6jD63TJyq3z0bUNikxcauEpRdyRN8rBgsmCiF3ScB9dqiqyOoJuq.png','ICfLfoLWA8LKafDAOC6Ml2wNn0Oosvv3TxciwLZlLBkpBXZSAN3kL5KURoFu',1,NULL,NULL,'$2y$10$W4ex2z.d34Hkjk9s.2GupO21iVlq5kWdc//G6NxF.bU1VsTJ7DhgS','Brisas de Santa Rosa Neighborhood','Lima','Peru','15112',NULL,'2021-05-26 02:16:07','2023-01-03 04:13:04',NULL),
 (7,'Joel','Blanco','joel.blanco.teacher','joeld.blanco@gmail.com','2021-06-29 23:00:43','$2y$10$fJ90ac8jabNJhqcDM/I/Uu.s1LKSLgwB7PhFVKekbebayMNk5Nxje',NULL,NULL,'profile-photos/HG53Av5vJRmTMMkFAQVWNL63Kh29UI98sQPcRTEF.png',NULL,1,'[[\"8\",\"0\"],[\"8\",\"1\"],[\"9\",\"1\"],[\"10\",\"1\"],[\"20\",\"0\"]]','[[\"6\",\"4\"],[\"6\",\"5\"],[\"7\",\"4\"],[\"7\",\"5\"],[\"8\",\"4\"],[\"8\",\"5\"],[\"9\",\"4\"],[\"9\",\"5\"],[\"10\",\"4\"],[\"10\",\"5\"],[\"11\",\"4\"],[\"11\",\"5\"],[\"12\",\"4\"],[\"12\",\"5\"],[\"13\",\"4\"],[\"13\",\"5\"],[\"14\",\"4\"],[\"14\",\"5\"],[\"15\",\"4\"],[\"15\",\"5\"],[\"16\",\"4\"],[\"16\",\"5\"],[\"17\",\"4\"],[\"17\",\"5\"],[\"18\",\"4\"],[\"18\",\"5\"],[\"19\",\"4\"],[\"19\",\"5\"],[\"\",\"20\"],[\"1\",\"20\"],[\"4\",\"20\"],[\"5\",\"21\"],[\"4\",\"21\"],[\"5\"]]',NULL,NULL,NULL,NULL,NULL,NULL,'2021-06-29 22:57:48','2023-01-03 03:51:20',NULL),
 (9,'Juan','Ruiz','juan.ruiz','ruizjuan875@gmail.com','2021-05-26 02:17:25','$2y$10$Q3hxqZ9uZc.NlFTZCMIsrOqTo.P8.fOkKnVVfDlW6l68kr5XqSlqO',NULL,NULL,'profile-photos/default_pp.jpg',NULL,1,'[]',NULL,'$2y$10$W4ex2z.d34Hkjk9s.2GupO21iVlq5kWdc//G6NxF.bU1VsTJ7DhgS',NULL,NULL,NULL,NULL,NULL,'2021-05-26 02:16:07','2022-04-12 15:59:30',NULL),
 (183,'Guest','User','guest','guest@example.com','2021-06-29 23:00:43','$2y$10$Q3hxqZ9uZc.NlFTZCMIsrOqTo.P8.fOkKnVVfDlW6l68kr5XqSlqO',NULL,NULL,'profile-photos/default_pp.jpg',NULL,1,NULL,NULL,NULL,'Brisas de Santa Rosa Neighborhood','Lima','Peru','15112',NULL,'2021-05-26 02:16:07','2023-01-03 05:01:46',NULL),
