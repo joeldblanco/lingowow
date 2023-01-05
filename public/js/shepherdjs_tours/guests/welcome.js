@@ -52,4 +52,22 @@ tour.addSteps([
     }
 ]);
 
-tour.start(); // FALTA COLOCAR UNA CONDICIÓN PARA QUE SE EJECUTE SOLO LA PRIMERA VEZ QUE EL USUARIO INGRESA AL SITIO
+tour.start();
+
+tour.on('complete', () => {
+    $.ajax({
+        type: 'POST',
+        url: route('complete-tour'),
+        data: {
+            tourName: 'guests/welcome',
+            '_token': $('meta[name="csrf-token"]').attr('content'),
+        },
+        success: function (data) {
+            // console.log(data);
+        },
+        error: function (data) {
+            // console.log(data["responseText"]);
+        }
+    });
+
+});

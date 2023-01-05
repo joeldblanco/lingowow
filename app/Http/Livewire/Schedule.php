@@ -107,7 +107,10 @@ class Schedule extends Component
 
             $this->schedules = User::withTrashed()->find($this->user->id)->schedules;
 
-            $this->loadTeacherSchedule($this->user->id);
+            if(count($this->schedules) > 0){
+                $this->loadTeacherSchedule($this->user->id);
+            }
+            
         } else if ($this->role == "admin") {
 
             // $this->loadAdminSchedule($this->user->id);
@@ -233,7 +236,8 @@ class Schedule extends Component
         $user = User::find($user_id);
         $enrolment = $user->enrolments->where('course_id', $this->course->id)->first();
 
-        if (!is_null($enrolment)) {
+        if (!is_null($enrolment) && ($user->schedules->where('enrolment_id', $enrolment->id)->first() != null)) {
+
             $this->user_schedules = $user->schedules->where('enrolment_id', $enrolment->id)->first()->selected_schedule;
             $this->user_schedules = null ? [] : array_filter($this->user_schedules);
 
@@ -321,7 +325,9 @@ class Schedule extends Component
         $this->students = User::select('id', 'first_name', 'last_name')->find($this->students);
 
         foreach ($this->students as $student) {
-            $this->students_schedules[] = $student->schedules->first()->selected_schedule;
+            if ($student->schedules->first() != null) {
+                $this->students_schedules[] = $student->schedules->first()->selected_schedule;
+            }
         }
         $this->students_schedules = array_merge(...$this->students_schedules);
     }

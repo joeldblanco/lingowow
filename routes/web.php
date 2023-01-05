@@ -64,6 +64,13 @@ Route::middleware(['web', 'auth', 'verified', 'impersonate'])->group(function ()
         return view('home');
     })->name('home');
 
+    Route::post('/complete-tour', function (Request $request) {
+        $query = DB::table('shepherd_users')->insertOrIgnore([
+            ['tour_name' => $request->tourName, 'user_id' => auth()->user()->id]
+        ]);
+        return $query;
+    })->name('complete-tour');
+
     // Route::middleware(['role:guest'])->get('/courses', function () {
     //     return view('courses');
     // })->name('courses');
@@ -102,7 +109,7 @@ Route::middleware(['web', 'auth', 'verified', 'impersonate'])->group(function ()
     //ROUTES FOR ACTIVITY//
     Route::middleware(['role:student|teacher|admin'])->get('/unit/{id_unit}/activity/{id}', [ActivityController::class, 'show_activity'])->name('activity.show'); ///Cree, esta nueva
     Route::middleware(['role:student|teacher|admin'])->get('/activity/edit/{id}', [ActivityController::class, 'edit_activity'])->name('activity.edit'); ///Cree, esta nueva
-     ///Cree, esta nueva
+    ///Cree, esta nueva
 
     //ROUTES FOR SHOP//
     Route::middleware(['role:guest|student|admin'])->get('/shop', [PayPalPaymentController::class, 'getIndex'])->name('shop');
@@ -146,7 +153,7 @@ Route::middleware(['web', 'auth', 'verified', 'impersonate'])->group(function ()
         Route::get('/admin/invoices', [InvoiceController::class, 'adminIndex'])->name('admin.invoices');
 
         //EARNINGS//
-        Route::get('/admin/earnings', [AnalyticsController::class, 'destroy'])->name('admin.earnings');
+        Route::get('/admin/earnings', [AnalyticsController::class, 'earnings'])->name('admin.earnings');
 
         //COUPONS//
         Route::get('/admin/coupons', [CouponController::class, 'index'])->name("coupons.index");
@@ -216,21 +223,23 @@ Route::middleware(['web', 'auth', 'verified', 'impersonate'])->group(function ()
         Route::get('/reset/{users}', function (User ...$users) {
             foreach ($users as $user) {
 
-                $user->studentClasses->each(function ($class) {
-                    // $deleted_class = $class->delete();
-                    $class->delete();
-                });
+                if ($user->roles[0]->name == 'student') {
+                    $user->studentClasses->each(function ($class) {
+                        // $deleted_class = $class->delete();
+                        $class->delete();
+                    });
 
-                if ($user->enrolments->count()) {
-                    // $user->schedules->where('enrolment_id', $user->enrolments->first()->id)->first()->delete();
-                    $user->schedules->first()->next_schedule = null;
-                    $user->schedules->first()->save();
-                    $user->schedules->first()->delete();
-                    $user->enrolments->first()->delete();
+                    if ($user->enrolments->count()) {
+                        // $user->schedules->where('enrolment_id', $user->enrolments->first()->id)->first()->delete();
+                        $user->schedules->first()->next_schedule = null;
+                        $user->schedules->first()->save();
+                        $user->schedules->first()->delete();
+                        $user->enrolments->first()->delete();
+                    }
+
+                    $user->removeRole('student');
+                    $user->assignRole('guest');
                 }
-
-                $user->removeRole('student');
-                $user->assignRole('guest');
             }
             return redirect()->route('users', 4);
         });
