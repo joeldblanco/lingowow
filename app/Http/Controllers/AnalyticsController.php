@@ -252,4 +252,14 @@ class AnalyticsController extends Controller
     {
         //
     }
+
+    /**
+     * Show the earnings.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function earnings()
+    {
+        //
+    }
 }

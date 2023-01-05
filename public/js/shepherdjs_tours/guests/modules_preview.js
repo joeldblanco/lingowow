@@ -39,3 +39,21 @@ tour.addSteps([
 ]);
 
 tour.start();
+
+tour.on('complete', () => {
+    $.ajax({
+        type: 'POST',
+        url: route('complete-tour'),
+        data: {
+            tourName: 'guests/modules_preview',
+            '_token': $('meta[name="csrf-token"]').attr('content'),
+        },
+        success: function (data) {
+            // console.log(data);
+        },
+        error: function (data) {
+            // console.log(data["responseText"]);
+        }
+    });
+
+});

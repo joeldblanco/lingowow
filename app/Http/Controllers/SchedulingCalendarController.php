@@ -138,7 +138,7 @@ class SchedulingCalendarController extends Controller
      */
     public function update(Request $request)
     {
-        dd($request->error);
+        // dd($request->error);
         if ($request->error == "false") {
             // $request->data = explode(',', $request->data);
             $request->data = json_decode($request->data);
@@ -152,8 +152,9 @@ class SchedulingCalendarController extends Controller
             $user_id = auth()->id();
 
             $user_schedule = Schedule::select('selected_schedule')->where('user_id', $user_id)->get();
-            // dd($user_id);
-            $user_schedule = $user_schedule[0]->selected_schedule;
+            if (count($user_schedule)) {
+                $user_schedule = $user_schedule[0]->selected_schedule;
+            }
 
             if ($user_role == "student") {
 
@@ -241,7 +242,7 @@ class SchedulingCalendarController extends Controller
 
                 $students_schedules = [];
                 $affected_students = [];
-                $students_enrolments = Enrolment::where('teacher_id', $user_id)->get();
+                $students_enrolments = Enrolment::where('teacher_id', $user_id)->where('student_id', '!=', NULL)->get();
 
                 //Fechas para la consulta de las clases reagendadas en el periodo vigente.
                 $current_period = ApportionmentController::currentPeriod();

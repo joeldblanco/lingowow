@@ -15,7 +15,7 @@
                 <hr class="mb-10">
 
 
-                @foreach ($courses as $course)
+                @forelse ($courses as $course)
                     {{-- <x-course_card id="{{$course->id}}" name="{{$course->name}}" image="https://img.pixers.pics/pho_wat(s3:700/FO/60/89/19/91/700_FO60891991_9eb8248aebe7688d0b16c848c91d86e9.jpg,700,467,cms:2018/10/5bd1b6b8d04b8_220x50-watermark.png,over,480,417,jpg)/almohadas-largas-ee-uu-y-el-reino-unido-de-la-bandera.jpg.jpg"/> --}}
                     <div
                         class="flex items-center justify-between mb-10 @if ($loop->first) course-div @endif">
@@ -57,7 +57,11 @@
                             </div>
                         @endrole
                     </div>
-                @endforeach
+                @empty
+                    <div class="flex justify-center items-center">
+                        <h1 class="text-2xl text-gray-500">You are not enroled in any course.</h1>
+                    </div>
+                @endforelse
                 {{-- </div> --}}
 
                 <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg">
@@ -70,7 +74,10 @@
             </div>
         </div>
     </div>
-
-    {{-- FALTA COLOCAR UNA CONDICIÓN PARA QUE SE EJECUTE SOLO LA PRIMERA VEZ QUE EL USUARIO INGRESA AL SITIO --}}
-    <script src="{{ asset('js/shepherdjs_tours/courses_preview.js') }}" defer></script>
+    @role('guest')
+        <x-shepherd-tour tourName="guests/courses_preview" role="guest" />
+    @endrole
+    @role('teacher')
+        <x-shepherd-tour tourName="teachers/courses_preview" role="teacher" />
+    @endrole
 </x-app-layout>

@@ -27,7 +27,7 @@ class ClassController extends Controller
         if ($start_date == null || $end_date == null) return redirect()->route('classes.index', ['start_date' => ApportionmentController::currentPeriod(true)[0], 'end_date' => ApportionmentController::currentPeriod(true)[1]]);
 
         if (auth()->user()->roles[0]->name == "teacher") {
-            $classes = User::find(auth()->id())->teacherClasses()->where('start_date', '>=', $start_date)->where('end_date', '<=', $end_date)->sortBy('start_date');
+            $classes = User::find(auth()->id())->teacherClasses->where('start_date', '>=', $start_date)->where('end_date', '<=', $end_date)->sortBy('start_date');
             $classes = Classes::whereIn('id', $classes->pluck('id'))->paginate(10);
 
         } else if (auth()->user()->roles[0]->name == "student") {

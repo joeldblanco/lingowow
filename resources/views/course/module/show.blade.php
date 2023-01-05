@@ -211,6 +211,6 @@
         </div>
     </div>
 
-    {{-- FALTA COLOCAR UNA CONDICIÓN PARA QUE SE EJECUTE SOLO LA PRIMERA VEZ QUE EL USUARIO INGRESA AL SITIO --}}
-    <script src="{{ asset('js/shepherdjs_tours/units_preview.js') }}" defer></script>
+    <x-shepherd-tour tourName="guests/units_preview" role="guest" />
+
 </x-app-layout>

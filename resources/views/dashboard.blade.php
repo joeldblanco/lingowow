@@ -88,7 +88,7 @@
 
                     @hasanyrole('student|teacher')
                         <a href="{{ route('classes.index', ['start_date' => App\Http\Controllers\ApportionmentController::currentPeriod(true)[0], 'end_date' => App\Http\Controllers\ApportionmentController::currentPeriod(true)[1]]) }}"
-                            class="inline-block bg-lw-light_blue text-white px-6 py-4 rounded hover:bg-lw-light_blue hover:text-white hover:no-underline">Classes</a>
+                            class="inline-block bg-lw-light_blue text-white px-4 py-2 rounded hover:bg-lw-light_blue hover:text-white hover:no-underline">Classes</a>
                     @endhasanyrole
                 </div>
 
@@ -160,8 +160,11 @@
             </div>
         </div>
     </div>
-
-    {{-- FALTA COLOCAR UNA CONDICIÓN PARA QUE SE EJECUTE SOLO LA PRIMERA VEZ QUE EL USUARIO INGRESA AL SITIO --}}
-    <script src="{{ asset('js/shepherdjs_tours/welcome.js') }}" defer></script>
+    @role('guest')
+        <x-shepherd-tour tourName="guests/welcome" role="guest" />
+    @endrole
+    @role('teacher')
+        <x-shepherd-tour tourName="teachers/welcome" role="teacher" />
+    @endrole
 
 </x-app-layout>

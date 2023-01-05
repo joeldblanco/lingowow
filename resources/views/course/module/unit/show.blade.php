@@ -91,7 +91,8 @@
                                         </div>
                                         @role('admin')
                                             <div class="flex space-x-4">
-                                                <a href="{{route('contents.edit', $content->id)}}" title="Edit"><i class="fas fa-pen m-1"></i></a>
+                                                <a href="{{ route('contents.edit', $content->id) }}" title="Edit"><i
+                                                        class="fas fa-pen m-1"></i></a>
                                                 <button @click="trash = false, deleteConfirmation = true" title="Delete"
                                                     x-show="trash"><i class="fas fa-trash m-1"></i></button>
                                                 <form action="{{ route('contents.destroy', $content->id) }}"
@@ -151,11 +152,9 @@
                         </ul>
 
                     </div>
+                @endif
             </div>
-            @endif
 
-
-            
 
         </div>
     </div>
@@ -218,7 +217,12 @@
         }
     </script>
 
-    {{-- FALTA COLOCAR UNA CONDICIÓN PARA QUE SE EJECUTE SOLO LA PRIMERA VEZ QUE EL USUARIO INGRESA AL SITIO --}}
-    <script src="{{ asset('js/shepherdjs_tours/contents_preview.js') }}" defer></script>
+    @role('guest')
+        <x-shepherd-tour tourName="guests/contents_preview" role="guest" />
+    @endrole
+
+    @role('teacher')
+        <x-shepherd-tour tourName="teachers/contents_preview" role="teacher" />
+    @endrole
 
 </x-app-layout>

@@ -35,6 +35,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    <link rel="shortcut icon" href="{{ asset('favicon.ico') }}">
 
     <title>{{ config('app.name', 'Laravel') }}</title>
 
@@ -96,7 +97,8 @@
                 <a href="{{ route('shop') }}" class="text-sm hover:font-bold text-white hover:underline">Shop</a>
             </div> --}}
             <div class="bg-yellow-300 text-center py-3">
-                <p class="text-red-500 font-semibold">You are previewing a course. If you want to buy it click in the link
+                <p class="text-red-500 font-semibold">You are previewing a course. If you want to buy it click in the
+                    link
                     below.</p>
                 <a href="{{ route('shop') }}" class="text-md font-bold hover:underline">Shop</a>
             </div>
@@ -142,6 +144,34 @@
         data-turbolinks-eval="false"></script>
     <script src="{{ asset('js/activities.js') }}"></script>
     {{-- @include('components.loading-state') --}}
+
+    <script>
+        (function(d, t) {
+            var BASE_URL = "https://app.chatwoot.com";
+            var g = d.createElement(t),
+                s = d.getElementsByTagName(t)[0];
+            g.src = BASE_URL + "/packs/js/sdk.js";
+            g.defer = true;
+            g.async = true;
+            s.parentNode.insertBefore(g, s);
+            g.onload = function() {
+                window.chatwootSDK.run({
+                    websiteToken: 'AT7bF4Zbt6nhFfpxDXUfoiBZ',
+                    baseUrl: BASE_URL
+                })
+            }
+        })(document, "script");
+
+        window.addEventListener("chatwoot:ready", function() {
+            window.$chatwoot.setUser("{{ auth()->id() }}", {
+                email: "{{ auth()->user()->email }}",
+                name: "{{ auth()->user()->first_name }} {{ auth()->user()->last_name }}",
+                // avatar_url: "<avatar-url-of-the-user>",
+                // phone_number: "<phone-number-of-the-user>",
+            });
+        });
+    </script>
+
 </body>
 
 </html>

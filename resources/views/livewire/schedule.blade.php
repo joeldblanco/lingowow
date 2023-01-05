@@ -123,7 +123,8 @@
                             class="bg-green-500 rounded-lg text-white font-bold px-6 py-1 my-3 shadow-md"
                             {{-- onclick="saveSchedule({{ $plan }},'schedule.check')" --}} wire:click="edit()">Save</button>
                     @else
-                        <div class="no-classes-div w-full text-center" style="background-color: rgba(255, 255, 255, 0.5)">
+                        <div class="no-classes-div w-full text-center"
+                            style="background-color: rgba(255, 255, 255, 0.5)">
                             <h2 class="text-4xl font-bold text-red-800" style="margin-top: 15%">You haven't
                                 selected a schedule yet.</h2>
                             <h2 class="text-2xl font-bold text-gray-800">You can select a schedule after you buy
@@ -218,8 +219,8 @@
                     <!-- FIN DEL HORARIO DE JUAN -->
                     <div class="flex items-center flex-col">
                         <button onclick="toggleCellBlock()" @click=" edit = true, editBtn = false " wire:click="edit()"
-                            class="inline-block bg-green-800 text-white px-4 py-2 my-5 rounded hover:bg-green-900 hover:text-white hover:no-underline"
-                            x-show="editBtn" x-transition>Edit Schedule
+                            class="teachers-edit-schedule-button inline-block bg-green-800 text-white px-4 py-2 my-5 rounded hover:bg-green-900 hover:text-white hover:no-underline"
+                            x-show="editBtn" x-transition>Update Schedule
                         </button>
                     </div>
                 @endif
@@ -427,8 +428,8 @@
                     <div class="flex items-center flex-col">
                         <button onclick="toggleCellBlock()" @click=" edit = true, editBtn = false "
                             wire:click="edit()"
-                            class="inline-block bg-green-800 text-white px-4 py-2 my-5 rounded hover:bg-green-900 hover:text-white hover:no-underline"
-                            x-show="editBtn" x-transition>Edit Schedule
+                            class="teachers-edit-schedule-button inline-block bg-green-800 text-white px-4 py-2 my-5 rounded hover:bg-green-900 hover:text-white hover:no-underline"
+                            x-show="editBtn" x-transition>Update Schedule
                         </button>
                     </div>
                 @endforeach

@@ -146,7 +146,7 @@ insert  into `courses`(`id`,`name`,`description`,`category`,`modality`,`image_ur
 /*Data for the table `enrolments` */
 
 insert  into `enrolments`(`id`,`student_id`,`teacher_id`,`course_id`,`created_at`,`updated_at`,`deleted_at`) values 
-(1,5,7,1,'2021-11-26 18:30:22','2022-12-21 06:06:51',NULL),
+(1,5,7,1,'2021-11-26 18:30:22','2022-12-21 06:06:51','2023-01-04 00:37:02'),
 (2,208,7,3,'2021-11-26 18:30:22','2021-11-26 18:30:22','2022-02-16 13:35:05'),
 (9,5,7,2,'2022-01-06 15:49:29','2022-01-06 15:49:29','2022-01-21 18:37:58'),
 (10,5,7,3,'2022-01-07 18:49:46','2022-01-07 18:49:46','2022-01-21 18:38:08'),
@@ -1655,7 +1655,12 @@ insert  into `schedules`(`id`,`selected_schedule`,`next_schedule`,`user_id`,`enr
 /*Data for the table `sessions` */
 
 insert  into `sessions`(`id`,`user_id`,`ip_address`,`user_agent`,`payload`,`last_activity`) values 
-('NuQqY22fKs2yTPTYTy7BxcpM6XHdCIOqcD3NGWwv',6,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36','YTo3OntzOjY6Il90b2tlbiI7czo0MDoieWJxaTcyQ0hzcVE1Z1lodHRqdVI3d3FEWXNjdjVHeURTcjI2aFl3UCI7czozOiJ1cmwiO2E6MDp7fXM6OToiX3ByZXZpb3VzIjthOjE6e3M6MzoidXJsIjtzOjM3OiJodHRwOi8vMTI3LjAuMC4xOjgwMDAvYWRtaW4vZGFzaGJvYXJkIjt9czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319czoxNzoicGFzc3dvcmRfaGFzaF93ZWIiO3M6NjA6IiQyeSQxMCRRM2h4cVo5dVpjLk5sRlRaQ01Jc3JPcVRvLlA4LmZPa0tuVlZmRGxXNmw2OGtyNVhxU2xxTyI7czoxMzoidXNlcl9zY2hlZHVsZSI7YTowOnt9czo1MDoibG9naW5fd2ViXzNkYzdhOTEzZWY1ZmQ0Yjg5MGVjYWJlMzQ4NzA4NTU3M2UxNmNmODIiO2k6Njt9',1672802720);
+('9u0rABzin6QlVfZ0pRF7X2OS3MzCNWYOpzNY3vNe',183,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36','YToxMDp7czo2OiJfdG9rZW4iO3M6NDA6IktrYWVoVWtEWGZyQ0x6aFJJUUVlamw4TU5jaDZmY1U3ZXhhUkM4NUUiO3M6NjoiX2ZsYXNoIjthOjI6e3M6MzoibmV3IjthOjA6e31zOjM6Im9sZCI7YTowOnt9fXM6MzoidXJsIjthOjA6e31zOjk6Il9wcmV2aW91cyI7YToxOntzOjM6InVybCI7czozMToiaHR0cDovLzEyNy4wLjAuMTo4MDAwL2Rhc2hib2FyZCI7fXM6MTc6InBhc3N3b3JkX2hhc2hfd2ViIjtzOjYwOiIkMnkkMTAkUTNoeHFaOXVaYy5ObEZUWkNNSXNyT3FUby5QOC5mT2tLblZWZkRsVzZsNjhrcjVYcVNscU8iO3M6MTM6InVzZXJfc2NoZWR1bGUiO2E6MDp7fXM6MTU6ImltcGVyc29uYXRlZF9ieSI7aTo2O3M6MTg6ImltcGVyc29uYXRvcl9ndWFyZCI7czozOiJ3ZWIiO3M6MjQ6ImltcGVyc29uYXRvcl9ndWFyZF91c2luZyI7TjtzOjUwOiJsb2dpbl93ZWJfM2RjN2E5MTNlZjVmZDRiODkwZWNhYmUzNDg3MDg1NTczZTE2Y2Y4MiI7aToxODM7fQ==',1672854441);
+
+/*Data for the table `shepherd_users` */
+
+insert  into `shepherd_users`(`id`,`user_id`,`tour_name`,`created_at`,`updated_at`) values 
+(2,183,'welcome',NULL,NULL);
 
 /*Data for the table `shoppingcart` */
 
