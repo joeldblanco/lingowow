@@ -59,13 +59,16 @@ class TeachersCarousel extends Component
         redirect()->route('cart');
     }
 
-    public function loadSchedule($teacher_id)
+    public function loadSchedule($teacher_id = 0)
     {
-        $this->loadingState = true;
-        $this->selectedTeacher = $teacher_id;
-        session(['teacher_id' => $teacher_id]);
-        session(['user_schedule' => []]); //Para hacer la precarga del scheduling vacia cada vez que se recarga
-        $this->emit('loadSelectingSchedule', $teacher_id);
+        // dd($teacher_id);
+        // if($teacher_id != 0){
+            $this->loadingState = true; 
+            $this->selectedTeacher = $teacher_id;
+            session(['teacher_id' => $teacher_id]);
+            session(['user_schedule' => []]); //Para hacer la precarga del scheduling vacia cada vez que se recarga
+            $this->emit('loadSelectingSchedule', $teacher_id);
+        // }
         // dd($this->emit('loadSchedule', $teacher_id));
     }
 

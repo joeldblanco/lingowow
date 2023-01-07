@@ -113,7 +113,6 @@
                 @else
                     <p class="text-2xl font-bold w-full text-center">There are no classes</p>
                 @endif
-
     <div wire:loading wire:target="clearComment,saveComment,showClass,loadComment">
         @include('components.loading-state')
     </div>
@@ -169,6 +168,7 @@
                         if($current_class != null) $lesson_date = (new Carbon\Carbon($current_class->start_date));
                     @endphp
                     @if($current_class != null && $lesson_date->gt(Carbon\Carbon::now())) --}}
+                    {{-- {{ dd(App\Http\Controllers\ApportionmentController::getPeriod($current_class->start_date), (new Carbon\Carbon (App\Http\Controllers\ApportionmentController::currentPeriod()[0]))->format('F Y')) }} --}}
                     {{-- @if(($current_class != null && ((!$current_class->teacher_check && !$current_class->student_check) && (App\Http\Controllers\ApportionmentController::getPeriod($current_class->start_date) < (new Carbon\Carbon (App\Http\Controllers\ApportionmentController::currentPeriod()[1]))) || auth()->user()->roles[0]->name == "admin"))) --}}
                     @if($current_class != null && (!$current_class->teacher_check && !$current_class->student_check) && ((App\Http\Controllers\ApportionmentController::getPeriod($current_class->start_date) == (new Carbon\Carbon (App\Http\Controllers\ApportionmentController::currentPeriod()[0]))->format('F Y')) || auth()->user()->roles[0]->name == "admin"))
                         <a

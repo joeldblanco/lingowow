@@ -121,7 +121,8 @@ insert  into `course_product`(`product_id`,`course_id`) values
 (4,4),
 (5,5),
 (6,6),
-(14,1);
+(14,1),
+(18,7);
 
 /*Data for the table `courses` */
 
@@ -131,7 +132,8 @@ insert  into `courses`(`id`,`name`,`description`,`category`,`modality`,`image_ur
 (3,'Regular Spanish Program','Nuestro programa en línea de español esta basado en los estándares del Marco de Referencia Europeo. El programa busca ayudar a los aprendices a comunicarse y desarrollar destrezas en contextos reales haciéndoles vivir experiencias de aprendizaje asertivas y con propósito en sus lecciones, a través del desarrollo de tareas y encuentros interactivos con otros aprendices y nativo hablantes.','Spanish','synchronous','images/courses/covers/regular_spanish_program.jpeg','2021-11-27 14:48:06','2021-11-27 14:48:06',NULL),
 (4,'Conversational Spanish Program','Clases con entornos totalmente personalizados, enfocadas en la necesidad específica de cada estudiante y en desarrollo de sus destrezas comunicativas. Además de las clases regulares, este paquete incluye otras prácticas conversacionales donde el estudiante interactúa con otros aprendices y nativo hablantes.','Spanish','synchronous','images/courses/covers/conversational_spanish_program.jpeg','2021-11-27 14:48:06','2021-11-27 14:48:06',NULL),
 (5,'English Pronunciation Course','El curso de Introducción a la Pronunciación presentará una amplia gama de sonidos del inglés profundizando en los patrones que podemos detectar en las letras vocales. Los sonidos vocálicos, sus entornos, las grafías entre otros aspectos serán estudiados en profundidad en este curso. Además, habrá prácticas y pruebas para evaluar tu proceso de aprendizaje. ','English','asynchronous','images/courses/covers/english_pronunciation_course.jpeg','2021-11-27 14:48:06','2021-11-27 14:48:06',NULL),
-(6,'English Grammar Course','Este curso pretende capacitarte para que seas capaz de identificar, analizar y manejar algunos puntos clave del sistema interno que rige el lenguaje. Además, profundizaremos en el enfoque práctico para que aprendas a utilizar lo que aprenderás.','English','asynchronous','images/courses/covers/english_grammar_course.jpeg','2021-11-27 14:48:06','2021-11-27 14:48:06',NULL);
+(6,'English Grammar Course','Este curso pretende capacitarte para que seas capaz de identificar, analizar y manejar algunos puntos clave del sistema interno que rige el lenguaje. Además, profundizaremos en el enfoque práctico para que aprendas a utilizar lo que aprenderás.','English','asynchronous','images/courses/covers/english_grammar_course.jpeg','2021-11-27 14:48:06','2021-11-27 14:48:06',NULL),
+(7,'Exam Clasification','This is an exam to clasificate','English','exam','images/courses/covers/english_grammar_course.jpeg','2021-11-27 14:48:06','2021-11-27 14:48:06',NULL);
 
 /*Data for the table `deleted_messages` */
 
@@ -1436,7 +1438,8 @@ insert  into `plans_products`(`plan_id`,`product_id`) values
 (2,4),
 (3,4),
 (4,5),
-(4,6);
+(4,6),
+(4,18);
 
 /*Data for the table `post_like` */
 
@@ -1491,7 +1494,8 @@ insert  into `products`(`id`,`name`,`slug`,`description`,`regular_price`,`sale_p
 (14,'English Regular Program','english-regular-program-old','English Regular Program',15.00,9.99,NULL,NULL,NULL),
 (15,'English Conversational Program','english-conversational-program-old','English Conversational Program',20.00,14.99,NULL,NULL,NULL),
 (16,'Spanish Regular Program','spanish-regular-program-old','Spanish Regular Program',20.00,14.99,NULL,NULL,NULL),
-(17,'Spanish Conversational Program','spanish-conversational-program-old','Spanish Conversational Program',20.00,14.99,NULL,NULL,NULL);
+(17,'Spanish Conversational Program','spanish-conversational-program-old','Spanish Conversational Program',20.00,14.99,NULL,NULL,NULL),
+(18,'Exam clasification','Exam clasification Exam clasification Exam clasification Exam clasification Exam clasification Exam clasification','English Exam clasification',190.00,150.00,NULL,NULL,NULL);;
 
 /*Data for the table `questions` */
 

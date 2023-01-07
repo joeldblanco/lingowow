@@ -41,6 +41,7 @@ class SchedulingCalendar extends Component
 
     public function loadSchedule($teacher_id)
     {
+        // dd($teacher_id);
         $this->teacher_id = $teacher_id;
         $this->name = User::find($this->teacher_id)->first_name." ".User::find($this->teacher_id)->last_name;
         //dd($this->name);

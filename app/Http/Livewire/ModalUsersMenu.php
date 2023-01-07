@@ -44,7 +44,11 @@ class ModalUsersMenu extends Component
     {
 
         $this->user = auth()->user();
-
+        
+        if($this->activity == [] && $this->student_assign == []){
+            $this->activity = (object) array('name' => ""); 
+            $this->student_assign = (object) array('first_name' => "", 'last_name' => "");
+        }
         // dd($user->enrolments_teacher);
 
         // $model_roles = DB::table('model_has_roles')->select('role_id', 'model_id')->get();
@@ -68,6 +72,11 @@ class ModalUsersMenu extends Component
         // dd($this->students);
         $this->activity = Activity::first();
         $this->student_assign = User::first();
+
+        if($this->activity == null){
+            $this->activity = (object) array('name' => ""); 
+            $this->student_assign = (object) array('first_name' => "", 'last_name' => "");
+        }
         // $this->students = User::all();
     }
 
@@ -116,7 +125,10 @@ class ModalUsersMenu extends Component
         } else {
             $this->students = User::find($students)->where("first_name", 'like', '%' . $this->name . '%')->sortBy("first_name");
         }
-
+        if($this->activity == null){
+            $this->activity = (object) array('name' => ""); 
+            $this->student_assign = (object) array('first_name' => "", 'last_name' => "");
+        }
         // dd($this->students);
     }
 
@@ -140,6 +152,12 @@ class ModalUsersMenu extends Component
             })->orderBy("first_name")->get();
         }
         // dd($this->students);
+
+        if($this->activity == null){
+            $this->activity = (object) array('name' => ""); 
+            $this->student_assign = (object) array('first_name' => "", 'last_name' => "");
+        }
+        
         return view('livewire.modal-users-menu');
     }
 }

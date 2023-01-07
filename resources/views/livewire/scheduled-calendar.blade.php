@@ -404,7 +404,7 @@
         });
 
         $('body').on("contentChanged", event => {
-            // console.log("hola")
+            console.log("hola")
             var cells = $(".selected");
             // console.log(cells);
             var role = "{{ Auth::user()->roles->pluck('name')[0] }}";
