@@ -1,7 +1,7 @@
 <x-app-layout>
     <div class="bg-white font-sans">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="p-6 sm:px-20 bg-white border-b border-gray-200">
+            <div class="p-6 sm:px-20 bg-white border-b border-gray-200 modules-list">
 
                 <div class="w-full flex justify-between my-10">
                     <h2 class="text-4xl font-bold text-gray-800 capitalize">My Modules</h2>
@@ -12,7 +12,7 @@
                 </div>
                 <hr class="mb-10">
                 @forelse ($modules as $module)
-                    <div class="flex items-center mb-10">
+                    <div class="flex items-center mb-10 @if ($loop->first) first-module @endif">
                         <div @if ($user_modules->contains($module)) onclick="location.href='{{ route('modules.show', $module->id) }}';" @endif
                             class="group flex flex-row bg-gray-100 rounded-lg w-full justify-between items-center @if (!$user_modules->contains($module)) shadow-inner opacity-50 filter saturate-0 @else shadow-md hover:shadow-xl cursor-pointer @endif">
 
@@ -48,4 +48,7 @@
             </div>
         </div>
     </div>
+
+    <x-shepherd-tour tourName="guests/modules_preview" role="guest" />
+    
 </x-app-layout>

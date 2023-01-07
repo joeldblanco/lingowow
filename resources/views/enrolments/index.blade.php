@@ -23,11 +23,17 @@
 
                             @foreach ($enrolments as $key => $enrolment)
                                 <tr class="flex justify-around">
-                                    <td class="flex w-full justify-center">
-                                        <a href="{{ route('profile.show', $enrolment->teacher->id) }}"
-                                            class="hover:underline hover:text-blue-500">{{ $enrolment->teacher->first_name }}
-                                            {{ $enrolment->teacher->last_name }}</a>
-                                    </td>
+                                    @if ($enrolment->teacher)
+                                        <td class="flex w-full justify-center">
+                                            <a href="{{ route('profile.show', $enrolment->teacher->id) }}"
+                                                class="hover:underline hover:text-blue-500">{{ $enrolment->teacher->first_name }}
+                                                {{ $enrolment->teacher->last_name }}</a>
+                                        </td>
+                                    @else
+                                        <td class="flex w-full justify-center">
+                                            -
+                                        </td>
+                                    @endif
                                     @if ($enrolment->student)
                                         <td class="flex w-full justify-center">
                                             <a href="{{ route('profile.show', $enrolment->student->id) }}"
@@ -36,9 +42,6 @@
                                         </td>
                                     @else
                                         <td class="flex w-full justify-center">
-                                            {{-- <a href="{{ route('profile.show', $enrolment->student->id) }}"
-                                                class="hover:underline hover:text-blue-500">{{ $enrolment->student->first_name }}
-                                                {{ $enrolment->student->last_name }}</a> --}}
                                             -
                                         </td>
                                     @endif

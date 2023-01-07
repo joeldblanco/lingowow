@@ -89,8 +89,10 @@ class ModuleController extends Controller
         if ($role == "admin") {
             // $user_units = $module->units;
             $user_units = $module_units;
+        } else if ($role == "teacher") {
+            $user_units = $module_units;
         } else if ($role == "student") {
-            $user_units = $module_units->where('order', '<', $user->units->first()->order);
+            $user_units = $module_units->where('order', '<=', $user->units->first()->order);
             // $user_units = $user->units->where('status', 1);
             // $user_units = $user_units->diff($user_units->diff($module->units->where('status', 1)));
 

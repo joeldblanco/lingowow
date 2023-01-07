@@ -32,7 +32,7 @@
         </div>
     </div>
 
-    <a href="{{ route('cart') }}"
+    {{-- <a href="{{ route('cart') }}"
         class="bg-green-500 rounded-full w-20 h-20 flex justify-center items-center fixed bottom-5 right-5 z-10">
         @if (Cart::count() > 0)
             <div
@@ -43,6 +43,6 @@
         <div class="text-white text-2xl">
             <i class="fas fa-shopping-cart"></i>
         </div>
-    </a>
+    </a> --}}
 
 </x-app-layout>

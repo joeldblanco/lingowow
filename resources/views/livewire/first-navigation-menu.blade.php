@@ -1,38 +1,38 @@
 @php
-
-$nav_links = [
-    [
-        'name' => 'Home',
-        'route' => route('home'),
-        'status' => request()->routeIs('home'),
-        'roles' => ['student', 'guest', 'teacher', 'admin'],
-    ],
-    [
-        'name' => 'Dashboard',
-        'route' => auth()->user()->roles[0]->name == 'admin' ? route('admin.dashboard') : route('dashboard'),
-        'status' => auth()->user()->roles[0]->name == 'admin' ? request()->routeIs('admin.dashboard') : request()->routeIs('dashboard'),
-        'roles' => auth()->user()->roles[0]->name == 'admin' ? ['admin'] : ['student', 'guest', 'teacher'],
-    ],
-    [
-        'name' => 'Courses',
-        'route' => route('courses.index'),
-        'status' => request()->is('courses', 'courses/*'),
-        'roles' => ['student', 'guest', 'teacher', 'admin'],
-    ],
-    // [
-    //     'name' => 'Pages',
-    //     'route' => route('pages'),
-    //     'status' => request()->routeIs('pages'),
-    //     'roles' => ['student','guest','teacher','admin'],
-    // ],
-    [
-        'name' => 'Shop',
-        'route' => route('shop'),
-        'status' => request()->is('shop', 'shop/*'),
-        'roles' => ['student', 'guest', 'admin'],
-    ],
-];
-
+    
+    $nav_links = [
+        [
+            'name' => 'Home',
+            'route' => route('home'),
+            'status' => request()->routeIs('home'),
+            'roles' => ['student', 'guest', 'teacher', 'admin'],
+        ],
+        [
+            'name' => 'Dashboard',
+            'route' => auth()->user()->roles[0]->name == 'admin' ? route('admin.dashboard') : route('dashboard'),
+            'status' => auth()->user()->roles[0]->name == 'admin' ? request()->routeIs('admin.dashboard') : request()->routeIs('dashboard'),
+            'roles' => auth()->user()->roles[0]->name == 'admin' ? ['admin'] : ['student', 'guest', 'teacher'],
+        ],
+        [
+            'name' => 'Courses',
+            'route' => route('courses.index'),
+            'status' => request()->is('courses', 'courses/*'),
+            'roles' => ['student', 'guest', 'teacher', 'admin'],
+        ],
+        // [
+        //     'name' => 'Pages',
+        //     'route' => route('pages'),
+        //     'status' => request()->routeIs('pages'),
+        //     'roles' => ['student','guest','teacher','admin'],
+        // ],
+        [
+            'name' => 'Shop',
+            'route' => route('shop'),
+            'status' => request()->is('shop', 'shop/*'),
+            'roles' => ['student', 'guest', 'admin'],
+        ],
+    ];
+    
 @endphp
 
 <nav x-data="{ open: false }" class="bg-white border-b border-gray-100 shadow">
@@ -51,9 +51,15 @@ $nav_links = [
                 <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
                     @foreach ($nav_links as $nav_link)
                         @if (in_array(Auth::user()->roles->pluck('name')[0], $nav_link['roles']))
-                            <x-jet-nav-link href="{{ $nav_link['route'] }}" :active="$nav_link['status']">
-                                {{ $nav_link['name'] }}
-                            </x-jet-nav-link>
+                            @if ($nav_link['name'] == 'Courses')
+                                <x-jet-nav-link href="{{ $nav_link['route'] }}" :active="$nav_link['status']" class="courses-link">
+                                    {{ $nav_link['name'] }}
+                                </x-jet-nav-link>
+                            @else
+                                <x-jet-nav-link href="{{ $nav_link['route'] }}" :active="$nav_link['status']">
+                                    {{ $nav_link['name'] }}
+                                </x-jet-nav-link>
+                            @endif
                         @endif
                     @endforeach
                 </div>
@@ -202,8 +208,7 @@ $nav_links = [
 
                             @if (count($notifications) > 0)
                                 @foreach ($notifications as $key => $value)
-                                    <x-jet-dropdown-link
-                                        href="{{ route('notifications.show', $value->id) }}">
+                                    <x-jet-dropdown-link href="{{ route('notifications.show', $value->id) }}">
                                         <div class="flex justify-between items-center space-x-1"
                                             id="{{ $value->id }}">
                                             <p class="@if ($value->read_at == null) font-bold @endif">
@@ -396,4 +401,3 @@ $nav_links = [
         window.user_id = {{ auth()->id() }};
     </script>
 </nav>
-

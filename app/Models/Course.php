@@ -34,5 +34,13 @@ class Course extends Model
     {
         return $this->hasMany(Module::class);
     }
+
+    /**
+     * Get the units associated with the course.
+     */
+    public function units()
+    {
+        return $this->modules->pluck('units')->flatten();
+    }
 }
 //

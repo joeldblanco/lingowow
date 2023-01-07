@@ -80,28 +80,89 @@
                     dd($response);
                 @endphp --}}
 
-                <div class="mt-10">
-                    @role('student')
-                        <a href="{{ route('classroom', auth()->id()) }}"
-                            class="inline-block bg-lw-blue text-white px-6 py-4 rounded hover:bg-blue-900 hover:text-white hover:no-underline">Classroom</a>
-                    @endrole
+                @php
+                    $enrolment = auth()
+                        ->user()
+                        ->enrolments->first();
+                    $course_id = null;
+                    $course_modality = null;
+                    
+                    if ($enrolment != null) {
+                        $course_id = $enrolment->course->id;
+                        $course_modality = $enrolment->course->modality;
+                    }
+                @endphp
 
-                    @hasanyrole('student|teacher')
-                        <a href="{{ route('classes.index', ['start_date' => App\Http\Controllers\ApportionmentController::currentPeriod(true)[0], 'end_date' => App\Http\Controllers\ApportionmentController::currentPeriod(true)[1]]) }}"
-                            class="inline-block bg-lw-light_blue text-white px-6 py-4 rounded hover:bg-lw-light_blue hover:text-white hover:no-underline">Classes</a>
-                    @endhasanyrole
+                <div class="mt-10 w-full flex items-center space-x-4">
+                    <div class="w-3/12">
+                        @role('student')
+                            <a href="{{ route('classroom', auth()->id()) }}"
+                                class="inline-block bg-lw-blue text-white px-4 py-2 rounded hover:bg-blue-900 hover:text-white hover:no-underline">Classroom</a>
+                        @endrole
+
+                        @hasanyrole('student|teacher')
+                            <a href="{{ route('classes.index', ['start_date' => App\Http\Controllers\ApportionmentController::currentPeriod(true)[0], 'end_date' => App\Http\Controllers\ApportionmentController::currentPeriod(true)[1]]) }}"
+                                class="inline-block bg-lw-light_blue text-white px-4 py-2 rounded hover:bg-lw-light_blue hover:text-white hover:no-underline">Classes</a>
+                        @endhasanyrole
+                    </div>
+                    @role('student')
+                        <div class="w-9/12">
+                            <div id="chart"></div>
+                            <script>
+                                var options = {
+                                    series: [{
+                                            name: 'Progress',
+                                            data: [{{ auth()->user()->units->first()->order }}]
+                                        },
+                                        {
+                                            name: 'Remaining',
+                                            data: [{{ (count($enrolment->course->units()) - auth()->user()->units->first()->order) }}]
+                                        },
+                                    ],
+                                    chart: {
+                                        type: 'bar',
+                                        height: 150,
+                                        stacked: true,
+                                        stackType: "100%",
+                                    },
+                                    plotOptions: {
+                                        bar: {
+                                            borderRadius: 4,
+                                            horizontal: true,
+                                        }
+                                    },
+                                    dataLabels: {
+                                        enabled: false
+                                    },
+                                    legend: {
+                                        position: 'top'
+                                    },
+                                    xaxis: {
+                                        categories: ['{{ $enrolment->course->name }}'],
+                                    },
+                                    yaxis: {
+                                        labels: {
+                                            show: false
+                                        }
+                                    },
+                                };
+
+                                var chart = new ApexCharts(document.querySelector("#chart"), options);
+                                chart.render();
+                            </script>
+                        </div>
+                    @endrole
                 </div>
 
-                <div>
-                    @php
-                        $course_id = auth()
-                            ->user()
-                            ->enrolments->first();
-                        if ($course_id != null) {
-                            $course_id = $course_id->course->id;
-                        }
-                    @endphp
-                    @livewire('schedule', ['user_id' => auth()->id(), 'mode' => 'show', 'course_id' => $course_id])
+                <div class="mt-5">
+                    @role('student')
+                        @if ($course_modality == 'synchronous')
+                            @livewire('schedule', ['user_id' => auth()->id(), 'mode' => 'show', 'course_id' => $course_id])
+                        @endif
+                    @endrole
+                    @hasanyrole('teacher|guest')
+                        @livewire('schedule', ['user_id' => auth()->id(), 'mode' => 'show', 'course_id' => $course_id])
+                    @endrole
                 </div>
 
                 @role('teacher')
@@ -160,5 +221,11 @@
             </div>
         </div>
     </div>
+    @role('guest')
+        <x-shepherd-tour tourName="guests/welcome" role="guest" />
+    @endrole
+    @role('teacher')
+        <x-shepherd-tour tourName="teachers/welcome" role="teacher" />
+    @endrole
 
 </x-app-layout>

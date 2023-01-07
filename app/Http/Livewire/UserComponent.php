@@ -20,7 +20,7 @@ class UserComponent extends Component
 
     public function editUser($id)
     {
-        $this->current_user = User::find($id);
+        $this->current_user = User::withTrashed()->find($id);
 
         $this->username = $this->current_user->username;
         $this->password = "";
@@ -70,14 +70,17 @@ class UserComponent extends Component
         }
     }
 
-    public function hideUnhide(User $user)
+    public function hide(User $user)
     {
-        if ($user->status) {
-            $user->status = 0;
-        } else {
-            $user->status = 1;
-        }
-        $user->save();
+        $user->delete();
+
+        return redirect()->route('users', $this->role);
+    }
+
+    public function unhide($user)
+    {
+        $user = User::withTrashed()->find($user);
+        $user->restore();
 
         return redirect()->route('users', $this->role);
     }

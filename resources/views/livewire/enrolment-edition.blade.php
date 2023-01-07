@@ -38,7 +38,7 @@
                                 @endforeach
                             </select>
                             @if ($errors->has('course_id'))
-                                <p class="text-xs font-light text-red-600">Required</p>
+                                <p class="text-xs font-light text-red-600">{{$errors->get('course_id')[0]}}</p>
                             @endif
                             <p class="text-gray-500 text-sm font-light">Please select a course for the enrolment</p>
                         </div>
@@ -54,8 +54,8 @@
                                     </option>
                                 @endforeach
                             </select>
-                            @if ($errors->has('course_id'))
-                                <p class="text-xs font-light text-red-600">Required</p>
+                            @if ($errors->has('module'))
+                                <p class="text-xs font-light text-red-600">{{$errors->get('module')[0]}}</p>
                             @endif
                             <p class="text-gray-500 text-sm font-light">Please select a module for the
                                 enrolment</p>
@@ -73,7 +73,7 @@
                                 @endforeach
                             </select>
                             @if ($errors->has('unit'))
-                                <p class="text-xs font-light text-red-600">Required</p>
+                                <p class="text-xs font-light text-red-600">{{$errors->get('unit')[0]}}</p>
                             @endif
                             <p class="text-gray-500 text-sm font-light">Please select a unit for the enrolment</p>
                         </div>
@@ -86,7 +86,7 @@
                                 </option>
                             </select>
                             @if ($errors->has('atendee_id'))
-                                <p class="text-xs font-light text-red-600">Required</p>
+                                <p class="text-xs font-light text-red-600">{{$errors->get('atendee_id')[0]}}</p>
                             @endif
                             <p class="text-gray-500 text-sm font-light">Please select a atendee for the meeting</p>
                         </div> --}}

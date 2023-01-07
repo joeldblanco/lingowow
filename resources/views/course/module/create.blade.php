@@ -36,7 +36,7 @@
                                     @endforeach
                                 </select>
                                 @if ($errors->has('course_id'))
-                                    <p class="text-xs font-light text-red-600">Required</p>
+                                    <p class="text-xs font-light text-red-600">{{$errors->get('course_id')[0]}}</p>
                                 @endif
                                 <p class="text-gray-500 text-sm font-light">Please select a course for the module</p>
                             </div>
@@ -46,7 +46,7 @@
                                     required
                                     class="w-full rounded-md p-3 text-gray-600 hover:border-gray-600 @if ($errors->has('name')) border-red-600 @else border-gray-300 @endif ">
                                 @if ($errors->has('name'))
-                                    <p class="text-xs font-light text-red-600">Required</p>
+                                    <p class="text-xs font-light text-red-600">{{$errors->get('name')[0]}}</p>
                                 @endif
                                 <p class="text-gray-500 text-sm font-light">Please enter module name</p>
                             </div>
@@ -55,7 +55,7 @@
                                 <textarea name="description" id="description" placeholder="Enter module description" required rows="4"
                                     class="resize-none w-full rounded-md p-3 text-gray-600 hover:border-gray-600 @if ($errors->has('description')) border-red-600 @else border-gray-300 @endif"></textarea>
                                 @if ($errors->has('description'))
-                                    <p class="text-xs font-light text-red-600">Required</p>
+                                    <p class="text-xs font-light text-red-600">{{$errors->get('description')[0]}}</p>
                                 @endif
                                 <p class="text-gray-500 text-sm font-light">Please enter module description</p>
                             </div>
@@ -71,7 +71,7 @@
                                     </option>
                                 </select>
                                 @if ($errors->has('status'))
-                                    <p class="text-xs font-light text-red-600">Required</p>
+                                    <p class="text-xs font-light text-red-600">{{$errors->get('status')[0]}}</p>
                                 @endif
                                 <p class="text-gray-500 text-sm font-light">Please select a status for the module</p>
                             </div>

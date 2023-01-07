@@ -82,7 +82,7 @@
                                     @endforeach
                                 </select>
                                 @if ($errors->has('unit_id'))
-                                    <p class="text-xs font-light text-red-600">Required</p>
+                                    <p class="text-xs font-light text-red-600">{{$errors->get('unit_id')[0]}}</p>
                                 @endif
                                 <p class="text-gray-500 text-sm font-light">Please select a unit</p>
                             </div>

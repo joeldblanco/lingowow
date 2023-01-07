@@ -40,6 +40,10 @@ class User extends Authenticatable implements MustVerifyEmail
         'email',
         'password',
         'status',
+        'street',
+        'city',
+        'zip_code',
+        'country',
     ];
 
     /**
@@ -156,9 +160,9 @@ class User extends Authenticatable implements MustVerifyEmail
 
         foreach ($friends as $key => $value) {
             if ($value->user_id == $this->id) {
-                $friends[$key] = User::find($value->friend_id);
+                $friends[$key] = User::withTrashed()->find($value->friend_id);
             } else {
-                $friends[$key] = User::find($value->user_id);
+                $friends[$key] = User::withTrashed()->find($value->user_id);
             }
         }
 

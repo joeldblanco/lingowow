@@ -28,7 +28,7 @@ class Classes extends Model
      */
     public function student()
     {
-        return User::find(Enrolment::withTrashed()->find($this->enrolment_id)->student_id);
+        return User::withTrashed()->find(Enrolment::withTrashed()->find($this->enrolment_id)->student_id);
     }
 
     /**
@@ -36,7 +36,7 @@ class Classes extends Model
      */
     public function teacher()
     {
-        return User::find(Enrolment::withTrashed()->find($this->enrolment_id)->teacher_id);
+        return User::withTrashed()->find(Enrolment::withTrashed()->find($this->enrolment_id)->teacher_id);
     }
 
     /**
@@ -45,5 +45,13 @@ class Classes extends Model
     public function comments()
     {
         return $this->morphMany(Comment::class, 'commentable');
+    }
+
+    /**
+     * Get the phone associated with the user.
+     */
+    public function meeting()
+    {
+        return $this->belongsTo(Meeting::class);
     }
 }

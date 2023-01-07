@@ -18,6 +18,7 @@ use App\Invoice;
 use App\Http\Controllers\CourseController;
 use App\Http\Controllers\EnrolmentController;
 use App\Http\Controllers\ExamController;
+use App\Http\Controllers\GatherController;
 use App\Http\Controllers\GradingController;
 use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\ModuleController;
@@ -33,6 +34,7 @@ use App\Notifications\BookedClass;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Notification;
 use App\Http\Controllers\MeetingController;
+use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\ProductController;
 use App\Models\Attempt;
 use App\Http\Controllers\UploadImages;
@@ -40,6 +42,7 @@ use App\Models\Enrolment;
 use App\Models\Post;
 use App\Models\Unit;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Http;
 
 /*
 |--------------------------------------------------------------------------
@@ -62,6 +65,13 @@ Route::middleware(['web', 'auth', 'verified', 'impersonate'])->group(function ()
 
         return view('home');
     })->name('home');
+
+    Route::post('/complete-tour', function (Request $request) {
+        $query = DB::table('shepherd_users')->insertOrIgnore([
+            ['tour_name' => $request->tourName, 'user_id' => auth()->user()->id]
+        ]);
+        return $query;
+    })->name('complete-tour');
 
     // Route::middleware(['role:guest'])->get('/courses', function () {
     //     return view('courses');
@@ -101,7 +111,7 @@ Route::middleware(['web', 'auth', 'verified', 'impersonate'])->group(function ()
     //ROUTES FOR ACTIVITY//
     Route::middleware(['role:student|teacher|admin'])->get('/unit/{id_unit}/activity/{id}', [ActivityController::class, 'show_activity'])->name('activity.show'); ///Cree, esta nueva
     Route::middleware(['role:student|teacher|admin'])->get('/activity/edit/{id}', [ActivityController::class, 'edit_activity'])->name('activity.edit'); ///Cree, esta nueva
-     ///Cree, esta nueva
+    ///Cree, esta nueva
 
     //ROUTES FOR SHOP//
     Route::middleware(['role:guest|student|admin'])->get('/shop', [PayPalPaymentController::class, 'getIndex'])->name('shop');
@@ -110,8 +120,8 @@ Route::middleware(['web', 'auth', 'verified', 'impersonate'])->group(function ()
     })->name("cart");
 
     //ROUTES FOR INVOICES//
-    Route::middleware(['role:student|admin'])->get('/shop/invoices', [InvoiceController::class, 'index'])->name("invoices");
-    Route::middleware(['role:student|admin'])->get('/shop/invoice/{id}', [InvoiceController::class, 'show'])->name('invoice.show');
+    Route::middleware(['role:guest|student|admin'])->get('/shop/invoices', [InvoiceController::class, 'index'])->name("invoices");
+    Route::middleware(['role:guest|student|admin'])->get('/shop/invoice/{id}', [InvoiceController::class, 'show'])->name('invoice.show');
 
     //ROUTES FOR SCHEDULE//
     Route::post('/schedule/check', [SchedulingCalendarController::class, 'checkForTeachers'])->name("schedule.check");
@@ -145,7 +155,7 @@ Route::middleware(['web', 'auth', 'verified', 'impersonate'])->group(function ()
         Route::get('/admin/invoices', [InvoiceController::class, 'adminIndex'])->name('admin.invoices');
 
         //EARNINGS//
-        Route::get('/admin/earnings', [AnalyticsController::class, 'destroy'])->name('admin.earnings');
+        Route::get('/admin/earnings', [AnalyticsController::class, 'earnings'])->name('admin.earnings');
 
         //COUPONS//
         Route::get('/admin/coupons', [CouponController::class, 'index'])->name("coupons.index");
@@ -218,6 +228,7 @@ Route::middleware(['web', 'auth', 'verified', 'impersonate'])->group(function ()
                 if ($user->roles[0]->name == 'student') {
                     $user->studentClasses->each(function ($class) {
                         // $deleted_class = $class->delete();
+                        (new MeetingController)->destroy($class->meeting);
                         $class->delete();
                     });
 
@@ -238,6 +249,9 @@ Route::middleware(['web', 'auth', 'verified', 'impersonate'])->group(function ()
             return redirect()->route('users', 4);
         });
     });
+
+    Route::get('gather/get_guests_list', [GatherController::class, 'getGuestsList']);
+    Route::get('gather/set_guests_list', [GatherController::class, 'setGuestsList']);
 
     Route::get('activities', [ActivityController::class, 'index'])->name('activities.index');
     Route::get('activities/{id}', [ActivityController::class, 'show'])->name('admin.activities.show');
@@ -269,10 +283,13 @@ Route::middleware(['web', 'auth', 'verified', 'impersonate'])->group(function ()
     Route::get('/classroom/{id}', [ClassroomController::class, 'openRoom'])->name("classroom");
 
     //ROUTES FOR PROCESSING PAYMENTS (PAYPAL)//
-    Route::get('/payment/ec-checkout', [PayPalPaymentController::class, 'getExpressCheckout'])->name("checkout");
+    Route::get('/payment/ec-checkout', [PayPalPaymentController::class, 'getExpressCheckout'])->name("paypal-checkout");
     Route::get('/payment/ec-checkout-success', [PayPalPaymentController::class, 'getExpressCheckoutSuccess'])->name("checkout-success");
     Route::get('/payment/adaptive-pay', [PayPalPaymentController::class, 'getAdaptivePay'])->name("adpative-payment");
     Route::post('/payment/notify', [PayPalPaymentController::class, 'notify'])->name("notify");
+
+    Route::get('/payment/gateway', [PaymentController::class, 'createButton'])->name("payments.gateway");
+    Route::get('/payment/checkout', [PaymentController::class, 'checkout'])->name("payments.checkout");
 
     //ROUTES FOR NOTIFICATIONS//
     Route::get('/notifications', [NotificationsController::class, 'index'])->name('notifications.index');

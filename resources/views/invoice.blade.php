@@ -16,9 +16,9 @@
         <header>
             <div class="row align-items-center">
                 <div class="col-sm-7 text-center text-sm-left mb-3 mb-sm-0">
-                    <img id="logo" src="{{ Storage::url('images/logo_circular_azul.png') }}"
-                        title="The Utterers' Corner" alt="The Utterers' Corner" class="w-16 mb-3" />
-                    <p class="font-bold">The Utterers' Corner</p>
+                    <img id="logo" src="{{ Storage::url('images/logo_512x512_transparente.png') }}"
+                        title="Lingowow" alt="Lingowow" class="w-16 mb-3" />
+                    <p class="font-bold">Lingowow</p>
                 </div>
                 <div class="col-sm-5 text-center text-sm-right">
                     <h4 class="text-7 mb-0">Invoice</h4>
@@ -32,7 +32,7 @@
             <div class="row">
                 @php
                     $date = explode(' ', $invoice->created_at);
-                    $user = App\Models\User::where('id', $invoice->user_id)->get();
+                    $user = App\Models\User::where('id', $invoice->user_id)->first();
                     $items = DB::table('items')
                         ->where('invoice_id', $invoice->id)
                         ->get();
@@ -45,18 +45,18 @@
             <div class="row">
                 <div class="col-sm-6 text-sm-right order-sm-1"> <strong>Paid To:</strong>
                     <address>
-                        The Utterers' Corner<br />
+                        Lingowow<br />
                         2705 N. Canta Callao Av<br />
                         Lima, PE 07031<br />
-                        <a href="mailto:contact@theuttererscorner.com">contact@theuttererscorner.com</a>
+                        <a href="mailto:contact@lingowow.com">contact@lingowow.com</a>
                     </address>
                 </div>
                 <div class="col-sm-6 order-sm-0"> <strong>Invoiced To:</strong>
                     <address>
-                        {{ $user[0]->first_name }} {{ $user[0]->last_name }}<br />
-                        15 Hodges Mews, High Wycombe<br />
-                        HP12 3JL<br />
-                        United Kingdom
+                        {{ $user->first_name }} {{ $user->last_name }}<br />
+                        {{ $user->street }}<br />
+                        {{ $user->zip_code }}<br />
+                        {{ $user->city }}, {{ $user->country }}
                     </address>
                 </div>
             </div>
