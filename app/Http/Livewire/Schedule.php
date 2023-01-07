@@ -551,7 +551,7 @@ class Schedule extends Component
         }
 
         // $schedules_exam_not_fre = array_unique($schedules_exam_not_fre);
-        dd($schedules_exam_reserve, $schedules_exam, $schedules_exam_not_free, $schedules_exam_not_free);
+        // dd($schedules_exam_reserve, $schedules_exam, $schedules_exam_not_free, $schedules_exam_not_free);
         $this->dispatchBrowserEvent('reserves_schedules_event_js', ['schedules' => $schedules_reserve, 'schedules_exam' => $schedules_exam_not_free, 'mode' => $this->mode, 'plan' => $this->plan]);
 
     }

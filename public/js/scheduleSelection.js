@@ -280,7 +280,7 @@ function post(path, params, method = 'post') {
 let identificadorIntervaloDeTiempo;
 let listPastOfSchedules = [];
 console.log("prueba de setInterval");
-repetirCadaMinuto();
+// repetirCadaMinuto();
 
 function repetirCadaMinuto() {
     // Livewire.emitTo('schedule', 'findReserves');
