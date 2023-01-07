@@ -89,7 +89,8 @@ class SchedulingCalendarController extends Controller
 
         //CREATING CLASSES (CLASS BOOKING)//
         foreach ($classes_dates as $date) {
-            CreateClasses::dispatch($date, $enrolment->id);
+            // CreateClasses::dispatch($date, $enrolment->id);
+            dispatch(new CreateClasses($date, $enrolment->id));
         }
 
 
@@ -301,7 +302,7 @@ class SchedulingCalendarController extends Controller
 
                 // dd($students_schedules, $requested_schedule, $affected_students);
 
-                if(count($requested_schedule) <= 0) $requested_schedule = null;
+                if (count($requested_schedule) <= 0) $requested_schedule = null;
 
 
                 Schedule::withTrashed()->updateOrCreate(

@@ -228,6 +228,7 @@ Route::middleware(['web', 'auth', 'verified', 'impersonate'])->group(function ()
                 if ($user->roles[0]->name == 'student') {
                     $user->studentClasses->each(function ($class) {
                         // $deleted_class = $class->delete();
+                        // dd($class);
                         (new MeetingController)->destroy($class->meeting);
                         $class->delete();
                     });
