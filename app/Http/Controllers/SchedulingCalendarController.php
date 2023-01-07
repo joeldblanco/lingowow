@@ -9,6 +9,7 @@ use App\Models\Classes;
 use App\Models\Course;
 use App\Models\Enrolment;
 use App\Models\Schedule;
+use App\Models\ScheduleReserve;
 use Illuminate\Http\Request;
 use App\Models\User;
 use App\Notifications\BookedClass;
@@ -22,6 +23,9 @@ use App\Notifications\ClassRescheduledToTeacher;
 use App\Notifications\ClassRescheduledToStudent;
 use Carbon\Carbon;
 use Cart;
+use Illuminate\Support\Facades\DB;
+
+use function PHPSTORM_META\type;
 
 class SchedulingCalendarController extends Controller
 {
@@ -43,7 +47,7 @@ class SchedulingCalendarController extends Controller
     public function create(Request $request)
     {
         $plan = session('plan');
-
+        // dd($request);
         return view('calendar-selection', compact('plan'));
     }
 
@@ -391,81 +395,103 @@ class SchedulingCalendarController extends Controller
      */
     public function checkForTeachers(Request $request)
     {
-        // dd($request->error);
         if ($request->error == "false") {
+            // session()->forget('teacher_id');
             $cells = json_decode($request->data);
             // $cells = array_chunk($request->data, 2);
+            // dd($cells);
             session(['user_schedule' => json_encode($cells)]);
+            session(['schedule_reserve' => json_encode($cells)]);
 
-            // $teachers = User::join('model_has_roles',function($join){
-            //                 $join->on('users.id','=','model_has_roles.model_id')
-            //                      ->where('model_has_roles.role_id','=','3');
-            //             })
-            //             ->get();
 
-            // $available_teachers = [];
-
-            // $teachers_available_schedule = [];
-            // $teachers_students_schedule = [];
-            // foreach ($teachers as $key => $value) {
-
-            //     $teachers_available_schedule[$key] = Schedule::where('user_id',$value->id)->select('selected_schedule')->get();
-
-            //     $teachers_students = Enrolment::where('teacher_id',$value->id)->select('student_id')->get();
-
-            //     foreach ($teachers_students as $tskey => $tsvalue) {
-
-            //         $teachers_students_schedule[$tskey] = Schedule::where('user_id',$tsvalue->student_id)->select('selected_schedule')->get();
-
-            //         $teachers_students_schedule[$tskey] = $teachers_students_schedule[$tskey][0]->selected_schedule;
-
-            //         $teachers_students_schedule = json_decode($teachers_students_schedule[$tskey]);
-            //     }
-
-            //     $teachers_available_schedule[$key] = json_decode($teachers_available_schedule[$key][0]->selected_schedule);
-
-            //     foreach ($teachers_students_schedule as $s_schedule) {
-            //         if($teachers_available_schedule[$key] != null)
-            //             array_splice($teachers_available_schedule[$key], array_search($s_schedule,$teachers_available_schedule[$key]), 1);
-            //     }
-
-            // }
-
-            // foreach($teachers_available_schedule as $key => $value){
-
-            //     $matched_blocks = 0;
-
-            //     if($value != null){
-            //         foreach($cells as $cell){
-            //             // dd($teacher_schedule);
-            //             if(in_array($cell,$value)){
-            //                 $matched_blocks++;
-            //             }
-            //         }
-            //     }
-
-            //     if($matched_blocks == count($cells)){
-            //         array_push($available_teachers,$teachers[$key]);
-            //     }
-            // }
-
-            // session(['available_teachers' => $available_teachers]);
-
-            Cart::destroy();
+            // dd(session()->all(), json_decode(session('user_schedule')), $cells);
+            $teachers = [];
+            $teachers_available = [];
+            $day_of_exam = [$cells[0][0], $cells[0][1]];
             $course_id = session('selected_course');
+            $modality = Course::find($course_id)->modality;
+            $error = false;
 
-            $product = Course::find($course_id)->products->first();
+            if ($modality == "exam") {
+                // dd(session('teacher_id', "hola"));
+                $model_roles = DB::table('model_has_roles')->select('role_id', 'model_id')->get();
+                foreach ($model_roles as $model_role) {
 
-            $apportionment = ApportionmentController::calculateApportionment(session('plan'));
-            $product_qty = $apportionment[0];
-            // dd($apportionment);
-            Cart::add($product->id, $product->name, $product_qty, ($product->sale_price == null ? $product->regular_price : $product->sale_price), ['editable' => false])->associate('App\Models\Product');
-            session([
-                'course_id' => $course_id,
-                'classes_dates' => $apportionment[1]
-            ]);
+                    if ($model_role->role_id == 3) {
+                        $teachers[] = $model_role->model_id;
+                    }
+                }
+            } else {
+                $teachers[] = session('teacher_id');
+                // dd(session('teacher_id', "hola1"));
+            }
+            $teachers = User::find($teachers);
 
-            return view('cart');
+            foreach ($teachers as $teacher) {
+                $T_schedule = $teacher->schedules->first()->selected_schedule;
+                if ($T_schedule != null && in_array($day_of_exam, $T_schedule)) {
+                    $classes = [];
+                    foreach ($teacher->teacherClasses as $class) {
+                        $classes[] = [(new Carbon($class->start_date))->isoFormat('H'), (new Carbon($class->start_date))->isoFormat('d')];
+                    }
+                    // dd($day_of_exam,$classes, !in_array($day_of_exam, $classes));
+                    if (!in_array($day_of_exam, $classes)) {
+                        // dd($modality, new Carbon(),(Carbon::create((new Carbon())->year, $cells[0][3], $cells[0][4], $cells[0][0], 0)), !(Carbon::create((new Carbon())->year, $cells[0][3], $cells[0][4], $cells[0][0], 0))->lessThan(new Carbon()));
+                        if (($modality == "exam" && (Carbon::create((new Carbon())->year, $cells[0][3], $cells[0][4], $cells[0][0], 0))->lessThan(new Carbon()) == false) || $modality == "synchronous") {
+                            // dd("todo perfect");
+                            array_push($teachers_available, $teacher->id);
+                        }
+                    } else {
+                        if ($modality != "exam") {
+                            $error = true;
+                            break;
+                        }
+                    }
+                    // dd($T_schedule,$classes);
+                } else {
+                    if ($modality != "exam") {
+                        $error = true;
+                        break;
+                    }
+                }
+            }
+
+
+
+            if (count($teachers_available) > 0 && !$error) {
+                
+                $T_selected = rand(0, count($teachers_available) - 1);
+                
+                Cart::destroy();
+
+                $product = Course::find($course_id)->products->first();
+                $apportionment = ApportionmentController::calculateApportionment(session('plan'));
+                $product_qty = $apportionment[0];
+                
+                if ($modality == "exam") {
+                    $product_qty = 1;
+                    session(['teacher_id' => 7]); //IMPORTANTE!!!!!! AQUI SUSTITUIR EL 7 POR "$T_selected"
+                }
+                // dd($apportionment);
+                self::saveScheduleReserve($cells);
+
+                Cart::add($product->id, $product->name, $product_qty, ($product->sale_price == null ? $product->regular_price : $product->sale_price), ['editable' => false])->associate('App\Models\Product');
+                session([
+                    'course_id' => $course_id,
+                    'classes_dates' => $apportionment[1]
+                ]);
+
+                // dd("hola que tal", $teachers, $teachers_available, count($teachers_available), rand(0, count($teachers_available) - 1), session()->all(), $cells);
+                return view('cart');
+            } else {
+                Cart::destroy();
+                if ($modality == "exam") {
+                    $message = "Sorry dear Linguado. There are not teachers availables for that date";
+                } else {
+                    $message = "Dear Linguado. That block is not available";
+                    session()->forget('teacher_id');
+                }
+            }
         } else {
             Cart::destroy();
             $message = "Request rejected";
@@ -486,4 +512,29 @@ class SchedulingCalendarController extends Controller
         //dd($message);
         return redirect()->route("schedule.create");
     }
+
+    public static function saveScheduleReserve($schedule = [])
+    {
+
+        $type = "";
+        if(count($schedule[0]) > 2){
+            $type = "exam";
+        }else{
+            $type = "schedule";
+        }
+        $teacher_id = session('teacher_id');
+        $schedule_encode = json_encode($schedule);
+
+
+            $reserve = ScheduleReserve::withTrashed()->updateOrCreate(
+                ['user_id' => auth()->id()],
+                ['teacher_id' => $teacher_id,'selected_schedule' => $schedule_encode, 'type' => $type]
+                // ['type' => 'exam']
+            );
+
+
+        // dd($schedule, "reserve");
+    }
+
+    
 }

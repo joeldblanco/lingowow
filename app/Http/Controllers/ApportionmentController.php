@@ -121,22 +121,51 @@ class ApportionmentController extends Controller
 
     public static function currentPeriod($onlyDate = false)
     {
-        $first_monday = new Carbon('first monday of this month');
-        if ($first_monday < Carbon::now()) {
-            $current_period_start = new Carbon('first monday of this month');
-            $current_period_end = (new Carbon('first monday of this month'))->addDays(5);
+        // $first_monday = new Carbon('first monday of this month');
+        // if ($first_monday < Carbon::now()) {
+        //     $current_period_start = new Carbon('first monday of this month');
+        //     $current_period_end = (new Carbon('first monday of this month'))->addDays(5);
+        //     $current_period_end->addWeeks(3);
+        //     $current_period_end->addDays(1);
+        // } else {
+        //     $current_period_start = new Carbon('first monday of last month');
+        //     $current_period_end = (new Carbon('first monday of last month'))->addDays(5);
+        //     $current_period_end->addWeeks(3);
+        //     $current_period_end->addDays(1);
+        // }
+
+        // if ($onlyDate) return [$current_period_start->toDateString(), $current_period_end->toDateString()];
+
+        // return [$current_period_start->toDateTimeString(), $current_period_end->toDateTimeString()];
+
+        $current_period = DB::table("metadata")->where("key", "current_period")->first()->value;
+        $current_period = array_values(json_decode($current_period,1));
+        // dd($current_period);
+        return $current_period;
+    }
+
+    public static function nextPeriod($onlyDate = false){
+        $current_period = DB::table("metadata")->where("key", "current_period")->first()->value;
+        $current_period = array_values(json_decode($current_period,1));
+
+        $start_period = new Carbon($current_period[0]);
+        $end_period = new Carbon($current_period[1]);
+
+        if($start_period->month == $end_period->month){
+            $current_period_start = new Carbon('first monday of next month');
+            $current_period_end = (new Carbon('first monday of next month'))->addDays(5);
             $current_period_end->addWeeks(3);
             $current_period_end->addDays(1);
-        } else {
-            $current_period_start = new Carbon('first monday of last month');
-            $current_period_end = (new Carbon('first monday of last month'))->addDays(5);
+        }else{
+            $current_period_start = new Carbon('first monday of this month');
+            $current_period_end = (new Carbon('first monday of this month'))->addDays(5);
             $current_period_end->addWeeks(3);
             $current_period_end->addDays(1);
         }
 
         if ($onlyDate) return [$current_period_start->toDateString(), $current_period_end->toDateString()];
-
         return [$current_period_start->toDateTimeString(), $current_period_end->toDateTimeString()];
+
     }
 
     public static function getPeriod($class, $extended = false)
