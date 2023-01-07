@@ -56,15 +56,16 @@ class PayPalPaymentController extends Controller
     {
         $recurring = ($request->get('mode') === 'recurring') ? true : false;
         $cart = $this->getCheckoutData($recurring);
-
+        
         try {
-
+            
             $response = $this->provider->setExpressCheckout($cart, $recurring);
+            // dd($response);
             
             return redirect($response['paypal_link']);
         } catch (\Exception $e) {
             $invoice = $this->createInvoice($cart, 'Invalid');
-         
+        
             session()->put(['code' => 'danger', 'message' => "Error processing PayPal payment for Order $invoice->id!"]);
         }
     }
@@ -86,7 +87,7 @@ class PayPalPaymentController extends Controller
 
         // Verify Express Checkout Token
         $response = $this->provider->getExpressCheckoutDetails($token);
-
+        // dd($response);
         if (in_array(strtoupper($response['ACK']), ['SUCCESS', 'SUCCESSWITHWARNING'])) {
             if ($recurring === true) {
                 $response = $this->provider->createMonthlySubscription($response['TOKEN'], 9.99, $cart['subscription_desc']);
@@ -117,24 +118,29 @@ class PayPalPaymentController extends Controller
                         $current_user->assignRole('student');
                     }
                 }
-
+                
                 $student = auth()->user();
                 $course_id = session('selected_course');
-
+                
                 //CHANGING STUDENT'S ROLE FROM 'GUEST' TO 'STUDENT'//
                 $student->removeRole('guest');
                 $student->assignRole('student');
 
-                $product = Course::find($course_id)->products->first();
-                if ($product->recurring) {
-                    $teacher = User::find(session('teacher_id'));
-
+                $modality_course = Course::find($course_id)->modality;
+                if ($modality_course == "synchronous" || $modality_course == "exam") {
+                    if($modality_course == "synchronous"){
+                        $teacher = User::find(session('teacher_id'));
+                    }else{
+                        $teacher = User::find(session('teacher_id'));
+                    }
+                    
+                    // dd(session('teacher_id'));
                     //CREATING STUDENT'S ENROLMENT (OR UPDATING IT, IN CASE IT ALREADY EXISTS BUT IS SOFTDELETED)//
                     $enrolment = Enrolment::withTrashed()->updateOrCreate(
                         ['student_id' => $student->id, 'course_id' => $course_id],
                         ['teacher_id' => $teacher->id, 'deleted_at' => NULL]
                     );
-
+                    
                     SchedulingCalendarController::store(auth()->user()->id, $enrolment);
                 } else {
 
@@ -179,7 +185,7 @@ class PayPalPaymentController extends Controller
         ];
 
         $response = $this->provider->createPayRequest($data);
-        dd($response);
+        // dd($response);
     }
 
     /**
@@ -220,8 +226,13 @@ class PayPalPaymentController extends Controller
     {
         $data = [];
 
-        $order_id = Invoice::all()->last()->id + 1;
-
+        if(Invoice::all()->last() != null){
+            
+            $order_id = Invoice::all()->last()->id + 1;
+        }else{
+            $order_id = 1;
+        }
+        // dd($order_id);
         $items = array();
 
         // dd($order_id);

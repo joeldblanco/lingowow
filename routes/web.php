@@ -215,21 +215,25 @@ Route::middleware(['web', 'auth', 'verified', 'impersonate'])->group(function ()
         Route::get('/reset/{users}', function (User ...$users) {
             foreach ($users as $user) {
 
-                $user->studentClasses->each(function ($class) {
-                    // $deleted_class = $class->delete();
-                    $class->delete();
-                });
+                if ($user->roles[0]->name == 'student') {
+                    $user->studentClasses->each(function ($class) {
+                        // $deleted_class = $class->delete();
+                        $class->delete();
+                    });
 
-                if ($user->enrolments->count()) {
-                    // $user->schedules->where('enrolment_id', $user->enrolments->first()->id)->first()->delete();
-                    $user->schedules->first()->next_schedule = null;
-                    $user->schedules->first()->save();
-                    $user->schedules->first()->delete();
-                    $user->enrolments->first()->delete();
+                    if ($user->enrolments->count()) {
+                        // $user->schedules->where('enrolment_id', $user->enrolments->first()->id)->first()->delete();
+                        $user->enrolments->first()->delete();
+                        if ($user->schedules->first() != null) {
+                            $user->schedules->first()->next_schedule = null;
+                            $user->schedules->first()->save();
+                            $user->schedules->first()->delete();
+                        }
+                    }
+
+                    $user->removeRole('student');
+                    $user->assignRole('guest');
                 }
-
-                $user->removeRole('student');
-                $user->assignRole('guest');
             }
             return redirect()->route('users', 4);
         });

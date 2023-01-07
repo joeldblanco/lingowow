@@ -23,6 +23,8 @@
         // curl_close($ch);
         // dd($ip_add);
         
+        // $current_period = DB::table("metadata")->where("key", "current_period")->first()->value;
+        //$current_period = array_values(json_decode($current_period,1));
         $current_period = App\Http\Controllers\ApportionmentController::currentPeriod();
         $period_start_c = new Carbon\Carbon($current_period[0]);
         $period_end_c = new Carbon\Carbon($current_period[1]);
@@ -32,7 +34,7 @@
         $now = new Carbon\Carbon();
         //$now = $now->format('d');
         //dd($period_start_c->toDateTimeString());
-        $date_range = new Carbon\CarbonPeriod($period_start_c->subDay(), $period_end_c);
+        $date_range = new Carbon\CarbonPeriod($period_start_c->copy()->subDay(), $period_end_c);
         $day_format_range = [];
         $period_range = [];
         $day_range = [];
@@ -57,7 +59,7 @@
         // }
         
         $abcense = App\Models\Classes::select('start_date')
-            ->whereBetween('start_date', [$period_start_c->subDay()->toDateTimeString(), $period_end_c->toDateTimeString()])
+            ->whereBetween('start_date', [$period_start_c->copy()->subDay()->toDateTimeString(), $period_end_c->toDateTimeString()])
             ->get();
         // ->where('status', '1')
         
@@ -161,7 +163,7 @@
 
                 <div class="mt-5 mb-10 grid grid-rows-1 grid-flow-col gap-4 justify-center ...">
                     <input class="" type="text" name="absence_reason"
-                        id="absence_reason" placeholder="Reason for Absence" required>
+                        id="absence_reason" placeholder="Reason for Absence" required> 
                 </div>
 
                 <div class="container mx-auto" x-data="{ editBtn: true, edit: false, showModal1: false, showModal2: false, showModal3: false, showModalAbsence: false, loadingState: false }" x-cloak>
@@ -223,6 +225,7 @@
                                             <td class="width border Local">
                                                 {{-- AQUI LA HORA SE LLENA MEDIANTE JAVASCRIPT --}}
                                             </td>
+                                            
                                             @foreach ($days as $day)
                                                 @if (in_array([$i, $e], $teacher_schedule) &&
                                                     (new Carbon\carbon($day_format_range[$d]))->addHour($i)->greaterThan($now))
@@ -394,8 +397,8 @@
     {{-- <script src="{{ asset('js/jquery-3.5.1.js') }}"></script> --}}
     <script src="{{ asset('js/jquery.dataTables.min.js') }}"></script>
 
-    <script src="{{ asset('js/jquery.datetimepicker.full.min.js') }}"></script>
     <script type="text/javascript" src="{{ asset('js/scheduleSelection.js') }}" defer></script>
+    <script src="{{ asset('js/jquery.datetimepicker.full.min.js') }}"></script>
 
     <script>
         // 0: "constructor"

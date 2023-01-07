@@ -121,7 +121,7 @@ function saveSchedule(plan, routeTo, role = 2) {
 
         data = JSON.stringify(data);
 
-        // console.log(plan);
+        console.log(data);
 
         post(route(routeTo), {
             data: data,
@@ -276,6 +276,56 @@ function post(path, params, method = 'post') {
     document.body.appendChild(form);
     form.submit();
 }
+
+let identificadorIntervaloDeTiempo;
+let listPastOfSchedules = [];
+console.log("prueba de setInterval");
+repetirCadaMinuto();
+
+function repetirCadaMinuto() {
+    // Livewire.emitTo('schedule', 'findReserves');
+    identificadorIntervaloDeTiempo = setInterval(mandarMensaje, 20000);
+}
+
+function mandarMensaje() {
+    console.log("Ha pasado 1 minuto.");
+    Livewire.emitTo('schedule', 'findReserves');
+}
+
+window.addEventListener('reserves_schedules_event_js', event => {
+    var schedules = event.detail.schedules;
+    // var result = _.union(listOfSchedules, schedules);
+    notOccupied(listPastOfSchedules);
+    setOccupied(schedules);
+    // listOfSchedules = listOfSchedules.concat()
+    console.log(event);
+})
+
+function notOccupied(schedule){
+
+    schedule.forEach(element => {
+        // console.log($('#' + element[0] +'-'+ element [1]));
+        if( $('#' + element[0] +'-'+ element [1]).hasClass('selectable') && $('#' + element[0] +'-'+ element [1]).hasClass('occupied') ){
+            $('#' + element[0] +'-'+ element [1]).toggleClass('occupied');
+            $('#' + element[0] +'-'+ element [1]).toggleClass('available');
+        }
+    });
+
+}
+
+function setOccupied(schedule){
+
+    schedule.forEach(element => {
+        // console.log($('#' + element[0] +'-'+ element [1]));
+        if( $('#' + element[0] +'-'+ element [1]).hasClass('selectable') && $('#' + element[0] +'-'+ element [1]).hasClass('available') ){
+            $('#' + element[0] +'-'+ element [1]).toggleClass('available');
+            $('#' + element[0] +'-'+ element [1]).toggleClass('occupied');
+        }
+    });
+
+    listPastOfSchedules = schedule;
+}
+
 
 // Funcion de seleccion en el horario
 
