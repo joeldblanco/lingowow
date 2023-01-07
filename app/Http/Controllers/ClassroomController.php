@@ -64,33 +64,34 @@ class ClassroomController extends Controller
                 $enter_classroom = false;
                 $message = "";
 
+                return redirect(auth()->user()->studentClasses->sortBy('start_date')->pluck('meeting')->first()->join_url);
+
                 if ($now->lessThanOrEqualTo($classes[$key])) {
                     $diffInSeconds = $classes[$key]->diffInSeconds();
 
-                    // dd($now, $classes[$key], $diffInSeconds);
-
                     if (($diffInSeconds < 600 && $user == 'teacher') || ($diffInSeconds < 20 && $user == 'student') || $user == 'admin') {
-                        $message = "This student's next class is in " . $classes[$key]->diffForHumans(['parts' => 2]) . ". On " . $classes[$key]->format('l') . ' at ' . $classes[$key]->format('g:00 a') . " Lima Time.";
+                        $message = "This student's next class is in " . $classes[$key]->diffForHumans(['parts' => 2]) . ". On " . $classes[$key]->format('l') . ' at ' . $classes[$key]->format('g:00 a') . " UTC.";
                         $enter_classroom = true;
                         break;
                     } else {
                         if ($user == 'student') {
-                            $message = "Your next class is in " . $classes[$key]->diffForHumans(['parts' => 2]) . ". On " . $classes[$key]->format('l') . ' at ' . $classes[$key]->format('g:00 a') . " Lima Time.";
+                            $message = "Your next class is in " . $classes[$key]->diffForHumans(['parts' => 2]) . ". On " . $classes[$key]->format('l') . ' at ' . $classes[$key]->format('g:00 a') . " UTC.";
                             break;
                         }
 
                         if ($user == 'teacher') {
-                            $message = "This student's next class is in " . $classes[$key]->diffForHumans(['parts' => 2]) . ". On " . $classes[$key]->format('l') . ' at ' . $classes[$key]->format('g:00 a') . " Lima Time.";
+                            $message = "This student's next class is in " . $classes[$key]->diffForHumans(['parts' => 2]) . ". On " . $classes[$key]->format('l') . ' at ' . $classes[$key]->format('g:00 a') . " UTC.";
                             break;
                         }
                     }
                 }
             }
 
-            return view('classroom.show', compact('enter_classroom', 'message', 'student', 'user'));
+            // return view('classroom.show', compact('enter_classroom', 'message', 'student', 'user'));
         } else {
-            $message = "User is not enroled in any course.";
-            return view('classroom.show', compact('message'));
+            abort(403, 'USER DOES NOT HAVE THE RIGHT PERMISSIONS.');
+            // $message = "User is not enroled in any course.";
+            // return view('classroom.show', compact('message'));
         }
     }
 }

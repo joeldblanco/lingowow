@@ -46,4 +46,12 @@ class Classes extends Model
     {
         return $this->morphMany(Comment::class, 'commentable');
     }
+
+    /**
+     * Get the phone associated with the user.
+     */
+    public function meeting()
+    {
+        return $this->belongsTo(Meeting::class);
+    }
 }

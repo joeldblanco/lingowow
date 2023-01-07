@@ -66,7 +66,7 @@
         crossorigin="anonymous" referrerpolicy="no-referrer" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/@shopify/draggable@1.0.0-beta.12/lib/draggable.bundle.js"></script>
     {{-- <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script> --}}
-    {{-- <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script> --}}
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
     <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
     <script src="https://cdn.tiny.cloud/1/xmua6246us3vdfealnkl1yf7ja0zafr4cttuehqtyz7nen6o/tinymce/5/tinymce.min.js"
@@ -110,7 +110,7 @@
         <!-- Page Content -->
         @livewireScripts
 
-        <main class="pb-20 w-full">
+        <main class="pb-10 w-full min-h-screen">
             {{ $slot }}
         </main>
         @include('footer')

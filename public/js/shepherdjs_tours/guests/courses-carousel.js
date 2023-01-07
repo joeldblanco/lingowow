@@ -2,7 +2,7 @@ const tour = new Shepherd.Tour({
     useModalOverlay: true,
     defaultStepOptions: {
         classes: 'border-2 border-blue-500',
-        // scrollTo: true
+        scrollTo: { behavior: 'smooth', block: 'center' },
         modalOverlayOpeningPadding: 10,
         modalOverlayOpeningRadius: 20,
         canClickTarget: false,
@@ -11,13 +11,12 @@ const tour = new Shepherd.Tour({
 
 tour.addSteps([
     {
-        id: 'modules-list',
-        text: 'All our courses are divided into modules and each module has a number of units. The available modules will be listed here.',
+        id: 'courses-carousel',
+        text: 'Here you will find a carousel with the courses we offer. You can drag right or left to see the other courses.',
         attachTo: {
-            element: '.modules-list',
+            element: '.courses-carousel',
             on: 'top'
         },
-        // classes: 'example-step-extra-class',
         buttons: [
             {
                 text: 'Next',
@@ -26,18 +25,18 @@ tour.addSteps([
         ]
     },
     {
-        id: 'first-module',
-        text: 'Click on the name of free module to preview it.',
+        id: 'course-card',
+        text: 'Once you find a course you like, you can select it to see the avaliable plans and prices.',
         attachTo: {
-            element: '.first-module',
+            element: '#course-card',
             on: 'top'
         },
         buttons: [
             {
-                text: 'Thanks!',
+                text: 'Great!',
                 action: tour.complete
             }
-        ]
+        ],
     },
 ]);
 
@@ -48,11 +47,11 @@ tour.on('complete', () => {
         type: 'POST',
         url: route('complete-tour'),
         data: {
-            tourName: 'guests/modules_preview',
+            tourName: 'guests/courses-carousel',
             '_token': $('meta[name="csrf-token"]').attr('content'),
         },
         success: function (data) {
-            // console.log(data);
+            console.log(data);
         },
         error: function (data) {
             // console.log(data["responseText"]);

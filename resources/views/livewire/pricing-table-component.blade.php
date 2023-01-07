@@ -1,5 +1,5 @@
 <div class="w-full bg-blue pt-8" x-data="{ open: @entangle('popup') }" id="plans" x-cloak>
-    <div class="flex flex-col sm:flex-row justify-center mb-6 sm:mb-0">
+    <div class="flex flex-col sm:flex-row justify-center mb-6 sm:mb-0 pricing-table">
         {{-- {{dd($plans[0]->plan_name)}} --}}
         @foreach ($plans as $plan)
             <div
@@ -28,12 +28,12 @@
                     @endif
                 </div>
                 <div class="text-center mb-8 mt-4">
-                    @if ($product->courses->first()->modality == "synchronous")
+                    @if ($product->courses->first()->modality == 'synchronous')
                         <button wire:click="store('{{ $plan->n_classes / 4 }}', true)"
-                            class="inline-block bg-blue-800 text-white px-6 py-4 rounded-lg hover:bg-blue-900 hover:text-white hover:no-underline">Select</button>
+                            class=" @if($loop->index == 1) select-button @endif inline-block bg-blue-800 text-white px-6 py-4 rounded-lg hover:bg-blue-900 hover:text-white hover:no-underline">Select</button>
                     @else
                         <button wire:click="store()"
-                            class="inline-block bg-blue-800 text-white px-6 py-4 rounded-lg hover:bg-blue-900 hover:text-white hover:no-underline">Select</button>
+                            class=" @if($loop->index == 1) select-button @endif inline-block bg-blue-800 text-white px-6 py-4 rounded-lg hover:bg-blue-900 hover:text-white hover:no-underline">Select</button>
                     @endif
 
                 </div>
@@ -58,4 +58,8 @@
     </div>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script type="text/javascript" src="{{ asset('js/pricingTable.js') }}" defer></script>
+
+    @role('guest')
+        <x-shepherd-tour tourName="guests/pricing-table" role="guest" />
+    @endrole
 </div>

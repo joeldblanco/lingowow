@@ -2,7 +2,10 @@ const tour = new Shepherd.Tour({
     useModalOverlay: true,
     defaultStepOptions: {
         classes: 'border-2 border-blue-500',
-        scrollTo: true
+        scrollTo: true,
+        modalOverlayOpeningPadding: 10,
+        modalOverlayOpeningRadius: 20,
+        canClickTarget: false,
     }
 });
 

@@ -92,7 +92,7 @@ class ModuleController extends Controller
         } else if ($role == "teacher") {
             $user_units = $module_units;
         } else if ($role == "student") {
-            $user_units = $module_units->where('order', '<', $user->units->first()->order);
+            $user_units = $module_units->where('order', '<=', $user->units->first()->order);
             // $user_units = $user->units->where('status', 1);
             // $user_units = $user_units->diff($user_units->diff($module->units->where('status', 1)));
 

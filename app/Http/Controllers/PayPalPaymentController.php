@@ -60,11 +60,11 @@ class PayPalPaymentController extends Controller
         try {
 
             $response = $this->provider->setExpressCheckout($cart, $recurring);
-            
+
             return redirect($response['paypal_link']);
         } catch (\Exception $e) {
             $invoice = $this->createInvoice($cart, 'Invalid');
-         
+
             session()->put(['code' => 'danger', 'message' => "Error processing PayPal payment for Order $invoice->id!"]);
         }
     }
@@ -126,7 +126,7 @@ class PayPalPaymentController extends Controller
                 $student->assignRole('student');
 
                 $product = Course::find($course_id)->products->first();
-                if ($product->recurring) {
+                if ($product->courses->first()->modality == "synchronous") {
                     $teacher = User::find(session('teacher_id'));
 
                     //CREATING STUDENT'S ENROLMENT (OR UPDATING IT, IN CASE IT ALREADY EXISTS BUT IS SOFTDELETED)//

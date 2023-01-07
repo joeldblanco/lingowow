@@ -85,8 +85,6 @@ class MeetingController extends Controller
                     ['join_url' => $data['join_url'], 'topic' => $data['topic'], 'deleted_at' => NULL]
                 );
 
-                // dd($meeting);
-
                 $class->meeting_id = $meeting->id;
                 $class->save();
             } else {

@@ -28,7 +28,7 @@
                                                 <textarea name="embeddable_data" id="embeddable_data" required
                                                     class="w-full rounded-md p-3 text-gray-600 hover:border-gray-600 @if ($errors->has('embeddable_data')) border-red-600 @else border-gray-300 @endif"></textarea>
                                                 @if ($errors->has('embeddable_data'))
-                                                    <p class="text-xs font-light text-red-600">Required</p>
+                                                    <p class="text-xs font-light text-red-600">{{$errors->get('embeddable_data')[0]}}</p>
                                                 @endif
                                                 <div id="embeddable_preview" class="hidden w-full overflow-auto">
 
@@ -49,7 +49,7 @@
                                                 <input type="text" name="link_title" id="link_title" required
                                                     class="w-full rounded-md p-3 text-gray-600 hover:border-gray-600 @if ($errors->has('link_title')) border-red-600 @else border-gray-300 @endif">
                                                 @if ($errors->has('link_title'))
-                                                    <p class="text-xs font-light text-red-600">Required</p>
+                                                    <p class="text-xs font-light text-red-600">{{$errors->get('link_title')[0]}}</p>
                                                 @endif
                                                 <p class="text-gray-500 text-sm font-light">Enter link title</p>
                                             </div>
@@ -58,7 +58,7 @@
                                                 <input type="text" name="link_url" id="link_url" required
                                                     class="w-full rounded-md p-3 text-gray-600 hover:border-gray-600 @if ($errors->has('link_url')) border-red-600 @else border-gray-300 @endif">
                                                 @if ($errors->has('link_url'))
-                                                    <p class="text-xs font-light text-red-600">Required</p>
+                                                    <p class="text-xs font-light text-red-600">{{$errors->get('link_url')[0]}}</p>
                                                 @endif
                                                 <p class="text-gray-500 text-sm font-light">Enter url</p>
                                             </div>
@@ -90,7 +90,7 @@
                                             <input type="file" name="new_media_file" id="new_media_file"
                                                 class="w-full rounded-md p-3 text-gray-600 hover:border-gray-600 @if ($errors->has('new_media_file')) border-red-600 @else border-gray-300 @endif">
                                             @if ($errors->has('new_media_file'))
-                                                <p class="text-xs font-light text-red-600">Required</p>
+                                                <p class="text-xs font-light text-red-600">{{$errors->get('new_media_file')[0]}}</p>
                                             @endif
                                             <p class="text-gray-500 text-sm font-light">Upload media file</p>
 
@@ -132,7 +132,7 @@
                                             class="text-6xl cursor-pointer rounded-md p-3 text-gray-400 @if ($errors->has('media_file')) border-red-600 @else border-gray-300 @endif"><i
                                                 class="far fa-folder-open"></i></button>
                                         @if ($errors->has('media_file'))
-                                            <p class="text-xs font-light text-red-600">Required</p>
+                                            <p class="text-xs font-light text-red-600">{{$errors->get('media_file')[0]}}</p>
                                         @endif
                                     </div>
                                     <p class="text-gray-500 text-sm font-light">Upload media file</p>
