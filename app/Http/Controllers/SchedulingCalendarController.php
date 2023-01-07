@@ -301,6 +301,8 @@ class SchedulingCalendarController extends Controller
 
                 // dd($students_schedules, $requested_schedule, $affected_students);
 
+                if(count($requested_schedule) <= 0) $requested_schedule = null;
+
 
                 Schedule::withTrashed()->updateOrCreate(
                     ['user_id' => $user_id],

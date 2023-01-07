@@ -2,7 +2,10 @@ const tour = new Shepherd.Tour({
     useModalOverlay: true,
     defaultStepOptions: {
         classes: 'border-2 border-blue-500',
-        scrollTo: true
+        scrollTo: true,
+        modalOverlayOpeningPadding: 10,
+        modalOverlayOpeningRadius: 20,
+        canClickTarget: false,
     }
 });
 
@@ -34,7 +37,7 @@ tour.addSteps([
                 text: 'Next',
                 action: tour.next
             }
-        ]
+        ],
     },
     {
         id: 'courses-link',
@@ -48,7 +51,8 @@ tour.addSteps([
                 text: 'Got it!',
                 action: tour.complete
             }
-        ]
+        ],
+        canClickTarget: false
     }
 ]);
 

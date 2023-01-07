@@ -62,7 +62,7 @@
 
                 {{-- <livewire:scheduling-calendar plan="{{$plan}}" /> --}}
 
-                @if (Spatie\Permission\Models\Role::findByName('teacher')->users->count() > 0)
+                @if (session()->exists('first_teacher'))
                     @livewire('schedule', ['plan' => $plan, 'user_id' => auth()->id(), 'mode' => 'edit'])
                 @endif
 

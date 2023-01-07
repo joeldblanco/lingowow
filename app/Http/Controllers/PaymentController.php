@@ -142,7 +142,7 @@ class PaymentController extends Controller
             $student->assignRole('student');
 
             $product = Course::find($course_id)->products->first();
-            if ($product->course->modality == "synchronous") {
+            if ($product->courses->first()->modality == "synchronous") {
                 $teacher = User::find(session('teacher_id'));
 
                 //CREATING STUDENT'S ENROLMENT (OR UPDATING IT, IN CASE IT ALREADY EXISTS BUT IS SOFTDELETED)//

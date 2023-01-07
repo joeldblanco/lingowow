@@ -158,21 +158,157 @@
                                     ${{ Cart::total() }}
                                 </div>
                             </div>
-                            @if (auth()->user()->street == null ||
-                                auth()->user()->city == null ||
-                                auth()->user()->country == null ||
-                                auth()->user()->zip_code == null)
-                                <div class="bg-red-200 border border-red-400 w-full rounded-md p-5 text-red-500 space-y-4">
+                            @if ($user->street == null || $user->city == null || $user->country == null || $user->zip_code == null)
+                                <div x-data="{ editBillingAddress: false }" x-cloak
+                                    class="bg-red-200 border border-red-400 w-full rounded-md p-5 text-red-500 space-y-4">
                                     <p>
-                                        In order to make the payment, you must complete your profile with your shipping
+                                        In order to make the payment, you must complete your profile with your billing
                                         address.
                                     </p>
                                     <p>
-                                        You can go to your profile by clicking <a
-                                            href="{{ route('profile.show', auth()->id()) }}"
-                                            class="text-blue-600 hover:underline">here</a>, once there click on the "Edit profile" button
+                                        You can go to your profile by clicking
+                                        <span @click="editBillingAddress = true"
+                                            class="text-blue-600 hover:underline cursor-pointer">here</span>, once there
+                                        click on the "Edit profile" button
                                         and complete the address fields.
                                     </p>
+
+
+                                    <x-modal type="info" name="editBillingAddress">
+                                        <x-slot name="title">
+                                            <p class="text-md ">Profile</p>
+                                        </x-slot>
+
+                                        <x-slot name="content">
+
+                                            <div class="bg-white flex space-x-6 mx-4">
+                                                <div class="border border-b rounded-xl divide-y w-1/3">
+                                                    <div class="py-4">
+                                                        <p>Profile Picture</p>
+                                                    </div>
+                                                    <div class="flex flex-col items-center space-y-4 p-4">
+                                                        <div class="w-32 h-32 border-gray-400 bg-white">
+                                                            <img id="profile_pic_preview"
+                                                                src="{{ Storage::url(auth()->user()->profile_photo_path) }}"
+                                                                class="w-full h-full object-cover rounded-full"
+                                                                alt="">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="bg-white rounded-md w-2/3 p-6 my-4 mx-auto border border-b"
+                                                    id="update_profile_form">
+                                                    <div class="divide-y mb-5">
+                                                        <p class="font-bold text-md mb-6 w-full text-left">
+                                                            Account Details
+                                                        </p>
+                                                        <div>
+                                                            <div class="flex pt-6 space-x-4">
+                                                                <div class="space-y-1">
+                                                                    <input type="text"
+                                                                        placeholder="{{ $user->first_name }}"
+                                                                        value="{{ $user->first_name }}"
+                                                                        class="w-full rounded-md p-3 text-gray-400 border-gray-300"
+                                                                        disabled>
+                                                                </div>
+                                                                <div class="space-y-1">
+                                                                    <input type="text"
+                                                                        placeholder="{{ $user->last_name }}"
+                                                                        value="{{ $user->last_name }}"
+                                                                        class="w-full rounded-md p-3 text-gray-400 border-gray-300"
+                                                                        disabled>
+                                                                </div>
+                                                            </div>
+                                                            <div class="flex pt-6 space-x-4">
+                                                                <div class="space-y-1">
+                                                                    <input type="text"
+                                                                        value="{{ $user->username }}" disabled
+                                                                        class="w-full rounded-md p-3 text-gray-400 border-gray-300">
+                                                                </div>
+                                                                <div class="space-y-1">
+                                                                    <input type="text"
+                                                                        placeholder="{{ $user->email }}"
+                                                                        value="{{ $user->email }}" disabled
+                                                                        class="w-full rounded-md p-3 text-gray-400 border-gray-300">
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="divide-y mb-5 mt-16">
+                                                        <p class="font-bold text-md mb-6 w-full text-left">
+                                                            Billing Information
+                                                        </p>
+                                                        <div>
+                                                            <div class="flex pt-6 space-x-4">
+                                                                <div class="space-y-1 w-full">
+                                                                    <input wire:model="street" type="text"
+                                                                        name="street" id="street"
+                                                                        placeholder="Street address" required
+                                                                        value="{{ $user->street }}"
+                                                                        class="w-full rounded-md p-3 text-gray-600 hover:border-gray-600 @if ($user->street == null) border-red-600 @endif @if ($errors->has('street')) border-red-600 @else border-gray-300 @endif ">
+                                                                    @if ($errors->has('street'))
+                                                                        <p class="text-xs font-light text-red-600">
+                                                                            {{ $errors->get('street')[0] }}</p>
+                                                                    @endif
+                                                                </div>
+                                                            </div>
+                                                            <div class="flex pt-6 space-x-4">
+                                                                <div class="space-y-1">
+                                                                    <input wire:model="city" type="text"
+                                                                        name="city" id="city"
+                                                                        placeholder="City" required
+                                                                        value="{{ $user->city }}"
+                                                                        class="w-full rounded-md p-3 text-gray-600 hover:border-gray-600 @if ($user->city == null) border-red-600 @endif @if ($errors->has('city')) border-red-600 @else border-gray-300 @endif ">
+                                                                    @if ($errors->has('city'))
+                                                                        <p class="text-xs font-light text-red-600">
+                                                                            {{ $errors->get('city')[0] }}</p>
+                                                                    @endif
+                                                                </div>
+                                                                <div class="space-y-1">
+                                                                    <input wire:model="country" type="text"
+                                                                        name="country" id="country"
+                                                                        placeholder="Country" required
+                                                                        value="{{ $user->country }}"
+                                                                        class="w-full rounded-md p-3 text-gray-600 hover:border-gray-600 @if ($user->country == null) border-red-600 @endif @if ($errors->has('country')) border-red-600 @else border-gray-300 @endif ">
+                                                                    @if ($errors->has('country'))
+                                                                        <p class="text-xs font-light text-red-600">
+                                                                            {{ $errors->get('country')[0] }}</p>
+                                                                    @endif
+                                                                </div>
+                                                            </div>
+                                                            <div class="flex pt-6 space-x-4 w-1/2">
+                                                                <div class="space-y-1 mr-2">
+                                                                    <input wire:model="zip_code" type="text"
+                                                                        name="zip_code" id="zip_code"
+                                                                        placeholder="ZIP Code" required
+                                                                        value="{{ $user->zip_code }}"
+                                                                        class="w-full rounded-md p-3 text-gray-600 hover:border-gray-600 @if ($user->zip_code == null) border-red-600 @endif @if ($errors->has('zip_code')) border-red-600 @else border-gray-300 @endif ">
+                                                                    @if ($errors->has('zip_code'))
+                                                                        <p class="text-xs font-light text-red-600">
+                                                                            {{ $errors->get('zip_code')[0] }}</p>
+                                                                    @endif
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="w-full flex justify-end">
+                                                        <button @click="editBillingAddress = false"
+                                                            wire:click="saveBillingAddress"
+                                                            class="bg-blue-500 py-1 px-3 rounded-md font-semibold text-white shadow-lg text-lg">
+                                                            Save
+                                                        </button>
+                                                    </div>
+                                                    </form>
+                                                </div>
+
+                                        </x-slot>
+
+                                        <x-slot name="footer" class="justify-center">
+                                        </x-slot>
+                                    </x-modal>
+
+                                </div>
+                                <div wire:loading wire:target="saveBillingAddress">
+                                    @include('components.loading-state')
                                 </div>
                             @else
                                 <a href="{{ route('payments.gateway') }}">

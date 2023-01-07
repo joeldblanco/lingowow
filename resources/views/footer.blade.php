@@ -1,13 +1,7 @@
-<div class="w-full bg-gray-900 mt-auto p-10 text-gray-400 flex justify-between">
-    <div class="flex flex-col w-2/3">
-        <a class="hover:text-lw-yellow inline-block mr-auto" href="https://jobs.lingowow.com/">Work with us</a>
-        <a class="hover:text-lw-yellow inline-block mr-auto" href="https://blog.lingowow.com/">Blog</a>
-        <a class="hover:text-lw-yellow inline-block mr-auto" href="https://www.lingowow.com/about">About</a>
-        <a class="hover:text-lw-yellow inline-block mr-auto" href="https://www.lingowow.com/help">Help</a>
-    </div>
+<div class="w-full bg-gray-900 mt-auto p-16 text-gray-400 flex justify-between">
     <div class="flex flex-col w-1/3 space-y-3 justify-end">
-        <div class="w-1/3 text-gray-400">
-            <svg id="Lingowow-_Present" data-name="Lingowow- Present" xmlns="http://www.w3.org/2000/svg"
+        <div class="w-full text-white">
+            <svg class="w-3/4" id="Lingowow-_Present" data-name="Lingowow- Present" xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 300 63.22" fill="currentColor">
                 <g id="Left">
                     <g id="Lingowow">
@@ -32,16 +26,37 @@
                 </g>
             </svg>
         </div>
-        <div class="flex space-x-2">
-            <a class="inline-block mb-auto" href="https://www.facebook.com/lingowow/"><i
-                    class="fab fa-facebook-square text-2xl"></i></a>
-            <a class="inline-block mb-auto" href="https://www.instagram.com/_lingowow/"><i
-                    class="fab fa-instagram-square text-2xl"></i></a>
-            <a class="inline-block mb-auto" href="https://twitter.com/lingowow"><i
-                    class="fab fa-twitter-square text-2xl"></i></a>
-            <a class="inline-block mb-auto" href="https://www.linkedin.com/company/lingowow/"><i
-                    class="fab fa-linkedin text-2xl"></i></a>
+        <div class="flex flex-col w-2/3">
+            <p class="inline-block mr-auto">©2023 Lingowow</p>
+            <a target="about:blank" class="hover:text-lw-yellow inline-block mr-auto" href="#">Terms of
+                Service</a>
+            <a target="about:blank" class="hover:text-lw-yellow inline-block mr-auto" href="#">Privacy Policy</a>
+        </div>
+        <div class="flex space-x-5 text-2xl pt-2">
+            <a target="about:blank" class="inline-block mb-auto" href="https://www.facebook.com/lingowow/"><i
+                    class="fab fa-facebook-square"></i></a>
+            <a target="about:blank" class="inline-block mb-auto" href="https://www.instagram.com/_lingowow/"><i
+                    class="fab fa-instagram"></i></a>
+            <a target="about:blank" class="inline-block mb-auto" href="https://twitter.com/lingowow"><i
+                    class="fab fa-twitter"></i></a>
+            <a target="about:blank" class="inline-block mb-auto" href="https://www.linkedin.com/company/lingowow/"><i
+                    class="fab fa-linkedin"></i></a>
+            <a target="about:blank" class="inline-block mb-auto" href="https://www.youtube.com/@lingowow"><i
+                    class="fab fa-youtube"></i></a>
         </div>
 
+    </div>
+    <div class="flex flex-col w-2/3 text-center mr-auto">
+        <p class="inline-block text-lg font-bold mb-5 text-white">Company</p>
+        <a target="about:blank" class="hover:text-lw-yellow inline-block" href="https://jobs.lingowow.com/">Careers</a>
+        <a target="about:blank" class="hover:text-lw-yellow inline-block" href="https://blog.lingowow.com/">Blog</a>
+        <a target="about:blank" class="hover:text-lw-yellow inline-block"
+            href="https://www.lingowow.com/about">About</a>
+
+    </div>
+    <div class="flex flex-col w-2/3 text-center mr-auto">
+        <p class="inline-block mr-auto text-lg font-bold mb-5 text-white">Company</p>
+        <a target="about:blank" class="hover:text-lw-yellow inline-block mr-auto">Help center</a>
+        <a target="about:blank" class="hover:text-lw-yellow inline-block mr-auto">Contact us</a>
     </div>
 </div>

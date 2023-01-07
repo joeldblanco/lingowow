@@ -27,6 +27,7 @@
             });
             VisanetCheckout.open();
         }
+        openForm();
     </script>
 
     <div class="w-full flex h-96 justify-center items-center">

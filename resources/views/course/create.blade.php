@@ -37,7 +37,7 @@
                                     @endforeach
                                 </select>
                                 @if ($errors->has('category'))
-                                    <p class="text-xs font-light text-red-600">Required</p>
+                                    <p class="text-xs font-light text-red-600">{{$errors->get('category')[0]}}</p>
                                 @endif
                                 <p class="text-gray-500 text-sm font-light">Please select a category for the course</p>
                             </div>
@@ -54,7 +54,7 @@
                                     @endforeach
                                 </select>
                                 @if ($errors->has('modality'))
-                                    <p class="text-xs font-light text-red-600">Required</p>
+                                    <p class="text-xs font-light text-red-600">{{$errors->get('modality')[0]}}</p>
                                 @endif
                                 <p class="text-gray-500 text-sm font-light">Please select a modality for the course</p>
                             </div>
@@ -64,7 +64,7 @@
                                     required
                                     class="w-full rounded-md p-3 text-gray-600 hover:border-gray-600 @if ($errors->has('name')) border-red-600 @else border-gray-300 @endif ">
                                 @if ($errors->has('name'))
-                                    <p class="text-xs font-light text-red-600">Required</p>
+                                    <p class="text-xs font-light text-red-600">{{$errors->get('name')[0]}}</p>
                                 @endif
                                 <p class="text-gray-500 text-sm font-light">Please enter course name</p>
                             </div>
@@ -73,7 +73,7 @@
                                 <textarea name="description" id="description" placeholder="Enter course description" required rows="4"
                                     class="resize-none w-full rounded-md p-3 text-gray-600 hover:border-gray-600 @if ($errors->has('description')) border-red-600 @else border-gray-300 @endif"></textarea>
                                 @if ($errors->has('description'))
-                                    <p class="text-xs font-light text-red-600">Required</p>
+                                    <p class="text-xs font-light text-red-600">{{$errors->get('description')[0]}}</p>
                                 @endif
                                 <p class="text-gray-500 text-sm font-light">Please enter course description</p>
                             </div>

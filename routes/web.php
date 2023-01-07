@@ -18,6 +18,7 @@ use App\Invoice;
 use App\Http\Controllers\CourseController;
 use App\Http\Controllers\EnrolmentController;
 use App\Http\Controllers\ExamController;
+use App\Http\Controllers\GatherController;
 use App\Http\Controllers\GradingController;
 use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\ModuleController;
@@ -41,6 +42,7 @@ use App\Models\Enrolment;
 use App\Models\Post;
 use App\Models\Unit;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Http;
 
 /*
 |--------------------------------------------------------------------------
@@ -226,15 +228,18 @@ Route::middleware(['web', 'auth', 'verified', 'impersonate'])->group(function ()
                 if ($user->roles[0]->name == 'student') {
                     $user->studentClasses->each(function ($class) {
                         // $deleted_class = $class->delete();
+                        (new MeetingController)->destroy($class->meeting);
                         $class->delete();
                     });
 
                     if ($user->enrolments->count()) {
                         // $user->schedules->where('enrolment_id', $user->enrolments->first()->id)->first()->delete();
-                        $user->schedules->first()->next_schedule = null;
-                        $user->schedules->first()->save();
-                        $user->schedules->first()->delete();
                         $user->enrolments->first()->delete();
+                        if ($user->schedules->first() != null) {
+                            $user->schedules->first()->next_schedule = null;
+                            $user->schedules->first()->save();
+                            $user->schedules->first()->delete();
+                        }
                     }
 
                     $user->removeRole('student');
@@ -244,6 +249,9 @@ Route::middleware(['web', 'auth', 'verified', 'impersonate'])->group(function ()
             return redirect()->route('users', 4);
         });
     });
+
+    Route::get('gather/get_guests_list', [GatherController::class, 'getGuestsList']);
+    Route::get('gather/set_guests_list', [GatherController::class, 'setGuestsList']);
 
     Route::get('activities', [ActivityController::class, 'index'])->name('activities.index');
     Route::get('activities/{id}', [ActivityController::class, 'show'])->name('admin.activities.show');

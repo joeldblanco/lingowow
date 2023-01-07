@@ -44,7 +44,7 @@
                                 @foreach ($classes as $key => $value)
                                     {{-- @if (App\Http\Controllers\ApportionmentController::getPeriod($value->start_date) == $month_year) --}}
                                     <tr
-                                        class="flex justify-around @if (!$value->student_check || !$value->teacher_check) bg-yellow-100 @endif">
+                                        class="flex justify-around @if ((auth()->user()->getRoleNames()[0] == "teacher" && !$value->teacher_check) || (auth()->user()->getRoleNames()[0] == "student" && !$value->student_check)) bg-yellow-100 @endif">
                                         @hasanyrole('student|admin')
                                             <td class="flex w-full justify-center">
                                                 <a href="{{ route('profile.show', $value->teacher()->id) }}"
@@ -77,7 +77,7 @@
                                         @endif
                                         @hasanyrole('teacher|admin')
                                             <td class="flex w-full justify-center">
-                                                <button wire:click="loadComment({{ $value->id }})"
+                                                <button type="button" wire:click="loadComment({{ $value->id }})"
                                                     @click="showCommentsModal = true">
                                                     <i class="fas fa-edit text-gray-600"></i>
                                                 </button>

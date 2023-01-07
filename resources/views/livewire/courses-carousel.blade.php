@@ -33,12 +33,11 @@
         .content-div:hover .fd-sh {
             opacity: 1;
         }
-
     </style>
     <h3 class="text-4xl font-bold my-10 text-gray-800">Courses</h3>
-    <div class="gallery js-flickity" data-flickity-options='{ "wrapAround": true }' wire:ignore>
+    <div class="gallery js-flickity courses-carousel" data-flickity-options='{ "wrapAround": true }' wire:ignore>
         @foreach ($courses as $course)
-            <div class="gallery-cell">
+            <div class="gallery-cell" @if($loop->first) id="course-card" @endif>
                 {{-- <div class="relative bg-white rounded-3xl w-64 my-4 shadow-xl mt-7 mb-2 mx-10 flex flex-col">
                     <div class="bg-green-600 w-full p-4 rounded-t-lg text-white">
                         <p class="text-xl font-semibold my-2">{{ $course->name }}</p>
@@ -73,12 +72,10 @@
                 </div> --}}
 
                 <div class="relative bg-white rounded-3xl w-96 my-4 shadow-xl mt-7 mb-2 mx-5 flex flex-col">
-                    <div
-                        class="shadow-lg group container rounded-md bg-white max-w-sm flex justify-center items-center mx-auto content-div"
-                        style="background-image: url('{{Storage::url($course->image_url)}}');"
-                        onMouseOver="this.style.backgroundImage='linear-gradient(to right, rgba(126, 213, 111, 0.801), hsla(160, 64%, 43%, 0.801)), url({{Storage::url($course->image_url)}})'"
-                        onMouseOut="this.style.backgroundImage='url({{Storage::url($course->image_url)}})'"
-                        >
+                    <div class="container shadow-lg group container rounded-md bg-white max-w-sm flex justify-center items-center mx-auto content-div"
+                        style="background-image: url('{{ Storage::url($course->image_url) }}');"
+                        onMouseOver="this.style.backgroundImage='linear-gradient(to right, rgba(126, 213, 111, 0.801), hsla(160, 64%, 43%, 0.801)), url({{ Storage::url($course->image_url) }})'"
+                        onMouseOut="this.style.backgroundImage='url({{ Storage::url($course->image_url) }})'">
                         <div>
                             <div class="w-full image-cover rounded-t-md blur-xl">
                                 {{-- <div
@@ -100,7 +97,7 @@
                                 class="text-3xl font-bold text-white tracking-wider leading-relaxed font-sans">{{ $course->name }}</span>
                             <div class="pt-8 text-center">
                                 <button onclick="selectProduct({{ $course->id }})"
-                                    class="text-center rounded-lg p-4 bg-white  text-gray-700 font-bold text-lg">Show</button>
+                                    class="text-center rounded-lg p-4 bg-white  text-gray-700 font-bold text-lg">Select</button>
                             </div>
                         </div>
                     </div>
@@ -122,4 +119,8 @@
             window.location = '#plans';
         }
     </script>
+
+    @role('guest')
+        <x-shepherd-tour tourName="guests/courses-carousel" role="guest" />
+    @endrole
 </div>

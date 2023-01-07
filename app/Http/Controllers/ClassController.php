@@ -21,6 +21,7 @@ class ClassController extends Controller
      */
     public function index(Request $request)
     {
+        if(auth()->user()->getRoleNames()[0] == "guest") abort(403, 'USER DOES NOT HAVE THE RIGHT PERMISSIONS.');
         $start_date = $request->start_date;
         $end_date = $request->end_date;
 
@@ -29,15 +30,12 @@ class ClassController extends Controller
         if (auth()->user()->roles[0]->name == "teacher") {
             $classes = User::find(auth()->id())->teacherClasses->where('start_date', '>=', $start_date)->where('end_date', '<=', $end_date)->sortBy('start_date');
             $classes = Classes::whereIn('id', $classes->pluck('id'))->paginate(10);
-
         } else if (auth()->user()->roles[0]->name == "student") {
             $classes = User::find(auth()->id())->studentClasses->where('start_date', '>=', $start_date)->where('end_date', '<=', $end_date)->sortBy('start_date');
             $classes = Classes::whereIn('id', $classes->pluck('id'))->paginate(10);
-
         } else if (auth()->user()->roles[0]->name == "admin") {
             $classes = Classes::where('start_date', '>=', $start_date)->where('end_date', '<=', $end_date)->orderBy('start_date');
             $classes = Classes::whereIn('id', $classes->pluck('id'))->paginate(10);
-            
         }
         $classes->appends(['start_date' => $start_date, 'end_date' => $end_date]);
 

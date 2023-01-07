@@ -35,4 +35,12 @@ class Meeting extends Model
         $zoom_id = explode('/',$this->join_url);
         return end($zoom_id);
     }
+
+    /**
+     * Get the phone associated with the user.
+     */
+    public function class()
+    {
+        return $this->hasOne(Classes::class);
+    }
 }

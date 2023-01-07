@@ -74,7 +74,7 @@ class ProfileController extends Controller
             'new_profile_pic' => 'file|mimes:jpg,png,webp|max:10000',
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255',
+            'email' => 'required|string|email|max:255|unique:App\Models\User,email',
             'street' => 'required|string|max:100',
             'city' => 'required|string|max:50',
             'zip_code' => 'required|string|max:10',

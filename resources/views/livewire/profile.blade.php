@@ -474,7 +474,7 @@
                                             placeholder="First name" required value="{{ $user->first_name }}"
                                             class="w-full rounded-md p-3 text-gray-600 hover:border-gray-600 @if ($errors->has('first_name')) border-red-600 @else border-gray-300 @endif ">
                                         @if ($errors->has('first_name'))
-                                            <p class="text-xs font-light text-red-600">Required</p>
+                                            <p class="text-xs font-light text-red-600">{{$errors->get('first_name')[0]}}</p>
                                         @endif
                                     </div>
                                     <div class="space-y-1">
@@ -482,7 +482,7 @@
                                             placeholder="Last name" required value="{{ $user->last_name }}"
                                             class="w-full rounded-md p-3 text-gray-600 hover:border-gray-600 @if ($errors->has('last_name')) border-red-600 @else border-gray-300 @endif ">
                                         @if ($errors->has('last_name'))
-                                            <p class="text-xs font-light text-red-600">Required</p>
+                                            <p class="text-xs font-light text-red-600">{{$errors->get('last_name')[0]}}</p>
                                         @endif
                                     </div>
                                 </div>
@@ -496,7 +496,7 @@
                                             required value="{{ $user->email }}"
                                             class="w-full rounded-md p-3 text-gray-600 hover:border-gray-600 @if ($errors->has('email')) border-red-600 @else border-gray-300 @endif ">
                                         @if ($errors->has('email'))
-                                            <p class="text-xs font-light text-red-600">Required</p>
+                                            <p class="text-xs font-light text-red-600">{{$errors->get('email')[0]}}</p>
                                         @endif
                                     </div>
                                 </div>
@@ -513,7 +513,7 @@
                                             placeholder="Street address" required value="{{ $user->street }}"
                                             class="w-full rounded-md p-3 text-gray-600 hover:border-gray-600 @if ($errors->has('street')) border-red-600 @else border-gray-300 @endif ">
                                         @if ($errors->has('street'))
-                                            <p class="text-xs font-light text-red-600">Required</p>
+                                            <p class="text-xs font-light text-red-600">{{$errors->get('street')[0]}}</p>
                                         @endif
                                     </div>
                                 </div>
@@ -523,7 +523,7 @@
                                             required value="{{ $user->city }}"
                                             class="w-full rounded-md p-3 text-gray-600 hover:border-gray-600 @if ($errors->has('city')) border-red-600 @else border-gray-300 @endif ">
                                         @if ($errors->has('city'))
-                                            <p class="text-xs font-light text-red-600">Required</p>
+                                            <p class="text-xs font-light text-red-600">{{$errors->get('city')[0]}}</p>
                                         @endif
                                     </div>
                                     <div class="space-y-1">
@@ -531,7 +531,7 @@
                                             required value="{{ $user->country }}"
                                             class="w-full rounded-md p-3 text-gray-600 hover:border-gray-600 @if ($errors->has('country')) border-red-600 @else border-gray-300 @endif ">
                                         @if ($errors->has('country'))
-                                            <p class="text-xs font-light text-red-600">Required</p>
+                                            <p class="text-xs font-light text-red-600">{{$errors->get('country')[0]}}</p>
                                         @endif
                                     </div>
                                 </div>
@@ -541,7 +541,7 @@
                                             required value="{{ $user->zip_code }}"
                                             class="w-full rounded-md p-3 text-gray-600 hover:border-gray-600 @if ($errors->has('zip_code')) border-red-600 @else border-gray-300 @endif ">
                                         @if ($errors->has('zip_code'))
-                                            <p class="text-xs font-light text-red-600">Required</p>
+                                            <p class="text-xs font-light text-red-600">{{$errors->get('zip_code')[0]}}</p>
                                         @endif
                                     </div>
                                 </div>
@@ -619,7 +619,7 @@
                                             placeholder="First name" required value="{{ $user->first_name }}"
                                             class="w-full rounded-md p-3 text-gray-600 hover:border-gray-600 @if ($errors->has('first_name')) border-red-600 @else border-gray-300 @endif ">
                                         @if ($errors->has('first_name'))
-                                            <p class="text-xs font-light text-red-600">Required</p>
+                                            <p class="text-xs font-light text-red-600">{{$errors->get('first_name')[0]}}</p>
                                         @endif
                                     </div>
                                     <div class="space-y-1">
@@ -627,7 +627,7 @@
                                             placeholder="Last name" required value="{{ $user->last_name }}"
                                             class="w-full rounded-md p-3 text-gray-600 hover:border-gray-600 @if ($errors->has('last_name')) border-red-600 @else border-gray-300 @endif ">
                                         @if ($errors->has('last_name'))
-                                            <p class="text-xs font-light text-red-600">Required</p>
+                                            <p class="text-xs font-light text-red-600">{{$errors->get('last_name')[0]}}</p>
                                         @endif
                                     </div>
                                 </div>
@@ -641,7 +641,7 @@
                                             required value="{{ $user->email }}"
                                             class="w-full rounded-md p-3 text-gray-600 hover:border-gray-600 @if ($errors->has('email')) border-red-600 @else border-gray-300 @endif ">
                                         @if ($errors->has('email'))
-                                            <p class="text-xs font-light text-red-600">Required</p>
+                                            <p class="text-xs font-light text-red-600">{{$errors->get('email')[0]}}</p>
                                         @endif
                                     </div>
                                 </div>
