@@ -284,7 +284,7 @@ repetirCadaMinuto();
 
 function repetirCadaMinuto() {
     // Livewire.emitTo('schedule', 'findReserves');
-    identificadorIntervaloDeTiempo = setInterval(mandarMensaje, 20000);
+    identificadorIntervaloDeTiempo = setInterval(mandarMensaje, 15000);
 }
 
 function mandarMensaje() {
