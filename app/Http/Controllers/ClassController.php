@@ -210,9 +210,9 @@ class ClassController extends Controller
             $data = array_filter($request->data);
             $data = array_merge(...array_values($data));
 
-            $newDateStart = Carbon::create("2022", $data[3], $data[4], $data[0]);
+            $newDateStart = Carbon::create((new Carbon())->year, $data[3], $data[4], $data[0]);
             $newDateStart = $newDateStart->toDateTimeString();
-            $newDateEnd = Carbon::create("2022", $data[3], $data[4], $data[0])->addMinutes(40);
+            $newDateEnd = Carbon::create((new Carbon())->year, $data[3], $data[4], $data[0])->addMinutes(40);
             $newDateEnd = $newDateEnd->toDateTimeString();
 
             $class = Classes::find($id);
@@ -222,12 +222,22 @@ class ClassController extends Controller
             $class->status = 1;
             $class->save();
 
-
-            Comment::create([
-                'class_id' => $id,
-                'comment' => $message,
-                'author' => $admin
-            ]);
+                                                        ////IMPORTANTE!!!! PREGUNTAR COMO SE MANEJA EL MODELO COMMENTS
+            // $type = "App\Models\Classes";
+            // Comment::create([
+            //     // 'class_id' => $id,
+            //     'author_id' => auth()->id(),
+            //     'content' => $message,
+            //     'commentable_id' => $id,
+            //     'commentable_type' => $type,
+            // ]);
+            $comment = new Comment();
+                $comment->author_id = auth()->user()->id;
+                $comment->content = $message;
+                $comment->commentable_id = $id;
+                $comment->commentable_type = 'App\Models\Classes';
+            $comment->save();
+            
         } else {
             switch ($request->error) {
                 case "not_enough_days":
@@ -265,7 +275,7 @@ class ClassController extends Controller
     {
         // $meeting = Meeting::where('atendee_id',$class->student()->id)->where('host_id',$class->teacher()->id)->first();
         $recordings = (new MeetingController)->getRecordings($class);
-        dump($recordings);
+        // dump($recordings);
         // if(isset($recordings["code"]) && ($recordings["code"] == 3301 || $recordings["code"] === 1001 || $recordings["code"] === 1010))
         // {
         //     return $recordings["message"];

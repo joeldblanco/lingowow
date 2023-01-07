@@ -57,12 +57,24 @@
     <div style="height: 100%" class="bg-white font-sans">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden">
-                
-                <livewire:teachers-carousel />
-                
-                {{-- <livewire:scheduling-calendar plan="{{$plan}}" /> --}}
 
-                @livewire('schedule', ['plan' => $plan, 'user_id' => auth()->id(), 'mode' => 'edit'])
+                @if ($plan != 1)
+                    <livewire:teachers-carousel />
+                @endif
+                @php
+                    $course_id = session('selected_course');
+                    if($course_id != null){
+                        $modality_course = App\Models\Course::find($course_id)->modality;
+                    }
+                @endphp
+
+                @if ($modality_course == "exam")
+                    @livewire('schedule', ['plan' => $plan, 'user_id' => auth()->id(), 'mode' => 'one'])
+                @else
+                    @livewire('schedule', ['plan' => $plan, 'user_id' => auth()->id(), 'mode' => 'edit'])    
+                @endif
+                {{-- <livewire:scheduling-calendar plan="{{$plan}}" /> --}}
+                
 
             </div>
         </div>
