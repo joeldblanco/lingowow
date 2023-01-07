@@ -79,6 +79,7 @@
                                                 @else
                                                     {{-- @php dd(isFree($abcense_classes,"20-4",$days_rest)); @endphp --}}
 
+                                                    {{-- {{dd($days_rest)}} --}}
                                                     @if ($this->notFree($abcense_classes, $i . '-' . $e, $days_rest))
                                                         <td id="{{ $i }}-{{ $e }}"
                                                             class="border width occupied">
