@@ -84,7 +84,7 @@ class Schedule extends Component
         }
         // dd($this->course);
         $this->hoy = (new Carbon())->toCookieString();
-        $this->user = User::find($user_id);
+        $this->user = User::withTrashed()->find($user_id);
         $this->role = $this->user->roles->first()->name;
         $this->plan = $plan;
 
@@ -99,34 +99,41 @@ class Schedule extends Component
                 if ($this->course->modality == "asynchronous") {
                     $this->mode = "asynchronous";
                 } else {
-                    $this->schedules = User::find($this->user->id)->schedules;
+                    $this->schedules = $this->user->schedules;
 
                     if ($this->user->enrolments->count() > 0) {
+                        $enrolment = Enrolment::where("student_id", $this->user->id)->first();
 
-                        $this->teacher_id = Enrolment::select("teacher_id")
-                            ->where("student_id", $this->user->id)->first();
+                        if ($enrolment->course->modality == "synchronous") {
 
-                        $this->teacher_id = $this->teacher_id->teacher_id;
-                        // dd($this->user->enrolments);
-                        $this->teacher_schedule = User::find($this->teacher_id)->schedules;
+                            $this->teacher_id = Enrolment::select("teacher_id")
+                                ->where("student_id", $this->user->id)->first();
 
-                        foreach ($this->teacher_schedule as $key => $value) {
-                            $this->teacher_schedule[$key] = $value->selected_schedule;
+                            $this->teacher_id = $this->teacher_id->teacher_id;
+
+                            $this->teacher_schedule = User::withTrashed()->find($this->teacher_id)->schedules;
+
+                            foreach ($this->teacher_schedule as $key => $value) {
+                                $this->teacher_schedule[$key] = $value->selected_schedule;
+                            }
+
+                            if (!$this->teacher_schedule->first()) $this->teacher_schedule = [];
+
+                            if (count($this->teacher_schedule) > 0) $this->teacher_schedule = json_decode(json_encode($this->teacher_schedule[0]), 1);
+
+                            $this->loadStudentSchedule($this->user->id);
                         }
-
-                        if (!$this->teacher_schedule->first()) $this->teacher_schedule = [];
-
-                        if (count($this->teacher_schedule) > 0) $this->teacher_schedule = json_decode(json_encode($this->teacher_schedule[0]), 1);
-
-                        $this->loadStudentSchedule($this->user->id);
                     }
                 }
             }
         } else if ($this->role == "teacher") {
 
-            $this->schedules = User::find($this->user->id)->schedules;
+            $this->schedules = User::withTrashed()->find($this->user->id)->schedules;
 
-            $this->loadTeacherSchedule($this->user->id);
+            if(count($this->schedules) > 0){
+                $this->loadTeacherSchedule($this->user->id);
+            }
+            
         } else if ($this->role == "admin") {
 
             // $this->loadAdminSchedule($this->user->id);
@@ -355,8 +362,8 @@ class Schedule extends Component
         $user = User::find($user_id);
         $enrolment = $user->enrolments->where('course_id', $this->course->id)->first();
 
-        if (!is_null($enrolment)) {
-            // dd($user->schedules);
+        if (!is_null($enrolment) && ($user->schedules->where('enrolment_id', $enrolment->id)->first() != null)) {
+
             $this->user_schedules = $user->schedules->where('enrolment_id', $enrolment->id)->first()->selected_schedule;
             $this->user_schedules = null ? [] : array_filter($this->user_schedules);
 
@@ -446,7 +453,9 @@ class Schedule extends Component
         $this->students = User::select('id', 'first_name', 'last_name')->find($this->students);
 
         foreach ($this->students as $student) {
-            $this->students_schedules[] = $student->schedules->first()->selected_schedule;
+            if ($student->schedules->first() != null) {
+                $this->students_schedules[] = $student->schedules->first()->selected_schedule;
+            }
         }
         $this->students_schedules = array_filter($this->students_schedules);
         $this->students_schedules = array_merge(...$this->students_schedules);

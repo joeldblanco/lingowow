@@ -18,6 +18,7 @@ class EnrolmentController extends Controller
     public function index()
     {
         $enrolments = Enrolment::paginate(50);
+        
         return view('enrolments.index', compact('enrolments'));
     }
 

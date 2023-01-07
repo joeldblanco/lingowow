@@ -18,7 +18,7 @@
                                     value="{{ $meeting->topic }}" disabled
                                     class="w-full rounded-md p-3 text-gray-400 @if ($errors->has('topic')) border-red-600 @else border-gray-300 @endif ">
                                 @if ($errors->has('topic'))
-                                    <p class="text-xs font-light text-red-600">Required</p>
+                                    <p class="text-xs font-light text-red-600">{{$errors->get('topic')[0]}}</p>
                                 @endif
                                 {{-- <p class="text-gray-500 text-sm font-light">Please enter meeting topic</p> --}}
                             </div>
@@ -39,7 +39,7 @@
                                     @endforeach
                                 </select>
                                 @if ($errors->has('host_id'))
-                                    <p class="text-xs font-light text-red-600">Required</p>
+                                    <p class="text-xs font-light text-red-600">{{$errors->get('host_id')[0]}}</p>
                                 @endif
                                 <p class="text-gray-500 text-sm font-light">Please select a host for the meeting</p>
                             </div>
@@ -52,7 +52,7 @@
                                     </option>
                                 </select>
                                 @if ($errors->has('atendee_id'))
-                                    <p class="text-xs font-light text-red-600">Required</p>
+                                    <p class="text-xs font-light text-red-600">{{$errors->get('atendee_id')[0]}}</p>
                                 @endif
                                 {{-- <p class="text-gray-500 text-sm font-light">Please select a atendee for the meeting</p> --}}
                             </div>

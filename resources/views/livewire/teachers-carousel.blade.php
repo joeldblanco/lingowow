@@ -51,9 +51,10 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden">
                 <div class="mt-10 mb-20">
-                    <h3 class="text-4xl font-bold text-gray-800">There are no available teachers in the selected
-                        schedule.</h3>
-                    <h4 class="text-2xl font-bold text-gray-400">Please, go back and select a different schedule.</h4>
+                    {{-- <h3 class="text-4xl font-bold text-gray-800">There are no available teachers in the selected
+                        schedule.</h3> --}}
+                    <h3 class="text-4xl font-bold text-gray-800">There are no available teachers.</h3>
+                    {{-- <h4 class="text-2xl font-bold text-gray-400">Please, go back and select a different schedule.</h4> --}}
                     <a href="{{ url()->previous() }}"
                         class="inline-block bg-blue-800 text-white px-6 py-2 rounded hover:bg-blue-900 hover:text-white mt-5">Go
                         Back</a>

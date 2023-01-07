@@ -24,7 +24,7 @@
                                     required
                                     class="w-full rounded-md p-3 text-gray-600 hover:border-gray-600 @if ($errors->has('topic')) border-red-600 @else border-gray-300 @endif ">
                                 @if ($errors->has('topic'))
-                                    <p class="text-xs font-light text-red-600">Required</p>
+                                    <p class="text-xs font-light text-red-600">{{$errors->get('topic')[0]}}</p>
                                 @endif
                                 <p class="text-gray-500 text-sm font-light">Please enter meeting topic</p>
                             </div>
@@ -40,7 +40,7 @@
                                     @endforeach
                                 </select>
                                 @if ($errors->has('host_id'))
-                                    <p class="text-xs font-light text-red-600">Required</p>
+                                    <p class="text-xs font-light text-red-600">{{$errors->get('host_id')[0]}}</p>
                                 @endif
                                 <p class="text-gray-500 text-sm font-light">Please select a host for the meeting</p>
                             </div>
@@ -56,7 +56,7 @@
                                     @endforeach
                                 </select>
                                 @if ($errors->has('atendee_id'))
-                                    <p class="text-xs font-light text-red-600">Required</p>
+                                    <p class="text-xs font-light text-red-600">{{$errors->get('atendee_id')[0]}}</p>
                                 @endif
                                 <p class="text-gray-500 text-sm font-light">Please select an atendee for the meeting</p>
                             </div>
@@ -65,7 +65,7 @@
                                 <input type="datetime-local" name="date" id="date" placeholder="Enter meeting date" step="3600" min="{{$now}}" value="0000-00-00T00:00" required
                                     class="w-full rounded-md p-3 text-gray-600 hover:border-gray-600 @if ($errors->has('date')) border-red-600 @else border-gray-300 @endif ">
                                 @if ($errors->has('atendee_id'))
-                                    <p class="text-xs font-light text-red-600">Required</p>
+                                    <p class="text-xs font-light text-red-600">{{$errors->get('atendee_id')[0]}}</p>
                                 @endif
                                 <p class="text-gray-500 text-sm font-light">Please select a meeting date and time <a>(UTC)</a></p>
                             </div>
