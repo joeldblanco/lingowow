@@ -264,33 +264,4 @@
             </div>
         </div>
     </div>
-<<<<<<< HEAD
-    <script src="{{ asset('js/jquery.datetimepicker.full.min.js') }}"></script>
-    
-    {{-- <script type="text/javascript">
-
-        var checkboxes = [];
-        
-        $("input[type='checkbox']").click(function(e) {
-            if (e.shiftKey) {
-                checkboxes.push(this);
-
-                if(checkboxes.length > 0){
-
-                    if(checkboxes[0].name == this.name){
-                        checkboxes.forEach(element => {
-                            $(element).prop('checked', checkboxes[0].checked);
-                        });
-                        console.log(1);
-                    }
-                }
-
-            } else{
-                checkboxes = [];
-            }
-        });
-        
-    </script> --}}
-=======
->>>>>>> 5493f088bdacebeec346a6be7384a2f892079fa9
 </div>

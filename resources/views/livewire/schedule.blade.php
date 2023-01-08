@@ -229,21 +229,6 @@
                             <!-- FIN DEL HORARIO DE JUAN -->
 
 
-                        <button onclick="toggleCellBlock()" @click="edit = false, editBtn = true"
-                            class="bg-red-500 rounded-lg text-white font-bold px-6 py-1 shadow-md h-1/6 width"
-                            wire:click="refresh"><i class="fas fa-times"></i></button>
-                        <button @click="showModal1 = true"
-                            class="bg-green-500 rounded-lg text-white font-bold px-6 py-1 shadow-md h-5/6 width"
-                            wire:click="edit()">Save</button>
-                    </div>
-                    <!-- FIN DEL HORARIO DE JUAN -->
-                    <div class="flex items-center flex-col">
-                        <button onclick="toggleCellBlock()" @click=" edit = true, editBtn = false " wire:click="edit()"
-                            class="teachers-edit-schedule-button inline-block bg-green-800 text-white px-4 py-2 my-5 rounded hover:bg-green-900 hover:text-white hover:no-underline"
-                            x-show="editBtn" x-transition>Update Schedule
-                        </button>
-                    </div>
-                @endif
 
 
                             <!-- <div class="mt-10 grid grid-rows-2 grid-flow-col gap-4 justify-center ...">
