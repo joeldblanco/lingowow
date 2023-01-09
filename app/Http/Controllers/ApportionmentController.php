@@ -32,15 +32,27 @@ class ApportionmentController extends Controller
         $today = Carbon::now()->setTimezone('UTC');
         $today->addDays(1);
 
-        $current_period_start = new Carbon('first monday of this month');
-        $current_period_end = (new Carbon('first monday of this month'))->addDays(6);
-        $current_period_end->addWeeks(3);
+        $current_period = ApportionmentController::currentPeriod();
+        $next_period = ApportionmentController::nextPeriod();
 
-        $next_period_start = new Carbon('first monday of next month');
-        $next_period_end = (new Carbon('first monday of next month'))->addDays(6);
-        $next_period_end->addDays(1);
-        $next_period_end->addWeeks(3);
+        // dd($current_period,$next_period);
+        $current_period_start = new Carbon($current_period[0]);
+        $current_period_end = new Carbon($current_period[1]);
+
+        $next_period_start = new Carbon($next_period[0]);
+        $next_period_end = new Carbon($next_period[1]);
+
+
+        // $current_period_start = new Carbon('second monday of this month');
+        // $current_period_end = (new Carbon('second monday of this month'))->addDays(6);
+        // $current_period_end->addWeeks(3);
+
+        // $next_period_start = new Carbon('second monday of next month');
+        // $next_period_end = (new Carbon('second monday of next month'))->addDays(6);
+        // $next_period_end->addDays(1);
+        // $next_period_end->addWeeks(3);
         // dd($next_period_end);
+        
 
         foreach ($schedule as $key => $value) {
             $schedule[$key][0] = (int)$value[0];
@@ -91,7 +103,7 @@ class ApportionmentController extends Controller
 
         //CONSULTA DE CLASES REAGENDADAS EN EL PERIODO ACTUAL PARA RESTAR AL COBRO
 
-        $current_period = ApportionmentController::currentPeriod();
+        
         $period_start_c = new Carbon($current_period[0]);
         $period_end_c = new Carbon($current_period[1]);
 
@@ -152,19 +164,19 @@ class ApportionmentController extends Controller
         $end_period = new Carbon($current_period[1]);
 
         if($start_period->month == $end_period->month){
-            $current_period_start = new Carbon('first monday of next month');
-            $current_period_end = (new Carbon('first monday of next month'))->addDays(5);
-            $current_period_end->addWeeks(3);
-            $current_period_end->addDays(1);
+            $next_period_start = new Carbon('first monday of next month');
+            $next_period_end = (new Carbon('first monday of next month'))->addDays(5);
+            $next_period_end->addWeeks(3);
+            $next_period_end->addDays(1);
         }else{
-            $current_period_start = new Carbon('first monday of this month');
-            $current_period_end = (new Carbon('first monday of this month'))->addDays(5);
-            $current_period_end->addWeeks(3);
-            $current_period_end->addDays(1);
+            $next_period_start = $end_period->copy()->firstOfMonth(Carbon::MONDAY);
+            $next_period_end = $end_period->copy()->firstOfMonth(Carbon::MONDAY)->addDays(5);
+            $next_period_end->addWeeks(3);
+            $next_period_end->addDays(1);
         }
-
-        if ($onlyDate) return [$current_period_start->toDateString(), $current_period_end->toDateString()];
-        return [$current_period_start->toDateTimeString(), $current_period_end->toDateTimeString()];
+        // dd($next_period_start,$next_period_end, $start_period, $end_period);
+        if ($onlyDate) return [$next_period_start->toDateString(), $next_period_end->toDateString()];
+        return [$next_period_start->toDateTimeString(), $next_period_end->toDateTimeString()];
 
     }
 
