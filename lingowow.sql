@@ -152,7 +152,7 @@ insert  into `enrolments`(`id`,`student_id`,`teacher_id`,`course_id`,`created_at
 (9,5,7,2,'2022-01-06 15:49:29','2022-01-06 15:49:29','2022-01-21 18:37:58'),
 (10,5,7,3,'2022-01-07 18:49:46','2022-01-07 18:49:46','2022-01-21 18:38:08'),
 (11,9,7,1,'2022-06-24 03:26:33','2022-12-21 03:16:00','2022-12-21 03:16:00'),
-(12,183,7,1,'2022-07-29 06:20:02','2023-01-07 20:12:57','2023-01-07 20:12:57'),
+(12,183,7,1,'2022-07-29 06:20:02','2023-01-08 03:32:48','2023-01-08 03:32:48'),
 (13,NULL,7,3,'2022-11-15 03:29:34','2022-11-15 03:36:59','2023-01-04 21:02:15'),
 (17,NULL,7,2,'2022-11-15 03:37:19','2022-11-22 03:45:26','2023-01-03 16:46:18'),
 (18,NULL,7,6,'2022-11-15 20:58:44','2022-11-15 20:58:58','2023-01-04 21:03:57'),
@@ -737,7 +737,9 @@ insert  into `invoices`(`id`,`user_id`,`title`,`price`,`paid`,`created_at`,`upda
 (331,183,'Invoice #331',134.91,1,'2023-01-07 20:02:38','2023-01-07 20:02:38'),
 (332,5,'Invoice #332',89.94,1,'2023-01-07 20:23:53','2023-01-07 20:23:53'),
 (333,5,'Invoice #333',134.91,1,'2023-01-07 23:21:15','2023-01-07 23:21:15'),
-(334,5,'Invoice #334',179.88,1,'2023-01-07 23:23:55','2023-01-07 23:23:55');
+(336,5,'Invoice #334',179.88,1,'2023-01-07 23:23:55','2023-01-07 23:23:55'),
+(337,183,'Invoice #337',119.92,1,'2023-01-08 03:19:32','2023-01-08 03:19:32'),
+(338,183,'Invoice #338',119.92,1,'2023-01-08 03:20:51','2023-01-08 03:20:51');
 
 /*Data for the table `ipn_status` */
 
@@ -1101,7 +1103,9 @@ insert  into `items`(`id`,`invoice_id`,`item_name`,`item_price`,`item_qty`,`crea
 (355,331,'English Regular Program',14.99,9,'2023-01-07 20:02:38','2023-01-07 20:02:38'),
 (356,332,'English Regular Program',14.99,6,'2023-01-07 20:23:53','2023-01-07 20:23:53'),
 (357,333,'English Regular Program',14.99,9,'2023-01-07 23:21:15','2023-01-07 23:21:15'),
-(358,334,'English Regular Program',14.99,12,'2023-01-07 23:23:56','2023-01-07 23:23:56');
+(358,336,'English Regular Program',14.99,12,'2023-01-07 23:23:56','2023-01-07 23:23:56'),
+(359,337,'English Regular Program',14.99,8,'2023-01-08 03:19:33','2023-01-08 03:19:33'),
+(360,338,'English Regular Program',14.99,8,'2023-01-08 03:20:51','2023-01-08 03:20:51');
 
 /*Data for the table `jobs` */
 
@@ -1157,7 +1161,15 @@ insert  into `meetings`(`id`,`topic`,`host_id`,`atendee_id`,`start_date`,`join_u
 (159,'Joel Blanco - Lesson Room',7,5,'2023-01-27T06:00:00Z','https://us02web.zoom.us/j/84357542613','2023-01-07 23:24:06','2023-01-07 23:24:33','2023-01-07 23:24:33'),
 (160,'Joel Blanco - Lesson Room',7,5,'2023-01-14T06:00:00Z','https://us02web.zoom.us/j/82399618085','2023-01-07 23:24:07','2023-01-07 23:24:33','2023-01-07 23:24:33'),
 (161,'Joel Blanco - Lesson Room',7,5,'2023-01-21T06:00:00Z','https://us02web.zoom.us/j/89985648159','2023-01-07 23:24:08','2023-01-07 23:24:34','2023-01-07 23:24:34'),
-(162,'Joel Blanco - Lesson Room',7,5,'2023-01-28T06:00:00Z','https://us02web.zoom.us/j/84350340652','2023-01-07 23:24:09','2023-01-07 23:24:34','2023-01-07 23:24:34');
+(162,'Joel Blanco - Lesson Room',7,5,'2023-01-28T06:00:00Z','https://us02web.zoom.us/j/84350340652','2023-01-07 23:24:09','2023-01-07 23:24:34','2023-01-07 23:24:34'),
+(163,'Guest User - Lesson Room',7,183,'2023-01-15T07:00:00Z','https://us02web.zoom.us/j/84901422743','2023-01-08 03:20:00','2023-01-08 03:27:48',NULL),
+(164,'Guest User - Lesson Room',7,183,'2023-01-22T07:00:00Z','https://us02web.zoom.us/j/84330444912','2023-01-08 03:20:03','2023-01-08 03:27:50',NULL),
+(165,'Guest User - Lesson Room',7,183,'2023-01-09T07:00:00Z','https://us02web.zoom.us/j/85046169990','2023-01-08 03:20:05','2023-01-08 03:27:51',NULL),
+(166,'Guest User - Lesson Room',7,183,'2023-01-16T07:00:00Z','https://us02web.zoom.us/j/85433053063','2023-01-08 03:20:09','2023-01-08 03:27:53',NULL),
+(167,'Guest User - Lesson Room',7,183,'2023-01-23T07:00:00Z','https://us02web.zoom.us/j/81493573870','2023-01-08 03:20:11','2023-01-08 03:27:54',NULL),
+(168,'Guest User - Lesson Room',7,183,'2023-01-10T07:00:00Z','https://us02web.zoom.us/j/89674807551','2023-01-08 03:20:16','2023-01-08 03:27:56',NULL),
+(169,'Guest User - Lesson Room',7,183,'2023-01-17T07:00:00Z','https://us02web.zoom.us/j/81262492907','2023-01-08 03:20:19','2023-01-08 03:27:58',NULL),
+(170,'Guest User - Lesson Room',7,183,'2023-01-24T07:00:00Z','https://us02web.zoom.us/j/82100607937','2023-01-08 03:20:24','2023-01-08 03:27:59',NULL);
 
 /*Data for the table `messages` */
 
@@ -1449,6 +1461,7 @@ insert  into `notifications`(`id`,`type`,`notifiable_type`,`notifiable_id`,`data
 ('4017a99e-3bc7-47f9-9188-0cf039e4f260','App\\Notifications\\BookedClass','App\\Models\\User',7,'{\"user_id\":5,\"schedule_string\":\"on Tuesdays at 12:00 and Tuesdays at 13:00.\"}',NULL,'2022-07-28 22:28:11','2022-07-28 22:28:11'),
 ('414c43ae-0322-4dbd-a193-45262c666a76','App\\Notifications\\BookedClass','App\\Models\\User',7,'{\"user_id\":5,\"schedule_string\":\"on Sundays at 5:00, on Tuesdays at 5:00 and Wednesdays at 5:00.\"}',NULL,'2023-01-06 22:04:45','2023-01-06 22:04:45'),
 ('41895788-9bb2-488d-a0fe-4df41a7760dc','App\\Notifications\\BookedClass','App\\Models\\User',7,'{\"user_id\":5,\"schedule_string\":\"on Wednesdays at 6:00 and Wednesdays at 7:00.\"}',NULL,'2022-07-29 06:29:10','2022-07-29 06:29:10'),
+('47948d9a-a1f9-4864-a95a-421a255eb4c8','App\\Notifications\\BookedClass','App\\Models\\User',7,'{\"user_id\":5,\"schedule_string\":\"on Sundays at 7:00, on Mondays at 7:00 and Tuesdays at 7:00.\"}',NULL,'2023-01-08 03:21:37','2023-01-08 03:21:37'),
 ('4b4f3f07-de9c-46f3-8104-cc7229fe49de','App\\Notifications\\BookedClass','App\\Models\\User',7,'{\"user_id\":9,\"schedule_string\":\"on Tuesdays at 15:00, on Tuesdays at 16:00 and Tuesdays at 17:00.\"}',NULL,'2022-07-08 04:54:56','2022-07-08 04:54:56'),
 ('4c1d0ed7-c222-4c65-bb80-17efd2bd53d9','App\\Notifications\\BookedClass','App\\Models\\User',241,'{\"user_id\":5,\"schedule_string\":\"on Tuesdays at 6:00 and Wednesdays at 6:00.\"}',NULL,'2022-04-07 17:49:30','2022-04-07 17:49:30'),
 ('4c9942aa-519b-4078-9a2d-7e45a2bbe097','App\\Notifications\\ClassRescheduledToTeacher','App\\Models\\User',7,'{\"user_id\":9,\"schedule_string\":\"on Wednesdays at 11:00, on Wednesdays at 12:00 and Wednesdays at 13:00.\"}','2022-11-14 16:08:36','2022-09-23 04:28:35','2022-11-14 16:08:36'),
@@ -1664,6 +1677,12 @@ insert  into `roles`(`id`,`name`,`guard_name`,`created_at`,`updated_at`) values
 (3,'teacher','web','2021-05-31 15:02:10','2021-05-31 15:02:10'),
 (4,'admin','web','2021-05-31 15:02:16','2021-05-31 15:02:16');
 
+/*Data for the table `schedule_reserve` */
+
+insert  into `schedule_reserve`(`id`,`user_id`,`teacher_id`,`selected_schedule`,`type`,`created_at`,`updated_at`,`deleted_at`) values 
+(1,6,NULL,NULL,'','2023-01-07 23:50:47','2023-01-07 23:50:47',NULL),
+(2,183,7,'[[\"7\",\"0\"],[\"7\",\"1\"],[\"7\",\"2\"]]','schedule','2023-01-08 02:27:43','2023-01-08 03:13:56',NULL);
+
 /*Data for the table `scheduled_classes` */
 
 insert  into `scheduled_classes`(`student_id`,`teacher_id`) values 
@@ -1765,12 +1784,12 @@ insert  into `schedules`(`id`,`selected_schedule`,`next_schedule`,`user_id`,`enr
 (96,NULL,NULL,277,NULL,'2022-01-15 00:24:30','2022-01-15 00:24:30',NULL),
 (99,'[[\"6\",\"1\"],[\"6\",\"2\"],[\"6\",\"5\"],[\"6\",\"6\"]]',NULL,5,1,'2022-05-07 02:23:12','2023-01-07 23:24:34','2023-01-07 23:24:34'),
 (100,'[[\"6\",\"1\"],[\"6\",\"2\"]]',NULL,9,11,'2022-06-24 03:26:33','2022-12-21 03:16:00','2022-12-21 03:16:00'),
-(101,'[[\"3\",\"1\"],[\"3\",\"2\"],[\"3\",\"3\"]]',NULL,183,12,'2022-07-29 06:20:02','2023-01-07 20:12:57','2023-01-07 20:12:57');
+(101,'[[\"7\",\"0\"],[\"7\",\"1\"],[\"7\",\"2\"]]',NULL,183,12,'2022-07-29 06:20:02','2023-01-08 03:32:48','2023-01-08 03:32:48');
 
 /*Data for the table `sessions` */
 
 insert  into `sessions`(`id`,`user_id`,`ip_address`,`user_agent`,`payload`,`last_activity`) values 
-('SDdmUfByKCib3yTKfOshDQlKsmAwEv58EPmVXTFx',6,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36','YToxNTp7czo2OiJfdG9rZW4iO3M6NDA6Im5nMXViR2k5anBYZFNpd1FXcXFrMlc0WkJwemYyME9aS0ZQcmpqMzciO3M6NjoiX2ZsYXNoIjthOjI6e3M6Mzoib2xkIjthOjA6e31zOjM6Im5ldyI7YTowOnt9fXM6OToiX3ByZXZpb3VzIjthOjE6e3M6MzoidXJsIjtzOjM1OiJodHRwOi8vMTI3LjAuMC4xOjgwMDAvYWRtaW4vdXNlcnMvNCI7fXM6MTc6InBhc3N3b3JkX2hhc2hfd2ViIjtzOjYwOiIkMnkkMTAkUTNoeHFaOXVaYy5ObEZUWkNNSXNyT3FUby5QOC5mT2tLblZWZkRsVzZsNjhrcjVYcVNscU8iO3M6MTM6InVzZXJfc2NoZWR1bGUiO2E6MDp7fXM6MTU6InNlbGVjdGVkX2NvdXJzZSI7aToxO3M6NDoicGxhbiI7czoxOiI0IjtzOjEzOiJmaXJzdF90ZWFjaGVyIjtpOjc7czoxMDoidGVhY2hlcl9pZCI7aTo3O3M6NDoiZGF0YSI7YTowOnt9czo0OiJjYXJ0IjthOjA6e31zOjk6ImNvdXJzZV9pZCI7aToxO3M6MTM6ImNsYXNzZXNfZGF0ZXMiO2E6MTI6e2k6MDtzOjE5OiIyMDIzLTAxLTA5IDA2OjAwOjAwIjtpOjE7czoxOToiMjAyMy0wMS0xNiAwNjowMDowMCI7aToyO3M6MTk6IjIwMjMtMDEtMjMgMDY6MDA6MDAiO2k6MztzOjE5OiIyMDIzLTAxLTEwIDA2OjAwOjAwIjtpOjQ7czoxOToiMjAyMy0wMS0xNyAwNjowMDowMCI7aTo1O3M6MTk6IjIwMjMtMDEtMjQgMDY6MDA6MDAiO2k6NjtzOjE5OiIyMDIzLTAxLTEzIDA2OjAwOjAwIjtpOjc7czoxOToiMjAyMy0wMS0yMCAwNjowMDowMCI7aTo4O3M6MTk6IjIwMjMtMDEtMjcgMDY6MDA6MDAiO2k6OTtzOjE5OiIyMDIzLTAxLTE0IDA2OjAwOjAwIjtpOjEwO3M6MTk6IjIwMjMtMDEtMjEgMDY6MDA6MDAiO2k6MTE7czoxOToiMjAyMy0wMS0yOCAwNjowMDowMCI7fXM6Nzoic3VjY2VzcyI7czoyODoiTWVldGluZyBkZWxldGVkIHN1Y2Nlc3NmdWxseSI7czo1MDoibG9naW5fd2ViXzNkYzdhOTEzZWY1ZmQ0Yjg5MGVjYWJlMzQ4NzA4NTU3M2UxNmNmODIiO2k6Njt9',1673135239);
+('1NBxWEmKkGsrXCOAQNNePqWZGIOV9m1CkQcyFuoI',6,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36','YToxODp7czo2OiJfdG9rZW4iO3M6NDA6Im5nMXViR2k5anBYZFNpd1FXcXFrMlc0WkJwemYyME9aS0ZQcmpqMzciO3M6NjoiX2ZsYXNoIjthOjI6e3M6Mzoib2xkIjthOjA6e31zOjM6Im5ldyI7YTowOnt9fXM6OToiX3ByZXZpb3VzIjthOjE6e3M6MzoidXJsIjtzOjQyOiJodHRwOi8vMTI3LjAuMC4xOjgwMDAvYWRtaW4vdXNlcnMvMT9wYWdlPTIiO31zOjE3OiJwYXNzd29yZF9oYXNoX3dlYiI7czo2MDoiJDJ5JDEwJFEzaHhxWjl1WmMuTmxGVFpDTUlzck9xVG8uUDguZk9rS25WVmZEbFc2bDY4a3I1WHFTbHFPIjtzOjEzOiJ1c2VyX3NjaGVkdWxlIjthOjA6e31zOjE1OiJzZWxlY3RlZF9jb3Vyc2UiO2k6MTtzOjQ6InBsYW4iO3M6MToiMyI7czoxMzoiZmlyc3RfdGVhY2hlciI7aTo3O3M6MTA6InRlYWNoZXJfaWQiO2k6NztzOjQ6ImRhdGEiO2E6MDp7fXM6NDoiY2FydCI7YTowOnt9czo5OiJjb3Vyc2VfaWQiO2k6MTtzOjEzOiJjbGFzc2VzX2RhdGVzIjthOjg6e2k6MDtzOjE5OiIyMDIzLTAxLTE1IDA3OjAwOjAwIjtpOjE7czoxOToiMjAyMy0wMS0yMiAwNzowMDowMCI7aToyO3M6MTk6IjIwMjMtMDEtMDkgMDc6MDA6MDAiO2k6MztzOjE5OiIyMDIzLTAxLTE2IDA3OjAwOjAwIjtpOjQ7czoxOToiMjAyMy0wMS0yMyAwNzowMDowMCI7aTo1O3M6MTk6IjIwMjMtMDEtMTAgMDc6MDA6MDAiO2k6NjtzOjE5OiIyMDIzLTAxLTE3IDA3OjAwOjAwIjtpOjc7czoxOToiMjAyMy0wMS0yNCAwNzowMDowMCI7fXM6Nzoic3VjY2VzcyI7czoyODoiTWVldGluZyBkZWxldGVkIHN1Y2Nlc3NmdWxseSI7czoxNjoic2NoZWR1bGVfcmVzZXJ2ZSI7YTowOnt9czoxNDoicHVyY2hhc2VOdW1iZXIiO2k6MzM1O3M6NTA6ImxvZ2luX3dlYl8zZGM3YTkxM2VmNWZkNGI4OTBlY2FiZTM0ODcwODU1NzNlMTZjZjgyIjtpOjY7czo1OiJlcnJvciI7YToyOntzOjQ6ImNvZGUiO2k6MzAwMTtzOjc6Im1lc3NhZ2UiO3M6MzY6Ik1lZXRpbmcgZG9lcyBub3QgZXhpc3Q6IDgyMTAwNjA3OTM3LiI7fX0=',1673148887);
 
 /*Data for the table `shepherd_users` */
 
@@ -1787,7 +1806,8 @@ insert  into `shepherd_users`(`id`,`user_id`,`tour_name`,`created_at`,`updated_a
 (50,183,'guests/courses-carousel',NULL,NULL),
 (51,7,'teachers/welcome',NULL,NULL),
 (52,7,'teachers/courses_preview',NULL,NULL),
-(53,7,'guests/contents_preview',NULL,NULL);
+(53,7,'guests/contents_preview',NULL,NULL),
+(54,183,'guests/pricing-table',NULL,NULL);
 
 /*Data for the table `shoppingcart` */
 

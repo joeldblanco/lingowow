@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\CreateSchedule;
 use App\Models\Course;
 use App\Models\Enrolment;
+use App\Models\Unit;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -18,7 +20,7 @@ class EnrolmentController extends Controller
     public function index()
     {
         $enrolments = Enrolment::paginate(50);
-        
+
         return view('enrolments.index', compact('enrolments'));
     }
 

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Invoice;
 use App\IPNStatus;
 use App\Item;
+use App\Jobs\StoreSelfEnrolment;
 use App\Models\Course;
 use App\Models\Enrolment;
 use Cart;
@@ -12,6 +13,7 @@ use Illuminate\Http\Request;
 use Srmklive\PayPal\Services\AdaptivePayments;
 use Srmklive\PayPal\Services\ExpressCheckout;
 use App\Models\Product;
+use App\Models\Unit;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
 
@@ -56,11 +58,11 @@ class PayPalPaymentController extends Controller
     {
         $recurring = ($request->get('mode') === 'recurring') ? true : false;
         $cart = $this->getCheckoutData($recurring);
-        
-        try {
-            
-            $response = $this->provider->setExpressCheckout($cart, $recurring);
 
+        try {
+
+            $response = $this->provider->setExpressCheckout($cart, $recurring);
+            // dd($response);
             return redirect($response['paypal_link']);
         } catch (\Exception $e) {
             $invoice = $this->createInvoice($cart, 'Invalid');
@@ -117,38 +119,8 @@ class PayPalPaymentController extends Controller
                         $current_user->assignRole('student');
                     }
                 }
-                
-                $student = auth()->user();
-                $course_id = session('selected_course');
-                
-                //CHANGING STUDENT'S ROLE FROM 'GUEST' TO 'STUDENT'//
-                $student->removeRole('guest');
-                $student->assignRole('student');
 
-                $modality_course = Course::find($course_id)->modality;
-                if ($modality_course == "synchronous" || $modality_course == "exam") {
-                    if($modality_course == "synchronous"){
-                        $teacher = User::find(session('teacher_id'));
-                    }else{
-                        $teacher = User::find(session('teacher_id'));
-                    }
-                    
-                    // dd(session('teacher_id'));
-                    //CREATING STUDENT'S ENROLMENT (OR UPDATING IT, IN CASE IT ALREADY EXISTS BUT IS SOFTDELETED)//
-                    $enrolment = Enrolment::withTrashed()->updateOrCreate(
-                        ['student_id' => $student->id, 'course_id' => $course_id],
-                        ['teacher_id' => $teacher->id, 'deleted_at' => NULL]
-                    );
-                    
-                    SchedulingCalendarController::store(auth()->user()->id, $enrolment);
-                } else {
-
-                    //CREATING STUDENT'S ENROLMENT (OR UPDATING IT, IN CASE IT ALREADY EXISTS BUT IS SOFTDELETED)//
-                    $enrolment = Enrolment::withTrashed()->updateOrCreate(
-                        ['student_id' => $student->id, 'course_id' => $course_id],
-                        ['teacher_id' => NULL, 'deleted_at' => NULL]
-                    );
-                }
+                dispatch(new StoreSelfEnrolment());
 
                 Cart::destroy();
 
@@ -225,10 +197,10 @@ class PayPalPaymentController extends Controller
     {
         $data = [];
 
-        if(Invoice::all()->last() != null){
-            
+        if (Invoice::all()->last() != null) {
+
             $order_id = Invoice::all()->last()->id + 1;
-        }else{
+        } else {
             $order_id = 1;
         }
         // dd($order_id);

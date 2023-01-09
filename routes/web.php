@@ -229,7 +229,7 @@ Route::middleware(['web', 'auth', 'verified', 'impersonate'])->group(function ()
                     $user->studentClasses->each(function ($class) {
                         // $deleted_class = $class->delete();
                         // dd($class);
-                        (new MeetingController)->destroy($class->meeting);
+                        if($class->meeting != null) (new MeetingController)->destroy($class->meeting);
                         $class->delete();
                     });
 

@@ -2,9 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Jobs\CreateClasses;
-use App\Jobs\CreateSchedule;
-use App\Jobs\EnrolUser;
 use App\Models\Classes;
 use App\Models\Course;
 use App\Models\Enrolment;
@@ -12,7 +9,6 @@ use App\Models\Schedule;
 use App\Models\ScheduleReserve;
 use Illuminate\Http\Request;
 use App\Models\User;
-use App\Notifications\BookedClass;
 use App\Notifications\StudentUnrolment;
 use App\Notifications\StudentUnrolmentToTeacher;
 // use Illuminate\Contracts\Session\Session;
@@ -59,57 +55,7 @@ class SchedulingCalendarController extends Controller
      */
     public static function store($student_id = null, $enrolment)
     {
-        //VARIABLE INITIALIZATION//
-        if ($student_id == null) {
-            $student = auth()->user();
-        } else {
-            $student = User::find($student_id);
-        }
-        $teacher = User::find(session('teacher_id'));
-        $student_schedule = json_decode(session('user_schedule'));
-        $classes_dates = session('classes_dates');
-        $teacher_students = Enrolment::where('teacher_id', $teacher->id)->select('student_id')->get();
-
-        //CREATING STUDENT'S SCHEDULE (OR UPDATING IT, IN CASE IT ALREADY EXISTS BUT IS SOFTDELETED)//
-        // $schedule = Schedule::withTrashed()->updateOrCreate(
-        //     ['user_id' => $student_id, 'enrolment_id' => $enrolment->id],
-        //     ['selected_schedule' => $student_schedule, 'deleted_at' => NULL]
-        // );
-        CreateSchedule::dispatch($student->id, $student_schedule, $enrolment->id);
-
-        //ADDING CLASS DURATION (40 MIN) TO CLASS START DATETIME AND STORING IT IN ANOTHER VARIABLE (TO CREATE CLASS END DATETIME)//
-        $classes_dates = session('classes_dates');
-        foreach ($classes_dates as $key => $value) {
-            $classes_dates[$key] = [];
-
-            $classes_dates[$key][0] = new Carbon($value);
-            $classes_dates[$key][0] = $classes_dates[$key][0]->toDateTimeString();
-
-            $classes_dates[$key][1] = new Carbon($value);
-            $classes_dates[$key][1] = $classes_dates[$key][1]->addMinutes(40);
-            $classes_dates[$key][1] = $classes_dates[$key][1]->toDateTimeString();
-        }
-
-
-        //CREATING CLASSES (CLASS BOOKING)//
-        foreach ($classes_dates as $date) {
-            // CreateClasses::dispatch($date, $enrolment->id);
-            dispatch(new CreateClasses($date, $enrolment->id));
-        }
-
-
-        //STORING ALL TEACHER'S STUDENTS' SCHEDULES IN ONE ARRAY//
-        // foreach ($teacher_students as $tskey => $tsvalue) {
-        //     $teacher_students_schedule[$tskey] = Schedule::where('user_id', $tsvalue->student_id)->select('selected_schedule')->first();
-        //     $teacher_students_schedule[$tskey] = $teacher_students_schedule[$tskey]->selected_schedule;
-        //     // $teacher_students_schedule = json_decode($teacher_students_schedule[$tskey]);
-        // }
-
-
-        //SENDING NOTIFICATION TO TEACHER//
-
-        // dd($student->id);
-        Notification::sendNow($teacher, new BookedClass($student->id));
+        // dispatch(new CreateSchedule($student_id, $enrolment->id));
     }
 
     /**
@@ -459,15 +405,15 @@ class SchedulingCalendarController extends Controller
 
 
             if (count($teachers_available) > 0 && !$error) {
-                
+
                 $T_selected = rand(0, count($teachers_available) - 1);
-                
+
                 Cart::destroy();
 
                 $product = Course::find($course_id)->products->first();
                 $apportionment = ApportionmentController::calculateApportionment(session('plan'));
                 $product_qty = $apportionment[0];
-                
+
                 if ($modality == "exam") {
                     $product_qty = 1;
                     session(['teacher_id' => 7]); //IMPORTANTE!!!!!! AQUI SUSTITUIR EL 7 POR "$T_selected"
@@ -517,24 +463,22 @@ class SchedulingCalendarController extends Controller
     {
 
         $type = "";
-        if(count($schedule[0]) > 2){
+        if (count($schedule[0]) > 2) {
             $type = "exam";
-        }else{
+        } else {
             $type = "schedule";
         }
         $teacher_id = session('teacher_id');
         $schedule_encode = json_encode($schedule);
 
 
-            $reserve = ScheduleReserve::withTrashed()->updateOrCreate(
-                ['user_id' => auth()->id()],
-                ['teacher_id' => $teacher_id,'selected_schedule' => $schedule_encode, 'type' => $type]
-                // ['type' => 'exam']
-            );
+        $reserve = ScheduleReserve::withTrashed()->updateOrCreate(
+            ['user_id' => auth()->id()],
+            ['teacher_id' => $teacher_id, 'selected_schedule' => $schedule_encode, 'type' => $type]
+            // ['type' => 'exam']
+        );
 
 
         // dd($schedule, "reserve");
     }
-
-    
 }
