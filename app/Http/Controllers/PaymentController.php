@@ -10,6 +10,7 @@ use App\Item;
 use App\Models\Course;
 use App\Models\Enrolment;
 use App\Models\User;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 
 class PaymentController extends Controller
@@ -160,6 +161,8 @@ class PaymentController extends Controller
                     ['teacher_id' => NULL, 'deleted_at' => NULL]
                 );
             }
+
+            
 
             Cart::destroy();
 

@@ -12,12 +12,13 @@ class Meeting extends Model
     use SoftDeletes;
 
     protected $fillable = [
-        'topic',
         'host_id',
         'atendee_id',
-        // 'meeting_url',
+        'start_date',
         'join_url',
-        'start_date'
+        'topic',
+        'deleted_at',
+        // 'meeting_url',
     ];
 
     public function host()

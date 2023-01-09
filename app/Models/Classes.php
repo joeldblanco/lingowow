@@ -21,7 +21,7 @@ class Classes extends Model
      *
      * @var array
      */
-    protected $fillable = ['start_date', 'end_date', 'enrolment_id', 'teacher_check', 'student_check', 'comment'];
+    protected $fillable = ['start_date', 'end_date', 'enrolment_id', 'teacher_check', 'student_check', 'comment', 'meeting_id'];
 
     /**
      * Get the student associated with the class.
