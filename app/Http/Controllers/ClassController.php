@@ -273,6 +273,7 @@ class ClassController extends Controller
     {
         // $meeting = Meeting::where('atendee_id',$class->student()->id)->where('host_id',$class->teacher()->id)->first();
         $recordings = (new MeetingController)->getRecordings($class);
+        // dd($recordings);
         // dump($recordings);
         // if(isset($recordings["code"]) && ($recordings["code"] == 3301 || $recordings["code"] === 1001 || $recordings["code"] === 1010))
         // {

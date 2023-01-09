@@ -96,7 +96,7 @@
                 <div class="mt-10 w-full flex items-center space-x-4">
                     <div class="w-3/12">
                         @role('student')
-                            <a href="{{ route('classroom', auth()->id()) }}"
+                            <a href="{{ route('classroom', auth()->id()) }}" target="_blank"
                                 class="inline-block bg-lw-blue text-white px-4 py-2 rounded hover:bg-blue-900 hover:text-white hover:no-underline">Classroom</a>
                         @endrole
 
