@@ -17,6 +17,7 @@ class CreateUnitUserTable extends Migration
             $table->bigIncrements('id');
             $table->bigInteger('user_id')->unsigned();
             $table->bigInteger('unit_id')->unsigned();
+            $table->unique(['user_id', 'unit_id']); // Establecer clave única a la combinación de usuario y unidad
 
             $table->foreign('user_id')->references('id')->on('users');
             $table->foreign('unit_id')->references('id')->on('units');
