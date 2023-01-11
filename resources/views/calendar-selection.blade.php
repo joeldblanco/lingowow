@@ -63,18 +63,18 @@
                 @endif
                 @php
                     $course_id = session('selected_course');
-                    if($course_id != null){
+                    if ($course_id != null) {
                         $modality_course = App\Models\Course::find($course_id)->modality;
                     }
                 @endphp
 
-                @if ($modality_course == "exam")
+                @if ($modality_course == 'exam')
                     @livewire('schedule', ['plan' => $plan, 'user_id' => auth()->id(), 'mode' => 'one'])
                 @else
-                    @livewire('schedule', ['plan' => $plan, 'user_id' => auth()->id(), 'mode' => 'edit'])    
+                    @livewire('schedule', ['plan' => $plan, 'user_id' => auth()->id(), 'mode' => 'edit'])
                 @endif
                 {{-- <livewire:scheduling-calendar plan="{{$plan}}" /> --}}
-                
+
 
             </div>
         </div>

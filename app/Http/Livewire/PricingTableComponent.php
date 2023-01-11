@@ -58,7 +58,11 @@ class PricingTableComponent extends Component
 
     public function render()
     {
-        $product = Course::find($this->selectedProduct)->products->first();
+        if (in_array(auth()->user()->id, [5])) {
+            $product = Course::find($this->selectedProduct)->products()->where('slug', 'like', '%old%')->first();
+        } else {
+            $product = Course::find($this->selectedProduct)->products->first();
+        }
 
         // dd(Course::find($this->selectedProduct));
 

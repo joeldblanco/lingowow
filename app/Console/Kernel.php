@@ -96,7 +96,7 @@ class Kernel extends ConsoleKernel
 
                 $today = (new carbon())->hour(0)->minute(0)->second(0);
                 $end_period = (new Carbon(ApportionmentController::currentPeriod(true)[1]))->hour(0)->minute(0)->second(0);
-                if($today->greaterThan($end_period)){
+                if ($today->greaterThan($end_period)) {
                     DB::table('metadata')->where('key', '=', 'current_period')->update([
                         'value' => json_encode([
                             "start_date" => ApportionmentController::nextPeriod(true)[0],
@@ -104,8 +104,6 @@ class Kernel extends ConsoleKernel
                         ])
                     ]);
                 }
-
-                // dump('New period');
             }
         })->everyMinute();
     }
