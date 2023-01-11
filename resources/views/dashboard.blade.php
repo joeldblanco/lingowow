@@ -116,7 +116,7 @@
                                         },
                                         {
                                             name: 'Remaining',
-                                            data: [{{ (count($enrolment->course->units()) - auth()->user()->units->first()->order) }}]
+                                            data: [{{ count($enrolment->course->units()) -auth()->user()->units->first()->order }}]
                                         },
                                     ],
                                     chart: {
@@ -207,6 +207,9 @@
                                         <td class="flex w-2/12 justify-around">
                                             <a href="{{ route('profile.show', $student->id) }}">
                                                 <i class="fas fa-eye"></i>
+                                            </a>
+                                            <a href="{{ route('classroom', $student->id) }}">
+                                                <i class="fas fa-door-open"></i>
                                             </a>
                                         </td>
                                     </tr>

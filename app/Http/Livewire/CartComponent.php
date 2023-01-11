@@ -75,7 +75,7 @@ class CartComponent extends Component
             $amount = (int)json_decode($user->redeemCode($this->coupon_code)->data)->amount;
             Cart::add('123', 'Discount', 1, -$amount);
         } catch (Throwable $e) {
-            $this->coupon_error_message = $e->getMessage();
+            $this->coupon_error_message = "Invalid coupon code";
         }
     }
 
