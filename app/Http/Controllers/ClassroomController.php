@@ -64,14 +64,14 @@ class ClassroomController extends Controller
                 $enter_classroom = false;
                 $message = "";
 
-                return redirect(auth()->user()->studentClasses->sortBy('start_date')->pluck('meeting')->first()->join_url);
-
                 if ($now->lessThanOrEqualTo($classes[$key])) {
                     $diffInSeconds = $classes[$key]->diffInSeconds();
 
                     if (($diffInSeconds < 600 && $user == 'teacher') || ($diffInSeconds < 20 && $user == 'student') || $user == 'admin') {
-                        $message = "This student's next class is in " . $classes[$key]->diffForHumans(['parts' => 2]) . ". On " . $classes[$key]->format('l') . ' at ' . $classes[$key]->format('g:00 a') . " UTC.";
-                        $enter_classroom = true;
+                        // $message = "This student's next class is in " . $classes[$key]->diffForHumans(['parts' => 2]) . ". On " . $classes[$key]->format('l') . ' at ' . $classes[$key]->format('g:00 a') . " UTC.";
+                        // $enter_classroom = true;
+                        return redirect(auth()->user()->studentClasses->sortBy('start_date')->first()->meeting->join_url);
+
                         break;
                     } else {
                         if ($user == 'student') {
@@ -87,7 +87,7 @@ class ClassroomController extends Controller
                 }
             }
 
-            // return view('classroom.show', compact('enter_classroom', 'message', 'student', 'user'));
+            return view('classroom.show', compact('enter_classroom', 'message', 'student', 'user'));
         } else {
             abort(403, 'USER DOES NOT HAVE THE RIGHT PERMISSIONS.');
             // $message = "User is not enroled in any course.";

@@ -1,7 +1,7 @@
 <div class="w-full bg-blue pt-8" x-data="{ open: @entangle('popup') }" id="plans" x-cloak>
     <div class="flex flex-col sm:flex-row justify-center mb-6 sm:mb-0 pricing-table">
         {{-- {{dd($plans[0]->plan_name)}} --}}
-        @foreach ($plans as $plan)
+        @foreach ($plans->sortBy('id') as $plan)
             <div
                 class="sm:flex-1 lg:flex-initial lg:w-1/4 rounded-t-lg rounded-tr-none bg-white @if ($loop->index == 1) z-10 @else mt-4 @endif flex flex-col shadow-2xl">
                 <div class="p-8 text-3xl font-bold text-center">{{ ucfirst($plan->plan_name) }}</div>

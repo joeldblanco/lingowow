@@ -90,6 +90,12 @@
             'status' => request()->routeIs('globals.index'),
             'parent_link' => request()->is('admin', 'admin/*'),
         ],
+        [
+            'name' => 'Recordings',
+            'route' => route('recordings.index'),
+            'status' => request()->routeIs('recordings', 'recordings/*'),
+            'parent_link' => request()->is('classes'),
+        ],
     ];
     
     $second_nav = false;
