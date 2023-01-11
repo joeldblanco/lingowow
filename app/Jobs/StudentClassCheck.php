@@ -19,19 +19,13 @@ class StudentClassCheck implements ShouldQueue
      *
      * @return void
      */
-    public function __construct($class_id)
+    public function __construct($class_id, $value)
     {
-        if (auth()->user()->roles[0]->name == "student" || auth()->user()->roles[0]->name == "admin") {
-            $student_check = Classes::select('student_check')->where('id', $class_id)->first()->student_check;
-            $student_check = intval(!$student_check);
-            try {
-                $class = Classes::find($class_id);
-                $class->student_check = $student_check;
-                $class->save();
-                $this->current_class = $class;
-            } catch (\Throwable $th) {
-                dd($th->getCode());
-            }
+        $class = Classes::find($class_id);
+        $value = boolval($value) == true ? 1 : 0;
+        if ($class->student_check != $value) {
+            $class->student_check = $value;
+            $class->save();
         }
     }
 

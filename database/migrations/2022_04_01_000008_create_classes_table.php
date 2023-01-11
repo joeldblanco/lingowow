@@ -24,6 +24,7 @@ class CreateClassesTable extends Migration
             $table->tinyInteger('student_check')->unsigned()->default(0);
             $table->tinyInteger('status')->unsigned()->nullable();
             $table->timestamps();
+            $table->softDeletes();
 
             $table->foreign('enrolment_id')->references('id')->on('enrolments');
         });

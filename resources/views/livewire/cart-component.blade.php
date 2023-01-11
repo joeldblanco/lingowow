@@ -308,7 +308,7 @@
                                     </x-modal>
 
                                 </div>
-                                <div wire:loading wire:target="saveBillingAddress">
+                                <div wire:loading wire:target="saveBillingAddress,applyCoupon">
                                     @include('components.loading-state')
                                 </div>
                             @else

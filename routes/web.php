@@ -35,10 +35,13 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Notification;
 use App\Http\Controllers\MeetingController;
 use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\PaypalController;
 use App\Http\Controllers\ProductController;
 use App\Models\Attempt;
 use App\Http\Controllers\UploadImages;
+use App\Http\Livewire\ClassesComponent;
 use App\Models\Enrolment;
+use App\Models\Meeting;
 use App\Models\Post;
 use App\Models\Unit;
 use Illuminate\Support\Facades\DB;
@@ -136,6 +139,9 @@ Route::middleware(['web', 'auth', 'verified', 'impersonate'])->group(function ()
     Route::get('/attempt/{id}', [AttemptController::class, 'show'])->name('attempt.show');
     Route::get('/attempt/{attempt_id}/question/{question_id}', [AttemptController::class, 'show_question'])->name('attempt.show_question');
 
+    //ROUTES FOR RECORDINGS//
+    Route::get('/recordings', [MeetingController::class, 'getRecordings'])->name('recordings.index');
+
     //ROUTES FOR ADMINISTRATION//
     Route::middleware(['role:admin'])->group(function () {
 
@@ -197,7 +203,7 @@ Route::middleware(['web', 'auth', 'verified', 'impersonate'])->group(function ()
         Route::post('contents/sort', [ContentController::class, 'sort'])->name('contents.sort');
 
         //ROUTES FOR CLASSES//
-        Route::get('/admin/classes', [ClassController::class, 'index'])->name('admin.classes.index');
+        Route::get('/admin/classes', ClassesComponent::class)->name('admin.classes.index');
 
         //ROUTES FOR ACTIVITIES//
         Route::resource('/activities', ActivityController::class);
@@ -229,7 +235,7 @@ Route::middleware(['web', 'auth', 'verified', 'impersonate'])->group(function ()
                     $user->studentClasses->each(function ($class) {
                         // $deleted_class = $class->delete();
                         // dd($class);
-                        if($class->meeting != null) (new MeetingController)->destroy($class->meeting);
+                        if ($class->meeting != null) (new MeetingController)->destroy($class->meeting);
                         $class->delete();
                     });
 
@@ -254,6 +260,8 @@ Route::middleware(['web', 'auth', 'verified', 'impersonate'])->group(function ()
     Route::get('gather/get_guests_list', [GatherController::class, 'getGuestsList']);
     Route::get('gather/set_guests_list', [GatherController::class, 'setGuestsList']);
 
+    Route::resource('api/paypal', PayPalController::class);
+
     Route::get('activities', [ActivityController::class, 'index'])->name('activities.index');
     Route::get('activities/{id}', [ActivityController::class, 'show'])->name('admin.activities.show');
 
@@ -262,7 +270,7 @@ Route::middleware(['web', 'auth', 'verified', 'impersonate'])->group(function ()
     Route::get('/users/stop-impersonation', [UsersController::class, 'stopImpersonation'])->name('stopImpersonation');
 
     //ROUTES FOR CLASSES//
-    Route::get('/classes', [ClassController::class, 'index'])->name('classes.index');
+    Route::get('/classes', ClassesComponent::class)->name('classes.index');
     Route::get('/classes/{id}', [ClassController::class, 'edit'])->name('classes.edit');
     Route::post('/classes/update', [ClassController::class, 'update'])->name('classes.update');
     Route::post('/classes/check', [ClassController::class, 'checkClasses'])->name('classes.check');

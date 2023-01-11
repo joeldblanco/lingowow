@@ -115,7 +115,7 @@
         async function selectProduct(object) {
             // console.log(object);
             @this.selectProduct(object);
-            await new Promise(r => setTimeout(r, 1000));
+            // await new Promise(r => setTimeout(r, 1000));
             window.location = '#plans';
         }
     </script>

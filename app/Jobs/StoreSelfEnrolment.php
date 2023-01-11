@@ -61,13 +61,13 @@ class StoreSelfEnrolment implements ShouldQueue
             return $innerCollection->isEmpty();
         })->flatten()->first();
 
-        if ($unit == null) {
+        if (empty($unit)) {
             $unit_id = Course::find($course_id)->units()->sortBy('order')->first()->id;
         } else {
             $unit_id = $unit->unit_id;
         }
         $current_unit = Unit::find(DB::table('unit_user')->select('unit_id')->where('user_id', auth()->user()->id)->first()->unit_id);
-        if ($current_unit == null) {
+        if (empty($current_unit)) {
             DB::table('unit_user')->insertOrIgnore([
                 ['unit_id' => $unit_id, 'user_id' => auth()->user()->id]
             ]);
