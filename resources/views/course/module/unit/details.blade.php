@@ -50,7 +50,7 @@
                                         {{ $user->getRoleNames()->first() }}</td>
                                     <td class="py-4 px-6 border-b border-gray-400 text-gray-500">
                                         <a href="#" title="Edit"><i class="fas fa-cog m-1"></i></a>
-                                        <a href="{{route('units.unenrol', [$unit_id, $user->id])}}" title="Unenrol"><i class="fas fa-trash m-1"></i></a>
+                                        <a href="#" title="Unenrol"><i class="fas fa-trash m-1"></i></a>
                                     </td>
                                 </tr>
                             @endforeach

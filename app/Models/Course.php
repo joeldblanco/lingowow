@@ -42,5 +42,13 @@ class Course extends Model
     {
         return $this->modules->pluck('units')->flatten();
     }
+
+    /**
+     * Get all of the categories for the course.
+     */
+    public function categories()
+    {
+        return $this->morphToMany(Category::class, 'categorizable');
+    }
 }
 //
