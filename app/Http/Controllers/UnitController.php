@@ -147,10 +147,10 @@ class UnitController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function details($unit_id)
+    public function details(Unit $unit)
     {
-        $unit = Unit::find($unit_id);
         $users = $unit->users;
+        $unit_id = $unit->id;
 
         return view('course.module.unit.details', compact('users', 'unit_id'));
     }

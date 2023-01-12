@@ -84,7 +84,7 @@ class CourseController extends Controller
      */
     public function store(Request $request)
     {
-        // dd($request);
+        dd($request);
         $request->validate([
             'name' => 'required',
             'description' => 'required',
@@ -126,7 +126,7 @@ class CourseController extends Controller
             $user_modules = $user_modules->unique();
         }
 
-        return view('course.show', compact('user_modules', 'modules'));
+        return view('course.show', compact('user_modules', 'modules', 'course'));
     }
 
     /**
@@ -161,6 +161,18 @@ class CourseController extends Controller
     public function destroy(Course $course)
     {
         //
+    }
+
+    /**
+     * Show course details
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function details($id)
+    {
+        $course = Course::find($id);
+        return view('course.details', compact('course'));
     }
 
     //REVIEW: MODIFICAR MODULO DE LA FUNCION

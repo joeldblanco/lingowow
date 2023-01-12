@@ -36,6 +36,12 @@
                                 </div>
 
                                 <div class="flex px-4 space-x-2">
+                                    @foreach ($course->categories as $category)
+                                        <span
+                                            class="flex flex-col bg-blue-500 rounded-full font-medium text-gray-100 px-3 pt-0.5">
+                                            <p class="my-auto capitalize">{{ $category->name }}</p>
+                                        </span>
+                                    @endforeach
                                     <span
                                         class="flex flex-col @if ($course->category == 'Spanish') bg-blue-500 @else bg-red-500 @endif rounded-full font-medium text-gray-100 px-3 pt-0.5">
                                         <p class="my-auto capitalize">{{ $course->category }}</p>
