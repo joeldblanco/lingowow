@@ -58,16 +58,43 @@ use Illuminate\Support\Facades\Http;
 |
 */
 
+
+
+
+//ROUTES FOR AUTHENTICATION//
 Route::get('/', function () {
     return redirect()->route('login');
 });
 
+
+
+
+//ROUTES FOR EMAIL VERIFICATION//
+Route::get('/email/verify', function () {
+    return view('auth.verify-email');
+})->middleware('auth')->name('verification.notice');
+
+Route::get('/email/verify/{id}/{hash}', function (EmailVerificationRequest $request) {
+    $request->fulfill();
+
+    return redirect('/dashboard');
+})->middleware(['auth', 'signed'])->name('verification.verify');
+
+Route::post('/email/verification-notification', function (Request $request) {
+    $request->user()->sendEmailVerificationNotification();
+
+    return back()->with('message', 'Verification link sent!');
+})->middleware(['auth', 'throttle:6,1'])->name('verification.send');
+
 Route::middleware(['web', 'auth', 'verified', 'impersonate'])->group(function () {
 
-    Route::get('/home', function () {
 
+    Route::get('/home', function () {
         return view('home');
     })->name('home');
+
+
+
 
     Route::post('/complete-tour', function (Request $request) {
         $query = DB::table('shepherd_users')->insertOrIgnore([
@@ -76,9 +103,8 @@ Route::middleware(['web', 'auth', 'verified', 'impersonate'])->group(function ()
         return $query;
     })->name('complete-tour');
 
-    // Route::middleware(['role:guest'])->get('/courses', function () {
-    //     return view('courses');
-    // })->name('courses');
+
+
 
     Route::get('/dashboard', function () {
         if (auth()->user()->roles[0]->name == "admin") {
@@ -88,33 +114,59 @@ Route::middleware(['web', 'auth', 'verified', 'impersonate'])->group(function ()
         }
     })->name('dashboard');
 
-    // Route::get('/pages', function () {
-    //     return view('pages');
-    // })->name('pages');
+
+
 
     //ROUTES FOR COURSES//
-    Route::resource('courses', CourseController::class);
-    Route::get('courses/{id}/details', function ($id) {
-        $course = App\Models\Course::find($id);
-        return view('course.details', compact('course'));
-    })->name('courses.details');
+    Route::get('/courses', [CourseController::class, 'index'])->name('courses.index');
+    Route::middleware(['role:admin'])->get('/courses/create', [CourseController::class, 'create'])->name('courses.create');
+    Route::middleware(['role:admin'])->post('/courses', [CourseController::class, 'store'])->name('courses.store');
+    Route::get('/courses/{id}', [CourseController::class, 'show'])->name('courses.show');
+    Route::middleware(['role:admin'])->get('/courses/{id}/edit', [CourseController::class, 'edit'])->name('courses.edit');
+    Route::middleware(['role:admin'])->patch('/courses/{id}', [CourseController::class, 'update'])->name('courses.update');
+    Route::middleware(['role:admin'])->delete('/courses/{id}', [CourseController::class, 'destroy'])->name('courses.destroy');
+
+    Route::get('courses/{id}/details', [CourseController::class, 'details'])->name('courses.details');
+
+
+
 
     //ROUTES FOR MODULES//
-    Route::resource('modules', ModuleController::class);
+    Route::get('/modules', [ModuleController::class, 'index'])->name('modules.index');
+    Route::middleware(['role:admin'])->get('/modules/create', [ModuleController::class, 'create'])->name('modules.create');
+    Route::middleware(['role:admin'])->post('/modules', [ModuleController::class, 'store'])->name('modules.store');
+    Route::get('/modules/{module}', [ModuleController::class, 'show'])->name('modules.show');
+    Route::middleware(['role:admin'])->get('/modules/{module}/edit', [ModuleController::class, 'edit'])->name('modules.edit');
+    Route::middleware(['role:admin'])->patch('/modules/{module}', [ModuleController::class, 'update'])->name('modules.update');
+    Route::middleware(['role:admin'])->delete('/modules/{module}', [ModuleController::class, 'destroy'])->name('modules.destroy');
+
     Route::post('modules/sort', [ModuleController::class, 'sort'])->name('modules.sort');
-    Route::get('modules/{id}/details', function ($id) {
-        $module = App\Models\Module::find($id);
-        return view('course.module.details', compact('module'));
-    })->name('modules.details');
+    Route::get('modules/{module}/details', [ModuleController::class, 'details'])->name('modules.details');
+
+
+
 
     //ROUTES FOR UNITS//
-    Route::resource('units', UnitController::class);
+    Route::get('/units', [UnitController::class, 'index'])->name('units.index');
+    Route::middleware(['role:admin'])->get('/units/create', [UnitController::class, 'create'])->name('units.create');
+    Route::middleware(['role:admin'])->post('/units', [UnitController::class, 'store'])->name('units.store');
+    Route::get('/units/{id}', [UnitController::class, 'show'])->name('units.show');
+    Route::middleware(['role:admin'])->get('/units/{unit}/edit', [UnitController::class, 'edit'])->name('units.edit');
+    Route::middleware(['role:admin'])->patch('/units/{unit}', [UnitController::class, 'update'])->name('units.update');
+    Route::middleware(['role:admin'])->delete('/units/{id}', [UnitController::class, 'destroy'])->name('units.destroy');
+
     Route::post('units/sort', [UnitController::class, 'sort'])->name('units.sort');
+    Route::get('/units/{unit}/details', [UnitController::class, "details"])->name('units.details');
+
+
+
 
     //ROUTES FOR ACTIVITY//
     Route::middleware(['role:student|teacher|admin'])->get('/unit/{id_unit}/activity/{id}', [ActivityController::class, 'show_activity'])->name('activity.show'); ///Cree, esta nueva
-    Route::middleware(['role:student|teacher|admin'])->get('/activity/edit/{id}', [ActivityController::class, 'edit_activity'])->name('activity.edit'); ///Cree, esta nueva
-    ///Cree, esta nueva
+    Route::middleware(['role:teacher|admin'])->get('/activity/edit/{id}', [ActivityController::class, 'edit_activity'])->name('activity.edit'); ///Cree, esta nueva
+
+
+
 
     //ROUTES FOR SHOP//
     Route::middleware(['role:guest|student|admin'])->get('/shop', [PayPalPaymentController::class, 'getIndex'])->name('shop');
@@ -122,15 +174,24 @@ Route::middleware(['web', 'auth', 'verified', 'impersonate'])->group(function ()
         return view('cart');
     })->name("cart");
 
+
+
+
     //ROUTES FOR INVOICES//
     Route::middleware(['role:guest|student|admin'])->get('/shop/invoices', [InvoiceController::class, 'index'])->name("invoices");
     Route::middleware(['role:guest|student|admin'])->get('/shop/invoice/{id}', [InvoiceController::class, 'show'])->name('invoice.show');
+
+
+
 
     //ROUTES FOR SCHEDULE//
     Route::post('/schedule/check', [SchedulingCalendarController::class, 'checkForTeachers'])->name("schedule.check");
     Route::middleware('checkPreviousUrlName:shop|schedule.check|schedule.create,shop')->get('/schedule/selection', [SchedulingCalendarController::class, 'create'])->name("schedule.create");
     Route::post('/schedule/update', [SchedulingCalendarController::class, 'update'])->name("schedule.update");
     Route::get('/schedule/destroy/{student_id}/{course_id}', [SchedulingCalendarController::class, 'destroy'])->name("schedule.destroy");
+
+
+
 
     //ROUTES FOR EXAMS//
     Route::get('/exam/{id}', [ExamController::class, 'display'])->name('exam.display');
@@ -139,8 +200,14 @@ Route::middleware(['web', 'auth', 'verified', 'impersonate'])->group(function ()
     Route::get('/attempt/{id}', [AttemptController::class, 'show'])->name('attempt.show');
     Route::get('/attempt/{attempt_id}/question/{question_id}', [AttemptController::class, 'show_question'])->name('attempt.show_question');
 
+
+
+
     //ROUTES FOR RECORDINGS//
     Route::get('/recordings', [MeetingController::class, 'getRecordings'])->name('recordings.index');
+
+
+
 
     //ROUTES FOR ADMINISTRATION//
     Route::middleware(['role:admin'])->group(function () {
@@ -168,6 +235,9 @@ Route::middleware(['web', 'auth', 'verified', 'impersonate'])->group(function ()
         Route::get('/admin/coupons/create/{product_id}/{coupon_amount}', [CouponController::class, 'store'])->name("coupons.create");
         // Route::get('/admin/marketing', [CouponController::class,'index'])->name('admin.marketing');
 
+
+
+
         //ROUTE FOR TESTING MAILS//
         Route::get('/mail/test', function () {
             $admin = User::find(6);
@@ -175,35 +245,35 @@ Route::middleware(['web', 'auth', 'verified', 'impersonate'])->group(function ()
             Notification::sendNow($admin, new BookedClass($student));
         })->name('mail.test');
 
+
+
+
         //ROUTES FOR EXAMS//
         Route::resource('/admin/exam', ExamController::class);
-        // Route::get('/admin/exam/store', [ExamController::class, 'store'])->name('exam.store');
-        // Route::get('/admin/exam/show/{id}', [ExamController::class, 'show'])->name('exam.show');
-        // Route::post('/admin/exam/edit/{id}', [ExamController::class, 'edit'])->name('exam.edit');
+        Route::get('/exam/{id}/details', [ExamController::class, "details"])->name('exam.details');
+
+
+
 
         //ROUTES FOR QUESTIONS//
-        // Route::post('/exam/{id}/question/store', [QuestionController::class, 'store'])->name('question.store');
-        // Route::get('/exam/{exam_id}/question/show/{question_id}', [QuestionController::class, 'show'])->name('question.show');
-        // Route::get('/exam/{exam_id}/question/edit/{question_id}', [QuestionController::class, 'edit'])->name('question.edit');
-        // Route::get('/exam/{exam_id}/question/delete/{question_id}', [QuestionController::class, 'destroy'])->name('question.destroy');
-        // Route::post('/exam/{exam_id}/question/update/{question_id}', [QuestionController::class, 'update'])->name('question.update');
         Route::resource('/questions', QuestionController::class);
         Route::post('/questions/import', [QuestionController::class, 'import'])->name('questions.import');
 
-        //ROUTES FOR UNITS//
-        Route::get('/units/{id}/details', [UnitController::class, "details"])->name('units.details');
-        Route::get('/exam/{id}/details', [ExamController::class, "details"])->name('exam.details');
-        Route::get('units/{unit_id}/unenrol/{user_id}', function ($unit_id, $user_id) {
-            Unit::find($unit_id)->users()->detach($user_id);
-            return redirect()->route('units.details', $unit_id);
-        })->name('units.unenrol');
+
+
 
         //ROUTES FOR CONTENTS//
         Route::resource('/contents', ContentController::class);
         Route::post('contents/sort', [ContentController::class, 'sort'])->name('contents.sort');
 
+
+
+
         //ROUTES FOR CLASSES//
         Route::get('/admin/classes', ClassesComponent::class)->name('admin.classes.index');
+
+
+
 
         //ROUTES FOR ACTIVITIES//
         Route::resource('/activities', ActivityController::class);
@@ -214,9 +284,8 @@ Route::middleware(['web', 'auth', 'verified', 'impersonate'])->group(function ()
         Route::post('activities/store/files', [ActivityController::class, 'storeFiles'])->name('admin.activities.storeFiles');
         Route::post('activities/update/{id}', [ActivityController::class, 'update'])->name('admin.activities.update');
 
-        // Route::get('/admin/activities/{id}/edit', [ActivityController::class, 'edit'])->name('admin.activities.edit');
-        // Route::patch('/admin/activities/{id}', [ActivityController::class, 'update'])->name('admin.activities.update');
-        // Route::post('/admin/activities/{id}', [ActivityController::class, 'destroy'])->name('admin.activities.destroy');
+
+
 
         //ROUTES FOR IMPERSONATION//
         Route::get('/users/impersonate/{id}', [UsersController::class, 'impersonate'])->name('impersonate');
@@ -317,28 +386,3 @@ Route::middleware(['web', 'auth', 'verified', 'impersonate'])->group(function ()
 
     Route::resource('/admin/enrolments', EnrolmentController::class);
 });
-
-
-
-//ROUTES FOR EMAIL VERIFICATION//
-Route::get('/email/verify', function () {
-    return view('auth.verify-email');
-})->middleware('auth')->name('verification.notice');
-
-Route::get('/email/verify/{id}/{hash}', function (EmailVerificationRequest $request) {
-    $request->fulfill();
-
-    return redirect('/dashboard');
-})->middleware(['auth', 'signed'])->name('verification.verify');
-
-Route::post('/email/verification-notification', function (Request $request) {
-    $request->user()->sendEmailVerificationNotification();
-
-    return back()->with('message', 'Verification link sent!');
-})->middleware(['auth', 'throttle:6,1'])->name('verification.send');
-
-
-// ROUTES ONLY AJAX//
-
-// Route::post('uploadFileImages',[UploadImages::class,'index']);
-// Route::get('uploadFileImages',[UploadImages::class,'index']);
