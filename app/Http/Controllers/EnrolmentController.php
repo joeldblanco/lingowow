@@ -64,6 +64,11 @@ class EnrolmentController extends Controller
             'course_id' => $request->get('course_id'),
         ]);
         $enrolment->save();
+        
+        if(Course::find($request->get('course_id'))->categories->pluck('name')->contains('Conversational') && ($request->get('student_id') == null) && ($request->get('teacher_id') != null))
+        {
+            User::find($request->get('teacher_id'))->givePermissionTo('edit conversational courses');
+        }
 
         return redirect()->route('enrolments.index');
     }

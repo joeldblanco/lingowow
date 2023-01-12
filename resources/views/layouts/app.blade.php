@@ -165,7 +165,17 @@
             }
         })(document, "script");
 
+        window.chatwootSettings = {
+            hideMessageBubble: false,
+            position: "right", // This can be left or right
+            locale: "en", // Language to be set
+            useBrowserLanguage: true, // Set widget language from user's browser
+            type: "expanded_bubble", // [standard, expanded_bubble]
+            darkMode: "auto", // [light, auto]
+        };
+
         window.addEventListener("chatwoot:ready", function() {
+
             window.$chatwoot.setUser("{{ auth()->id() }}", {
                 email: "{{ auth()->user()->email }}",
                 name: "{{ auth()->user()->first_name }} {{ auth()->user()->last_name }}",

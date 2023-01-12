@@ -5,10 +5,18 @@
 
                 <div class="w-full flex justify-between my-10">
                     <h2 class="text-4xl font-bold text-gray-800 capitalize">My Modules</h2>
-                    @role('admin')
-                        <a href="{{ route('modules.create') }}"
-                            class="text-center leading-10 text-3xl font-bold text-white capitalize rounded-full bg-lw-blue w-10 mr-10 hover:bg-lw-light_blue">+</a>
-                    @endrole
+                    @if ($course->categories->pluck('name')->contains('Conversational'))
+                        @can('edit conversational courses')
+                            <a href="{{ route('modules.create', ['course' => $course->id]) }}"
+                                class="text-center leading-10 text-3xl font-bold text-white capitalize rounded-full bg-lw-blue w-10 mr-10 hover:bg-lw-light_blue">+</a>
+                        @endcan
+                    @else
+                        @role('admin')
+                            <a href="{{ route('modules.create', ['course' => $course->id]) }}"
+                                class="text-center leading-10 text-3xl font-bold text-white capitalize rounded-full bg-lw-blue w-10 mr-10 hover:bg-lw-light_blue">+</a>
+                        @endrole
+                    @endif
+
                 </div>
                 <hr class="mb-10">
                 @forelse ($modules as $module)
@@ -50,5 +58,5 @@
     </div>
 
     <x-shepherd-tour tourName="guests/modules_preview" role="guest" />
-    
+
 </x-app-layout>

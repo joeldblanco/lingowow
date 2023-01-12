@@ -28,9 +28,14 @@ class ModuleController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
+    public function create(Request $request)
     {
-        $courses = Course::all();
+        if (auth()->user()->hasRole('admin')) {
+            $courses = collect(Course::all());
+        } else {
+            $courses = collect([Course::find($request->course)]);
+        }
+
         return view('course.module.create', compact('courses'));
     }
 
@@ -65,53 +70,16 @@ class ModuleController extends Controller
         $user = User::find(auth()->id());
         $role = $user->roles->first()->name;
         $module_units  = $module->units;
-        //dd($module_units);
-
-        // $module_units = [];
-        // $module->groups->each(function($group, $key) use (&$module_units){
-        //     $group->units->each(function($unit, $key2) use (&$module_units){
-        //         array_push($module_units,$unit);
-        //     });
-        // });
-
-        // dd($module->groups->count());
-
-
-        // foreach ($groups as $key => $value) {
-        //     // dd(json_decode($value->units()->where('status','1')->get()));
-        //     $unit[] = $value->units()->where('status','1')->get();
-
-        // }
-
-        // dd($unit);
-        // $units = $module->units->where('status', 1)->sort();
 
         if ($role == "admin") {
-            // $user_units = $module->units;
             $user_units = $module_units;
         } else if ($role == "teacher") {
             $user_units = $module_units;
         } else if ($role == "student") {
             $user_units = $module_units->where('order', '<=', $user->units->first()->order);
-            // $user_units = $user->units->where('status', 1);
-            // $user_units = $user_units->diff($user_units->diff($module->units->where('status', 1)));
-
-            // $user_units = $user->units->intersect($units)->sort();
         } else if ($role == "guest") {
             $user_units = new Collection([$module_units->where('order', 1)->first()]);
         }
-
-        // $units = $units->diff($user_units);
-        // dd($module_units->first()->isPassed);
-        // foreach ($module_units->first()->isPassed($user->id) as $key => $value) {
-        // dd($module_units->first()->isPassed($user->id)->first()->pivot->nota);
-        // }
-        // $units = array_diff($module_units,$user_units);
-        // $units = $module_units;
-        // dd($units[0]->exams);
-        // dd($module_units, $user_units, $units);
-        // dd($user->id);
-        // dd($user_units);
         return view('course.module.show', compact('user', 'role', 'module_units', 'user_units'));
     }
 
@@ -180,6 +148,17 @@ class ModuleController extends Controller
             }
         }
         return redirect()->route('courses.details', $request->course_id);
+    }
+
+    /**
+     * Show module details
+     *
+     * @param  \App\Models\Module  $module
+     * @return \Illuminate\Http\Response
+     */
+    public function details(Module $module)
+    {
+        return view('course.module.details', compact('module'));
     }
 
     static function is_passed($nota, $id)
