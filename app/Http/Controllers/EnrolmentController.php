@@ -35,13 +35,52 @@ class EnrolmentController extends Controller
             $query->where('name', 'teacher');
         })->orderBy('first_name')->orderBy('last_name')->get();
 
-        $students = User::whereHas('roles', function ($query) {
-            $query->where('name', 'student');
-        })->orderBy('first_name')->orderBy('last_name')->get();
+        $guests = User::role('guest')->orderBy('first_name')->orderBy('last_name')->get();
 
         $courses = Course::orderBy('name')->get();
 
-        return view('enrolments.create', compact('teachers', 'courses', 'students'));
+        return view('enrolments.create', compact('teachers', 'courses', 'guests'));
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function isScheduleNeeded(Request $request)
+    {
+        $request->validate([
+            'course_id' => 'required|numeric|exists:App\Models\Course,id',
+        ]);
+
+        // dd($request);
+
+        $course = Course::find($request->course_id);
+
+        if ($course->categories->pluck('name')->contains("Synchronous")) {
+            $request->validate([
+                'teacher_id' => 'required|numeric|exists:App\Models\User,id',
+                'student_id' => 'numeric|exists:App\Models\User,id',
+            ]);
+
+            if ($request->student_id == null) {
+                $this->store($request);
+            } else {
+                $selected_teacher = $request->teacher_id;
+                $student_id = $request->student_id;
+
+                return view('enrolments.schedule-selection', compact('student_id', 'selected_teacher'));
+            }
+        }
+
+        if ($course->categories->pluck('name')->contains("Asynchronous")) {
+            $request->validate([
+                'student_id' => 'required|numeric|exists:App\Models\User,id',
+            ]);
+
+            $this->store($request);
+        }
     }
 
     /**
@@ -52,22 +91,19 @@ class EnrolmentController extends Controller
      */
     public function store(Request $request)
     {
-        $request->validate([
-            'teacher_id' => 'required',
-            // 'student_id' => 'required',
-            'course_id' => 'required',
-        ]);
-
         $enrolment = new Enrolment([
             'teacher_id' => $request->get('teacher_id'),
             'student_id' => $request->get('student_id'),
             'course_id' => $request->get('course_id'),
         ]);
         $enrolment->save();
-        
-        if(Course::find($request->get('course_id'))->categories->pluck('name')->contains('Conversational') && ($request->get('student_id') == null) && ($request->get('teacher_id') != null))
-        {
+
+        if (Course::find($request->get('course_id'))->categories->pluck('name')->contains('Conversational') && ($request->get('student_id') == null) && ($request->get('teacher_id') != null)) {
             User::find($request->get('teacher_id'))->givePermissionTo('edit conversational courses');
+        }
+
+        if (($request->get('student_id') != null) && ($request->get('teacher_id') != null)) {
+            User::find($request->get('student_id'))->givePermissionTo('view units');
         }
 
         return redirect()->route('enrolments.index');

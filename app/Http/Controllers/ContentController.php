@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Content;
+use App\Models\Unit;
 use Illuminate\Http\Request;
 
 class ContentController extends Controller
@@ -24,9 +25,19 @@ class ContentController extends Controller
      */
     public function create(Request $request)
     {
-        $type = $request->type;
-        $unit_id = $request->unit_id;
-        return view('contents.create', compact('type', 'unit_id'));
+        $unit = Unit::find($request->unit_id);
+
+        if (auth()->user()->getRoleNames()->first() == "admin") {
+            $type = $request->type;
+            $unit_id = $unit->id;
+            return view('contents.create', compact('type', 'unit_id'));
+        } else if (auth()->user()->getRoleNames()->first() == "teacher" && $unit->course()->categories->pluck('name')->contains('Conversational') && auth()->user()->modules->contains($unit->module)) {
+            $type = $request->type;
+            $unit_id = $unit->id;
+            return view('contents.create', compact('type', 'unit_id'));
+        } else {
+            abort(404);
+        }
     }
 
     /**
@@ -109,8 +120,15 @@ class ContentController extends Controller
      */
     public function edit(Content $content)
     {
-        $content->content = json_decode($content->content);
-        return view('contents.edit', compact('content'));
+        if (auth()->user()->getRoleNames()->first() == "admin") {
+            $content->content = json_decode($content->content);
+            return view('contents.edit', compact('content'));
+        } else if (auth()->user()->getRoleNames()->first() == "teacher" && $content->unit->course()->categories->pluck('name')->contains('Conversational') && auth()->user()->modules->contains($content->unit->module)) {
+            $content->content = json_decode($content->content);
+            return view('contents.edit', compact('content'));
+        } else {
+            abort(404);
+        }
     }
 
     /**
@@ -138,15 +156,14 @@ class ContentController extends Controller
         }
 
         if ($request->type == 'media') {
-            
+
             $content->content = json_encode([
                 'type' => $request->type,
-                'media_url' => 'public/'.$request->data,
+                'media_url' => 'public/' . $request->data,
             ]);
         }
 
         $content->unit_id = $content->unit_id;
-        $content->save();
         return redirect()->route('units.show', ['unit' => $content->unit_id]);
     }
 

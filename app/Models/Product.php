@@ -20,6 +20,16 @@ class Product extends Model
         'image',
     ];
 
+
+    /**
+     * The plans that belong to the product.
+     */
+    public function plans()
+    {
+        return $this->belongsToMany(Plan::class);
+    }
+
+
     /**
      * Get the courses associated with the product.
      */
