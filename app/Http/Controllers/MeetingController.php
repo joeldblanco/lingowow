@@ -260,7 +260,7 @@ class MeetingController extends Controller
         }
     }
 
-    public function getRecordings()
+    public function getRecordings($link = false)
     {
         $meetings = Meeting::find(auth()->user()->studentClasses->pluck('meeting_id')->unique()->toArray());
         $recordings = [];
@@ -283,8 +283,13 @@ class MeetingController extends Controller
                         'password' => $password,
                     ];
                 }
-
+            } else {
+                $recordings = [];
             }
+        }
+
+        if ($link) {
+            return $recordings;
         }
 
         return view('meetings.recordings', compact('recordings'));

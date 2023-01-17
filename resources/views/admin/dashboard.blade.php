@@ -172,7 +172,7 @@
                         </tbody>
                     </table>
                 @endif
-                {{-- <div id="chart" class="w-1/2"></div> --}}
+                <div id="chart" class="w-1/2"></div>
             </div>
             <div class="flex flex-col w-1/3 space-y-4">
                 {{-- <div class="flex flex-col justify-between h-44"> --}}
@@ -268,8 +268,7 @@
         }
 
         var chart = new ApexCharts(document.querySelector("#chart"), options);
-        // console.log(chart);
-        chart.render(); //ESTA LINEA ME DA ERROR
+        chart.render();
     </script>
 
 </x-app-layout>

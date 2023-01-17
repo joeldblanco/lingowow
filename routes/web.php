@@ -4,6 +4,7 @@ use App\Http\Controllers\ActivityController;
 use App\Http\Controllers\AnalyticsController;
 use App\Http\Controllers\AttemptController;
 use App\Http\Controllers\ChatController;
+use App\Http\Controllers\ChatwootController;
 use App\Http\Controllers\ClassController;
 use App\Http\Controllers\ClassroomController;
 use App\Http\Controllers\ContentController;
@@ -39,6 +40,7 @@ use App\Http\Controllers\PaypalController;
 use App\Http\Controllers\ProductController;
 use App\Models\Attempt;
 use App\Http\Controllers\UploadImages;
+use App\Http\Controllers\WhatsAppController;
 use App\Http\Livewire\ClassesComponent;
 use App\Models\Enrolment;
 use App\Models\Meeting;
@@ -95,6 +97,9 @@ Route::middleware(['web', 'auth', 'verified', 'impersonate'])->group(function ()
 
 
 
+    Route::get('chatwoot/createContact', [ChatwootController::class, 'createContact']);
+
+
 
     Route::post('/complete-tour', function (Request $request) {
         $query = DB::table('shepherd_users')->insertOrIgnore([
@@ -148,15 +153,28 @@ Route::middleware(['web', 'auth', 'verified', 'impersonate'])->group(function ()
 
     //ROUTES FOR UNITS//
     Route::get('/units', [UnitController::class, 'index'])->name('units.index');
-    Route::middleware(['role:admin'])->get('/units/create', [UnitController::class, 'create'])->name('units.create');
-    Route::middleware(['role:admin'])->post('/units', [UnitController::class, 'store'])->name('units.store');
-    Route::get('/units/{id}', [UnitController::class, 'show'])->name('units.show');
-    Route::middleware(['role:admin'])->get('/units/{unit}/edit', [UnitController::class, 'edit'])->name('units.edit');
-    Route::middleware(['role:admin'])->patch('/units/{unit}', [UnitController::class, 'update'])->name('units.update');
+    Route::middleware(['role:admin|teacher'])->get('/units/create', [UnitController::class, 'create'])->name('units.create');
+    Route::middleware(['role:admin|teacher'])->post('/units', [UnitController::class, 'store'])->name('units.store');
+    Route::get('/units/{unit}', [UnitController::class, 'show'])->name('units.show');
+    Route::middleware(['role:admin|teacher'])->get('/units/{unit}/edit', [UnitController::class, 'edit'])->name('units.edit');
+    Route::middleware(['role:admin|teacher'])->patch('/units/{unit}', [UnitController::class, 'update'])->name('units.update');
     Route::middleware(['role:admin'])->delete('/units/{id}', [UnitController::class, 'destroy'])->name('units.destroy');
 
     Route::post('units/sort', [UnitController::class, 'sort'])->name('units.sort');
     Route::get('/units/{unit}/details', [UnitController::class, "details"])->name('units.details');
+
+
+
+    //ROUTES FOR CONTENTS//
+    Route::get('/contents', [ContentController::class, 'index'])->name('contents.index');
+    Route::middleware(['role:admin|teacher'])->get('/contents/create', [ContentController::class, 'create'])->name('contents.create');
+    Route::middleware(['role:admin|teacher'])->post('/contents', [ContentController::class, 'store'])->name('contents.store');
+    Route::get('/contents/{id}', [ContentController::class, 'show'])->name('contents.show');
+    Route::middleware(['role:admin|teacher'])->get('/contents/{content}/edit', [ContentController::class, 'edit'])->name('contents.edit');
+    Route::middleware(['role:admin|teacher'])->patch('/contents/{content}', [ContentController::class, 'update'])->name('contents.update');
+    Route::middleware(['role:admin'])->delete('/contents/{id}', [ContentController::class, 'destroy'])->name('contents.destroy');
+
+    Route::post('contents/sort', [ContentController::class, 'sort'])->name('contents.sort');
 
 
 
@@ -262,13 +280,6 @@ Route::middleware(['web', 'auth', 'verified', 'impersonate'])->group(function ()
 
 
 
-        //ROUTES FOR CONTENTS//
-        Route::resource('/contents', ContentController::class);
-        Route::post('contents/sort', [ContentController::class, 'sort'])->name('contents.sort');
-
-
-
-
         //ROUTES FOR CLASSES//
         Route::get('/admin/classes', ClassesComponent::class)->name('admin.classes.index');
 
@@ -286,6 +297,9 @@ Route::middleware(['web', 'auth', 'verified', 'impersonate'])->group(function ()
 
 
 
+        //ROUTES FOR WHATSAPP BUSINESS API//
+        Route::post('/whatsapp/callback', [WhatsAppController::class, 'handleCallback']);
+
 
         //ROUTES FOR IMPERSONATION//
         Route::get('/users/impersonate/{id}', [UsersController::class, 'impersonate'])->name('impersonate');
@@ -295,6 +309,7 @@ Route::middleware(['web', 'auth', 'verified', 'impersonate'])->group(function ()
 
         //ROUTES FOR ENROLMENTS//
         Route::resource('enrolments', EnrolmentController::class);
+        Route::post('enrolments/checkSchedule', [EnrolmentController::class, 'isScheduleNeeded'])->name('enrolments.checkSchedule');
 
         //USER RESET//
         Route::get('/reset/{users}', function (User ...$users) {

@@ -29,7 +29,11 @@ class UnitController extends Controller
      */
     public function create()
     {
-        $modules = Module::all();
+        if (auth()->user()->getRoleNames()->first() == "admin") {
+            $modules = Module::all()->orderBy('order');
+        } else {
+            $modules = auth()->user()->modules->sortBy('order');
+        }
         return view('course.module.unit.create', compact('modules'));
     }
 
@@ -41,12 +45,12 @@ class UnitController extends Controller
      */
     public function store(Request $request)
     {
-        // dd($request);
+
         $request->validate([
             'name' => 'required',
             'status' => 'required',
             'module_id' => 'required',
-            'image' => 'required|image|mimes:jpeg,png,jpg|max:2048',
+            'image' => 'image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
         $unit = new Unit();
@@ -78,19 +82,15 @@ class UnitController extends Controller
         }
 
         if ($role == "teacher") {
-            $teacher_courses = $user->enrolments_teacher->pluck('course');
-            $teacher_units = new Collection();
-            foreach ($teacher_courses as $course) {
-                if (count($course->units()) > 0) {
-                    $teacher_units->push($course->units());
-                }
-            }
-            $teacher_units = $teacher_units->flatten();
 
-            if ($teacher_units->contains(Unit::findOrFail($id))) {
-                $unit = Unit::find($id);
-            } else {
-                abort(403, 'USER DOES NOT HAVE THE RIGHT PERMISSIONS.');
+            $unit = Unit::findOrFail($id);
+            $course = $unit->course();
+
+            if ($course->categories->pluck('name')->contains('Conversational')) {
+                $teacher_units = $user->modules->pluck('units')->flatten();
+
+                if (!$teacher_units->contains($unit, false))
+                    abort(404);
             }
         }
 
@@ -189,7 +189,26 @@ class UnitController extends Controller
     public function destroy(Unit $unit)
     {
         $module_id = $unit->module->id;
-        $unit->delete();
+        $user = User::find(auth()->id());
+        $role = $user->roles->first()->name;
+
+        if ($role == "admin") {
+            $unit->delete();
+        }
+
+        if ($role == "teacher") {
+
+            $course = $unit->course();
+
+            if ($course->categories->pluck('name')->contains('Conversational')) {
+                $teacher_units = $user->modules->pluck('units')->flatten();
+
+                if (!$teacher_units->contains($unit, false))
+                    abort(404);
+
+                $unit->delete();
+            }
+        }
 
         return redirect()->route('modules.details', $module_id);
     }

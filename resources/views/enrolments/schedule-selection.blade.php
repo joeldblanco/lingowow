@@ -3,7 +3,7 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="p-6 sm:px-20 bg-white border-b border-gray-200">
 
-                <form method="POST" action="{{ route('enrolments.checkSchedule') }}"
+                {{-- <form method="POST" action="{{ route('enrolments.store') }}"
                     class="bg-white rounded-md w-1/2 p-6 my-4 mx-auto border border-gray-400">
                     @csrf
                     <div class="divide-y">
@@ -13,8 +13,8 @@
                         <div>
                             <div class="py-6 space-y-1">
                                 <p class="font-bold text-gray-600 mb-1">Guest</p>
-                                <select name="student_id" id="student_id"
-                                    class="w-full rounded-md hover:border-gray-600 p-3 text-gray-600 @if ($errors->has('student_id')) border-red-600 @else border-gray-300 @endif">
+                                <select name="guest_id" id="guest_id"
+                                    class="w-full rounded-md hover:border-gray-600 p-3 text-gray-600 @if ($errors->has('guest_id')) border-red-600 @else border-gray-300 @endif">
                                     <option value="none" selected disabled hidden>Select a guest</option>
                                     @foreach ($guests as $guest)
                                         <option value="{{ $guest->id }}">
@@ -58,7 +58,11 @@
                             Save
                         </button>
                     </div>
-                </form>
+                </form> --}}
+
+                @livewire('teachers-carousel', ['available_teachers' => $selected_teacher])
+
+                @livewire('schedule', ['plan' => 99, 'user_id' => $student_id, 'mode' => 'edit'])
 
             </div>
         </div>
