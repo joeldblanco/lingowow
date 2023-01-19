@@ -232,7 +232,7 @@
                                                     {{-- @php dd(($i+6)."-".$day_range[$d]); @endphp --}}
                                                     @if (in_array([$i, $e], $students_schedules) || in_array($i . '-' . $day_range[$d], $abcense_classes))
                                                         <td id="{{ $i }}-{{ $e }}-{{ $week }}-{{ $period_range[$d] }}"
-                                                            class="border width occupied">
+                                                            class="border width occupied bg-gray-100">
                                                         </td>
                                                     @else
                                                         <td id="{{ $i }}-{{ $e }}-{{ $week }}-{{ $period_range[$d] }}"
@@ -241,7 +241,7 @@
                                                     @endif
                                                 @else
                                                     <td id="{{ $i }}-{{ $e }}-{{ $week }}-{{ $period_range[$d] }}"
-                                                        class="border width occupied">
+                                                        class="border width occupied bg-gray-100">
                                                     </td>
                                                 @endif
                                                 @php

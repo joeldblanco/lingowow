@@ -266,6 +266,8 @@ class ClassController extends Controller
         // }else{
 
         // }
+
+        return $recordings;
     }
 
     public function checkClasses(Request $request)

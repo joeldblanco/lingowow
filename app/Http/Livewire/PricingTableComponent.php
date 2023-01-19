@@ -64,7 +64,7 @@ class PricingTableComponent extends Component
             $product = Course::find($this->selectedProduct)->products->first();
         }
 
-        // dd(Course::find($this->selectedProduct));
+        dd($product->plans);
 
         $plans =  DB::table('plans')
             ->join('plans_products', function ($join) use (&$product) {

@@ -55,9 +55,9 @@ class Kernel extends ConsoleKernel
 
                     if ($pending_classes <= 0) {
                         $enrolment = Enrolment::where('student_id', $user->id)->first();
-                        if ($enrolment) {
+                        if ($enrolment && $enrolment->course->mdoality == 'synchronous') {
                             $user_schedule = ModelsSchedule::where('user_id', $user->id)->where('enrolment_id', $enrolment->id)->where('next_schedule', null)->first();
-                            dump($user_schedule);
+                            // dump($user_schedule);
                             if ($user_schedule) {
                                 $enrolment->delete();
                                 $user_schedule->delete();

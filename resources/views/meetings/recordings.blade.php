@@ -53,14 +53,8 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @if (count($recordings) <= 0)
-                                    <tr class="text-3xl font-bold">
-                                        <td colspan="4" class="text-center">
-                                            <div class="py-20 text-red-500">No recordings available.</div>
-                                        </td>
-                                    </tr>
-                                @endif
-                                @foreach ($recordings as $recording)
+                                @forelse ($recordings as $recording)
+                                {{dd($recordings)}}
                                     <tr class="text-center">
                                         <td class="py-4 px-6 border-b border-gray-400 text-center">
                                             {{ $recording['recording_start'] }}
@@ -80,7 +74,13 @@
                                             </a>
                                         </td>
                                     </tr>
-                                @endforeach
+                                @empty
+                                    <tr class="text-3xl font-bold">
+                                        <td colspan="4" class="text-center">
+                                            <div class="py-20 text-red-500">No recordings available.</div>
+                                        </td>
+                                    </tr>
+                                @endforelse
                             </tbody>
                         </table>
                     </div>

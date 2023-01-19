@@ -8,6 +8,7 @@ use App\Models\User;
 use App\Models\Group_unit;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class CourseController extends Controller
 {
@@ -113,17 +114,44 @@ class CourseController extends Controller
         $user = User::find(auth()->id());
         $role = $user->roles->first()->name;
         $modules = $course->modules->where('status', 1)->sortBy('order');
-        $user_modules = $course->modules->sortBy('order');
+
         if ($role == "guest") {
             $user_modules = new Collection([$modules->first()]);
+
+            if ($user->hasPermissionTo('view units')) {
+                $user_modules = new Collection();
+                foreach ($modules as $module) {
+                    if ($module->id <= $user->units->first()->module->order) {   //TO DO: use $module->order instead of $module->id *URGENT*
+                        $user_modules->push($module);
+                    }
+                }
+                $user_modules = $user_modules->unique();
+            }
         } else if ($role == "student") {
             $user_modules = new Collection();
-            foreach ($modules as $module) {
-                if ($module->id <= $user->units->first()->module->id) {   //TO DO: use $module->order instead of $module->id *URGENT*
-                    $user_modules->push($module);
+            if ($course->categories->pluck('name')->contains('Conversational')) {
+                $user_module = DB::table('module_user')->select('module_id')->where('user_id', auth()->user()->id)->first();
+                if (!empty($user_module)) {
+                    $user_module = Module::findOrFail($user_module->module_id);
+                    $user_modules->push($user_module);
                 }
+            } else {
+                foreach ($modules as $module) {
+                    if ($module->id <= $user->units->first()->module->order) {
+                        $user_modules->push($module);
+                    }
+                }
+                $user_modules = $user_modules->unique();
             }
-            $user_modules = $user_modules->unique();
+        } else if ($role == "teacher") {
+            if ($course->categories->pluck('name')->contains('Conversational')) {
+                $user_modules = $user->modules->sortBy('order');
+                $modules = $user_modules;
+            } else {
+                $user_modules = $modules;
+            }
+        } else if ($role == "admin") {
+            $user_modules = $course->modules->sortBy('order');
         }
 
         return view('course.show', compact('user_modules', 'modules', 'course'));

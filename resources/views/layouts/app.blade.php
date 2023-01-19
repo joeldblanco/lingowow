@@ -5,9 +5,14 @@
     @php
         
         // dd(Auth::user()->canBeImpersonated());
-        // $session_info = json_decode(((new Illuminate\Http\Client\PendingRequest())->get('http://ipwho.is/' . $_SERVER['REMOTE_ADDR']))->getBody(), true);
-        // session(['session_info' => $session_info]);
-        // dump(session('session_info'));
+        $session_info = json_decode((new Illuminate\Http\Client\PendingRequest())->get('http://ipwho.is/' . $_SERVER['REMOTE_ADDR'])->getBody(), true);
+        if ($session_info['success'] == false) {
+            session()->forget('session_info');
+        } else {
+            session(['session_info' => $session_info]);
+            session(['tz' => session('session_info')['timezone']['id']]);
+        }
+        // dd(session('session_info'));
         
         // if (isset($_GET['tz']) && session('tz') == null) {
         //     // This is just an example. In application this will come from Javascript (via an AJAX or something)
@@ -28,8 +33,6 @@
         
         //     // return !isset($_GET['tz']);
         // }
-        
-        // session(['tz' => session('session_info')['timezone']['id']]);
     @endphp
 
     <meta charset="utf-8">
