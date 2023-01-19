@@ -26,7 +26,7 @@ class TeachersCarousel extends Component
         if ($available_teachers == null) {
             $this->available_teachers = new Collection([]);
             $this->available_teachers = User::role('teacher')->get()->pluck('schedules')->flatten()->whereNotNull('selected_schedule')->pluck('user');
-            $this->teachers_ids = $available_teachers->pluck('id');
+            $this->teachers_ids = $this->available_teachers->pluck('id');
         } else {
             $this->teachers_ids = $available_teachers;
             if (!is_array($available_teachers)) {
@@ -82,7 +82,8 @@ class TeachersCarousel extends Component
 
     public function render()
     {
-        if (!is_array($this->teachers_ids)) {
+        // dd($this->teachers_ids);
+        if (!is_iterable($this->teachers_ids)) {
             $this->teachers_ids = [$this->teachers_ids];
         }
         $this->available_teachers = new Collection([]);

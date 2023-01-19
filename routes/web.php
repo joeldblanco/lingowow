@@ -172,7 +172,7 @@ Route::middleware(['web', 'auth', 'verified', 'impersonate'])->group(function ()
     Route::get('/contents/{id}', [ContentController::class, 'show'])->name('contents.show');
     Route::middleware(['role:admin|teacher'])->get('/contents/{content}/edit', [ContentController::class, 'edit'])->name('contents.edit');
     Route::middleware(['role:admin|teacher'])->patch('/contents/{content}', [ContentController::class, 'update'])->name('contents.update');
-    Route::middleware(['role:admin'])->delete('/contents/{id}', [ContentController::class, 'destroy'])->name('contents.destroy');
+    Route::middleware(['role:admin|teacher'])->delete('/contents/{id}', [ContentController::class, 'destroy'])->name('contents.destroy');
 
     Route::post('contents/sort', [ContentController::class, 'sort'])->name('contents.sort');
 

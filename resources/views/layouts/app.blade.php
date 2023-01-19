@@ -79,6 +79,7 @@
     <script src="{{ asset('js/wordfind.js') }}"></script>
     <script src="{{ asset('js/wordfindgame.js') }}"></script>
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.0.2/index.global.min.js"></script>
+    <script src='//fw-cdn.com/2451489/3025849.js' chat='true'></script>
 </head>
 
 <body class="font-sans antialiased">
@@ -94,9 +95,9 @@
         @endif
 
         @if (auth()->user()->roles->first()->name == 'guest' &&
-            (Route::currentRouteName() == 'courses.show' ||
-                Route::currentRouteName() == 'modules.show' ||
-                Route::currentRouteName() == 'units.show'))
+                (Route::currentRouteName() == 'courses.show' ||
+                    Route::currentRouteName() == 'modules.show' ||
+                    Route::currentRouteName() == 'units.show'))
             {{-- <div class="bg-lw-blue text-center py-3">
                 <p class="text-black font-semibold">You are previewing a course. If you want to buy it click in the link
                     below.</p>
@@ -151,7 +152,7 @@
     <script src="{{ asset('js/activities.js') }}"></script>
     {{-- @include('components.loading-state') --}}
 
-    <script>
+    {{-- <script>
         (function(d, t) {
             var BASE_URL = "https://app.chatwoot.com";
             var g = d.createElement(t),
@@ -186,6 +187,61 @@
                 // phone_number: "<phone-number-of-the-user>",
             });
         });
+    </script> --}}
+
+    <script defer>
+        // window.fcWidget.user.create({
+        //     externalId: '{{ auth()->id() }}',
+        //     firstName: '{{ auth()->user()->first_name }}',
+        //     lastName: '{{ auth()->user()->last_name }}',
+        //     email: '{{ auth()->user()->email }}',
+        // }, function(data) {
+        //     console.log('User created', data)
+        // })
+
+
+
+
+
+
+
+        // function initFreshChat() {
+        //     window.fcWidget.init({
+        //         token: "d01c8512-38eb-4066-8446-862f13f26e8f",
+        //         host: "https://lingowow-org.freshchat.com/",
+        //         externalId: '{{ auth()->id() }}', // user’s id unique to your system
+        //         firstName: '{{ auth()->user()->first_name }}', // user’s first name
+        //         lastName: '{{ auth()->user()->last_name }}',
+        //         email: '{{ auth()->user()->email }}', // user’s email
+        //     });
+        // }
+
+        // function initialize(i, t) {
+        //     var e;
+        //     i.getElementById(t) ? initFreshChat() : ((e = i.createElement("script")).id = t, e.async = !0, e.src =
+        //         "https://lingowow-org.freshchat.com/js/widget.js", e.onload = initFreshChat, i.head.appendChild(e))
+        // }
+
+        // function initiateCall() {
+        //     initialize(document, "freshchat-js-sdk")
+        // }
+
+        // window.addEventListener ? window.addEventListener("load", initiateCall, !1) : window.attachEvent("onload",
+        //     initiateCall);
+
+
+
+
+
+
+        /// To set unique user id in your system when it is available
+        // window.fcWidget.setExternalId = "john.doe1987";
+
+        // // To set user name
+        // window.fcWidget.user.setFirstName("John");
+
+        // // To set user email
+        // window.fcWidget.user.setEmail("john.doe@gmail.com");
     </script>
 
 </body>
