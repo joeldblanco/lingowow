@@ -173,8 +173,9 @@ class ContentController extends Controller
      * @param  \App\Models\Content  $content
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Content $content)
+    public function destroy($id)
     {
+        $content = Content::find($id);
         $unit_id = $content->unit_id;
         $content->delete();
         return redirect()->route('units.show', $unit_id);
