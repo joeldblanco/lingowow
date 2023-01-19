@@ -54,14 +54,14 @@ class Schedule extends Component
     //variables para el horario de un solo bloque!
     public $table_date = [];
     public $date_format_range = [];
-    public $day_range =[];
+    public $day_range = [];
     public $prediod_range = [];
     public $weeks = 0;
     public $period_end_aux;
     // public $day_rest = 0;
 
 
-    protected $listeners = ['showTeacherInfo', 'loadSelectingSchedule', 'checkForClass','findReserves' => 'findReservesAndRetun'];
+    protected $listeners = ['showTeacherInfo', 'loadSelectingSchedule', 'checkForClass', 'findReserves' => 'findReservesAndRetun'];
 
     /**
      * Create a new component instance.
@@ -73,8 +73,8 @@ class Schedule extends Component
         // dd($course_id);
 
         $reserve = ScheduleReserve::withTrashed()->updateOrCreate(
-            ['user_id' => auth()->id()],
-            ['teacher_id' => NULL,'selected_schedule' => NULL, 'type' => ""]
+            ['user_id' => $user_id],
+            ['teacher_id' => NULL, 'selected_schedule' => NULL, 'type' => ""]
             // ['type' => 'exam']
         );
 
@@ -130,10 +130,9 @@ class Schedule extends Component
 
             $this->schedules = User::withTrashed()->find($this->user->id)->schedules;
 
-            if(count($this->schedules) > 0){
+            if (count($this->schedules) > 0) {
                 $this->loadTeacherSchedule($this->user->id);
             }
-            
         } else if ($this->role == "admin") {
 
             // $this->loadAdminSchedule($this->user->id);
@@ -147,14 +146,14 @@ class Schedule extends Component
         session(['user_schedule' => []]);
 
         $current_period = DB::table("metadata")->where("key", "current_period")->first()->value;
-        $current_period = array_values(json_decode($current_period,1));
+        $current_period = array_values(json_decode($current_period, 1));
         // $current_period = ApportionmentController::currentPeriod();
         $period_start_c = new Carbon($current_period[0]);
         $period_end_c = new Carbon($current_period[1]);
         $this->now = new Carbon();
         // dd(new CarbonPeriod($this->now, $period_end_c));
         foreach (new CarbonPeriod($this->now, $period_end_c) as $key => $date) {
-                $this->days_rest++;
+            $this->days_rest++;
         }
 
         if ($mode == "one") {
@@ -164,17 +163,17 @@ class Schedule extends Component
             $period_start = $period_start_c->format('Y/m/d');
             $period_end = $period_end_c->format('Y/m/d');
             $this->weeks = ceil($period_start_c->floatDiffInWeeks($period_end_c) + 1);
-            if($this->weeks > 4){
+            if ($this->weeks > 4) {
                 $period_end_c->addWeek();
             }
             // dd($period_start_c);
-            
+
             $date_range = new CarbonPeriod($period_start_c->copy()->subDay(), $period_end_c);
             $this->day_format_range = [];
             $this->period_range = [];
             $this->day_range = [];
             $this->table_date = [];
-            
+
             foreach ($date_range as $key => $date) {
                 //if ($key) {
                 $this->day_format_range[$key] = $date->format('Y-m-d');
@@ -387,10 +386,10 @@ class Schedule extends Component
             // $period_end_c = new Carbon($current_period[1]);
 
             $this->classes = Classes::select()
-            ->where('enrolment_id', $enrolment->id)
-            ->whereDate('start_date', '>=', $period_start_c->copy()->subDay()->toDateTimeString())
-            ->get();
-            
+                ->where('enrolment_id', $enrolment->id)
+                ->whereDate('start_date', '>=', $period_start_c->copy()->subDay()->toDateTimeString())
+                ->get();
+
             // dd($this->classes, $period_start_c->copy()->subDay()->toDateTimeString());
 
             if ($this->classes->count() > 0) $this->classes = $this->classes->toArray();
@@ -510,10 +509,11 @@ class Schedule extends Component
         $this->showModalAbsence = true;
     }
 
-    public function findReservesAndRetun(){
+    public function findReservesAndRetun()
+    {
         // dd("entro!");
         // $reserve = ScheduleReserve::all()->whereNotNull('selected_schedule');
-        $schedules = []; 
+        $schedules = [];
         $schedules_exam = [];
         $classes = [];
         $current_period = ApportionmentController::currentPeriod();
@@ -525,36 +525,36 @@ class Schedule extends Component
         $schedules_exam = ScheduleReserve::all()->where('teacher_id', session('teacher_id'))->where('type', 'exam')->whereNotNull('selected_schedule')->pluck('selected_schedule');
         $classes = User::find(session('teacher_id'))->teacherClasses()->where('status', 1)->whereDate('start_date', '>=', $current_period[0])->orderBy('start_date', 'asc')->get()->pluck('start_date');
         // dd($classes);
-        
-        foreach($schedules as $schedule){
+
+        foreach ($schedules as $schedule) {
             $schedules_reserve = array_merge($schedules_reserve, json_decode($schedule));
         }
 
-        if($this->mode == "edit"){
-            foreach($schedules_exam as $schedule){
+        if ($this->mode == "edit") {
+            foreach ($schedules_exam as $schedule) {
                 // dd(json_decode($schedule)[0][0]);
-                $schedules_exam_reserve = array_merge($schedules_exam_reserve, [[(json_decode($schedule))[0][0],(json_decode($schedule))[0][1]]]);
+                $schedules_exam_reserve = array_merge($schedules_exam_reserve, [[(json_decode($schedule))[0][0], (json_decode($schedule))[0][1]]]);
             }
-            foreach($classes as $key => $class){
-                $date_class = new Carbon($class); 
+            foreach ($classes as $key => $class) {
+                $date_class = new Carbon($class);
                 $schedules_exam_reserve = array_merge($schedules_exam_reserve, [[$date_class->isoFormat('H'), $date_class->isoFormat('d')]]);
             }
-            foreach($classes as $key => $class){
-                $date_class = new Carbon($class); 
+            foreach ($classes as $key => $class) {
+                $date_class = new Carbon($class);
                 $schedules_exam_reserve = array_merge($schedules_exam_reserve, [[$date_class->isoFormat('H'), $date_class->isoFormat('d')]]);
             }
-        }elseif ($this->mode == "one"){
-            foreach($schedules_exam as $schedule){
+        } elseif ($this->mode == "one") {
+            foreach ($schedules_exam as $schedule) {
                 $schedules_exam_reserve = array_merge($schedules_exam_reserve, json_decode($schedule));
             }
-            foreach($classes as $key => $class){
-                $date_class = new Carbon($class); 
-                $schedules_exam_reserve = array_merge($schedules_exam_reserve, [[$date_class->isoFormat('H'), $date_class->isoFormat('d'), (string)($date_class->weekOfMonth-1), $date_class->isoFormat('MM'), $date_class->isoFormat('DD')]]);
+            foreach ($classes as $key => $class) {
+                $date_class = new Carbon($class);
+                $schedules_exam_reserve = array_merge($schedules_exam_reserve, [[$date_class->isoFormat('H'), $date_class->isoFormat('d'), (string)($date_class->weekOfMonth - 1), $date_class->isoFormat('MM'), $date_class->isoFormat('DD')]]);
             }
         }
 
-        foreach($schedules_exam_reserve as $day){
-            if($this->notFree($schedules_exam_reserve, $day, $this->days_rest) && !in_array($day, $schedules_exam_not_free)){
+        foreach ($schedules_exam_reserve as $day) {
+            if ($this->notFree($schedules_exam_reserve, $day, $this->days_rest) && !in_array($day, $schedules_exam_not_free)) {
                 $schedules_exam_not_free[] = $day;
             }
         }
@@ -562,7 +562,6 @@ class Schedule extends Component
         // $schedules_exam_not_fre = array_unique($schedules_exam_not_fre);
         // dd($schedules_exam_reserve, $schedules_exam, $schedules_exam_not_free, $schedules_exam_not_free);
         $this->dispatchBrowserEvent('reserves_schedules_event_js', ['schedules' => $schedules_reserve, 'schedules_exam' => $schedules_exam_not_free, 'mode' => $this->mode, 'plan' => $this->plan]);
-
     }
 
     /**

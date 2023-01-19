@@ -17,10 +17,12 @@ class CreateSchedulesTable extends Migration
             $table->bigIncrements('id');
             $table->longText('selected_schedule')->nullable();
             $table->longText('next_schedule')->nullable();//
-            $table->bigInteger('user_id')->unsigned()->unique();
+            $table->bigInteger('user_id')->unsigned();
             $table->bigInteger('enrolment_id')->unsigned()->nullable();
             $table->timestamps();
             $table->softDeletes();
+
+            $table->unique(['user_id', 'enrolment_id']); // Establecer clave única a la combinación de usuario y enrolment
         });
     }
 

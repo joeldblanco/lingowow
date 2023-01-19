@@ -134,7 +134,6 @@
                 @php
                     $current_class_teacher = $current_class->teacher();
                     $current_class_student = $current_class->student();
-                    // dd($current_class);
                 @endphp
                 <p><span class="font-bold">Course:</span> {{ $enrolment->course->name }}</p>
                 <p><span class="font-bold">Teacher:</span> {{ $current_class_teacher->first_name }}

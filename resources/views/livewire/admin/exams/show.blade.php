@@ -23,7 +23,7 @@
                 x-transition:enter="transition duration-300" x-transition:enter-start="opacity-0"
                 x-transition:enter-end="opacity-100" x-transition:leave="transition duration-300"
                 x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0" x-show="create_question">
-                <form action="{{ route('question.store', $exam_id) }}" enctype="multipart/form-data" method="POST"
+                <form action="{{ route('questions.store', $exam_id) }}" enctype="multipart/form-data" method="POST"
                     id="exam-form">
                     <div class="w-full h-full flex items-center justify-center">
                         <div class="leading-loose">
@@ -68,7 +68,7 @@
                 x-transition:enter="transition duration-300" x-transition:enter-start="opacity-0"
                 x-transition:enter-end="opacity-100" x-transition:leave="transition duration-300"
                 x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0" x-show="import_question">
-                <form action="{{ route('question.import') }}" enctype="multipart/form-data" method="POST"
+                <form action="{{ route('questions.import') }}" enctype="multipart/form-data" method="POST"
                     id="exam-form">
                     <div class="w-full h-full flex items-center justify-center">
                         <div class="leading-loose">
@@ -160,14 +160,14 @@
                                     @endif
                                 </td>
                                 {{-- <td class="py-4 px-6 border-b border-gray-400 text-center">
-                                    <a href="{{route('question.show',[$exam_id,$question->id])}}" class="text-gray-600 font-bold py-1 px-3 rounded text-xs bg-blue-100 hover:bg-blue-500 hover:text-white">View</a>
+                                    <a href="{{route('questions.show',[$exam_id,$question->id])}}" class="text-gray-600 font-bold py-1 px-3 rounded text-xs bg-blue-100 hover:bg-blue-500 hover:text-white">View</a>
                                 </td> --}}
                                 <td class="py-4 px-6 border-b border-gray-400 text-center">
-                                    <a href="{{ route('question.edit', [$exam_id, $question->id]) }}"
+                                    <a href="{{ route('questions.edit', [$exam_id, $question->id]) }}"
                                         class="text-gray-600 font-bold py-1 px-3 rounded text-xs bg-blue-100 hover:bg-blue-500 hover:text-white">Edit</a>
                                 </td>
                                 <td class="py-4 px-6 border-b border-gray-400 text-center">
-                                    <a href="{{ route('question.destroy', [$exam_id, $question->id]) }}"
+                                    <a href="{{ route('questions.destroy', [$exam_id, $question->id]) }}"
                                         class="text-gray-600 font-bold py-1 px-3 rounded text-xs bg-red-100 hover:bg-red-500 hover:text-white">Delete</a>
                                 </td>
                             </tr>
