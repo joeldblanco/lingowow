@@ -244,6 +244,31 @@
         // window.fcWidget.user.setEmail("john.doe@gmail.com");
     </script>
 
+    <script defer>
+	function runFcWidgetFunction() {
+ 	    return new Promise(resolve => {
+   	    var intervalId = setInterval(() => {
+      	        if (typeof fcWidget !== 'undefined') {
+        	        clearInterval(intervalId);
+       		        resolve();
+                    }
+                }, 100);
+            });
+        }
+
+        runFcWidgetFunction().then(()=>{
+                /// To set unique user id in your system when it is available
+                window.fcWidget.setExternalId("{{auth()->id()}}");
+
+                // // To set user name
+                window.fcWidget.user.setFirstName("{{auth()->user()->first_name}}");
+                window.fcWidget.user.setLastName("{{auth()->user()->last_name}}");
+
+                // // To set user email
+                window.fcWidget.user.setEmail("{{auth()->user()->email}}");
+        });
+    </script>
+
 </body>
 
 </html>
