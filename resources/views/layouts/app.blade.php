@@ -98,11 +98,6 @@
                 (Route::currentRouteName() == 'courses.show' ||
                     Route::currentRouteName() == 'modules.show' ||
                     Route::currentRouteName() == 'units.show'))
-            {{-- <div class="bg-lw-blue text-center py-3">
-                <p class="text-black font-semibold">You are previewing a course. If you want to buy it click in the link
-                    below.</p>
-                <a href="{{ route('shop') }}" class="text-sm hover:font-bold text-white hover:underline">Shop</a>
-            </div> --}}
             <div class="bg-yellow-300 text-center py-3">
                 <p class="text-red-500 font-semibold">You are previewing a course. If you want to buy it click in the
                     link
@@ -124,148 +119,33 @@
     </div>
 
     @stack('modals')
-    {{-- <script>
-        let _tz = JSON.parse("{{ json_encode(tz()) }}");
-        if (_tz) {
-            var tz = new Date().getTimezoneOffset();
-            tz = tz == 0 ? 0 : -tz;
-            window.location.href = window.location.href + "?tz=" + tz;
-        }
-    </script> --}}
-    {{-- <script src="https://cdn.jsdelivr.net/gh/livewire/turbolinks@v0.1.x/dist/livewire-turbolinks.js"
-        data-turbolinks-eval="false"></script> --}}
-    @role('student')
-        {{-- <script src='//fw-cdn.com/2207350/2881175.js' chat='true'></script>
-        <script>
-            var new_contact = {
-                "First name": "{{auth()->user()->first_name}}", //Replace with first name of the user
-                "Last name": "{{auth()->user()->last_name}}", //Replace with last name of the user
-                "Email": "{{auth()->user()->email}}", //Replace with email of the user
-                "ID": "{{auth()->user()->id}}", //Replace with a custom field
-            };
-            var identifier = "{{auth()->user()->id}}";
-            fwcrm.identify(identifier, new_contact)
-        </script> --}}
-    @endrole
+
     <script src="https://cdn.jsdelivr.net/gh/livewire/turbolinks@v0.1.x/dist/livewire-turbolinks.js"
         data-turbolinks-eval="false"></script>
     <script src="{{ asset('js/activities.js') }}"></script>
-    {{-- @include('components.loading-state') --}}
-
-    {{-- <script>
-        (function(d, t) {
-            var BASE_URL = "https://app.chatwoot.com";
-            var g = d.createElement(t),
-                s = d.getElementsByTagName(t)[0];
-            g.src = BASE_URL + "/packs/js/sdk.js";
-            g.defer = true;
-            g.async = true;
-            s.parentNode.insertBefore(g, s);
-            g.onload = function() {
-                window.chatwootSDK.run({
-                    websiteToken: 'AT7bF4Zbt6nhFfpxDXUfoiBZ',
-                    baseUrl: BASE_URL
-                })
-            }
-        })(document, "script");
-
-        window.chatwootSettings = {
-            hideMessageBubble: false,
-            position: "right", // This can be left or right
-            locale: "en", // Language to be set
-            useBrowserLanguage: true, // Set widget language from user's browser
-            type: "expanded_bubble", // [standard, expanded_bubble]
-            darkMode: "auto", // [light, auto]
-        };
-
-        window.addEventListener("chatwoot:ready", function() {
-
-            window.$chatwoot.setUser("{{ auth()->id() }}", {
-                email: "{{ auth()->user()->email }}",
-                name: "{{ auth()->user()->first_name }} {{ auth()->user()->last_name }}",
-                // avatar_url: "<avatar-url-of-the-user>",
-                // phone_number: "<phone-number-of-the-user>",
-            });
-        });
-    </script> --}}
 
     <script defer>
-        // window.fcWidget.user.create({
-        //     externalId: '{{ auth()->id() }}',
-        //     firstName: '{{ auth()->user()->first_name }}',
-        //     lastName: '{{ auth()->user()->last_name }}',
-        //     email: '{{ auth()->user()->email }}',
-        // }, function(data) {
-        //     console.log('User created', data)
-        // })
-
-
-
-
-
-
-
-        // function initFreshChat() {
-        //     window.fcWidget.init({
-        //         token: "d01c8512-38eb-4066-8446-862f13f26e8f",
-        //         host: "https://lingowow-org.freshchat.com/",
-        //         externalId: '{{ auth()->id() }}', // user’s id unique to your system
-        //         firstName: '{{ auth()->user()->first_name }}', // user’s first name
-        //         lastName: '{{ auth()->user()->last_name }}',
-        //         email: '{{ auth()->user()->email }}', // user’s email
-        //     });
-        // }
-
-        // function initialize(i, t) {
-        //     var e;
-        //     i.getElementById(t) ? initFreshChat() : ((e = i.createElement("script")).id = t, e.async = !0, e.src =
-        //         "https://lingowow-org.freshchat.com/js/widget.js", e.onload = initFreshChat, i.head.appendChild(e))
-        // }
-
-        // function initiateCall() {
-        //     initialize(document, "freshchat-js-sdk")
-        // }
-
-        // window.addEventListener ? window.addEventListener("load", initiateCall, !1) : window.attachEvent("onload",
-        //     initiateCall);
-
-
-
-
-
-
-        /// To set unique user id in your system when it is available
-        // window.fcWidget.setExternalId = "john.doe1987";
-
-        // // To set user name
-        // window.fcWidget.user.setFirstName("John");
-
-        // // To set user email
-        // window.fcWidget.user.setEmail("john.doe@gmail.com");
-    </script>
-
-    <script defer>
-	function runFcWidgetFunction() {
- 	    return new Promise(resolve => {
-   	    var intervalId = setInterval(() => {
-      	        if (typeof fcWidget !== 'undefined') {
-        	        clearInterval(intervalId);
-       		        resolve();
+        function runFcWidgetFunction() {
+            return new Promise(resolve => {
+                var intervalId = setInterval(() => {
+                    if (typeof fcWidget !== 'undefined') {
+                        clearInterval(intervalId);
+                        resolve();
                     }
                 }, 100);
             });
         }
 
-        runFcWidgetFunction().then(()=>{
-                /// To set unique user id in your system when it is available
-                window.fcWidget.setExternalId("{{auth()->id()}}");
+        runFcWidgetFunction().then(() => {
+            /// To set unique user id in your system when it is available
+            window.fcWidget.setExternalId("{{ auth()->id() }}");
 
-                // // To set user name
-                window.fcWidget.user.setFirstName("{{auth()->user()->first_name}}");
-                window.fcWidget.user.setLastName("{{auth()->user()->last_name}}");
+            // // To set user name
+            window.fcWidget.user.setFirstName("{{ auth()->user()->first_name }}");
+            window.fcWidget.user.setLastName("{{ auth()->user()->last_name }}");
 
-                // // To set user email
-                window.fcWidget.user.setEmail("{{auth()->user()->email}}");
+            // // To set user email
+            window.fcWidget.user.setEmail("{{ auth()->user()->email }}");
         });
     </script>
 
