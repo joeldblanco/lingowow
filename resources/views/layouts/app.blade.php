@@ -76,6 +76,7 @@
     <script src="{{ asset('js/wordfind.js') }}"></script>
     <script src="{{ asset('js/wordfindgame.js') }}"></script>
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.0.2/index.global.min.js"></script>
+    <script src='//fw-cdn.com/2451489/3025849.js' chat='true'></script>
 </head>
 
 <body class="font-sans antialiased">
@@ -182,6 +183,31 @@
                 // avatar_url: "<avatar-url-of-the-user>",
                 // phone_number: "<phone-number-of-the-user>",
             });
+        });
+    </script>
+
+    <script defer>
+	function runFcWidgetFunction() {
+ 	    return new Promise(resolve => {
+   	    var intervalId = setInterval(() => {
+      	        if (typeof fcWidget !== 'undefined') {
+        	        clearInterval(intervalId);
+       		        resolve();
+                    }
+                }, 100);
+            });
+        }
+
+        runFcWidgetFunction().then(()=>{
+                /// To set unique user id in your system when it is available
+                window.fcWidget.setExternalId("{{auth()->id()}}");
+
+                // // To set user name
+                window.fcWidget.user.setFirstName("{{auth()->user()->first_name}}");
+                window.fcWidget.user.setLastName("{{auth()->user()->last_name}}");
+
+                // // To set user email
+                window.fcWidget.user.setEmail("{{auth()->user()->email}}");
         });
     </script>
 
