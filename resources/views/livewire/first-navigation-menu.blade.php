@@ -122,7 +122,7 @@
                 @endif
 
                 <!-- Messages Dropdown -->
-                <div class="ml-3 relative">
+                <div class="ml-3 relative" wire:ignore>
                     <x-jet-dropdown align="right" width="80">
                         <x-slot name="trigger">
                             <button
