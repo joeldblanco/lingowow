@@ -80,8 +80,8 @@
             </div>
         </div>
     </div>
-    <script src="https://cdn.jsdelivr.net/npm/@shopify/draggable@1.0.0-beta.11/lib/sortable.js"></script>
-    <script>
+    <script   src="https://cdn.jsdelivr.net/npm/@shopify/draggable@1.0.0-beta.11/lib/sortable.js"></script>
+    <script  >
         const sortable = new Sortable.default(document.querySelectorAll('tbody'), {
             draggable: 'tr',
             handle: '.cursor-move',

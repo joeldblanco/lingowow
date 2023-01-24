@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Category;
 use App\Models\Course;
 use App\Models\Module;
 use App\Models\User;
@@ -74,7 +75,9 @@ class CourseController extends Controller
      */
     public function create()
     {
-        return view('course.create');
+        return view('course.create', [
+            'categories' => Category::all(),
+        ]);
     }
 
     /**
@@ -85,21 +88,32 @@ class CourseController extends Controller
      */
     public function store(Request $request)
     {
-        dd($request);
+        // dd($request);
         $request->validate([
             'name' => 'required',
             'description' => 'required',
-            'image' => 'required|image|mimes:jpeg,png,jpg|max:2048',
-            'modality' => 'required|in:synchronous,asynchronous',
-            'category' => 'required|in:spanish,english',
+            'image' => 'image|mimes:jpeg,png,jpg|max:2048',
+            'modality' => 'required|in:Synchronous,Asynchronous,synchronous,asynchronous',
+            'categories' => 'exists:App\Models\Category,id',
         ]);
 
-        $course = new Course();
-        $course->name = $request->name;
-        $course->description = $request->description;
-        $course->modality = $request->modality;
-        $course->category = $request->category;
-        $course->image = $request->image;
+        $image = $request->file('image');
+        $path_to_file = $image == null ? DB::table('metadata')->where('key', 'sample_image_url')->first()->value : $image->storeAs('public/images/courses/covers', str_replace(" ", "_", $request->name) . '.' . $image->getClientOriginalExtension());
+        $course_image = $path_to_file;
+
+        $course = Course::create([
+            'name' => $request->name,
+            'description' => $request->description,
+            'modality' => $request->modality,
+            'image_url' => $course_image,
+        ]);
+
+        $categories = explode(',', $request->categories);
+        if (!empty($categories)) {
+            $course->categories()->attach($categories);
+        }
+
+        return redirect()->route('courses.index')->with('success', 'Course created successfully.');
     }
 
     /**
@@ -116,16 +130,26 @@ class CourseController extends Controller
         $modules = $course->modules->where('status', 1)->sortBy('order');
 
         if ($role == "guest") {
-            $user_modules = new Collection([$modules->first()]);
-
             if ($user->hasPermissionTo('view units')) {
+
                 $user_modules = new Collection();
-                foreach ($modules as $module) {
-                    if ($module->id <= $user->units->first()->module->order) {   //TO DO: use $module->order instead of $module->id *URGENT*
-                        $user_modules->push($module);
+
+                if ($course->categories->pluck('name')->contains('Conversational')) {
+                    $user_module = DB::table('module_user')->select('module_id')->where('user_id', auth()->user()->id)->first();
+                    if (!empty($user_module)) {
+                        $user_module = Module::findOrFail($user_module->module_id);
+                        $user_modules->push($user_module);
                     }
+                } else {
+                    foreach ($modules as $module) {
+                        if ($module->order <= $user->units->first()->module->order) {   //TO DO: use $module->order instead of $module->id *URGENT*
+                            $user_modules->push($module);
+                        }
+                    }
+                    $user_modules = $user_modules->unique();
                 }
-                $user_modules = $user_modules->unique();
+            } else {
+                $user_modules = new Collection([$modules->first()]);
             }
         } else if ($role == "student") {
             $user_modules = new Collection();

@@ -395,12 +395,12 @@
     {{-- <link rel="stylesheet" type="text/css" href="{{ asset('css/jquery.dataTables.min.css') }}"> --}}
     <link rel="stylesheet" type="text/css" href="{{ asset('css/jquery.datetimepicker.min.css') }}">
     {{-- <script src="{{ asset('js/jquery-3.5.1.js') }}"></script> --}}
-    <script src="{{ asset('js/jquery.dataTables.min.js') }}"></script>
+    <script   src="{{ asset('js/jquery.dataTables.min.js') }}"></script>
 
-    <script type="text/javascript" src="{{ asset('js/scheduleSelection.js') }}" defer></script>
-    <script src="{{ asset('js/jquery.datetimepicker.full.min.js') }}"></script>
+    <script   type="text/javascript" src="{{ asset('js/scheduleSelection.js') }}" defer></script>
+    <script   src="{{ asset('js/jquery.datetimepicker.full.min.js') }}"></script>
 
-    <script>
+    <script  >
         // 0: "constructor"
         // 1: "toString"
         // 2: "toDateString"

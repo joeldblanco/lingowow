@@ -1,5 +1,5 @@
 <div class="mt-10 mb-20" x-data="{ loadingState: @entangle('loadingState') }">
-    <style>
+    <style  >
         .content-div {
             background-image: url('https://images.unsplash.com/photo-1522093007474-d86e9bf7ba6f?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=400&q=80');
             background-repeat: no-repeat;
@@ -111,7 +111,7 @@
     <div wire:loading>
         @include('components.loading-state')
     </div>
-    <script>
+    <script  >
         async function selectProduct(object) {
             // console.log(object);
             @this.selectProduct(object);

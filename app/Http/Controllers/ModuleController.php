@@ -89,11 +89,24 @@ class ModuleController extends Controller
             $module_units  = $module->units->where('status', 1)->sortBy('order');
             $user_units = $module_units->where('order', '<=', $user->units->first()->order);
         } else if ($role == "guest") {
-            $module_units  = $module->units->where('status', 1)->sortBy('order');
-            $user_units = new Collection([$module_units->where('order', 1)->first()]);
 
             if ($user->hasPermissionTo('view units')) {
-                $user_units = $module_units->where('order', '<=', $user->units->first()->order);
+                $user_units = $module->units->where('status', 1)->sortBy('order')->where('order', '<=', $user->units->first()->order);
+
+                if ($module->course->categories->pluck('name')->contains('Conversational')) {
+                    if ($user->modules->sortBy('order')->contains($module)) {
+                        $module_units  = $module->units->where('status', 1)->sortBy('order');
+                        $user_units = $module_units;
+                    } else {
+                        abort(404);
+                    }
+                } else {
+                    $module_units  = $module->units->where('status', 1)->sortBy('order');
+                    $user_units = $module_units;
+                }
+            } else {
+                $module_units  = $module->units->where('status', 1)->sortBy('order');
+                $user_units = new Collection([$module_units->where('order', 1)->first()]);
             }
         }
         return view('course.module.show', compact('user', 'role', 'module_units', 'user_units', 'module'));

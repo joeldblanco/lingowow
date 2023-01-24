@@ -53,15 +53,20 @@
                                     <td class="flex w-full justify-center cursor-pointer hover:underline">
                                         {{ $enrolment->updated_at->format('d/m/Y - h:00 a') }}
                                     </td>
-                                    <td class="flex w-full justify-center space-x-5">
+                                    <td class="flex w-full justify-center space-x-5" x-data="{ trash: true, deleteConfirmation: false }" x-cloak>
                                         <a href="{{ route('enrolments.edit', $enrolment->id) }}">
                                             <i class="fas fa-edit text-gray-600"></i>
                                         </a>
-                                        <form action="{{ route('enrolments.destroy', $enrolment->id) }}"
-                                            method="POST">
+                                        <button @click="trash = false, deleteConfirmation = true" x-show="trash">
+                                            <i class="fas fa-trash text-gray-600"></i></button>
+                                        <form action="{{ route('enrolments.destroy', $enrolment->id) }}" method="POST"
+                                            x-show="deleteConfirmation"
+                                            @click.outside="deleteConfirmation=false, trash = true">
                                             @csrf
                                             @method('DELETE')
-                                            <button type="submit"><i class="fas fa-trash text-gray-600"></i></button>
+                                            <button type="submit">
+                                                <i class="fas fa-check m-1 text-red-500"></i>
+                                            </button>
                                         </form>
                                     </td>
                                 </tr>

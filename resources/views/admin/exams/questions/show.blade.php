@@ -95,13 +95,13 @@
             </div>
         </div>
     </div>
-    <script>
+    <script  >
         tinymce.init({
             selector: '#question-description',
             plugins: 'wordcount',
         });
     </script>
-    <script>
+    <script  >
         $("#question-type").change(function() {
             var option = $("#question-type").find(":selected").text();
             $('#options').empty();

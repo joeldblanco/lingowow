@@ -258,7 +258,7 @@
                         </x-slot>
                     </x-modal>
 
-                    <script>
+                    <script  >
                         function selectAllTeacherCheckboxes(source) {
                             checkboxes = document.getElementsByClassName('teacher_checkbox');
                             for (var i in checkboxes)
@@ -272,7 +272,7 @@
                         }
                     </script>
 
-                    <script src="{{ asset('js/jquery.datetimepicker.full.min.js') }}">
+                    <script   src="{{ asset('js/jquery.datetimepicker.full.min.js') }}">
                         $(function() {
                             $("#start_date").datepicker({
                                 altField: "#start_date",

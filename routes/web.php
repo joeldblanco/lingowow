@@ -3,6 +3,7 @@
 use App\Http\Controllers\ActivityController;
 use App\Http\Controllers\AnalyticsController;
 use App\Http\Controllers\AttemptController;
+use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ChatController;
 use App\Http\Controllers\ChatwootController;
 use App\Http\Controllers\ClassController;
@@ -19,6 +20,7 @@ use App\Invoice;
 use App\Http\Controllers\CourseController;
 use App\Http\Controllers\EnrolmentController;
 use App\Http\Controllers\ExamController;
+use App\Http\Controllers\FeatureController;
 use App\Http\Controllers\GatherController;
 use App\Http\Controllers\GradingController;
 use App\Http\Controllers\InvoiceController;
@@ -233,25 +235,61 @@ Route::middleware(['web', 'auth', 'verified', 'impersonate'])->group(function ()
         //ROUTES FOR GRADINGS//
         Route::resource('/gradings', GradingController::class);
 
+
+
+
+
         //ROUTES FOR PRODUCTS//
         Route::resource('/products', ProductController::class);
+
+
+
+
 
         //DASHBOARD//
         Route::get('/admin/dashboard', [AnalyticsController::class, 'index'])->name('admin.dashboard');
 
+
+
+
+
         //USERS//
         Route::get('/admin/users/{role}', [UsersController::class, 'index'])->name('users');
+
+
+
+
 
         //INVOICES//
         Route::get('/admin/invoices', [InvoiceController::class, 'adminIndex'])->name('admin.invoices');
 
+
+
+
+
         //EARNINGS//
         Route::get('/admin/earnings', [AnalyticsController::class, 'earnings'])->name('admin.earnings');
+
+
+
 
         //COUPONS//
         Route::get('/admin/coupons', [CouponController::class, 'index'])->name("coupons.index");
         Route::get('/admin/coupons/create/{product_id}/{coupon_amount}', [CouponController::class, 'store'])->name("coupons.create");
         // Route::get('/admin/marketing', [CouponController::class,'index'])->name('admin.marketing');
+
+
+
+
+        //ROUTES FOR CATEGORIES//
+        Route::resource('/categories', CategoryController::class);
+
+
+
+
+        //ROUTES FOR FEATURES//
+        Route::resource('/features', FeatureController::class);
+
 
 
 
@@ -338,7 +376,7 @@ Route::middleware(['web', 'auth', 'verified', 'impersonate'])->group(function ()
                 }
             }
             return redirect()->route('users', 4);
-        });
+        })->name('reset.user');
     });
 
     Route::get('gather/get_guests_list', [GatherController::class, 'getGuestsList']);

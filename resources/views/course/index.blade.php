@@ -42,14 +42,14 @@
                                                 <p class="my-auto capitalize">{{ $category->name }}</p>
                                             </span>
                                         @endforeach
-                                        <span
+                                        {{-- <span
                                             class="flex flex-col @if ($course->category == 'Spanish') bg-blue-500 @else bg-red-500 @endif rounded-full font-medium text-gray-100 px-3 pt-0.5">
                                             <p class="my-auto capitalize">{{ $course->category }}</p>
                                         </span>
                                         <span
                                             class="flex flex-col @if ($course->modality == 'synchronous') bg-green-500 @else bg-purple-500 @endif rounded-full font-medium text-gray-100 px-3 pt-0.5">
                                             <p class="my-auto capitalize">{{ $course->modality }}</p>
-                                        </span>
+                                        </span> --}}
                                     </div>
                                 </div>
                                 <div class="text-3xl text-gray-400 w-1/12 group-hover:text-blue-500">

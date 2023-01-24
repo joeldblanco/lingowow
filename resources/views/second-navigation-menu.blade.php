@@ -67,6 +67,12 @@
             'parent_link' => request()->is('admin', 'admin/*'),
         ],
         [
+            'name' => 'Products',
+            'route' => route('products.index'),
+            'status' => request()->routeIs('products.index'),
+            'parent_link' => request()->is('admin', 'admin/*'),
+        ],
+        [
             'name' => 'Exams',
             'route' => route('exam.index'),
             'status' => request()->is('admin/exam', 'admin/exam/*'),

@@ -121,7 +121,7 @@
                         <!-- FIN DEL HORARIO DE JUAN -->
 
                         <button @click="showModalAbsence = true"
-                            onclick="checkClass({{ isset($plan) ? $plan : 0 }},{{ Auth::user()->roles->pluck('id')[0] }});"
+                            onclick="checkClass({{ isset($plan) ? $plan : 0 }},{{ $user->roles->pluck('id')[0] }});"
                             class="bg-green-500 rounded-lg text-white font-bold px-6 py-1 my-3 shadow-md"
                             {{-- onclick="saveSchedule({{ $plan }},'schedule.check')" --}} wire:click="edit()">Save</button>
                     @elseif ($mode == 'one')
@@ -177,8 +177,8 @@
                                                 </td>
                                                 @foreach ($days as $day)
                                                     @if (in_array([$i, $e], $teacher_schedule) &&
-                                                        (new Carbon\carbon($day_format_range[$d]))->addHour($i)->greaterThan($now) &&
-                                                        (new Carbon\carbon($day_format_range[$d]))->addHour($i)->lessThan($period_end_aux->copy()->addDay()))
+                                                            (new Carbon\carbon($day_format_range[$d]))->addHour($i)->greaterThan($now) &&
+                                                            (new Carbon\carbon($day_format_range[$d]))->addHour($i)->lessThan($period_end_aux->copy()->addDay()))
                                                         {{-- @php dd(($i+6)."-".$day_range[$d]); @endphp --}}
                                                         {{-- {{dd($abcense_classes, $day_range)}} --}}
                                                         {{-- {{dump($i . '-' . $day_range[$d].' -- '.$abcense_classes[0])}} --}}
@@ -612,7 +612,7 @@
 
                 <x-slot name="footer" class="justify-center">
                     <button
-                        onclick="saveSchedule({{ isset($plan) ? $plan : 0 }},'schedule.check',{{ Auth::user()->roles->pluck('id')[0] }});toggleCellBlock()"
+                        onclick="saveSchedule({{ isset($plan) ? $plan : 0 }},'schedule.check',{{ $user->roles->pluck('id')[0] }});toggleCellBlock()"
                         class="bg-green-600 font-semibold text-white p-2 w-32 mr-1 rounded-full hover:bg-green-700 focus:outline-none focus:ring shadow-lg hover:shadow-none transition-all duration-300"
                         @click=" showModalAbsence = false, editBtn = true, edit = false">
                         Save
@@ -636,7 +636,7 @@
 
                 <x-slot name="footer" class="justify-center">
                     <button wire:click="edit()"
-                        onclick="saveSchedule({{ isset($user_schedules) ? count($user_schedules) : 0 }},'schedule.update',{{ Auth::user()->roles->pluck('id')[0] }});toggleCellBlock()"
+                        onclick="saveSchedule({{ isset($user_schedules) ? count($user_schedules) : 0 }},'schedule.update',{{ $user->roles->pluck('id')[0] }});toggleCellBlock()"
                         class="bg-green-600 font-semibold text-white p-2 w-32 mr-1 rounded-full hover:bg-green-700 focus:outline-none focus:ring shadow-lg hover:shadow-none transition-all duration-300"
                         @click=" showModal1 = false, editBtn = true, edit = false">
                         Save
@@ -719,7 +719,7 @@
                 }
             }
 
-            var role = "{{ Auth::user()->roles->pluck('name')[0] }}";
+            var role = "{{ $user->roles->pluck('id')[0] }}";
 
             $(".selectable").selectable({
                 //disabled: true
@@ -729,7 +729,7 @@
                 //  console.log("hola")
                 var cells = $(".selected");
                 // console.log(cells);
-                var role = "{{ Auth::user()->roles->pluck('name')[0] }}";
+                var role = "{{ $user->roles->pluck('id')[0] }}";
 
                 if (role == "student") {
 

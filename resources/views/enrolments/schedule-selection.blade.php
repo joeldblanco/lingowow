@@ -62,7 +62,7 @@
 
                 @livewire('teachers-carousel', ['available_teachers' => $selected_teacher])
 
-                @livewire('schedule', ['plan' => 99, 'user_id' => $student_id, 'mode' => 'edit'])
+                @livewire('schedule', ['plan' => $plan, 'user_id' => $student_id, 'mode' => 'edit'])
 
             </div>
         </div>

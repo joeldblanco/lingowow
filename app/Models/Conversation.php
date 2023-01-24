@@ -28,6 +28,8 @@ class Conversation extends Model
 
                 $user = $this->users->where('id', '!=', auth()->id())->first();
 
+                if(empty($user)) return null;
+
                 return $user->fisrt_name . $user->last_name;
             }
         );

@@ -147,31 +147,33 @@
                             @if (count($conversations) > 0)
 
                                 @foreach ($conversations as $conversation)
-                                    <x-jet-dropdown-link href="{{ route('chat.show', $conversation->id) }}">
-                                        <div class="flex justify-between items-center">
-                                            <p class="text-md font-normal text-gray-500"
-                                                id="conversation_{{ $conversation->id }}">
-                                                @if ($conversation->group_conversation)
-                                                    {{ $conversation->name }}
-                                                @else
-                                                    @php
-                                                        $participants = $conversation->users;
-                                                    @endphp
-                                                    @foreach ($participants as $participant)
-                                                        @if ($participant->id != auth()->id())
-                                                            {{ $participant->first_name }}
-                                                            {{ $participant->last_name }}
-                                                        @endif
-                                                    @endforeach
-                                                @endif
+                                    @if ($conversation->users->count() >= 2)
+                                        <x-jet-dropdown-link href="{{ route('chat.show', $conversation->id) }}">
+                                            <div class="flex justify-between items-center">
+                                                <p class="text-md font-normal text-gray-500"
+                                                    id="conversation_{{ $conversation->id }}">
+                                                    @if ($conversation->group_conversation)
+                                                        {{ $conversation->name }}
+                                                    @else
+                                                        @php
+                                                            $participants = $conversation->users;
+                                                        @endphp
+                                                        @foreach ($participants as $participant)
+                                                            @if ($participant->id != auth()->id())
+                                                                {{ $participant->first_name }}
+                                                                {{ $participant->last_name }}
+                                                            @endif
+                                                        @endforeach
+                                                    @endif
+                                                </p>
+                                                <span class="w-3 h-3 bg-blue-500 rounded-full mr-3 hidden"
+                                                    id="unread_conversation_{{ $conversation->id }}"></span>
+                                            </div>
+                                            <p class="text-xs text-gray-400 font-normal" id="last_message">
+                                                {{ Str::limit($conversation->last_message->message_content, 25, '...') }}
                                             </p>
-                                            <span class="w-3 h-3 bg-blue-500 rounded-full mr-3 hidden"
-                                                id="unread_conversation_{{ $conversation->id }}"></span>
-                                        </div>
-                                        <p class="text-xs text-gray-400 font-normal" id="last_message">
-                                            {{ Str::limit($conversation->last_message->message_content, 25, '...') }}
-                                        </p>
-                                    </x-jet-dropdown-link>
+                                        </x-jet-dropdown-link>
+                                    @endif
                                 @endforeach
                             @else
                                 <p class="p-1 text-sm text-center">There are no messages</p>

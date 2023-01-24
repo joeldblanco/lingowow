@@ -2,6 +2,9 @@
 
 namespace App\Jobs;
 
+use App\Invoice;
+use Cart;
+use App\Item;
 use App\Models\Course;
 use App\Models\Enrolment;
 use App\Models\Module;
@@ -24,9 +27,59 @@ class StoreSelfEnrolment implements ShouldQueue
      *
      * @return void
      */
-    public function __construct()
+    public function __construct($student = null)
     {
-        $student = auth()->user();
+
+        if (empty($student)) {
+            $student = auth()->user();
+        } else {
+
+
+            $cart = [];
+
+            if (Invoice::all()->last() != null) {
+                $order_id = Invoice::all()->last()->id + 1;
+            } else {
+                $order_id = 1;
+            }
+
+            $items = array();
+
+            foreach (Cart::content() as $item) {
+                array_push($items, ['name'  => $item->name, 'price' => $item->price, 'qty' => $item->qty]);
+            }
+
+            $cart['items'] = $items;
+
+            $cart['invoice_id'] = config('paypal.invoice_prefix') . '_' . $order_id;
+            $cart['invoice_description'] = "Invoice #$order_id";
+
+            $total = 0;
+            foreach ($cart['items'] as $item) {
+                $total += $item['price'] * $item['qty'];
+            }
+            $cart['total'] = $total;
+
+
+
+            $invoice = new Invoice();
+            $invoice->title = $cart['invoice_description'];
+            $invoice->price = $cart['total'];
+            $invoice->paid = 1;
+            $invoice->user_id = $student->id;
+            $invoice->save();
+
+            collect($cart['items'])->each(function ($product) use ($invoice) {
+                $item = new Item();
+                $item->invoice_id = $invoice->id;
+                $item->item_name = $product['name'];
+                $item->item_price = $product['price'];
+                $item->item_qty = $product['qty'];
+
+                $item->save();
+            });
+        }
+
         $course_id = session('selected_course');
 
         //CHANGING STUDENT'S ROLE FROM 'GUEST' TO 'STUDENT'//
@@ -43,8 +96,8 @@ class StoreSelfEnrolment implements ShouldQueue
                 ['teacher_id' => $teacher->id, 'deleted_at' => NULL]
             );
 
-            // SchedulingCalendarController::store(auth()->user()->id, $enrolment);
-            dispatch(new CreateSchedule(auth()->user()->id, $enrolment->id));
+            // SchedulingCalendarController::store($student->id, $enrolment);
+            dispatch(new CreateSchedule($student->id, $enrolment->id));
         } else {
 
             //CREATING STUDENT'S ENROLMENT (OR UPDATING IT, IN CASE IT ALREADY EXISTS BUT IS SOFTDELETED)//
@@ -60,7 +113,7 @@ class StoreSelfEnrolment implements ShouldQueue
 
             if (Course::find($course_id)->categories->pluck('name')->contains('Conversational')) {
 
-                $module = DB::table('module_user')->select('module_id')->where('user_id', auth()->user()->id)->first();
+                $module = DB::table('module_user')->select('module_id')->where('user_id', $student->id)->first();
                 if (empty($module)) {
                     $order = Course::find($course_id)->modules->sortBy('order')->last() == null ? 1 : Course::find($course_id)->modules->sortBy('order')->last()->order + 1;
                     $module = Module::create([
@@ -78,7 +131,7 @@ class StoreSelfEnrolment implements ShouldQueue
                     ]);
 
                     DB::table('module_user')->insertOrIgnore([
-                        ['module_id' => $module->id, 'user_id' => auth()->user()->id],
+                        ['module_id' => $module->id, 'user_id' => $student->id],
                         ['module_id' => $module->id, 'user_id' => session('teacher_id')]
                     ]);
                 }
@@ -92,10 +145,10 @@ class StoreSelfEnrolment implements ShouldQueue
                 } else {
                     $unit_id = $unit->unit_id;
                 }
-                $current_unit = Unit::find(DB::table('unit_user')->select('unit_id')->where('user_id', auth()->user()->id)->first()->unit_id);
+                $current_unit = Unit::find(DB::table('unit_user')->select('unit_id')->where('user_id', $student->id)->first()->unit_id);
                 if (empty($current_unit)) {
                     DB::table('unit_user')->insertOrIgnore([
-                        ['unit_id' => $unit_id, 'user_id' => auth()->user()->id]
+                        ['unit_id' => $unit_id, 'user_id' => $student->id]
                     ]);
                 }
             }

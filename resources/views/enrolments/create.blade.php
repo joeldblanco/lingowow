@@ -50,6 +50,13 @@
                                 </select>
                                 <p class="text-gray-500 text-sm font-light">Please select a course</p>
                             </div>
+                            <div class="pb-6 space-y-1">
+                                <p class="font-bold text-gray-600 mb-1">Plan (classes per week)</p>
+                                <input type="number" name="plan" id="plan" value="plan"
+                                    class="w-3/12 px-2 py-2 text-gray-700 bg-gray-200 rounded" placeholder="0"
+                                    min="0" max="99" required>
+                                <p class="text-gray-500 text-sm font-light">Please select a plan</p>
+                            </div>
 
                         </div>
                     </div>

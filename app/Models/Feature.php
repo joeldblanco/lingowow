@@ -6,16 +6,19 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Plan extends Model
+
+class Feature extends Model
 {
     use HasFactory;
     use SoftDeletes;
 
-    /**
-     * Get all of the features for the plan.
-     */
-    public function features()
+    protected $fillable = [
+        'name',
+        'details',
+    ];
+
+    public function plans()
     {
-        return $this->belongsToMany(Feature::class)->withPivot('status');
+        return $this->belongsToMany(Plan::class);
     }
 }
