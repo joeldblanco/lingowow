@@ -17,7 +17,6 @@ class CreateCoursesTable extends Migration
             $table->bigIncrements('id');
             $table->string('name',250);
             $table->string('description',500)->nullable();//
-            $table->string('category',250);
             $table->string('modality',50);
             $table->string('image_url',255)->nullable();//
             $table->timestamps();

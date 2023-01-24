@@ -54,14 +54,13 @@ class EnrolmentController extends Controller
             'course_id' => 'required|numeric|exists:App\Models\Course,id',
         ]);
 
-        // dd($request);
-
         $course = Course::find($request->course_id);
 
         if ($course->categories->pluck('name')->contains("Synchronous")) {
             $request->validate([
                 'teacher_id' => 'required|numeric|exists:App\Models\User,id',
                 'student_id' => 'numeric|exists:App\Models\User,id',
+                'plan' => 'required|numeric',
             ]);
 
             if ($request->student_id == null) {
@@ -69,8 +68,16 @@ class EnrolmentController extends Controller
             } else {
                 $selected_teacher = $request->teacher_id;
                 $student_id = $request->student_id;
+                $plan = $request->plan;
 
-                return view('enrolments.schedule-selection', compact('student_id', 'selected_teacher'));
+                session([
+                    'enrolment_type' => 'manual_enrolment',
+                    'selected_course' => $request->course_id,
+                    'selected_teacher' => $request->teacher_id,
+                    'student_id' => $request->student_id,
+                ]);
+
+                return view('enrolments.schedule-selection', compact('student_id', 'selected_teacher', 'plan'));
             }
         }
 
@@ -91,12 +98,17 @@ class EnrolmentController extends Controller
      */
     public function store(Request $request)
     {
-        $enrolment = new Enrolment([
-            'teacher_id' => $request->get('teacher_id'),
-            'student_id' => $request->get('student_id'),
-            'course_id' => $request->get('course_id'),
-        ]);
-        $enrolment->save();
+        // $enrolment = new Enrolment([
+        //     'teacher_id' => $request->get('teacher_id'),
+        //     'student_id' => $request->get('student_id'),
+        //     'course_id' => $request->get('course_id'),
+        // ]);
+        // $enrolment->save();
+
+        $enrolment = Enrolment::withTrashed()->updateOrCreate(
+            ['student_id' => $request->get('student_id'), 'course_id' => $request->get('course_id')],
+            ['teacher_id' => $request->get('teacher_id'), 'deleted_at' => NULL]
+        );
 
         if (Course::find($request->get('course_id'))->categories->pluck('name')->contains('Conversational') && ($request->get('student_id') == null) && ($request->get('teacher_id') != null)) {
             User::find($request->get('teacher_id'))->givePermissionTo('edit conversational courses');
@@ -176,6 +188,30 @@ class EnrolmentController extends Controller
      */
     public function destroy(Enrolment $enrolment)
     {
+        $user = User::find($enrolment->student_id);
+
+        if ($user->roles[0]->name == 'student') {
+            $user->studentClasses->each(function ($class) {
+                // $deleted_class = $class->delete();
+                // dd($class);
+                if ($class->meeting != null) (new MeetingController)->destroy($class->meeting);
+                $class->delete();
+            });
+
+            if ($user->enrolments->count()) {
+                // $user->schedules->where('enrolment_id', $user->enrolments->first()->id)->first()->delete();
+                $user->enrolments->first()->delete();
+                if ($user->schedules->first() != null) {
+                    $user->schedules->first()->next_schedule = null;
+                    $user->schedules->first()->save();
+                    $user->schedules->first()->delete();
+                }
+            }
+
+            $user->removeRole('student');
+            $user->assignRole('guest');
+        }
+
         $enrolment->delete();
         return redirect()->route('enrolments.index');
     }

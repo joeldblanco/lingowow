@@ -460,7 +460,7 @@ $nav_links = [
             </div>
         </div>
     </div>
-    <script>
+    <script  >
         window.user_id = {{ auth()->id() }};
     </script>
 </nav>

@@ -43,22 +43,19 @@ class ProductController extends Controller
      */
     public function store(Request $request)
     {
-        try {
-            $request->validate([
-                'product_image' => 'image|mimes:jpeg,png,jpg|max:2048',
-                'name' => 'required',
-                'description' => 'required',
-                'regular_price' => 'required|numeric',
-                'sale_price' => 'required|numeric',
-                'categories' => 'exists:App\Models\Category,id',
-                'course_id' => 'numeric|exists:App\Models\Course,id',
-            ]);
-        } catch (\Throwable $th) {
-            // throw $th;
-        }
+
+        $request->validate([
+            'product_image' => 'image|mimes:jpeg,png,jpg|max:2048',
+            'name' => 'required',
+            'description' => 'required',
+            'regular_price' => 'required|numeric',
+            'sale_price' => 'required|numeric',
+            'categories' => 'exists:App\Models\Category,id',
+            'course_id' => 'numeric|exists:App\Models\Course,id',
+        ]);
 
         $image = $request->file('product_image');
-        $path_to_file = $image == null ? DB::table('metadata')->where('key', 'sample_image_url')->first()->value : $image->storeAs('public/images/units/covers', str_replace(" ", "_", $request->name) . '.' . $image->getClientOriginalExtension());
+        $path_to_file = $image == null ? DB::table('metadata')->where('key', 'sample_image_url')->first()->value : $image->storeAs('public/images/products/covers', str_replace(" ", "_", $request->name) . '.' . $image->getClientOriginalExtension());
         $product_image = $path_to_file;
 
         $product = Product::create([

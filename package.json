@@ -26,6 +26,7 @@
         "@fortawesome/fontawesome-free": "^5.15.3",
         "@viselect/vanilla": "^3.0.0-beta.13",
         "@zoomus/websdk": "^1.9.7",
-        "autosize": "^5.0.1"
+        "autosize": "^5.0.1",
+        "turbolinks": "^5.2.0"
     }
 }

@@ -115,13 +115,43 @@ class UnitController extends Controller
         }
 
         if ($role == "guest") {
-            $unit = Unit::findOrFail($id);
-            $unit_course = $unit->course();
-            $course_units = $unit_course->units()->sortBy('order');
-            $first_unit = $course_units->first();
 
-            if ($first_unit->id != $id) {
-                abort(403, 'USER DOES NOT HAVE THE RIGHT ROLES.');
+            $unit = Unit::findOrFail($id);
+
+            if ($user->hasPermissionTo('view units')) {
+                if ($unit->course()->categories->pluck('name')->contains('Conversational')) {
+                    if ($user->modules->sortBy('order')->contains($unit->module)) {
+                        $module_units  = $unit->module->units->where('status', 1)->sortBy('order');
+                        $user_units = $module_units;
+                    } else {
+                        abort(404);
+                    }
+                } else {
+                    //REVISAR QUE EL CURSO DE LA UNIDAD SOLICITADA SE ENCUENTRE ENTRE LOS CURSOS A LOS QUE EL ESTUDIANTE ESTÁ INSCRITO
+                    $student_courses = $user->enrolments->pluck('course');
+                    $unit = Unit::findOrFail($id);
+                    $unit_course = $unit->course();
+                    if ($student_courses->contains($unit_course)) {
+                        //REVISAR QUE EL ORDEN DE LA UNIDAD SOLICITADA SEA IGUAL O MENOR AL ORDEN DE LA UNIDAD DEL ESTUDIANTE
+
+                        foreach ($user->units as $user_unit) {
+                            if ($user_unit->course()->id == $unit_course->id) {
+                                if ($unit->order > $user_unit->order) {
+                                    abort(403, 'USER DOES NOT HAVE THE RIGHT PERMISSIONS.');
+                                }
+                            }
+                        }
+                    } else {
+                        abort(403, 'USER DOES NOT HAVE THE RIGHT PERMISSIONS.');
+                    }
+                }
+            } else {
+                $course_units = $unit->course()->units()->sortBy('order');
+                $first_unit = $course_units->first();
+
+                if ($first_unit->id != $id) {
+                    abort(403, 'USER DOES NOT HAVE THE RIGHT ROLES.');
+                }
             }
         }
 

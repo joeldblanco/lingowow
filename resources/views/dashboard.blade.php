@@ -108,7 +108,7 @@
                     @role('student')
                         <div class="w-9/12">
                             <div id="chart"></div>
-                            <script>
+                            <script  >
                                 var options = {
                                     series: [{
                                             name: 'Progress (Units)',

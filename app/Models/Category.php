@@ -9,19 +9,23 @@ class Category extends Model
 {
     use HasFactory;
 
+    protected $fillable = [
+        'name',
+    ];
+
     /**
-     * Get all of the products that are assigned this tag.
+     * Get all of the products that are assigned this category.
      */
     public function products()
     {
-        return $this->morphedByMany(Product::class, 'taggable');
+        return $this->morphedByMany(Product::class, 'categorizable');
     }
 
     /**
-     * Get all of the courses that are assigned this tag.
+     * Get all of the courses that are assigned this category.
      */
     public function courses()
     {
-        return $this->morphedByMany(Course::class, 'taggable');
+        return $this->morphedByMany(Course::class, 'categorizable');
     }
 }

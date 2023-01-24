@@ -132,9 +132,9 @@
             $('#categories-select').on('change', function() {
                 var option = $(this).find('option:selected');
                 var chip = $(
-                    '<div class="chip bg-transparent border-2 border-green-500 text-green-500 rounded-full p-2 m-2 inline-block font-bold">' +
+                    '<div class="chip bg-transparent border-2 border-green-500 text-green-500 rounded-full px-2 py-1 m-2 inline-block font-bold">' +
                     option.text() +
-                    '<i class="fas fa-times text-white rounded-full bg-green-500 close ml-2 p-2 cursor-pointer"></i></div>'
+                    '<i class="fas fa-times text-white text-sm rounded-full bg-green-500 close ml-2 px-2 py-1 cursor-pointer"></i></div>'
                 );
                 $('#selected-categories').append(chip);
                 selectedCategories.push(option.val());

@@ -24,7 +24,7 @@
                                 <p class="text-gray-500 text-sm font-light">Please select an image for the course</p>
 
                             </div>
-                            <div class="pt-6 pb-2 space-y-1">
+                            {{-- <div class="pt-6 pb-2 space-y-1">
                                 <p class="font-bold text-gray-600 mb-1">Category</p>
                                 <select name="category" id="category" required
                                     class="w-full rounded-md hover:border-gray-600 p-3 text-gray-600 @if ($errors->has('category')) border-red-600 @else border-gray-300 @endif">
@@ -37,10 +37,10 @@
                                     @endforeach
                                 </select>
                                 @if ($errors->has('category'))
-                                    <p class="text-xs font-light text-red-600">{{$errors->get('category')[0]}}</p>
+                                    <p class="text-xs font-light text-red-600">{{ $errors->get('category')[0] }}</p>
                                 @endif
                                 <p class="text-gray-500 text-sm font-light">Please select a category for the course</p>
-                            </div>
+                            </div> --}}
                             <div class="pt-6 pb-2 space-y-1">
                                 <p class="font-bold text-gray-600 mb-1">Modality</p>
                                 <select name="modality" id="modality" required
@@ -54,7 +54,7 @@
                                     @endforeach
                                 </select>
                                 @if ($errors->has('modality'))
-                                    <p class="text-xs font-light text-red-600">{{$errors->get('modality')[0]}}</p>
+                                    <p class="text-xs font-light text-red-600">{{ $errors->get('modality')[0] }}</p>
                                 @endif
                                 <p class="text-gray-500 text-sm font-light">Please select a modality for the course</p>
                             </div>
@@ -64,16 +64,33 @@
                                     required
                                     class="w-full rounded-md p-3 text-gray-600 hover:border-gray-600 @if ($errors->has('name')) border-red-600 @else border-gray-300 @endif ">
                                 @if ($errors->has('name'))
-                                    <p class="text-xs font-light text-red-600">{{$errors->get('name')[0]}}</p>
+                                    <p class="text-xs font-light text-red-600">{{ $errors->get('name')[0] }}</p>
                                 @endif
                                 <p class="text-gray-500 text-sm font-light">Please enter course name</p>
+                            </div>
+                            <div class="pt-6 space-y-1">
+                                <p class="font-bold text-gray-600 mb-1">Categories</p>
+                                <div id="selected-categories" name="selected-categories"
+                                    class="bg-white border border-gray-300 rounded p-2"></div>
+                                <input type="hidden" id="selected-categories-input" name="categories">
+                                <select id="categories-select"
+                                    class="w-full rounded-md hover:border-gray-600 p-3 text-gray-600 @if ($errors->has('category_id')) border-red-600 @else border-gray-300 @endif">
+                                    <option value="">Selecciona una categoría</option>
+                                    @foreach ($categories as $category)
+                                        <option value="{{ $category->id }}">{{ $category->name }}</option>
+                                    @endforeach
+                                </select>
+                                @if ($errors->has('category_id'))
+                                    <p class="text-xs font-light text-red-600">{{ $errors->get('category_id')[0] }}</p>
+                                @endif
+                                <p class="text-gray-500 text-sm font-light">Please select a category for the product</p>
                             </div>
                             <div class="py-4 pt-3 space-y-1">
                                 <p class="font-bold text-gray-600 mb-1">Description</p>
                                 <textarea name="description" id="description" placeholder="Enter course description" required rows="4"
                                     class="resize-none w-full rounded-md p-3 text-gray-600 hover:border-gray-600 @if ($errors->has('description')) border-red-600 @else border-gray-300 @endif"></textarea>
                                 @if ($errors->has('description'))
-                                    <p class="text-xs font-light text-red-600">{{$errors->get('description')[0]}}</p>
+                                    <p class="text-xs font-light text-red-600">{{ $errors->get('description')[0] }}</p>
                                 @endif
                                 <p class="text-gray-500 text-sm font-light">Please enter course description</p>
                             </div>
@@ -124,6 +141,36 @@
 
             });
 
+        });
+    </script>
+    <script>
+        // JavaScript: Escuchar el evento change del select y crear el chip
+        var selectedCategories = [];
+        $('#categories-select').on('change', function() {
+            var option = $(this).find('option:selected');
+            var chip = $(
+                '<div class="chip bg-transparent border-2 border-green-500 text-green-500 rounded-full px-2 py-1 m-2 inline-block font-bold">' +
+                option.text() +
+                '<i class="fas fa-times text-white text-sm rounded-full bg-green-500 close ml-2 px-2 py-1 cursor-pointer"></i></div>'
+            );
+            $('#selected-categories').append(chip);
+            selectedCategories.push(option.val());
+            $('#selected-categories-input').val(selectedCategories.join(','));
+            option.remove();
+        });
+
+        //JavaScript: Eliminar el chip seleccionado
+        $(document).on('click', '.chip i.close', function() {
+            var chip = $(this).parent();
+            var option = $('<option value="' + chip.attr('data-value') + '">' + chip.text().trim() + '</option>');
+            $('#categories-select').append(option);
+            $('#categories-select').append(option);
+            var index = selectedCategories.indexOf(chip.attr('data-value'));
+            if (index > -1) {
+                selectedCategories.splice(index, 1);
+            }
+            $('#selected-categories-input').val(selectedCategories.join(','));
+            chip.remove();
         });
     </script>
 

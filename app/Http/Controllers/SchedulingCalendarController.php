@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\StoreSelfEnrolment;
 use App\Models\Classes;
 use App\Models\Course;
 use App\Models\Enrolment;
@@ -428,7 +429,15 @@ class SchedulingCalendarController extends Controller
                 ]);
 
                 // dd("hola que tal", $teachers, $teachers_available, count($teachers_available), rand(0, count($teachers_available) - 1), session()->all(), $cells);
-                return view('cart');
+
+                if (session()->exists('enrolment_type') && session('enrolment_type') == "manual_enrolment") {
+                    // dd(session()->all());
+                    $student = User::find(session('student_id'));
+                    dispatch(new StoreSelfEnrolment($student));
+                    return redirect()->route('enrolments.index');
+                } else {
+                    return redirect()->route('cart');
+                }
             } else {
                 Cart::destroy();
                 if ($modality == "exam") {

@@ -77,10 +77,17 @@
                                         </tr>
                                     @else
                                         {{-- @foreach ($attempts as $attempt) --}}
-
-                                        @foreach ($course->modules as $module)
+                                        @php
+                                            if ($course->categories->pluck('name')->contains('Conversational')) {
+                                                $modules = $course->modules->intersect($user->modules);
+                                            } else {
+                                                $modules = $course->modules;
+                                            }
+                                        @endphp
+                                        @foreach ($modules as $module)
                                             <tr class="text-center">
-                                                <td class="border-b border-gray-400 text-center py-4 text-xl font-bold text-gray-600">
+                                                <td
+                                                    class="border-b border-gray-400 text-center py-4 text-xl font-bold text-gray-600">
                                                     {{ $module->name }}
                                                 </td>
                                                 <td class="border-b border-gray-400 text-center py-4 bg-gray-200">

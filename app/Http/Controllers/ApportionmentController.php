@@ -27,7 +27,7 @@ class ApportionmentController extends Controller
         if ($course_id == null) {
             $course_id = session("selected_course");
         }
-        $product = Course::find($course_id)->products->first();
+        // $product = Course::find($course_id)->products->first();
 
         $today = Carbon::now()->setTimezone('UTC');
         $today->addDays(1);
