@@ -6,11 +6,13 @@ use App\Http\Controllers\ApportionmentController;
 use App\Jobs\CreateClasses;
 use App\Models\Enrolment;
 use App\Models\Schedule as ModelsSchedule;
+use App\Models\ScheduleReserve;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class Kernel extends ConsoleKernel
 {
@@ -42,6 +44,7 @@ class Kernel extends ConsoleKernel
             if ($now->greaterThan($current_period_end)) {
 
                 //HERE ALL NEW PERIOD CALCULATIONS ARE MADE
+
 
                 $users = Enrolment::where('student_id', '!=', null)->get()->pluck('student');
                 foreach ($users as $user) {
@@ -96,7 +99,7 @@ class Kernel extends ConsoleKernel
 
                 $today = (new carbon())->hour(0)->minute(0)->second(0);
                 $end_period = (new Carbon(ApportionmentController::currentPeriod(true)[1]))->hour(0)->minute(0)->second(0);
-                if($today->greaterThan($end_period)){
+                if ($today->greaterThan($end_period)) {
                     DB::table('metadata')->where('key', '=', 'current_period')->update([
                         'value' => json_encode([
                             "start_date" => ApportionmentController::nextPeriod(true)[0],

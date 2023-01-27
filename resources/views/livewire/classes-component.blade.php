@@ -1,4 +1,4 @@
-<div x-data="{showCommentsModal: false, classDetails: false}" id="classes_main" >
+<div x-data="{showCommentsModal: false, classDetails: @entangle('classDetails')}" id="classes_main">
     @if (count($classes) > 0)
                     <div class="flex justify-center w-full items-center my-8">
                         {{-- <button wire:click="previousPeriod"><i class="fas fa-angle-left text-4xl"></i></button> --}}
@@ -64,13 +64,13 @@
                                         @endphp
                                         @if ($lesson_date->lt(Carbon\Carbon::now()))
                                             <td class="flex w-full justify-center text-red-500 cursor-pointer hover:underline"
-                                                @click="classDetails = true"
+                                                {{-- @click="classDetails = true" --}}
                                                 wire:click="showClass({{ $value->id }})">
                                                 {{ $lesson_date->format('d/m/Y - h:00 a') }}
                                             </td>
                                         @else
                                             <td class="flex w-full justify-center text-green-500 cursor-pointer hover:underline"
-                                                @click="classDetails = true"
+                                                {{-- @click="classDetails = true" --}}
                                                 wire:click="showClass({{ $value->id }})">
                                                 {{ $lesson_date->format('d/m/Y - h:00 a') }}
                                             </td>
@@ -170,7 +170,7 @@
                     @if($current_class != null && $lesson_date->gt(Carbon\Carbon::now())) --}}
                     {{-- {{ dd(App\Http\Controllers\ApportionmentController::getPeriod($current_class->start_date), (new Carbon\Carbon (App\Http\Controllers\ApportionmentController::currentPeriod()[0]))->format('F Y')) }} --}}
                     {{-- @if(($current_class != null && ((!$current_class->teacher_check && !$current_class->student_check) && (App\Http\Controllers\ApportionmentController::getPeriod($current_class->start_date) < (new Carbon\Carbon (App\Http\Controllers\ApportionmentController::currentPeriod()[1]))) || auth()->user()->roles[0]->name == "admin"))) --}}
-                    @if($current_class != null && (!$current_class->teacher_check && !$current_class->student_check) && ((App\Http\Controllers\ApportionmentController::getPeriod($current_class->start_date) == (new Carbon\Carbon (App\Http\Controllers\ApportionmentController::currentPeriod()[0]))->format('F Y')) || auth()->user()->roles[0]->name == "admin"))
+                    @if($current_class != null && (!$current_class->teacher_check && !$current_class->student_check) && ((App\Http\Controllers\ApportionmentController::getPeriod($current_class->start_date) == (new Carbon\Carbon (App\Http\Controllers\ApportionmentController::currentPeriod()[0]))->format('F Y')) && new Carbon\Carbon($current_class->start_date) > new Carbon\Carbon() || auth()->user()->roles[0]->name == "admin"))
                         <a
                             href="{{route('classes.edit',$current_class->id)}}"
                             class="bg-green-600 font-semibold text-white p-4 mr-1 rounded-full hover:bg-green-700 focus:outline-none focus:ring shadow-lg hover:shadow-none transition-all duration-300"

@@ -280,9 +280,10 @@ function post(path, params, method = 'post') {
 let identificadorIntervaloDeTiempo;
 let listPastOfSchedules = [];
 let listPastOfSchedulesExam = [];
+
 console.log("prueba de setInterval");
 repetirCadaMinuto();
-
+mandarMensaje();
 function repetirCadaMinuto() {
     // Livewire.emitTo('schedule', 'findReserves');
     identificadorIntervaloDeTiempo = setInterval(mandarMensaje, 15000);
@@ -290,21 +291,44 @@ function repetirCadaMinuto() {
 
 function mandarMensaje() {
     console.log("Ha pasado 1 minuto.");
+    $cells = $(".selected");
     Livewire.emitTo('schedule', 'findReserves');
+    
 }
 
 window.addEventListener('reserves_schedules_event_js', event => {
+
+    
+    console.log($cells);
+    if(event.detail.mode == "show" || event.detail.mode == "edit"){
+        $cells.each( function(index,element){
+            $(element).toggleClass('selected');
+        })
+    }
     var schedules = event.detail.schedules;
     var schedules_exam = event.detail.schedules_exam;
     var mode = event.detail.mode;
+    // console.log(schedules, schedules_exam);
     // var result = _.union(listOfSchedules, schedules);
-    notOccupied(listPastOfSchedules, mode);
+    notOccupied(listPastOfSchedules, listPastOfSchedulesExam, mode);
     setOccupied(schedules, schedules_exam, mode);
+    listPastOfSchedules = schedules;
+    listPastOfSchedulesExam = schedules_exam;
     // listOfSchedules = listOfSchedules.concat()
-    console.log(event);
+    // console.log(event);
 })
 
-function notOccupied(schedule, mode){
+// console.log(DT);
+// DT.on( 'draw', function () {
+
+//     console.log("Event datatable")
+//     mandarMensaje();
+    
+
+// });
+
+
+function notOccupied(schedule, schedules_exam ,mode){
 
     if(mode == "edit"){
 
@@ -316,25 +340,46 @@ function notOccupied(schedule, mode){
             }
         });
 
-    }else if(mode == "one"){
+        schedules_exam.forEach(element => {
+            // console.log($('#' + element[0] +'-'+ element [1]));
+            if( $('#' + element[0] +'-'+ element [1]).hasClass('selectable') && $('#' + element[0] +'-'+ element [1]).hasClass('occupied') ){
+                $('#' + element[0] +'-'+ element [1]).toggleClass('available');
+                $('#' + element[0] +'-'+ element [1]).toggleClass('occupied');
+            }
+        });
+
+    }else if(mode == "one" || mode == "absence"){
+
+        schedule.forEach(element => {
+            // console.log($("[id^='"+ element[0] +"-"+ element [1] +"-']"));
+            // console.log(DT.cells("[id^='"+ element[0] +"-"+ element [1] +"-']").nodes());
+            (DT.cells("[id^='"+ element[0] +"-"+ element [1] +"-']").nodes()).each(function (cell, index) {
+                // console.log(cell);
+                if( $(cell).hasClass('selectable') && $(cell).hasClass('occupied') ){
+                    $(cell).toggleClass('occupied');
+                    $(cell).toggleClass('available');
+                }
+            });
+        });
+        
+        schedules_exam.forEach(element => {
+            // console.log($('#' + element[0] +'-'+ element [1] +"*"))
+            // console.log($("[id^='"+ element[0] +"-"+ element [1] +"-']"));
+            if( $("[id^='"+ element[0] +"-"+ element [1] +"-']").hasClass('selectable') && $("[id^='"+ element[0] +"-"+ element [1] +"-']").hasClass('occupied') ){
+                $("[id^='"+ element[0] +"-"+ element [1] +"-']").toggleClass('occupied');
+                $("[id^='"+ element[0] +"-"+ element [1] +"-']").toggleClass('available');
+            }
+        });
 
     }
 
 }
 
 function setOccupied(schedule, schedules_exam, mode){
-
+    
     if(mode == "edit"){
-
+        
         schedule.forEach(element => {
-            // console.log($('#' + element[0] +'-'+ element [1]));
-            if( $('#' + element[0] +'-'+ element [1]).hasClass('selectable') && $('#' + element[0] +'-'+ element [1]).hasClass('available') ){
-                $('#' + element[0] +'-'+ element [1]).toggleClass('available');
-                $('#' + element[0] +'-'+ element [1]).toggleClass('occupied');
-            }
-        });
-
-        schedule_exam.forEach(element => {
             // console.log($('#' + element[0] +'-'+ element [1]));
             if( $('#' + element[0] +'-'+ element [1]).hasClass('selectable') && $('#' + element[0] +'-'+ element [1]).hasClass('available') ){
                 $('#' + element[0] +'-'+ element [1]).toggleClass('available');
@@ -342,16 +387,6 @@ function setOccupied(schedule, schedules_exam, mode){
             }
         });
         
-    }else if(mode == "one"){
-
-        schedule.forEach(element => {
-            // console.log($('#' + element[0] +'-'+ element [1]));
-            if( $('#' + element[0] +'-'+ element [1]).hasClass('selectable') && $('#' + element[0] +'-'+ element [1]).hasClass('available') ){
-                $('#' + element[0] +'-'+ element [1]).toggleClass('available');
-                $('#' + element[0] +'-'+ element [1]).toggleClass('occupied');
-            }
-        });
-
         schedules_exam.forEach(element => {
             // console.log($('#' + element[0] +'-'+ element [1]));
             if( $('#' + element[0] +'-'+ element [1]).hasClass('selectable') && $('#' + element[0] +'-'+ element [1]).hasClass('available') ){
@@ -359,12 +394,38 @@ function setOccupied(schedule, schedules_exam, mode){
                 $('#' + element[0] +'-'+ element [1]).toggleClass('occupied');
             }
         });
+        
+    }else if(mode == "one" || mode == "absence"){
+        // console.log("entrando al absence", mode)
+        schedule.forEach(element => {
+            // console.log($("[id^='"+ element[0] +"-"+ element [1] +"-']"));
+            // console.log(DT.cells("[id^='"+ element[0] +"-"+ element [1] +"-']").nodes());
+            (DT.cells("[id^='"+ element[0] +"-"+ element [1] +"-']").nodes()).each(function (cell, index) {
+                // console.log(cell);
+                if( $(cell).hasClass('selectable') && $(cell).hasClass('available') ){
+                    $(cell).toggleClass('available');
+                    $(cell).toggleClass('occupied');
+                }
+            });
+        });
+        
+        schedules_exam.forEach(element => {
+            // console.log($('#' + element[0] +'-'+ element [1] +"*"))
+            // console.log($("[id^='"+ element[0] +"-"+ element [1] +"-']"));
+            if( $('#' + element[0] +'-'+ element [1] +'-'+ element [2] +'-'+ element [3] +'-'+ element [4]).hasClass('selectable') && $('#' + element[0] +'-'+ element [1] +'-'+ element [2] +'-'+ element [3] +'-'+ element [4]).hasClass('available') ){
+                $('#' + element[0] +'-'+ element [1] +'-'+ element [2] +'-'+ element [3] +'-'+ element [4]).toggleClass('available');
+                $('#' + element[0] +'-'+ element [1] +'-'+ element [2] +'-'+ element [3] +'-'+ element [4]).toggleClass('occupied');
+            }
+        });
+        
+        // PARA FECHAS EXACTAS BUSCAR DESDE EL ELEMENT[0] HASTA EL ELEMENT[4];
 
     }
-    
-            listPastOfSchedules = schedule;
-            listPastOfSchedulesExam = schedules_exam;
+
+            
 }
+
+
 
 
 // Funcion de seleccion en el horario
