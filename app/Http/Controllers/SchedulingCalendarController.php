@@ -407,7 +407,18 @@ class SchedulingCalendarController extends Controller
             if (count($teachers_available) > 0 && !$error) {
 
                 $T_selected = rand(0, count($teachers_available) - 1);
-
+                $teacher = User::find(7); //IMPORTANTE!!!!!! AQUI SUSTITUIR EL 7 POR "$T_selected"
+                $schedules_reserves = ScheduleReserve::schedulesReserves($teacher->id); // Posicion 0 para los horarios normales, Posicion 1 para los horarios de un solo dia.
+                // dd($schedules_reserves, count($cells), $cells);
+                // dd($teacher->studentsSchedules(), $teacher->schedules->first()->selected_schedule, $cells, $cell);
+                foreach ($cells as $cell) {
+                    // dd(in_array($cell, $teacher->studentsSchedules()), !in_array($cell, $teacher->schedules->first()->selected_schedule));
+                    if (in_array($cell, $teacher->studentsSchedules()) || !in_array($cell, $teacher->schedules->first()->selected_schedule) || in_array($cell, $schedules_reserves[0]) || (count($cells) == 1 && in_array($cell, $schedules_reserves[1]))) {
+                        Cart::destroy();
+                        session(['message' => "Dear Linguado. That block is not available"]);
+                        return redirect()->route("schedule.create");
+                    }
+                }
                 Cart::destroy();
 
                 $product = Course::find($course_id)->products->first();
@@ -477,8 +488,5 @@ class SchedulingCalendarController extends Controller
             ['teacher_id' => $teacher_id, 'selected_schedule' => $schedule_encode, 'type' => $type]
             // ['type' => 'exam']
         );
-
-
-        // dd($schedule, "reserve");
     }
 }

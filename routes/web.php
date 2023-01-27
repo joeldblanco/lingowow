@@ -35,6 +35,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Notification;
 use App\Http\Controllers\MeetingController;
 use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\PaypalController;
 use App\Http\Controllers\ProductController;
 use App\Models\Attempt;
 use App\Http\Controllers\UploadImages;
@@ -253,6 +254,9 @@ Route::middleware(['web', 'auth', 'verified', 'impersonate'])->group(function ()
 
     Route::get('gather/get_guests_list', [GatherController::class, 'getGuestsList']);
     Route::get('gather/set_guests_list', [GatherController::class, 'setGuestsList']);
+
+    //ROUTES FOR NEW PAYPAL API//
+    Route::resource('api/paypal', PaypalController::class);
 
     Route::get('activities', [ActivityController::class, 'index'])->name('activities.index');
     Route::get('activities/{id}', [ActivityController::class, 'show'])->name('admin.activities.show');

@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use Carbon\Carbon;
 use App\Models\Comment;
 use App\Models\Meeting;
+use App\Models\ScheduleReserve;
 use Illuminate\Support\Facades\Auth;
 
 class ClassController extends Controller
@@ -208,12 +209,23 @@ class ClassController extends Controller
             $data = array_filter($request->data);
             $data = array_merge(...array_values($data));
 
+            $class = Classes::find($id); //Ubico la clase, para sacar el id del profesor;
+            
+            $schedules_reserves = ScheduleReserve::schedulesReserves($class->teacher()->id); // Posicion 0 para los horarios normales, Posicion 1 para los horarios de un solo dia.
+            $teacher = User::find($class->teacher()->id);
+            // dd(in_array($data, $schedules_reserves[1]),in_array($data, $schedules_reserves[0]), $schedules_reserves[1], $data);
+            if (in_array([$data[0], $data[1]], $teacher->studentsSchedules()) || !in_array([$data[0], $data[1]], $teacher->schedules->first()->selected_schedule) || in_array([$data[0], $data[1]], $schedules_reserves[0]) || in_array($data, $schedules_reserves[1])) {
+                session(['message' => "Dear Linguado. That block is not available"]);
+                return redirect()->back();
+            }
+            dd($request->data, $data);
+            
+
             $newDateStart = Carbon::create((new Carbon())->year, $data[3], $data[4], $data[0]);
             $newDateStart = $newDateStart->toDateTimeString();
             $newDateEnd = Carbon::create((new Carbon())->year, $data[3], $data[4], $data[0])->addMinutes(40);
             $newDateEnd = $newDateEnd->toDateTimeString();
 
-            $class = Classes::find($id);
             $class->start_date = $newDateStart;
             $class->end_date = $newDateEnd;
             //ESTATUS ONE, MEANS THAT SOMEONE ABCENSES A CLASS

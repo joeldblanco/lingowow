@@ -14,4 +14,25 @@ class ScheduleReserve extends Model
     protected $table = 'schedule_reserve';
     protected $fillable = ['user_id','teacher_id', 'selected_schedule', 'type'];
     use HasFactory;
+
+    public static function schedulesReserves($teacher_id){
+        $schedules = []; $schedules_exam = [];
+        $schedule = ScheduleReserve::all()->where('teacher_id', $teacher_id)->where('type', 'schedule')->whereNotNull('selected_schedule')->pluck('selected_schedule');
+        $exam = ScheduleReserve::all()->where('teacher_id', $teacher_id)->where('type', 'exam')->whereNotNull('selected_schedule')->pluck('selected_schedule');
+
+        foreach($schedule as $value){
+            foreach(json_decode($value) as $day){
+                    $schedules[] = $day;
+            }
+        }
+
+        foreach($exam as $value){
+            foreach(json_decode($value) as $day){
+                    $schedules_exam[] = $day;
+            }
+        }
+
+        return [$schedules, $schedules_exam];
+        // dd($schedules, $schedules_exam); 
+    }
 }

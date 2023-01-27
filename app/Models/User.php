@@ -140,6 +140,24 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->hasManyThrough(Classes::class, Enrolment::class, 'student_id')->withTrashedParents();
     }
 
+    public function studentsSchedules()
+    {
+        $enrolments = $this->enrolments_teacher()->whereNotNull('student_id')->get();
+        $schedules = [];
+        $Students_schedules = [];
+        foreach($enrolments as $enrolment){
+            $schedules[] = $enrolment->schedule->selected_schedule;
+        }
+        foreach($schedules as $schedule){
+            foreach($schedule as $days){
+                // dd(array_map(function($element) { return json_encode($element); }, $schedule));
+                $Students_schedules[] = $days;
+            }
+        }
+        // dd($enrolments, $schedules, $Students_schedules);
+        return $Students_schedules;
+    }
+
     /**
      * Get all the teacher's classes.
      */

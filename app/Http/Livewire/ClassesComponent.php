@@ -17,7 +17,7 @@ class ClassesComponent extends Component
 {
     use WithPagination;
 
-    public /*$classes, $teachers, $students,*/ $studentClassCheck = "", $teacherClassCheck = "", $comment = "", $current_class, $comments = [], $enrolment, $to_review_classes;
+    public /*$classes, $teachers, $students,*/ $studentClassCheck = "", $teacherClassCheck = "", $comment = "", $current_class, $comments = [], $enrolment, $to_review_classes, $classDetails = false;
 
     protected $rules = [
         'comment' => 'required|string|max:500',
@@ -63,6 +63,7 @@ class ClassesComponent extends Component
     {
         $this->current_class = Classes::find($id);
         $this->enrolment = Enrolment::withTrashed()->where('id', $this->current_class->enrolment_id)->first();
+        $this->classDetails = true;
     }
 
     public function saveComment()
@@ -155,6 +156,7 @@ class ClassesComponent extends Component
             //     $this->students[$key] = $value->student();
             // }
         } else if ($role == "student" && $this->current_class) {
+            
             $classes = User::find(auth()->id())->studentClasses()->whereBetween('start_date', ApportionmentController::getPeriod($this->current_class->start_date, true))->orderBy('start_date')->paginate(10);
             // foreach ($classes as $key => $value) {
             //     // $this->teachers[$key] = $value->teacher();
