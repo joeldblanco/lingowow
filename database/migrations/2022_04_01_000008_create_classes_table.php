@@ -20,8 +20,8 @@ class CreateClassesTable extends Migration
             $table->dateTime('end_date');
             $table->bigInteger('enrolment_id')->unsigned();
             $table->string('meeting_id')->nullable();
-            $table->tinyInteger('teacher_check')->unsigned()->default(0);
-            $table->tinyInteger('student_check')->unsigned()->default(0);
+            // $table->tinyInteger('teacher_check')->unsigned()->default(0);
+            // $table->tinyInteger('student_check')->unsigned()->default(0);
             $table->tinyInteger('status')->unsigned()->nullable();
             $table->timestamps();
             $table->softDeletes();

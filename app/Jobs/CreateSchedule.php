@@ -68,6 +68,7 @@ class CreateSchedule implements ShouldQueue
 
         $request = new Request($data);
         $meeting_id = (new MeetingController)->store($request, true);
+        // $meeting_id = null;
 
         //CREATING CLASSES (CLASS BOOKING)//
         foreach ($classes_dates as $date) {

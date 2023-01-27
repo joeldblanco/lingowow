@@ -17,7 +17,8 @@
                                     <textarea name="embeddable_data" id="embeddable_data" required
                                         class="w-full rounded-md p-3 text-gray-600 hover:border-gray-600 @if ($errors->has('embeddable_data')) border-red-600 @else border-gray-300 @endif">{{ $content->content->embeddable }}</textarea>
                                     @if ($errors->has('embeddable_data'))
-                                        <p class="text-xs font-light text-red-600">{{$errors->get('embeddable_data')[0]}}</p>
+                                        <p class="text-xs font-light text-red-600">
+                                            {{ $errors->get('embeddable_data')[0] }}</p>
                                     @endif
                                     <div id="embeddable_preview" class="hidden w-full overflow-auto">
 
@@ -39,7 +40,8 @@
                                         value="{{ $content->content->link_title }}"
                                         class="w-full rounded-md p-3 text-gray-600 hover:border-gray-600 @if ($errors->has('link_title')) border-red-600 @else border-gray-300 @endif">
                                     @if ($errors->has('link_title'))
-                                        <p class="text-xs font-light text-red-600">{{$errors->get('link_title')[0]}}</p>
+                                        <p class="text-xs font-light text-red-600">{{ $errors->get('link_title')[0] }}
+                                        </p>
                                     @endif
                                     <p class="text-gray-500 text-sm font-light">Enter link title</p>
                                 </div>
@@ -49,7 +51,7 @@
                                         value="{{ $content->content->link_url }}"
                                         class="w-full rounded-md p-3 text-gray-600 hover:border-gray-600 @if ($errors->has('link_url')) border-red-600 @else border-gray-300 @endif">
                                     @if ($errors->has('link_url'))
-                                        <p class="text-xs font-light text-red-600">{{$errors->get('link_url')[0]}}</p>
+                                        <p class="text-xs font-light text-red-600">{{ $errors->get('link_url')[0] }}</p>
                                     @endif
                                     <p class="text-gray-500 text-sm font-light">Enter url</p>
                                 </div>
@@ -85,7 +87,8 @@
                                             class="text-6xl cursor-pointer rounded-md p-3 text-gray-400 @if ($errors->has('media_file')) border-red-600 @else border-gray-300 @endif"><i
                                                 class="far fa-folder-open"></i></button>
                                         @if ($errors->has('media_file'))
-                                            <p class="text-xs font-light text-red-600">{{$errors->get('media_file')[0]}}</p>
+                                            <p class="text-xs font-light text-red-600">
+                                                {{ $errors->get('media_file')[0] }}</p>
                                         @endif
                                     </div>
                                     <p class="text-gray-500 text-sm font-light">Upload media file</p>
@@ -108,10 +111,10 @@
                         <x-slot name="content">
                             <div class="border">
                                 @php
-                                    $files = File::allFiles(storage_path() . '\app\public');
+                                    $files = File::allFiles(storage_path() . '/app/public');
                                     $relativePaths = [];
                                     foreach ($files as $file) {
-                                        if (!str_contains($file->getRelativePath(), 'photos\users')) {
+                                        if (!str_contains($file->getRelativePath(), 'photos/users')) {
                                             $relativePaths[] = $file->getRelativePath();
                                         }
                                     }
@@ -182,6 +185,57 @@
                 }
 
                 preview_embeddable();
+
+                var data = [];
+
+                data.push({
+                    "type": "embeddable",
+                    "embeddable_data": document.getElementById('embeddable_data').value,
+                });
+
+                $("#saveButton").on('click', function() {
+                    // console.log(data);
+                    post(route('contents.update', {{ $content->id }}), {
+                        "type": "media",
+                        data: data,
+                        "_token": $("meta[name='csrf-token']").attr("content"),
+                        "_method": "PATCH"
+                    });
+                })
+
+                // method="POST" action="{{ route('contents.update', $content->id) }}" enctype="multipart/form-data"
+
+                /**
+                 * sends a request to the specified url from a form. this will change the window location.
+                 * @param {string} path the path to send the post request to
+                 * @param {object} params the parameters to add to the url
+                 * @param {string} [method=post] the method to use on the form
+                 */
+
+                function post(path, params, method = 'post') {
+
+                    // The rest of this code assumes you are not using a library.
+                    // It can be made less verbose if you use one.
+                    const form = document.createElement('form');
+                    form.method = method;
+                    form.action = path;
+
+                    console.log(form);
+
+                    for (const key in params) {
+                        if (params.hasOwnProperty(key)) {
+                            const hiddenField = document.createElement('input');
+                            hiddenField.type = 'hidden';
+                            hiddenField.name = key;
+                            hiddenField.value = params[key];
+
+                            form.appendChild(hiddenField);
+                        }
+                    }
+
+                    document.body.appendChild(form);
+                    form.submit();
+                }
             </script>
         @elseif($content->content->type == 'media')
             <script type="text/javascript">
@@ -224,49 +278,49 @@
 
                     });
 
-                    // $('#media_file').change(function() {
+                    $('#media_file').change(function() {
 
-                    //     let reader = new FileReader();
+                        let reader = new FileReader();
 
-                    //     reader.onload = (e) => {
+                        reader.onload = (e) => {
 
-                    //         if (e.target.result.split(";")[0].includes("audio")) {
-                    //             $('#audio').attr('src', e.target.result);
-                    //             $('#audio').removeClass('hidden');
+                            if (e.target.result.split(";")[0].includes("audio")) {
+                                $('#audio').attr('src', e.target.result);
+                                $('#audio').removeClass('hidden');
 
-                    //             $('#findOrUpload').addClass('hidden');
-                    //             $('#image').addClass('hidden');
-                    //             $("#video").addClass('hidden');
-                    //             $('#cancelButton').removeClass('hidden');
+                                $('#findOrUpload').addClass('hidden');
+                                $('#image').addClass('hidden');
+                                $("#video").addClass('hidden');
+                                $('#cancelButton').removeClass('hidden');
 
-                    //         } else if (e.target.result.split(";")[0].includes("image")) {
-                    //             $('#image').attr('src', e.target.result);
-                    //             $('#image').removeClass('hidden');
+                            } else if (e.target.result.split(";")[0].includes("image")) {
+                                $('#image').attr('src', e.target.result);
+                                $('#image').removeClass('hidden');
 
-                    //             $('#findOrUpload').addClass('hidden');
-                    //             $('#audio').addClass('hidden');
-                    //             $("#video").addClass('hidden');
-                    //             $('#cancelButton').removeClass('hidden');
+                                $('#findOrUpload').addClass('hidden');
+                                $('#audio').addClass('hidden');
+                                $("#video").addClass('hidden');
+                                $('#cancelButton').removeClass('hidden');
 
-                    //         } else if (e.target.result.split(";")[0].includes("video")) {
-                    //             $('#video').attr('src', e.target.result);
-                    //             $('#video').removeClass('hidden');
+                            } else if (e.target.result.split(";")[0].includes("video")) {
+                                $('#video').attr('src', e.target.result);
+                                $('#video').removeClass('hidden');
 
-                    //             $('#findOrUpload').addClass('hidden');
-                    //             $('#audio').addClass('hidden');
-                    //             $("#image").addClass('hidden');
-                    //             $('#cancelButton').removeClass('hidden');
-                    //         }
-                    //     }
+                                $('#findOrUpload').addClass('hidden');
+                                $('#audio').addClass('hidden');
+                                $("#image").addClass('hidden');
+                                $('#cancelButton').removeClass('hidden');
+                            }
+                        }
 
-                    //     reader.readAsDataURL(this.files[0]);
+                        reader.readAsDataURL(this.files[0]);
 
-                    //     // $("#image").toggleClass("hidden");
-                    //     $("#post_content").attr('required', false);
+                        // $("#image").toggleClass("hidden");
+                        $("#post_content").attr('required', false);
 
-                    // });
+                    });
 
-                    $('#cancelButton').click(function() {
+                    $('#cancelButton').on('click', function() {
                         $('#findOrUpload').removeClass('hidden');
                         $('#audio').addClass('hidden');
                         $('#cancelButton').addClass('hidden');
@@ -274,7 +328,7 @@
                         $("#video").addClass('hidden');
                     });
 
-                    $("#saveButton").click(function() {
+                    $("#saveButton").on('click', function() {
                         console.log(data);
                         post(route('contents.update', {{ $content->id }}), {
                             "type": "media",
@@ -318,6 +372,61 @@
                     form.submit();
                 }
             </script>
+        @elseif($content->content->type == 'url')
+            <script>
+                var data = [];
+
+                data.push({
+                    "type": "url",
+                    "link_title": document.getElementById('link_title').value,
+                    "link_url": document.getElementById('link_url').value,
+                });
+
+                $("#saveButton").on('click', function() {
+                    // console.log(data);
+                    post(route('contents.update', {{ $content->id }}), {
+                        "type": "media",
+                        data: data,
+                        "_token": $("meta[name='csrf-token']").attr("content"),
+                        "_method": "PATCH"
+                    });
+                })
+
+                // method="POST" action="{{ route('contents.update', $content->id) }}" enctype="multipart/form-data"
+
+                /**
+                 * sends a request to the specified url from a form. this will change the window location.
+                 * @param {string} path the path to send the post request to
+                 * @param {object} params the parameters to add to the url
+                 * @param {string} [method=post] the method to use on the form
+                 */
+
+                function post(path, params, method = 'post') {
+
+                    // The rest of this code assumes you are not using a library.
+                    // It can be made less verbose if you use one.
+                    const form = document.createElement('form');
+                    form.method = method;
+                    form.action = path;
+
+                    console.log(form);
+
+                    for (const key in params) {
+                        if (params.hasOwnProperty(key)) {
+                            const hiddenField = document.createElement('input');
+                            hiddenField.type = 'hidden';
+                            hiddenField.name = key;
+                            hiddenField.value = params[key];
+
+                            form.appendChild(hiddenField);
+                        }
+                    }
+
+                    document.body.appendChild(form);
+                    form.submit();
+                }
+            </script>
         @endif
+
 
 </x-app-layout>

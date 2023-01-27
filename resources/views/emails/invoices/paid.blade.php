@@ -111,14 +111,13 @@
                 <td colspan="2">
                     <table>
                         <tr>
-                            <td class="title">
-                                {{-- <img src="{{ $message->embed(Storage::url('images/logo_512x512_transparente.png')) }}"> --}}
-                                <img src="{{ Storage::url('images/logo_512x512_transparente.png') }}"
+                            <td class="title" style="width: 20%">
+                                <img src="{{ url(Storage::url('images/logo_512x512_transparente.png')) }}"
                                     style="width: 100%; max-width: 300px" />
                             </td>
 
                             <td>
-                                Invoice #: {{ $invoice->id }}<br />
+                                Invoice #: {{ str_pad($invoice->id, 7, '0', STR_PAD_LEFT) }}<br />
                                 Created: {{ (new Carbon\Carbon($invoice->created_at))->isoFormat('LL') }}<br />
                                 Due: {{ (new Carbon\Carbon($invoice->created_at))->isoFormat('LL') }}
                             </td>
