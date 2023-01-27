@@ -3,14 +3,20 @@
 namespace App\Console;
 
 use App\Http\Controllers\ApportionmentController;
+use App\Http\Controllers\GatherController;
 use App\Jobs\CreateClasses;
+use App\Models\Classes;
 use App\Models\Enrolment;
 use App\Models\Schedule as ModelsSchedule;
 use App\Models\User;
+use App\Notifications\UpcomingClassForStudent;
+use App\Notifications\UpcomingClassForTeacher;
 use Carbon\Carbon;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Notification;
+use PhpParser\Node\Stmt\Foreach_;
 
 class Kernel extends ConsoleKernel
 {
@@ -103,6 +109,27 @@ class Kernel extends ConsoleKernel
                             "end_date" => ApportionmentController::nextPeriod(true)[1],
                         ])
                     ]);
+                }
+
+                GatherController::setGuestsList();
+
+                
+            }
+        })->everyMinute();
+
+
+        $schedule->call(function () {
+            $notified_students = User::find(DB::table('notifications')->where('created_at', '>=', Carbon::now()->subHours(1))->where('notifiable_type', 'App\Models\User')->where('type', 'App\Notifications\UpcomingClassForStudent')->get('notifiable_id')->pluck('notifiable_id')->unique());
+            $notified_teachers = User::find(DB::table('notifications')->where('created_at', '>=', Carbon::now()->subHours(1))->where('notifiable_type', 'App\Models\User')->where('type', 'App\Notifications\UpcomingClassForTeacher')->get('notifiable_id')->pluck('notifiable_id')->unique());
+            $classes = Classes::where('start_date', '<=', Carbon::now()->addHour())->where('start_date', '>', Carbon::now())->get();
+
+            foreach ($classes as $class) {
+                if (!$notified_teachers->contains($class->teacher())) {
+                    Notification::sendNow($class->teacher(), new UpcomingClassForTeacher($class));
+                }
+
+                if (!$notified_students->contains($class->student())) {
+                    Notification::sendNow($class->student(), new UpcomingClassForStudent($class));
                 }
             }
         })->everyMinute();

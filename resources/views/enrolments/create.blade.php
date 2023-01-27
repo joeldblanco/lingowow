@@ -61,7 +61,17 @@
                         </div>
                     </div>
                     <div class="w-full flex justify-end">
-                        <button class="bg-blue-500 py-1 px-3 rounded-md font-semibold text-white shadow-lg text-lg">
+                        <div class="bg-red-200 border border-red-400 w-full rounded-md p-5 text-red-500 space-y-4 hidden"
+                            id="needsBillingAddress">
+                            <p>
+                                In order to make the payment, the student must complete their profile with their
+                                billing
+                                address.
+                            </p>
+                        </div>
+                        <button
+                            class="bg-blue-500 py-1 px-3 rounded-md font-semibold text-white shadow-lg text-lg hidden"
+                            id="saveButton">
                             Save
                         </button>
                     </div>
@@ -70,5 +80,32 @@
             </div>
         </div>
     </div>
+
+    <script>
+        $('#student_id').change(function() {
+            $.ajax({
+                type: 'POST',
+                url: route('getUser'),
+                data: {
+                    id: this.value,
+                    '_token': $('meta[name="csrf-token"]').attr('content'),
+                },
+                success: function(user) {
+                    if (user.street == null || user.city == null || user.country == null || user
+                        .zip_code == null) {
+                        $('#needsBillingAddress').show();
+                        $('#saveButton').hide();
+                    } else {
+                        $('#needsBillingAddress').hide();
+                        $('#saveButton').show();
+                    }
+                },
+                error: function(data) {
+                    // console.log(data["responseText"]);
+                }
+            });
+
+        });
+    </script>
 
 </x-app-layout>

@@ -190,27 +190,27 @@ class ModuleController extends Controller
         return view('course.module.details', compact('module'));
     }
 
-    static function is_passed($nota, $id)
-    {
+    // static function is_passed($nota, $id)
+    // {
 
-        if ($nota != null) {
+    //     if ($nota != null) {
 
-            if (GroupUnit::find($id)->priority == 'FIRST') {
-                return true;
-            } else {
-                $nota = $nota->pivot->nota;
-                if ($nota >= 10) {
-                    return true;
-                } else {
-                    return false;
-                }
-            }
-        } else {
-            if (GroupUnit::find($id)->priority == 'FIRST') {
-                return true;
-            } else {
-                return false;
-            }
-        }
-    }
+    //         if (GroupUnit::find($id)->priority == 'FIRST') {
+    //             return true;
+    //         } else {
+    //             $nota = $nota->pivot->nota;
+    //             if ($nota >= 10) {
+    //                 return true;
+    //             } else {
+    //                 return false;
+    //             }
+    //         }
+    //     } else {
+    //         if (GroupUnit::find($id)->priority == 'FIRST') {
+    //             return true;
+    //         } else {
+    //             return false;
+    //         }
+    //     }
+    // }
 }

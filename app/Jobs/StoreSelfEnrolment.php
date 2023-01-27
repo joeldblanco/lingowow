@@ -2,9 +2,11 @@
 
 namespace App\Jobs;
 
+use App\Http\Controllers\GatherController;
 use App\Invoice;
 use Cart;
 use App\Item;
+use App\Mail\InvoicePaid;
 use App\Models\Course;
 use App\Models\Enrolment;
 use App\Models\Module;
@@ -17,6 +19,7 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
 
 class StoreSelfEnrolment implements ShouldQueue
 {
@@ -68,6 +71,7 @@ class StoreSelfEnrolment implements ShouldQueue
             $invoice->paid = 1;
             $invoice->user_id = $student->id;
             $invoice->save();
+            Mail::to($student)->send(new InvoicePaid($invoice));
 
             collect($cart['items'])->each(function ($product) use ($invoice) {
                 $item = new Item();
@@ -106,6 +110,8 @@ class StoreSelfEnrolment implements ShouldQueue
                 ['teacher_id' => NULL, 'deleted_at' => NULL]
             );
         }
+
+        GatherController::editGuestsList($student->id);
 
         if (($student->id != null)) {
 

@@ -31,6 +31,12 @@
             'status' => request()->is('shop', 'shop/*'),
             'roles' => ['student', 'guest', 'admin'],
         ],
+        [
+            'name' => 'Gather',
+            'route' => 'https://app.gather.town/invite?token=odIfjNGGT7G4ZWGJXV24',
+            'status' => false,
+            'roles' => ['student', 'teacher', 'admin'],
+        ],
     ];
     
 @endphp
