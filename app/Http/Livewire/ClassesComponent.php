@@ -3,8 +3,8 @@
 namespace App\Http\Livewire;
 
 use App\Http\Controllers\ApportionmentController;
-use App\Jobs\StudentClassCheck;
-use App\Jobs\TeacherClassCheck;
+// use App\Jobs\StudentClassCheck;
+// use App\Jobs\TeacherClassCheck;
 use App\Models\Classes;
 use App\Models\Comment;
 use App\Models\Enrolment;
@@ -19,8 +19,8 @@ class ClassesComponent extends Component
     use WithPagination;
 
     // public $classes;
-    public $studentClassCheck = "";
-    public $teacherClassCheck = "";
+    // public $studentClassCheck = "";
+    // public $teacherClassCheck = "";
     public $comment = "";
     public $current_class;
     public $comments = [];
@@ -100,7 +100,7 @@ class ClassesComponent extends Component
                 // $this->students[$key] = $value->student();
                 // $this->teachers[$key] = $value->teacher();
 
-                if (!$value->student_check || !$value->teacher_check) {
+                if (empty($value->rating)) {
                     $this->to_review_classes[] = $value->id;
                 }
             }
@@ -111,39 +111,6 @@ class ClassesComponent extends Component
         if ($this->current_class) {
             $this->enrolment = Enrolment::withTrashed()->where('id', $this->current_class->enrolment_id)->first();
         }
-
-
-        // $this->teachers = [];
-        // $this->students = [];
-        // $this->to_review_classes = [];
-        // $role = auth()->user()->roles[0]->name;
-        // $classes = [];
-
-        // if ($role == "teacher" && $this->current_class) {
-        //     $classes = User::find(auth()->id())->teacherClasses()->whereBetween('start_date', ApportionmentController::getPeriod($this->current_class->start_date, true))->orderBy('start_date')->paginate(10);
-        //     // $classes = User::find(auth()->id())->teacherClasses->sortBy('start_date', 'ASC')->get();
-        //     // $classes = $classes->sortBy('start_date');
-        //     // foreach ($classes as $key => $value) {
-        //     //     $this->students[$key] = $value->student();
-        //     // }
-        // } else if ($role == "student" && $this->current_class) {
-        //     $classes = User::find(auth()->id())->studentClasses()->whereBetween('start_date', ApportionmentController::getPeriod($this->current_class->start_date, true))->orderBy('start_date')->paginate(10);
-        //     // foreach ($classes as $key => $value) {
-        //     //     // $this->teachers[$key] = $value->teacher();
-        //     // }
-        // } else if ($role == "admin" && $this->current_class) {
-        //     // dd(ApportionmentController::getPeriod($this->current_class->start_date, true));
-        //     $classes = Classes::whereBetween('start_date', ApportionmentController::getPeriod($this->current_class->start_date, true))->orderBy('start_date')->paginate(10);
-        //     // $classes = $classes->sortBy('start_date');
-        //     foreach ($classes as $key => $value) {
-        //         // $this->students[$key] = $value->student();
-        //         // $this->teachers[$key] = $value->teacher();
-
-        //         if (!$value->student_check || !$value->teacher_check) {
-        //             $this->to_review_classes[] = $value->id;
-        //         }
-        //     }
-        // }
 
         if (is_int($this->current_class)) $this->current_class = Classes::find($this->current_class);
 

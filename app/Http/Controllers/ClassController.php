@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Jobs\StudentClassCheck;
-use App\Jobs\TeacherClassCheck;
+// use App\Jobs\StudentClassCheck;
+// use App\Jobs\TeacherClassCheck;
 use App\Models\Classes;
 use App\Models\Enrolment;
 use App\Models\Schedule;
@@ -270,22 +270,22 @@ class ClassController extends Controller
         return $recordings;
     }
 
-    public function checkClasses(Request $request)
-    {
-        $request = $request->except(['_token', '_method']);
-        $role = Auth::user()->roles()->first()->name;
-        foreach ($request as $key => $value) {
-            $name = explode('_', $key)[0];
-            $id = explode('_', $key)[1];
+    // public function checkClasses(Request $request)
+    // {
+    //     $request = $request->except(['_token', '_method']);
+    //     $role = Auth::user()->roles()->first()->name;
+    //     foreach ($request as $key => $value) {
+    //         $name = explode('_', $key)[0];
+    //         $id = explode('_', $key)[1];
 
-            if ($name == 'teacher' && ($role == "teacher" || $role == "admin")) {
-                dispatch(new TeacherClassCheck($id, $value));
-            }
+    //         if ($name == 'teacher' && ($role == "teacher" || $role == "admin")) {
+    //             dispatch(new TeacherClassCheck($id, $value));
+    //         }
 
-            if ($name == 'student' && ($role == "student" || $role == "admin")) {
-                dispatch(new StudentClassCheck($id, $value));
-            }
-        }
-        return redirect()->back();
-    }
+    //         if ($name == 'student' && ($role == "student" || $role == "admin")) {
+    //             dispatch(new StudentClassCheck($id, $value));
+    //         }
+    //     }
+    //     return redirect()->back();
+    // }
 }

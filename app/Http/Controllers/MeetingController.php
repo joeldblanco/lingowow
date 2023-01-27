@@ -46,6 +46,7 @@ class MeetingController extends Controller
             'host_id' => 'required',
             // 'date' => 'required|date',
         ]);
+        $meeting = null;
 
         $data = $request->all();
 
@@ -120,7 +121,6 @@ class MeetingController extends Controller
             $error = json_decode($response->getBody(), true);
             session(['error' => $error]);
         }
-
 
         // } else {
         //     $meetings = Meeting::all();

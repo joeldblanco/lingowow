@@ -20,7 +20,7 @@ class AnalyticsController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function index()
-    {   
+    {
         $current_period = ApportionmentController::currentPeriod();
         $invoices = Invoice::all();
         // $invoices = Invoice::whereDate('created_at', '>=', $current_period[0])->whereDate('created_at', '<=', $current_period[1])->get();
@@ -66,7 +66,8 @@ class AnalyticsController extends Controller
             $enrolments = Enrolment::where('teacher_id', $value->id)->get();
 
             foreach ($enrolments as $enrolment) {
-                $n_classes = Classes::where('enrolment_id', $enrolment->id)->whereDate('start_date', '>=', $current_period[0])->where('teacher_check', 1)->where('student_check', 1)->count();
+                // $n_classes = Classes::where('enrolment_id', $enrolment->id)->whereDate('start_date', '>=', $current_period[0])->where('teacher_check', 1)->where('student_check', 1)->count();
+                $n_classes = Classes::where('enrolment_id', $enrolment->id)->whereDate('start_date', '>=', $current_period[0])->get()->pluck('rating')->whereNotNull()->count();
                 $product = Course::find($enrolment->course_id)->products->first();
                 if ($product->sale_price == NULL) {
                     $product_price = $product->regular_price;
@@ -140,7 +141,7 @@ class AnalyticsController extends Controller
             $total_earnings += $invoice->price;
         }
 
-        if(count($invoices)) $month = $invoices[0]->created_at->month;
+        if (count($invoices)) $month = $invoices[0]->created_at->month;
         $month_total = 0;
         $months_total = [];
         $months = [];
