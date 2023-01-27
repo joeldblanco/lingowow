@@ -64,4 +64,12 @@ class Classes extends Model
     {
         return $this->belongsTo(Meeting::class);
     }
+
+    /**
+     * Get the rating associated with the class.
+     */
+    public function rating()
+    {
+        return $this->hasOne(Rating::class, 'class_id');
+    }
 }

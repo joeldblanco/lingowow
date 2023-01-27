@@ -240,8 +240,8 @@
             </div>
         </div>
     </div>
-    <script   src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
-    <script  >
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+    <script>
         var options = {
             chart: {
                 type: "area",

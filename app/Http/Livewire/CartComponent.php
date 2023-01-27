@@ -2,11 +2,16 @@
 
 namespace App\Http\Livewire;
 
+use App\Invoice;
+use App\Item;
+use App\Jobs\StoreSelfEnrolment;
+use App\Mail\InvoicePaid;
 use App\Models\Course;
 use App\Models\Product;
 use App\Models\User;
 use Livewire\Component;
 use Gloudemans\Shoppingcart\Facades\Cart;
+use Illuminate\Support\Facades\Mail;
 use Throwable;
 
 class CartComponent extends Component
@@ -18,6 +23,10 @@ class CartComponent extends Component
     public $country = "";
     public $zip_code = "";
     public $user;
+
+    protected $listeners = [
+        'paypalCheckout'
+    ];
 
     protected $rules = [
         'street' => 'required|string|max:100',
@@ -33,6 +42,58 @@ class CartComponent extends Component
         $this->city = $this->user->city;
         $this->country = $this->user->country;
         $this->zip_code = $this->user->zip_code;
+    }
+
+    public function paypalCheckout()
+    {
+        // $cart = [];
+        // if (Invoice::all()->last() != null) {
+        //     $order_id = Invoice::all()->last()->id + 1;
+        // } else {
+        //     $order_id = 1;
+        // }
+
+        // $items = array();
+
+        // foreach (Cart::content() as $item) {
+        //     array_push($items, ['name'  => $item->name, 'price' => $item->price, 'qty' => $item->qty]);
+        // }
+
+        // $cart['items'] = $items;
+
+        // $cart['invoice_id'] = config('paypal.invoice_prefix') . '_' . $order_id;
+        // $cart['invoice_description'] = "Invoice #$order_id";
+
+        // $total = 0;
+        // foreach ($cart['items'] as $item) {
+        //     $total += $item['price'] * $item['qty'];
+        // }
+        // $cart['total'] = $total;
+
+        // $invoice = new Invoice();
+        // $invoice->title = $cart['invoice_description'];
+        // $invoice->price = $cart['total'];
+        // $invoice->paid = 1;
+        // $invoice->user_id = $this->user->id;
+        // $invoice->save();
+
+        // Mail::to($this->user)->send(new InvoicePaid($invoice));
+
+        // collect($cart['items'])->each(function ($product) use ($invoice) {
+        //     $item = new Item();
+        //     $item->invoice_id = $invoice->id;
+        //     $item->item_name = $product['name'];
+        //     $item->item_price = $product['price'];
+        //     $item->item_qty = $product['qty'];
+
+        //     $item->save();
+        // });
+
+        // Cart::destroy();
+
+        dispatch(new StoreSelfEnrolment($this->user));
+
+        return redirect()->route('invoices');
     }
 
     public function updated($propertyName)

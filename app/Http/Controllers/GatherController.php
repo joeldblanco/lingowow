@@ -18,7 +18,7 @@ class GatherController extends Controller
 
         $body = [
             'apiKey' => env('GATHER_API_KEY', ''),
-            'spaceId'  => 'Z1brs5e4jun0FRSm\lingowow',
+            'spaceId'  => 'NMqppR61QkKUarTd/beach_bar',
         ];
 
         $response = Http::withHeaders($headers)->get($path, $body);
@@ -26,16 +26,16 @@ class GatherController extends Controller
         return $response->getStatusCode() === 200 ? $response->body() : null;
     }
 
-    public function setGuestsList()
+    public static function setGuestsList()
     {
-        $users = User::role(['teacher', 'student'])->get();
+        $users = User::role(['teacher', 'student', 'admin'])->get();
         $guestlist = array();
 
         foreach ($users as $user) {
             $guestList[$user->email] = [
                 'name' => $user->first_name . ' ' . $user->last_name,
                 'affiliation' => $user->getRoleNames()->first(),
-                'role' => $user->getRoleNames()->first() == "teacher" ? "moderator" : "member",
+                'role' => $user->getRoleNames()->first() == ("teacher" || "admin") ? "moderator" : "member",
             ];
         }
 
@@ -47,7 +47,7 @@ class GatherController extends Controller
 
         $body = [
             'apiKey' => env('GATHER_API_KEY', ''),
-            'spaceId'  => 'Z1brs5e4jun0FRSm\lingowow',
+            'spaceId'  => 'NMqppR61QkKUarTd/beach_bar',
             'guestlist' => $guestList,
             'overwrite' => 'true',
         ];
@@ -66,7 +66,7 @@ class GatherController extends Controller
             $guestList[$user->email] = [
                 'name' => $user->first_name . ' ' . $user->last_name,
                 'affiliation' => $user->getRoleNames()->first(),
-                'role' => $user->getRoleNames()->first() == "teacher" ? "moderator" : "member",
+                'role' => $user->getRoleNames()->first() == ("teacher" || "admin") ? "moderator" : "member",
             ];
         }
 

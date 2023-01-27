@@ -44,12 +44,14 @@ use App\Models\Attempt;
 use App\Http\Controllers\UploadImages;
 use App\Http\Controllers\WhatsAppController;
 use App\Http\Livewire\ClassesComponent;
+use App\Mail\InvoicePaid;
 use App\Models\Enrolment;
 use App\Models\Meeting;
 use App\Models\Post;
 use App\Models\Unit;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Mail;
 
 /*
 |--------------------------------------------------------------------------
@@ -232,10 +234,12 @@ Route::middleware(['web', 'auth', 'verified', 'impersonate'])->group(function ()
     //ROUTES FOR ADMINISTRATION//
     Route::middleware(['role:admin'])->group(function () {
 
+
+
+
+
         //ROUTES FOR GRADINGS//
         Route::resource('/gradings', GradingController::class);
-
-
 
 
 
@@ -255,6 +259,7 @@ Route::middleware(['web', 'auth', 'verified', 'impersonate'])->group(function ()
 
         //USERS//
         Route::get('/admin/users/{role}', [UsersController::class, 'index'])->name('users');
+        Route::post('/admin/getUser/', [UsersController::class, 'getUser'])->name('getUser');
 
 
 
@@ -352,7 +357,7 @@ Route::middleware(['web', 'auth', 'verified', 'impersonate'])->group(function ()
         //USER RESET//
         Route::get('/reset/{users}', function (User ...$users) {
             foreach ($users as $user) {
-
+                $role_id = $user->roles[0]->id;
                 if ($user->roles[0]->name == 'student') {
                     $user->studentClasses->each(function ($class) {
                         // $deleted_class = $class->delete();
@@ -375,19 +380,29 @@ Route::middleware(['web', 'auth', 'verified', 'impersonate'])->group(function ()
                     $user->assignRole('guest');
                 }
             }
-            return redirect()->route('users', 4);
+            return redirect()->route('users', $role_id);
         })->name('reset.user');
+
+        //ROUTES FOR GLOBALS//
+        Route::get('admin/globals', function () {
+            $globals = DB::table('metadata')->get();
+            return view('globals.index', compact('globals'));
+        })->name("globals.index");
+        Route::get('admin/globals/{key}/edit', function ($key) {
+            $globals = DB::table('metadata')->where('key', $key)->first();
+            return view('globals.edit', compact('globals'));
+        })->name("globals.edit");
+
+        Route::get('gather/get_guests_list', [GatherController::class, 'getGuestsList']);
+        Route::get('gather/set_guests_list', [GatherController::class, 'setGuestsList']);
+
+        Route::resource('api/paypal', PayPalController::class);
+
+        Route::get('/admin/exam/result/{id}', [ExamController::class, 'correct'])->name('exam.result');
     });
-
-    Route::get('gather/get_guests_list', [GatherController::class, 'getGuestsList']);
-    Route::get('gather/set_guests_list', [GatherController::class, 'setGuestsList']);
-
-    Route::resource('api/paypal', PayPalController::class);
 
     Route::get('activities', [ActivityController::class, 'index'])->name('activities.index');
     Route::get('activities/{id}', [ActivityController::class, 'show'])->name('admin.activities.show');
-
-    Route::get('/admin/exam/result/{id}', [ExamController::class, 'correct'])->name('exam.result');
 
     Route::get('/users/stop-impersonation', [UsersController::class, 'stopImpersonation'])->name('stopImpersonation');
 
@@ -396,16 +411,6 @@ Route::middleware(['web', 'auth', 'verified', 'impersonate'])->group(function ()
     Route::get('/classes/{id}', [ClassController::class, 'edit'])->name('classes.edit');
     Route::post('/classes/update', [ClassController::class, 'update'])->name('classes.update');
     Route::post('/classes/check', [ClassController::class, 'checkClasses'])->name('classes.check');
-
-    //ROUTES FOR GLOBALS//
-    Route::get('admin/globals', function () {
-        $globals = DB::table('metadata')->get();
-        return view('globals.index', compact('globals'));
-    })->name("globals.index");
-    Route::get('admin/globals/{key}/edit', function ($key) {
-        $globals = DB::table('metadata')->where('key', $key)->first();
-        return view('globals.edit', compact('globals'));
-    })->name("globals.edit");
 
     //ROUTES FOR POSTS//
     Route::post('/post/store', [PostController::class, 'store'])->name('post.store');
@@ -437,5 +442,5 @@ Route::middleware(['web', 'auth', 'verified', 'impersonate'])->group(function ()
     // });
     Route::resource('/profile', ProfileController::class);
 
-    Route::resource('/admin/enrolments', EnrolmentController::class);
+    // Route::resource('/admin/enrolments', EnrolmentController::class);
 });

@@ -229,58 +229,58 @@ class CourseController extends Controller
 
     //REVIEW: MODIFICAR MODULO DE LA FUNCION
 
-    static function module_passed($module, $user_id)
-    {
-        $group = $module->groups->first();
-        // dump($group);
-        if ($group == null) return false;
+    // static function module_passed($module, $user_id)
+    // {
+    //     $group = $module->groups->first();
+    //     // dump($group);
+    //     if ($group == null) return false;
 
-        $passed = (new CourseController)->is_passed($group->isPassed($user_id, $group->id)->first(), $group->id);
+    //     $passed = (new CourseController)->is_passed($group->isPassed($user_id, $group->id)->first(), $group->id);
 
-        return $passed;
-    }
+    //     return $passed;
+    // }
 
-    public function is_passed($nota, $id)
-    {
+    // public function is_passed($nota, $id)
+    // {
 
-        if ($nota != null) {
+    //     if ($nota != null) {
 
-            if (GroupUnit::find($id)->priority == 'FIRST') {
-                return true;
-            } else {
-                $nota = $nota->pivot->nota;
-                if ($nota >= 10) {
-                    return true;
-                } else {
-                    return false;
-                }
-            }
-        } else {
-            if (GroupUnit::find($id)->priority == 'FIRST') {
-                return true;
-            } else {
-                return false;
-            }
-        }
-    }
+    //         if (GroupUnit::find($id)->priority == 'FIRST') {
+    //             return true;
+    //         } else {
+    //             $nota = $nota->pivot->nota;
+    //             if ($nota >= 10) {
+    //                 return true;
+    //             } else {
+    //                 return false;
+    //             }
+    //         }
+    //     } else {
+    //         if (GroupUnit::find($id)->priority == 'FIRST') {
+    //             return true;
+    //         } else {
+    //             return false;
+    //         }
+    //     }
+    // }
 
-    public function module_priority($modules, $module_priority, $module_id)
-    {
+    // public function module_priority($modules, $module_priority, $module_id)
+    // {
 
-        // $modules[] = Module::where('priority', $module_id);
-        $id = $module_id;
-        foreach ($modules as $key => $value) {
+    //     // $modules[] = Module::where('priority', $module_id);
+    //     $id = $module_id;
+    //     foreach ($modules as $key => $value) {
 
 
 
-            foreach ($modules as $key2 => $value2) {
-                if ($value2->priority == $id) {
-                    $module_priority[] = $value2;
-                    $id = $value2->id;
-                    break;
-                }
-            }
-        }
-        return $module_priority;
-    }
+    //         foreach ($modules as $key2 => $value2) {
+    //             if ($value2->priority == $id) {
+    //                 $module_priority[] = $value2;
+    //                 $id = $value2->id;
+    //                 break;
+    //             }
+    //         }
+    //     }
+    //     return $module_priority;
+    // }
 }

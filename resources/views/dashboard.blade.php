@@ -6,7 +6,6 @@
                 {{-- @if (isset($_GET['tz'])) --}}
 
                 {{-- {{ dd(session('affected_students')) }} --}}
-
                 @php
                     $users = \App\User::select('first_name', 'last_name', 'id')->get();
                     $affected_students = session('affected_students');
@@ -108,7 +107,7 @@
                     @role('student')
                         <div class="w-9/12">
                             <div id="chart"></div>
-                            <script  >
+                            <script>
                                 var options = {
                                     series: [{
                                             name: 'Progress (Units)',
@@ -158,6 +157,7 @@
                     @role('student')
                         @if ($course_modality == 'synchronous')
                             @livewire('schedule', ['user_id' => auth()->id(), 'mode' => 'show', 'course_id' => $course_id])
+                            {{-- @livewire('schedule-controller', ['user_id' => auth()->id(), 'mode' => 'show', 'course_id' => $course_id]) --}}
                         @endif
                     @endrole
                     @hasanyrole('teacher|guest')
@@ -219,7 +219,9 @@
                     @endif
                 @endrole
 
-                <livewire:rating-form />
+                @role('student')
+                    <livewire:rating-form />
+                @endrole
 
             </div>
         </div>
