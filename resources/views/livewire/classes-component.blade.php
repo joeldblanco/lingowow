@@ -19,103 +19,100 @@
             </div>
         </div>
         {{ $classes->links() }}
-        <form action="{{ route('classes.check') }}" method="POST">
+        {{-- <form action="{{ route('classes.check') }}" method="POST">
             @csrf
-            @method('POST')
-            <table class="flex flex-col w-full space-y-5 border border-gray-200 p-5 my-5 rounded-lg">
-                <thead>
-                    <tr class="flex text-md justify-around">
-                        @hasanyrole('student|admin')
-                            <th {{-- wire:click="sort('teacher')" --}} class="flex justify-center w-full">Teacher</th>
-                        @endhasanyrole
-                        @hasanyrole('teacher|admin')
-                            <th {{-- wire:click="sort('teacher')" --}} class="flex justify-center w-full">Student</th>
-                        @endhasanyrole
-                        <th class="flex justify-center w-full">Class Date</th>
-                        @hasanyrole('teacher|admin')
-                            <th {{-- wire:click="sort('start_date')" --}} class="flex justify-center w-full">Comments</th>
-                        @endhasanyrole
-                        @hasanyrole('teacher|admin')
-                            <th class="flex items-center w-full flex-col space-y-5">
-                                <p>Teacher check</p>
-                                <input type="checkbox" onchange="selectAllTeacherCheckboxes(this)" />
-                            </th>
-                        @endhasanyrole
-                        @hasanyrole('student|admin')
-                            <th class="flex items-center w-full flex-col space-y-5">
-                                <p>Student check</p>
-                                <input type="checkbox" onchange="selectAllStudentCheckboxes(this)" />
-                            </th>
-                        @endhasanyrole
-                    </tr>
-                </thead>
-                <tbody class="space-y-4">
+            @method('POST') --}}
+        <table class="flex flex-col w-full space-y-5 border border-gray-200 p-5 my-5 rounded-lg">
+            <thead>
+                <tr class="flex text-md justify-around">
+                    @hasanyrole('student|admin')
+                        <th {{-- wire:click="sort('teacher')" --}} class="flex justify-center w-full">Teacher</th>
+                    @endhasanyrole
+                    @hasanyrole('teacher|admin')
+                        <th {{-- wire:click="sort('teacher')" --}} class="flex justify-center w-full">Student</th>
+                    @endhasanyrole
+                    <th class="flex justify-center w-full">Class Date</th>
+                    @hasanyrole('teacher|admin')
+                        <th {{-- wire:click="sort('start_date')" --}} class="flex justify-center w-full">Comments</th>
+                    @endhasanyrole
+                    {{-- @hasanyrole('teacher|admin')
+                        <th class="flex items-center w-full flex-col space-y-5">
+                            <p>Teacher check</p>
+                            <input type="checkbox" onchange="selectAllTeacherCheckboxes(this)" />
+                        </th>
+                    @endhasanyrole
+                    @hasanyrole('student|admin')
+                        <th class="flex items-center w-full flex-col space-y-5">
+                            <p>Student check</p>
+                            <input type="checkbox" onchange="selectAllStudentCheckboxes(this)" />
+                        </th>
+                    @endhasanyrole --}}
+                </tr>
+            </thead>
+            <tbody class="space-y-4">
 
-                    @foreach ($classes as $key => $value)
-                        <tr class="flex justify-around @if ((auth()->user()->getRoleNames()[0] == 'teacher' &&
-                            !$value->teacher_check) ||
-                            (auth()->user()->getRoleNames()[0] == 'student' &&
-                                !$value->student_check) || (auth()->user()->getRoleNames()[0] == 'admin' && ((!$value->teacher_check) || (!$value->student_check)))) bg-yellow-100 @endif">
-                            @hasanyrole('student|admin')
-                                <td class="flex w-full justify-center">
-                                    <a href="{{ route('profile.show', $value->teacher()->id) }}"
-                                        class="hover:underline hover:text-blue-500">{{ $value->teacher()->first_name }}
-                                        {{ $value->teacher()->last_name }}</a>
-                                </td>
-                            @endhasanyrole
-                            @hasanyrole('teacher|admin')
-                                <td class="flex w-full justify-center">
-                                    <a href="{{ route('profile.show', $value->student()->id) }}"
-                                        class="hover:underline hover:text-blue-500">{{ $value->student()->first_name }}
-                                        {{ $value->student()->last_name }}</a>
-                                </td>
-                            @endhasanyrole
-                            @php
-                                $lesson_date = new Carbon\Carbon($value->start_date);
-                            @endphp
-                            @if ($lesson_date->lt(Carbon\Carbon::now()))
-                                <td class="flex w-full justify-center text-red-500 cursor-pointer hover:underline"
-                                    wire:click="showClass({{ $value->id }})">
-                                    {{ $lesson_date->format('d/m/Y - h:00 a') }}
-                                </td>
-                            @else
-                                <td class="flex w-full justify-center text-green-500 cursor-pointer hover:underline"
-                                    wire:click="showClass({{ $value->id }})">
-                                    {{ $lesson_date->format('d/m/Y - h:00 a') }}
-                                </td>
-                            @endif
-                            @hasanyrole('teacher|admin')
-                                <td class="flex w-full justify-center">
-                                    <button type="button" wire:click="loadComment({{ $value->id }})"
-                                        @click="showCommentsModal = true">
-                                        <i class="fas fa-edit text-gray-600"></i>
-                                    </button>
-                                </td>
-                            @endhasanyrole
-                            @hasanyrole('teacher|admin')
-                                <td class="flex w-full justify-center">
-                                    <input type='hidden' value='0' name='teacher_{{ $value->id }}'>
-                                    <input type="checkbox" class="teacher_checkbox" name="teacher_{{ $value->id }}"
-                                        @if ($value->teacher_check) checked @endif />
-                                </td>
-                            @endhasanyrole
-                            @hasanyrole('student|admin')
-                                <td class="flex w-full justify-center">
-                                    <input type='hidden' value='0' name='student_{{ $value->id }}'>
-                                    <input type="checkbox" class="student_checkbox" name="student_{{ $value->id }}"
-                                        @if ($value->student_check) checked @endif />
-                                </td>
-                            @endhasanyrole
-                        </tr>
-                    @endforeach
-                </tbody>
-            </table>
-            <div class="flex justify-end">
+                @foreach ($classes as $key => $value)
+                    <tr class="flex justify-around @if (auth()->user()->getRoleNames()[0] == 'admin' && empty($value->rating)) bg-yellow-100 @endif">
+                        @hasanyrole('student|admin')
+                            <td class="flex w-full justify-center">
+                                <a href="{{ route('profile.show', $value->teacher()->id) }}"
+                                    class="hover:underline hover:text-blue-500">{{ $value->teacher()->first_name }}
+                                    {{ $value->teacher()->last_name }}</a>
+                            </td>
+                        @endhasanyrole
+                        @hasanyrole('teacher|admin')
+                            <td class="flex w-full justify-center">
+                                <a href="{{ route('profile.show', $value->student()->id) }}"
+                                    class="hover:underline hover:text-blue-500">{{ $value->student()->first_name }}
+                                    {{ $value->student()->last_name }}</a>
+                            </td>
+                        @endhasanyrole
+                        @php
+                            $lesson_date = new Carbon\Carbon($value->start_date);
+                        @endphp
+                        @if ($lesson_date->lt(Carbon\Carbon::now()))
+                            <td class="flex w-full justify-center text-red-500 cursor-pointer hover:underline"
+                                wire:click="showClass({{ $value->id }})">
+                                {{ $lesson_date->format('d/m/Y - h:00 a') }}
+                            </td>
+                        @else
+                            <td class="flex w-full justify-center text-green-500 cursor-pointer hover:underline"
+                                wire:click="showClass({{ $value->id }})">
+                                {{ $lesson_date->format('d/m/Y - h:00 a') }}
+                            </td>
+                        @endif
+                        @hasanyrole('teacher|admin')
+                            <td class="flex w-full justify-center">
+                                <button type="button" wire:click="loadComment({{ $value->id }})"
+                                    @click="showCommentsModal = true">
+                                    <i class="fas fa-edit text-gray-600"></i>
+                                </button>
+                            </td>
+                        @endhasanyrole
+                        {{-- @hasanyrole('teacher|admin')
+                            <td class="flex w-full justify-center">
+                                <input type='hidden' value='0' name='teacher_{{ $value->id }}'>
+                                <input type="checkbox" class="teacher_checkbox" name="teacher_{{ $value->id }}"
+                                    @if ($value->teacher_check) checked @endif />
+                            </td>
+                        @endhasanyrole
+                        @hasanyrole('student|admin')
+                            <td class="flex w-full justify-center">
+                                <input type='hidden' value='0' name='student_{{ $value->id }}'>
+                                <input type="checkbox" class="student_checkbox" name="student_{{ $value->id }}"
+                                    @if ($value->student_check) checked @endif />
+                            </td>
+                        @endhasanyrole --}}
+                    </tr>
+                @endforeach
+            </tbody>
+        </table>
+        {{-- <div class="flex justify-end">
                 <button type="submit" class="bg-lw-blue py-2 px-4 text-white rounded-md hover:bg-blue-800">
                     Check/Uncheck
                 </button>
-            </div>
-        </form>
+            </div> --}}
+        {{-- </form> --}}
     @else
         <p class="text-2xl font-bold w-full text-center">There are no classes</p>
     @endif
@@ -141,15 +138,15 @@
                 <p><span class="font-bold">Student:</span> {{ $current_class_student->first_name }}
                     {{ $current_class_student->last_name }}</p>
                 <p><span class="font-bold">Class Date:</span> {{ $current_class->start_date }}</p>
-                <p><span class="font-bold">Did the professor teach the class?</span>
+                {{-- <p><span class="font-bold">Did the professor teach the class?</span>
                     @if ($current_class->teacher_check == 0)
                         No
                     @else
                         Yes
                     @endif
-                </p>
+                </p> --}}
                 <p><span class="font-bold">Did the student receive the class?</span>
-                    @if ($current_class->student_check == 0)
+                    @if (empty($current_class->rating))
                         No
                     @else
                         Yes
@@ -162,10 +159,11 @@
         <x-slot name="footer" class="justify-center">
             <div class="flex justify-center p-2">
                 @role('student')
-                    @if (!empty($current_class) &&
-                        (!$current_class->teacher_check && !$current_class->student_check) &&
-                        App\Http\Controllers\ApportionmentController::getPeriod($current_class->start_date) ==
-                            (new Carbon\Carbon(App\Http\Controllers\ApportionmentController::currentPeriod()[0]))->format('F Y'))
+                    @if (
+                        !empty($current_class) &&
+                            empty($current_class->rating) &&
+                            App\Http\Controllers\ApportionmentController::getPeriod($current_class->start_date) ==
+                                (new Carbon\Carbon(App\Http\Controllers\ApportionmentController::currentPeriod()[0]))->format('F Y'))
                         @if ($current_class->start_date > Carbon\Carbon::now()->addHours(1))
                             <a href="{{ route('classes.edit', $current_class->id) }}"
                                 class="bg-green-600 font-semibold text-white p-4 mr-1 rounded-full hover:bg-green-700 focus:outline-none focus:ring shadow-lg hover:shadow-none transition-all duration-300"
@@ -229,7 +227,11 @@
         </x-slot>
     </x-modal>
 
-    <script>
+    @role('student')
+        <livewire:rating-form />
+    @endrole
+
+    {{-- <script>
         function selectAllTeacherCheckboxes(source) {
             checkboxes = document.getElementsByClassName('teacher_checkbox');
             for (var i in checkboxes)

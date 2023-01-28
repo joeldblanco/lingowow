@@ -413,7 +413,7 @@ Route::middleware(['web', 'auth', 'verified', 'impersonate'])->group(function ()
     Route::get('/classes', ClassesComponent::class)->name('classes.index');
     Route::get('/classes/{id}', [ClassController::class, 'edit'])->name('classes.edit');
     Route::post('/classes/update', [ClassController::class, 'update'])->name('classes.update');
-    Route::post('/classes/check', [ClassController::class, 'checkClasses'])->name('classes.check');
+    // Route::post('/classes/check', [ClassController::class, 'checkClasses'])->name('classes.check');
 
     //ROUTES FOR POSTS//
     Route::post('/post/store', [PostController::class, 'store'])->name('post.store');

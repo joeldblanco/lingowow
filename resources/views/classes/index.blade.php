@@ -28,9 +28,9 @@
                                 @endrole --}}
                             </div>
                         </div>
-                        <form action="{{ route('classes.check') }}" method="POST">
+                        {{-- <form action="{{ route('classes.check') }}" method="POST">
                             @csrf
-                            @method('POST')
+                            @method('POST') --}}
                             <table class="flex flex-col w-full space-y-5 border border-gray-200 p-5 my-5 rounded-lg">
                                 <thead>
                                     <tr class="flex text-md justify-around">
@@ -44,7 +44,7 @@
                                         @hasanyrole('teacher|admin')
                                             <th class="flex justify-center w-full">Comments</th>
                                         @endhasanyrole
-                                        @hasanyrole('teacher|admin')
+                                        {{-- @hasanyrole('teacher|admin')
                                             <th class="flex justify-center w-full">
                                                 <input type="checkbox" onchange="selectAllTeacherCheckboxes(this)" />
                                             </th>
@@ -53,17 +53,14 @@
                                             <th class="flex justify-center w-full">
                                                 <input type="checkbox" onchange="selectAllStudentCheckboxes(this)" />
                                             </th>
-                                        @endhasanyrole
+                                        @endhasanyrole --}}
                                     </tr>
                                 </thead>
                                 <tbody class="space-y-4">
                                     {{ $classes->links() }}
                                     @foreach ($classes as $key => $value)
                                         <tr
-                                            class="flex justify-around @if ((auth()->user()->getRoleNames()[0] == 'teacher' &&
-                                                !$value->teacher_check) ||
-                                                (auth()->user()->getRoleNames()[0] == 'student' &&
-                                                    !$value->student_check)) bg-yellow-100 @endif">
+                                            class="flex justify-around @if (auth()->user()->getRoleNames()[0] == 'student' && empty($value->rating)) bg-yellow-100 @endif">
                                             @hasanyrole('student|admin')
                                                 <td class="flex w-full justify-center">
                                                     <a href="{{ route('profile.show', $value->teacher()->id) }}"
@@ -101,7 +98,7 @@
                                                     </a>
                                                 </td>
                                             @endhasanyrole
-                                            @hasanyrole('teacher|admin')
+                                            {{-- @hasanyrole('teacher|admin')
                                                 <td class="flex w-full justify-center">
                                                     <input type='hidden' value='0'
                                                         name='teacher_{{ $value->id }}'>
@@ -118,19 +115,19 @@
                                                         name="student_{{ $value->id }}"
                                                         @if ($value->student_check) checked @endif />
                                                 </td>
-                                            @endhasanyrole
+                                            @endhasanyrole --}}
                                         </tr>
                                     @endforeach
                                     {{-- {{ $classes->links() }} --}}
                                 </tbody>
                             </table>
-                            <div class="flex justify-end">
+                            {{-- <div class="flex justify-end">
                                 <button type="submit"
                                     class="bg-lw-blue py-2 px-4 text-white rounded-md hover:bg-blue-800">
                                     Check/Uncheck
                                 </button>
-                            </div>
-                        </form>
+                            </div> --}}
+                        {{-- </form> --}}
                     @else
                         <p class="text-2xl font-bold w-full text-center">There are no classes</p>
                     @endif
@@ -156,15 +153,15 @@
                                 <p><span class="font-bold">Student:</span> {{ $current_class_student->first_name }}
                                     {{ $current_class_student->last_name }}</p>
                                 <p><span class="font-bold">Class Date:</span> {{ $current_class->start_date }}</p>
-                                <p><span class="font-bold">Did the professor teach the class?</span>
+                                {{-- <p><span class="font-bold">Did the professor teach the class?</span>
                                     @if ($current_class->teacher_check == 0)
                                         No
                                     @else
                                         Yes
                                     @endif
-                                </p>
+                                </p> --}}
                                 <p><span class="font-bold">Did the student receive the class?</span>
-                                    @if ($current_class->student_check == 0)
+                                    @if (empty($current_class->rating))
                                         No
                                     @else
                                         Yes
@@ -176,10 +173,11 @@
 
                         <x-slot name="footer" class="justify-center">
                             @role('student')
-                                @if (!empty($current_class) &&
-                                    (!$current_class->teacher_check && !$current_class->student_check) &&
-                                    App\Http\Controllers\ApportionmentController::getPeriod($current_class->start_date) ==
-                                        (new Carbon\Carbon(App\Http\Controllers\ApportionmentController::currentPeriod()[0]))->format('F Y'))
+                                @if (
+                                    !empty($current_class) &&
+                                        empty($current_class->rating) &&
+                                        App\Http\Controllers\ApportionmentController::getPeriod($current_class->start_date) ==
+                                            (new Carbon\Carbon(App\Http\Controllers\ApportionmentController::currentPeriod()[0]))->format('F Y'))
                                     <a href="{{ route('classes.edit', $current_class->id) }}"
                                         class="bg-green-600 font-semibold text-white p-4 mr-1 rounded-full hover:bg-green-700 focus:outline-none focus:ring shadow-lg hover:shadow-none transition-all duration-300"
                                         @click=" classDetails = false">
@@ -258,7 +256,7 @@
                         </x-slot>
                     </x-modal>
 
-                    <script  >
+                    {{-- <script>
                         function selectAllTeacherCheckboxes(source) {
                             checkboxes = document.getElementsByClassName('teacher_checkbox');
                             for (var i in checkboxes)
@@ -270,9 +268,9 @@
                             for (var i in checkboxes)
                                 checkboxes[i].checked = source.checked;
                         }
-                    </script>
+                    </script> --}}
 
-                    <script   src="{{ asset('js/jquery.datetimepicker.full.min.js') }}">
+                    <script src="{{ asset('js/jquery.datetimepicker.full.min.js') }}">
                         $(function() {
                             $("#start_date").datepicker({
                                 altField: "#start_date",
