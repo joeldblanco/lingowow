@@ -225,7 +225,7 @@
 
                                                     @if (in_array([$i, $e], $students_schedules) || in_array($i . '-' . $day_range[$d], $abcense_classes))
                                                         <td id="{{ $i }}-{{ $e }}-{{ $week }}-{{ $period_range[$d] }}"
-                                                            class="border width occupied">
+                                                            class="border width occupied bg-gray-100">
                                                         </td>
                                                     @else
                                                         <td id="{{ $i }}-{{ $e }}-{{ $week }}-{{ $period_range[$d] }}"
@@ -234,7 +234,7 @@
                                                     @endif
                                                 @else
                                                     <td id="{{ $i }}-{{ $e }}-{{ $week }}-{{ $period_range[$d] }}"
-                                                        class="border width occupied">
+                                                        class="border width occupied bg-gray-100">
                                                     </td>
                                                 @endif
                                                 @php
@@ -344,7 +344,7 @@
     {{-- <script type="text/javascript" src="{{ asset('js/scheduleSelection.js') }}" defer></script> --}}
     <script src="{{ asset('js/jquery.datetimepicker.full.min.js') }}"></script>
 
-    <script>
+    <script  >
         // 0: "constructor"
         // 1: "toString"
         // 2: "toDateString"

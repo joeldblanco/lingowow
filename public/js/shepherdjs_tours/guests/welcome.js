@@ -52,7 +52,6 @@ tour.addSteps([
                 action: tour.complete
             }
         ],
-        canClickTarget: false
     }
 ]);
 

@@ -43,7 +43,7 @@ tour.on('complete', () => {
         type: 'POST',
         url: route('complete-tour'),
         data: {
-            tourName: 'guests/contents_preview',
+            tourName: 'teachers/contents_preview',
             '_token': $('meta[name="csrf-token"]').attr('content'),
         },
         success: function (data) {

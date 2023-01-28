@@ -91,6 +91,11 @@ class User extends Authenticatable implements MustVerifyEmail
         // return [$this->email_address => $this->name];
     }
 
+    public function modules()
+    {
+        return $this->belongsToMany(Module::class)->orderBy('module_id');
+    }
+
     public function units()
     {
         return $this->belongsToMany(Unit::class)->orderBy('unit_id');

@@ -1,21 +1,21 @@
 @php
-$last_conn = new Carbon\Carbon('first day of this month');
-$last_conn = $last_conn->diffForHumans();
-
-// $now = new DateTime('now');
-// dd($now);
-
-// $now = Carbon\Carbon::now();
-
-// $utc = Carbon\Carbon::now(new DateTimeZone('UTC'));
-
-// dd($now,$utc);
-
-// dd(timezone_name_from_abbr("",-300*60,false));
-// var_dump($now);
-
-// dd($show_id,$this->conversation_id);
-
+    $last_conn = new Carbon\Carbon('first day of this month');
+    $last_conn = $last_conn->diffForHumans();
+    
+    // $now = new DateTime('now');
+    // dd($now);
+    
+    // $now = Carbon\Carbon::now();
+    
+    // $utc = Carbon\Carbon::now(new DateTimeZone('UTC'));
+    
+    // dd($now,$utc);
+    
+    // dd(timezone_name_from_abbr("",-300*60,false));
+    // var_dump($now);
+    
+    // dd($show_id,$this->conversation_id);
+    
 @endphp
 
 <div class="bg-gray-300 font-sans p-5 mx-5 rounded-xl flex" x-data="data()">
@@ -42,47 +42,49 @@ $last_conn = $last_conn->diffForHumans();
             </div>
             <div class="flex flex-col overflow-y-auto" style="max-height: calc(100vh - 245px)">
                 @foreach ($conversations as $key => $value)
-                    {{-- <a href="{{ route('chat.show', $value) }}"> --}}
-                    <button class="flex items-center space-x-3 cursor-pointer hover:bg-gray-200 py-3 pl-2 pr-1"
-                        wire:click="showConversation({{ $value->id }})">
+                    @if ($value->users->count() >= 2)
+                        {{-- <a href="{{ route('chat.show', $value) }}"> --}}
+                        <button class="flex items-center space-x-3 cursor-pointer hover:bg-gray-200 py-3 pl-2 pr-1"
+                            wire:click="showConversation({{ $value->id }})">
 
-                        @if (!$value->group_conversation)
-                            @php
-                                $participant = $value->users->where('id', '!=', auth()->user()->id)->first();
-                            @endphp
-
-                            <img src="{{ Storage::url($participant->profile_photo_path) }}" alt="profile_pic"
-                                class="w-1/6 rounded-full">
-                        @else
-                            <img src="{{ Storage::url($value->group_image) }}" alt="profile_pic"
-                                class="w-1/6 rounded-full">
-                        @endif
-
-                        {{-- <img src="https://picsum.photos/200?random={{auth()->id()}}" alt="profile_pic" class="w-1/6 rounded-full"> --}}
-                        <div class="w-3/4 items-start flex flex-col">
                             @if (!$value->group_conversation)
-                                <p>{{ $participant->first_name }} {{ $participant->last_name }}
-                                </p>
+                                @php
+                                    $participant = $value->users->where('id', '!=', auth()->user()->id)->first();
+                                @endphp
+
+                                <img src="{{ Storage::url($participant->profile_photo_path) }}" alt="profile_pic"
+                                    class="w-1/6 rounded-full">
                             @else
-                                <p>{{ $value->name }}
+                                <img src="{{ Storage::url($value->group_image) }}" alt="profile_pic"
+                                    class="w-1/6 rounded-full">
+                            @endif
+
+                            {{-- <img src="https://picsum.photos/200?random={{auth()->id()}}" alt="profile_pic" class="w-1/6 rounded-full"> --}}
+                            <div class="w-3/4 items-start flex flex-col">
+                                @if (!$value->group_conversation)
+                                    <p>{{ $participant->first_name }} {{ $participant->last_name }}
+                                    </p>
+                                @else
+                                    <p>{{ $value->name }}
+                                    </p>
+                                @endif
+                                <p class="text-sm text-gray-400">
+                                    {{ Str::limit($value->messages->last()->message_content, 20, '...') }}</p>
+                            </div>
+                            <div class="flex flex-col items-end space-y-3 w-1/4">
+                                <p class="text-xs text-gray-400 text-right">
+                                    {{ (new Carbon\Carbon($value->messages->last()->created_at))->diffForHumans(['options' => Carbon\Carbon::JUST_NOW | Carbon\Carbon::ONE_DAY_WORDS | Carbon\Carbon::TWO_DAY_WORDS]) }}
                                 </p>
-                            @endif
-                            <p class="text-sm text-gray-400">
-                                {{ Str::limit($value->messages->last()->message_content, 20, '...') }}</p>
-                        </div>
-                        <div class="flex flex-col items-end space-y-3 w-1/4">
-                            <p class="text-xs text-gray-400 text-right">
-                                {{ (new Carbon\Carbon($value->messages->last()->created_at))->diffForHumans(['options' => Carbon\Carbon::JUST_NOW | Carbon\Carbon::ONE_DAY_WORDS | Carbon\Carbon::TWO_DAY_WORDS]) }}
-                            </p>
-                            @if ($value->unread_messages)
-                                <div class="rounded-full bg-green-700 w-5 h-5 flex justify-center items-center">
-                                    <span
-                                        class="w-full text-white font-bold text-xs">{{ $value->unread_messages }}</span>
-                                </div>
-                            @endif
-                        </div>
-                    </button>
-                    {{-- </a> --}}
+                                @if ($value->unread_messages)
+                                    <div class="rounded-full bg-green-700 w-5 h-5 flex justify-center items-center">
+                                        <span
+                                            class="w-full text-white font-bold text-xs">{{ $value->unread_messages }}</span>
+                                    </div>
+                                @endif
+                            </div>
+                        </button>
+                        {{-- </a> --}}
+                    @endif
                 @endforeach
             </div>
         </div>

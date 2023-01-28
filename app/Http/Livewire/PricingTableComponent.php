@@ -58,16 +58,17 @@ class PricingTableComponent extends Component
 
     public function render()
     {
-        $product = Course::find($this->selectedProduct)->products->first();
+        if (in_array(auth()->user()->id, [5])) {
+            $product = Course::find($this->selectedProduct)->products();
+            $product = $product->where('slug', 'like', '%old%')->first();
+            if (empty($product))
+                $product = Course::find($this->selectedProduct)->products->first();
+        } else {
+            $product = Course::find($this->selectedProduct)->products;
+            $product = $product->first();
+        }
 
-        // dd(Course::find($this->selectedProduct));
-
-        $plans =  DB::table('plans')
-            ->join('plans_products', function ($join) use (&$product) {
-                $join->on('plans.id', '=', 'plans_products.plan_id')
-                    ->where('plans_products.product_id', '=', $product->id);
-            })
-            ->get();
+        $plans = $product->plans;
 
         return view('livewire.pricing-table-component')->with(compact('product', 'plans'));
     }

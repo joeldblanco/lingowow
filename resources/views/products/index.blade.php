@@ -10,7 +10,7 @@
 
                     @role('admin')
                         <div class="w-full flex justify-end mb-6">
-                            <a href="{{ route('modules.create') }}"
+                            <a href="{{ route('products.create') }}"
                                 class="text-center leading-10 text-3xl font-bold text-white capitalize rounded-full bg-lw-blue w-10 mr-10 hover:bg-lw-light_blue">+</a>
                         </div>
                     @endrole

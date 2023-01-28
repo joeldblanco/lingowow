@@ -37,7 +37,6 @@ class CouponController extends Controller
      */
     public function store(Request $request)
     {
-        // dd($request->coupon_amount);
         $amount = $request->coupon_amount;
         $product = $request->product_id;
         $product = Product::find($product);

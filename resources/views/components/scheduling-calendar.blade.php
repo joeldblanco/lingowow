@@ -1,5 +1,5 @@
 <div>
-    <script src="{{ asset('js/viselect.cjs.js') }}"></script>
+    <script   src="{{ asset('js/viselect.cjs.js') }}"></script>
 
 
     @php
@@ -231,7 +231,7 @@
 
 
         {{-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script> --}}
-        <script type="text/javascript" src="{{ asset('js/scheduleSelection.js') }}" defer></script>
+        <script   type="text/javascript" src="{{ asset('js/scheduleSelection.js') }}" defer></script>
         {{-- <script src="https://cdn.jsdelivr.net/npm/@simonwep/selection-js/lib/selection.min.js"></script> --}}
 
 
@@ -263,7 +263,7 @@
         {{-- @include('modal') --}}
 
 
-        <script>
+        <script  >
             $(function() {
 
                 var selectedCells = 0;

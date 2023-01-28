@@ -7,11 +7,13 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Cart;
 use App\Item;
+use App\Mail\InvoicePaid;
 use App\Models\Course;
 use App\Models\Enrolment;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Mail;
 
 class PaymentController extends Controller
 {
@@ -135,7 +137,7 @@ class PaymentController extends Controller
                 }
             }
 
-            $student = auth()->user();
+            $student = auth()->user(); //EDITAR: EN LUGAR DEL USUARIO LOGUEADO, DEBERÍA SER EL USUARIO QUE SE ENVÍE POR PARAMETRO//
             $course_id = session('selected_course');
 
             //CHANGING STUDENT'S ROLE FROM 'GUEST' TO 'STUDENT'//
@@ -162,10 +164,10 @@ class PaymentController extends Controller
                 );
             }
 
-            
+
 
             Cart::destroy();
-
+            // Mail::to($student)->send(new InvoicePaid($invoice));
             return redirect()->route('invoice.show', ['id' => $invoice->id]);
         } else {
             session()->put(['code' => 'danger', 'message' => "Error processing payment for Order $invoice->id!"]);

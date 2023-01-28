@@ -3,11 +3,15 @@
 
 <head>
     @php
-        
         // dd(Auth::user()->canBeImpersonated());
-        // $session_info = json_decode(((new Illuminate\Http\Client\PendingRequest())->get('http://ipwho.is/' . $_SERVER['REMOTE_ADDR']))->getBody(), true);
-        // session(['session_info' => $session_info]);
-        // dump(session('session_info'));
+        $session_info = json_decode((new Illuminate\Http\Client\PendingRequest())->get('http://ipwho.is/' . $_SERVER['REMOTE_ADDR'])->getBody(), true);
+        if ($session_info['success'] == false) {
+            session()->forget('session_info');
+        } else {
+            session(['session_info' => $session_info]);
+            session(['tz' => session('session_info')['timezone']['id']]);
+        }
+        // dd(session('session_info'));
         
         // if (isset($_GET['tz']) && session('tz') == null) {
         //     // This is just an example. In application this will come from Javascript (via an AJAX or something)
@@ -28,8 +32,6 @@
         
         //     // return !isset($_GET['tz']);
         // }
-        
-        // session(['tz' => session('session_info')['timezone']['id']]);
     @endphp
 
     <meta charset="utf-8">
@@ -63,8 +65,8 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/shepherd.js@8.3.1/dist/css/shepherd.css" />
     <script src="https://kit.fontawesome.com/968fe8efd4.js" crossorigin="anonymous" defer></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/flickity/2.2.2/flickity.pkgd.min.js"
-    integrity="sha512-cA8gcgtYJ+JYqUe+j2JXl6J3jbamcMQfPe0JOmQGDescd+zqXwwgneDzniOd3k8PcO7EtTW6jA7L4Bhx03SXoA=="
-    crossorigin="anonymous" referrerpolicy="no-referrer" defer></script>
+        integrity="sha512-cA8gcgtYJ+JYqUe+j2JXl6J3jbamcMQfPe0JOmQGDescd+zqXwwgneDzniOd3k8PcO7EtTW6jA7L4Bhx03SXoA=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/@shopify/draggable@1.0.0-beta.12/lib/draggable.bundle.js"></script>
     {{-- <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script> --}}
     <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
@@ -75,6 +77,8 @@
         referrerpolicy="origin"></script>
     <script src="{{ asset('js/wordfind.js') }}"></script>
     <script src="{{ asset('js/wordfindgame.js') }}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.0.2/index.global.min.js"></script>
+    <script src='//fw-cdn.com/2451489/3025849.js' chat='true'></script>
 </head>
 
 <body class="font-sans antialiased">
@@ -90,14 +94,9 @@
         @endif
 
         @if (auth()->user()->roles->first()->name == 'guest' &&
-            (Route::currentRouteName() == 'courses.show' ||
-                Route::currentRouteName() == 'modules.show' ||
-                Route::currentRouteName() == 'units.show'))
-            {{-- <div class="bg-lw-blue text-center py-3">
-                <p class="text-black font-semibold">You are previewing a course. If you want to buy it click in the link
-                    below.</p>
-                <a href="{{ route('shop') }}" class="text-sm hover:font-bold text-white hover:underline">Shop</a>
-            </div> --}}
+                (Route::currentRouteName() == 'courses.show' ||
+                    Route::currentRouteName() == 'modules.show' ||
+                    Route::currentRouteName() == 'units.show'))
             <div class="bg-yellow-300 text-center py-3">
                 <p class="text-red-500 font-semibold">You are previewing a course. If you want to buy it click in the
                     link
@@ -119,58 +118,33 @@
     </div>
 
     @stack('modals')
-    {{-- <script>
-        let _tz = JSON.parse("{{ json_encode(tz()) }}");
-        if (_tz) {
-            var tz = new Date().getTimezoneOffset();
-            tz = tz == 0 ? 0 : -tz;
-            window.location.href = window.location.href + "?tz=" + tz;
-        }
-    </script> --}}
-    {{-- <script src="https://cdn.jsdelivr.net/gh/livewire/turbolinks@v0.1.x/dist/livewire-turbolinks.js"
-        data-turbolinks-eval="false"></script> --}}
-    @role('student')
-        {{-- <script src='//fw-cdn.com/2207350/2881175.js' chat='true'></script>
-        <script>
-            var new_contact = {
-                "First name": "{{auth()->user()->first_name}}", //Replace with first name of the user
-                "Last name": "{{auth()->user()->last_name}}", //Replace with last name of the user
-                "Email": "{{auth()->user()->email}}", //Replace with email of the user
-                "ID": "{{auth()->user()->id}}", //Replace with a custom field
-            };
-            var identifier = "{{auth()->user()->id}}";
-            fwcrm.identify(identifier, new_contact)
-        </script> --}}
-    @endrole
+
     <script src="https://cdn.jsdelivr.net/gh/livewire/turbolinks@v0.1.x/dist/livewire-turbolinks.js"
         data-turbolinks-eval="false"></script>
     <script src="{{ asset('js/activities.js') }}"></script>
-    {{-- @include('components.loading-state') --}}
 
-    <script>
-        (function(d, t) {
-            var BASE_URL = "https://app.chatwoot.com";
-            var g = d.createElement(t),
-                s = d.getElementsByTagName(t)[0];
-            g.src = BASE_URL + "/packs/js/sdk.js";
-            g.defer = true;
-            g.async = true;
-            s.parentNode.insertBefore(g, s);
-            g.onload = function() {
-                window.chatwootSDK.run({
-                    websiteToken: 'AT7bF4Zbt6nhFfpxDXUfoiBZ',
-                    baseUrl: BASE_URL
-                })
-            }
-        })(document, "script");
-
-        window.addEventListener("chatwoot:ready", function() {
-            window.$chatwoot.setUser("{{ auth()->id() }}", {
-                email: "{{ auth()->user()->email }}",
-                name: "{{ auth()->user()->first_name }} {{ auth()->user()->last_name }}",
-                // avatar_url: "<avatar-url-of-the-user>",
-                // phone_number: "<phone-number-of-the-user>",
+    <script defer>
+        function runFcWidgetFunction() {
+            return new Promise(resolve => {
+                var intervalId = setInterval(() => {
+                    if (typeof fcWidget !== 'undefined') {
+                        clearInterval(intervalId);
+                        resolve();
+                    }
+                }, 100);
             });
+        }
+
+        runFcWidgetFunction().then(() => {
+            /// To set unique user id in your system when it is available
+            window.fcWidget.setExternalId("{{ auth()->id() }}");
+
+            // // To set user name
+            window.fcWidget.user.setFirstName("{{ auth()->user()->first_name }}");
+            window.fcWidget.user.setLastName("{{ auth()->user()->last_name }}");
+
+            // // To set user email
+            window.fcWidget.user.setEmail("{{ auth()->user()->email }}");
         });
     </script>
 
