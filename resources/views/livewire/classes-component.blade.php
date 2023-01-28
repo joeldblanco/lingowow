@@ -241,19 +241,19 @@
             for (var i in checkboxes)
                 checkboxes[i].checked = source.checked;
         }
+        
+        // $(function() {
+        //     $("#start_date").datepicker({
+        //         altField: "#start_date",
+        //         altFormat: "yy-mm-dd"
+        //     });
+        //     $("#end_date").datepicker({
+        //         altField: "#end_date",
+        //         altFormat: "yy-mm-dd"
+        //     });
+        // });
     </script>
 
-    <script src="{{ asset('js/jquery.datetimepicker.full.min.js') }}">
-        $(function() {
-            $("#start_date").datepicker({
-                altField: "#start_date",
-                altFormat: "yy-mm-dd"
-            });
-            $("#end_date").datepicker({
-                altField: "#end_date",
-                altFormat: "yy-mm-dd"
-            });
-        });
-    </script>
+    {{-- <script src="{{ asset('js/jquery.datetimepicker.full.min.js') }}"></script> --}}
 
 </div>
