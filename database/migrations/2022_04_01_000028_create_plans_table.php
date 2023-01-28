@@ -18,6 +18,8 @@ class CreatePlansTable extends Migration
             $table->string('plan_name',250);
             $table->integer('n_classes');
             $table->string('slug',250);
+            $table->timestamps();
+            $table->softDeletes();
         });
     }
 

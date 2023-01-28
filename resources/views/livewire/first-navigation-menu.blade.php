@@ -31,6 +31,12 @@
             'status' => request()->is('shop', 'shop/*'),
             'roles' => ['student', 'guest', 'admin'],
         ],
+        [
+            'name' => 'Gather',
+            'route' => 'https://app.gather.town/invite?token=odIfjNGGT7G4ZWGJXV24',
+            'status' => false,
+            'roles' => ['student', 'teacher', 'admin'],
+        ],
     ];
     
 @endphp
@@ -122,7 +128,7 @@
                 @endif
 
                 <!-- Messages Dropdown -->
-                <div class="ml-3 relative">
+                <div class="ml-3 relative" wire:ignore>
                     <x-jet-dropdown align="right" width="80">
                         <x-slot name="trigger">
                             <button
@@ -147,31 +153,33 @@
                             @if (count($conversations) > 0)
 
                                 @foreach ($conversations as $conversation)
-                                    <x-jet-dropdown-link href="{{ route('chat.show', $conversation->id) }}">
-                                        <div class="flex justify-between items-center">
-                                            <p class="text-md font-normal text-gray-500"
-                                                id="conversation_{{ $conversation->id }}">
-                                                @if ($conversation->group_conversation)
-                                                    {{ $conversation->name }}
-                                                @else
-                                                    @php
-                                                        $participants = $conversation->users;
-                                                    @endphp
-                                                    @foreach ($participants as $participant)
-                                                        @if ($participant->id != auth()->id())
-                                                            {{ $participant->first_name }}
-                                                            {{ $participant->last_name }}
-                                                        @endif
-                                                    @endforeach
-                                                @endif
+                                    @if ($conversation->users->count() >= 2)
+                                        <x-jet-dropdown-link href="{{ route('chat.show', $conversation->id) }}">
+                                            <div class="flex justify-between items-center">
+                                                <p class="text-md font-normal text-gray-500"
+                                                    id="conversation_{{ $conversation->id }}">
+                                                    @if ($conversation->group_conversation)
+                                                        {{ $conversation->name }}
+                                                    @else
+                                                        @php
+                                                            $participants = $conversation->users;
+                                                        @endphp
+                                                        @foreach ($participants as $participant)
+                                                            @if ($participant->id != auth()->id())
+                                                                {{ $participant->first_name }}
+                                                                {{ $participant->last_name }}
+                                                            @endif
+                                                        @endforeach
+                                                    @endif
+                                                </p>
+                                                <span class="w-3 h-3 bg-blue-500 rounded-full mr-3 hidden"
+                                                    id="unread_conversation_{{ $conversation->id }}"></span>
+                                            </div>
+                                            <p class="text-xs text-gray-400 font-normal" id="last_message">
+                                                {{ Str::limit($conversation->last_message->message_content, 25, '...') }}
                                             </p>
-                                            <span class="w-3 h-3 bg-blue-500 rounded-full mr-3 hidden"
-                                                id="unread_conversation_{{ $conversation->id }}"></span>
-                                        </div>
-                                        <p class="text-xs text-gray-400 font-normal" id="last_message">
-                                            {{ Str::limit($conversation->last_message->message_content, 25, '...') }}
-                                        </p>
-                                    </x-jet-dropdown-link>
+                                        </x-jet-dropdown-link>
+                                    @endif
                                 @endforeach
                             @else
                                 <p class="p-1 text-sm text-center">There are no messages</p>

@@ -1,0 +1,18 @@
+{
+    "nunito": {
+        "normal": "C:\\xampp\\htdocs\\TheUAcademy\\storage\\fonts\/nunito_normal_f8ce9593f0c56e52776379aa29b2d690",
+        "600": "C:\\xampp\\htdocs\\TheUAcademy\\storage\\fonts\/nunito_600_0275befc5ca0fc822c590fc63a6c14d5",
+        "bold": "nunito_bold_8dc3583b65bede23262ac4c563179f23"
+    },
+    "poppins": {
+        "100": "C:\\xampp\\htdocs\\TheUAcademy\\storage\\fonts\/poppins_100_068bd9b25394b5841c43e43604f4abf6",
+        "200": "C:\\xampp\\htdocs\\TheUAcademy\\storage\\fonts\/poppins_200_6ad855cb213b5e84660a5640d8f48bbd",
+        "300": "C:\\xampp\\htdocs\\TheUAcademy\\storage\\fonts\/poppins_300_999a4088f0da952988730996a4bec1d8",
+        "normal": "C:\\xampp\\htdocs\\TheUAcademy\\storage\\fonts\/poppins_normal_ee697d7869cb745ccf3ccccc013145ad",
+        "500": "C:\\xampp\\htdocs\\TheUAcademy\\storage\\fonts\/poppins_500_fce53b208cddccda1573b7620b579598",
+        "600": "C:\\xampp\\htdocs\\TheUAcademy\\storage\\fonts\/poppins_600_9623fbc18c38938c2057a9aae8390a42",
+        "bold": "C:\\xampp\\htdocs\\TheUAcademy\\storage\\fonts\/poppins_bold_8fe618268f56b4b8f1e70e87a9e99fc0",
+        "800": "C:\\xampp\\htdocs\\TheUAcademy\\storage\\fonts\/poppins_800_ef86a7722c08a791e114b6649bbd6ae4",
+        "900": "poppins_900_c60a07be40ef8f258a248a492dd87245"
+    }
+}

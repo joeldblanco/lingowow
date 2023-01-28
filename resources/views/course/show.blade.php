@@ -4,11 +4,21 @@
             <div class="p-6 sm:px-20 bg-white border-b border-gray-200 modules-list">
 
                 <div class="w-full flex justify-between my-10">
-                    <h2 class="text-4xl font-bold text-gray-800 capitalize">My Modules</h2>
+                    @if ($course->categories->pluck('name')->contains('Conversational'))
+                        <h2 class="text-4xl font-bold text-gray-800 capitalize">My Classrooms</h2>
+                    @else
+                        <h2 class="text-4xl font-bold text-gray-800 capitalize">My Modules</h2>
+                    @endif
                     @role('admin')
-                        <a href="{{ route('modules.create') }}"
+                        <a href="{{ route('modules.create', ['course' => $course->id]) }}"
                             class="text-center leading-10 text-3xl font-bold text-white capitalize rounded-full bg-lw-blue w-10 mr-10 hover:bg-lw-light_blue">+</a>
                     @endrole
+
+                    {{-- @can('edit conversational courses')
+                        <a href="{{ route('modules.create', ['course' => $course->id]) }}"
+                            class="text-center leading-10 text-3xl font-bold text-white capitalize rounded-full bg-lw-blue w-10 mr-10 hover:bg-lw-light_blue">+</a>
+                    @endcan --}}
+
                 </div>
                 <hr class="mb-10">
                 @forelse ($modules as $module)
@@ -40,9 +50,15 @@
                         @endrole
                     </div>
                 @empty
-                    <div class="flex justify-center items-center">
-                        <h1 class="text-2xl text-gray-500">No modules found</h1>
-                    </div>
+                    @if ($course->categories->pluck('name')->contains('Conversational'))
+                        <div class="flex justify-center items-center">
+                            <h1 class="text-2xl text-gray-500">No classrooms found</h1>
+                        </div>
+                    @else
+                        <div class="flex justify-center items-center">
+                            <h1 class="text-2xl text-gray-500">No modules found</h1>
+                        </div>
+                    @endif
                 @endforelse
 
             </div>
@@ -50,5 +66,5 @@
     </div>
 
     <x-shepherd-tour tourName="guests/modules_preview" role="guest" />
-    
+
 </x-app-layout>

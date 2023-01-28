@@ -5,33 +5,65 @@
 
                 <div class="mt-10 mb-20">
                     <h2 class="text-3xl font-bold text-center text-gray-500 mb-3">{{ $unit->name }}</h2>
-                    @role('admin')
-                        <div class="w-full flex justify-end relative mb-20">
-                            <button @click="showTypes = true"
-                                class="bg-green-600 font-semibold text-white p-2 w-32 mr-1 rounded-full hover:bg-green-700">
-                                Add
-                            </button>
-                            <button onclick="sendRequest()"
-                                class="bg-blue-600 font-semibold text-white p-2 w-32 mr-1 rounded-full hover:bg-blue-700">
-                                Reorder
-                            </button>
-                            <div class="absolute right-4 top-8" x-show="showTypes" @click.outside="showTypes = false">
-                                <div
-                                    class="flex flex-col border border-gray-400 rounded-xl divide-y divide-opacity-100 divide-gray-300 bg-white">
-                                    <a href="{{ route('contents.create', ['type' => 'embeddable', 'unit_id' => $unit->id]) }}"
-                                        class="hover:bg-gray-200 p-2 rounded-xl" @click="showTypes = false">Embeddable</a>
-                                    <a href="{{ route('contents.create', ['type' => 'url', 'unit_id' => $unit->id]) }}"
-                                        class="hover:bg-gray-200 p-2 rounded-xl" @click="showTypes = false">Url</a>
-                                    <a href="{{ route('contents.create', ['type' => 'media', 'unit_id' => $unit->id]) }}"
-                                        class="hover:bg-gray-200 p-2 rounded-xl" @click="showTypes = false">Media</a>
-                                    {{-- <a href="{{ route('contents.create', ['type' => 'image', 'unit_id' => $unit->id]) }}"
+                    @if ($unit->course()->categories->pluck('name')->contains('Conversational'))
+                        @hasanyrole('admin|teacher')
+                            <div class="w-full flex justify-end relative mb-20">
+                                <button @click="showTypes = true"
+                                    class="bg-green-600 font-semibold text-white p-2 w-32 mr-1 rounded-full hover:bg-green-700">
+                                    Add
+                                </button>
+                                <button onclick="sendRequest()"
+                                    class="bg-blue-600 font-semibold text-white p-2 w-32 mr-1 rounded-full hover:bg-blue-700">
+                                    Reorder
+                                </button>
+                                <div class="absolute right-4 top-8" x-show="showTypes" @click.outside="showTypes = false">
+                                    <div
+                                        class="flex flex-col border border-gray-400 rounded-xl divide-y divide-opacity-100 divide-gray-300 bg-white">
+                                        <a href="{{ route('contents.create', ['type' => 'embeddable', 'unit_id' => $unit->id]) }}"
+                                            class="hover:bg-gray-200 p-2 rounded-xl"
+                                            @click="showTypes = false">Embeddable</a>
+                                        <a href="{{ route('contents.create', ['type' => 'url', 'unit_id' => $unit->id]) }}"
+                                            class="hover:bg-gray-200 p-2 rounded-xl" @click="showTypes = false">Url</a>
+                                        <a href="{{ route('contents.create', ['type' => 'media', 'unit_id' => $unit->id]) }}"
+                                            class="hover:bg-gray-200 p-2 rounded-xl" @click="showTypes = false">Media</a>
+                                        {{-- <a href="{{ route('contents.create', ['type' => 'image', 'unit_id' => $unit->id]) }}"
                                     class="hover:bg-gray-200 p-2 rounded-xl" @click="showTypes = false">Image</a>
                                 <a href="{{ route('contents.create', ['type' => 'video', 'unit_id' => $unit->id]) }}"
                                     class="hover:bg-gray-200 p-2 rounded-xl" @click="showTypes = false">Video</a> --}}
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    @endrole
+                        @endhasanyrole
+                    @else
+                        @role('admin')
+                            <div class="w-full flex justify-end relative mb-20">
+                                <button @click="showTypes = true"
+                                    class="bg-green-600 font-semibold text-white p-2 w-32 mr-1 rounded-full hover:bg-green-700">
+                                    Add
+                                </button>
+                                <button onclick="sendRequest()"
+                                    class="bg-blue-600 font-semibold text-white p-2 w-32 mr-1 rounded-full hover:bg-blue-700">
+                                    Reorder
+                                </button>
+                                <div class="absolute right-4 top-8" x-show="showTypes" @click.outside="showTypes = false">
+                                    <div
+                                        class="flex flex-col border border-gray-400 rounded-xl divide-y divide-opacity-100 divide-gray-300 bg-white">
+                                        <a href="{{ route('contents.create', ['type' => 'embeddable', 'unit_id' => $unit->id]) }}"
+                                            class="hover:bg-gray-200 p-2 rounded-xl"
+                                            @click="showTypes = false">Embeddable</a>
+                                        <a href="{{ route('contents.create', ['type' => 'url', 'unit_id' => $unit->id]) }}"
+                                            class="hover:bg-gray-200 p-2 rounded-xl" @click="showTypes = false">Url</a>
+                                        <a href="{{ route('contents.create', ['type' => 'media', 'unit_id' => $unit->id]) }}"
+                                            class="hover:bg-gray-200 p-2 rounded-xl" @click="showTypes = false">Media</a>
+                                        {{-- <a href="{{ route('contents.create', ['type' => 'image', 'unit_id' => $unit->id]) }}"
+                            class="hover:bg-gray-200 p-2 rounded-xl" @click="showTypes = false">Image</a>
+                        <a href="{{ route('contents.create', ['type' => 'video', 'unit_id' => $unit->id]) }}"
+                            class="hover:bg-gray-200 p-2 rounded-xl" @click="showTypes = false">Video</a> --}}
+                                    </div>
+                                </div>
+                            </div>
+                        @endrole
+                    @endif
                     <table class="w-2/3 mx-auto">
                         <tbody>
                             @foreach ($unit->contents->sortBy('order') as $content)
@@ -89,6 +121,28 @@
                                                 </video>
                                             @endif
                                         </div>
+                                        @if ($unit->course()->categories->pluck('name')->contains('Conversational'))
+                                            @hasanyrole('admin|teacher')
+                                                <div class="flex space-x-4">
+                                                    <a href="{{ route('contents.edit', $content->id) }}" title="Edit"><i
+                                                            class="fas fa-pen m-1"></i></a>
+                                                    <button @click="trash = false, deleteConfirmation = true" title="Delete"
+                                                        x-show="trash"><i class="fas fa-trash m-1"></i></button>
+                                                    <form action="{{ route('contents.destroy', $content->id) }}"
+                                                        x-show="deleteConfirmation" method="POST">
+                                                        @csrf
+                                                        @method('DELETE')
+                                                        <button type="submit"
+                                                            class="text-gray-500 hover:text-red-600 font-bold">
+                                                            <i class="fas fa-check m-1"></i>
+                                                        </button>
+                                                    </form>
+                                                    <button title="Reorder" class="ml-8 cursor-move">
+                                                        <i class="fas fa-grip-lines"></i>
+                                                    </button>
+                                                </div>
+                                            @endhasanyrole
+                                        @endif
                                         @role('admin')
                                             <div class="flex space-x-4">
                                                 <a href="{{ route('contents.edit', $content->id) }}" title="Edit"><i

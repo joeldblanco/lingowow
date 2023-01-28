@@ -113,4 +113,11 @@ class UsersController extends Controller
         if (!$unit) $user->units()->attach($unit_id);
         // }
     }
+
+    public function getUser(Request $request)
+    {
+        $id = $request->id;
+        $user = User::find($id);
+        return response()->json($user);
+    }
 }

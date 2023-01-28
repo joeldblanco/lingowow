@@ -67,6 +67,12 @@
             'parent_link' => request()->is('admin', 'admin/*'),
         ],
         [
+            'name' => 'Products',
+            'route' => route('products.index'),
+            'status' => request()->routeIs('products.index'),
+            'parent_link' => request()->is('admin', 'admin/*'),
+        ],
+        [
             'name' => 'Exams',
             'route' => route('exam.index'),
             'status' => request()->is('admin/exam', 'admin/exam/*'),
@@ -89,6 +95,12 @@
             'route' => route('globals.index'),
             'status' => request()->routeIs('globals.index'),
             'parent_link' => request()->is('admin', 'admin/*'),
+        ],
+        [
+            'name' => 'Recordings',
+            'route' => route('recordings.index'),
+            'status' => request()->routeIs('recordings', 'recordings/*'),
+            'parent_link' => request()->is('classes'),
         ],
     ];
     

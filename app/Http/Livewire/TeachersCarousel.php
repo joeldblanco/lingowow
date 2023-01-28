@@ -9,6 +9,7 @@ use App\Models\Schedule;
 use App\Models\User;
 use Livewire\Component;
 use Cart;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
 
 class TeachersCarousel extends Component
@@ -16,29 +17,31 @@ class TeachersCarousel extends Component
 
     public $selectedTeacher = 7;
     public $loadingState = false;
+    public $available_teachers;
+    public $teachers_ids;
     protected $listeners = ['loadingState'];
 
-    // public function mount(){
-    //     $available_teachers = User::join('model_has_roles',function($join){
-    //                             $join->on('users.id','=','model_has_roles.model_id')
-    //                                 ->where('model_has_roles.role_id','=','3');
-    //                         })->get();
+    public function mount($available_teachers = null)
+    {
+        if ($available_teachers == null) {
+            $this->available_teachers = new Collection([]);
+            $this->available_teachers = User::role('teacher')->get()->pluck('schedules')->flatten()->whereNotNull('selected_schedule')->pluck('user');
+            $this->teachers_ids = $this->available_teachers->pluck('id');
+        } else {
+            $this->teachers_ids = $available_teachers;
+            if (!is_array($available_teachers)) {
+                $available_teachers = [$available_teachers];
+            }
+            $this->available_teachers = User::role('teacher')->whereIn('id', $available_teachers)->get()->pluck('schedules')->flatten()->whereNotNull('selected_schedule')->pluck('user');
+        }
 
-    //     foreach ($available_teachers as $key => $value) {
-    //     $available_teachers[$key] = Schedule::where('user_id',$value->id)->where('selected_schedule', '<>', null)->select('user_id')->first();
-    //     if($available_teachers[$key] == null){
-    //     unset($available_teachers[$key]);
-    //     }else{
-    //     $available_teachers[$key] = $available_teachers[$key]->user_id;
-    //     }
-    //     }
-
-    //     $available_teachers = User::find($available_teachers);
-    //     $available_teachers = $available_teachers->shuffle();
-    //     session(['first_teacher' => $available_teachers[0]->id]);
-    //     session(['teacher_id' => $available_teachers[0]->id]);
-    //     dd($available_teachers[0]->id);
-    // }
+        $this->available_teachers = $this->available_teachers->shuffle();
+        if (count($this->available_teachers) > 0) {
+            session(['first_teacher' => $this->available_teachers[0]->id]);
+        } else {
+            session()->forget('first_teacher');
+        }
+    }
 
     public function saveTeacher($teacher_id)
     {
@@ -63,11 +66,11 @@ class TeachersCarousel extends Component
     {
         // dd($teacher_id);
         // if($teacher_id != 0){
-            $this->loadingState = true; 
-            $this->selectedTeacher = $teacher_id;
-            session(['teacher_id' => $teacher_id]);
-            session(['user_schedule' => []]); //Para hacer la precarga del scheduling vacia cada vez que se recarga
-            $this->emit('loadSelectingSchedule', $teacher_id);
+        $this->loadingState = true;
+        $this->selectedTeacher = $teacher_id;
+        session(['teacher_id' => $teacher_id]);
+        session(['user_schedule' => []]); //Para hacer la precarga del scheduling vacia cada vez que se recarga
+        $this->emit('loadSelectingSchedule', $teacher_id);
         // }
         // dd($this->emit('loadSchedule', $teacher_id));
     }
@@ -79,35 +82,20 @@ class TeachersCarousel extends Component
 
     public function render()
     {
-        // $available_teachers = User::join('model_has_roles', function ($join) {
-        //     $join->on('users.id', '=', 'model_has_roles.model_id')
-        //         ->where('model_has_roles.role_id', '=', '3');
-        // })->get();
+        // dd($this->teachers_ids);
+        if (!is_iterable($this->teachers_ids)) {
+            $this->teachers_ids = [$this->teachers_ids];
+        }
+        $this->available_teachers = new Collection([]);
+        $this->available_teachers = User::role('teacher')->whereIn('id', $this->teachers_ids)->get()->pluck('schedules')->flatten()->whereNotNull('selected_schedule')->pluck('user');
 
-        $available_teachers = User::role('teacher')->get()->pluck('schedules')->flatten()->whereNotNull('selected_schedule')->pluck('user');
-        // $teachers_schedules = $available_teachers
-        // dd($available_teachers, $teachers_schedules);
-
-        // foreach ($available_teachers as $key => $value) {
-        //     $available_teachers[$key] = Schedule::where('user_id', $value->id)->where('selected_schedule', '<>', null)->select('user_id')->first();
-        //     if ($available_teachers[$key] == null) {
-        //         unset($available_teachers[$key]);
-        //     } else {
-        //         $available_teachers[$key] = $available_teachers[$key]->user_id;
-        //     }
-        // }
-
-        // $available_teachers = User::find($available_teachers);
-        $available_teachers = $available_teachers->shuffle();
-        if (count($available_teachers) > 0) {
-            session(['first_teacher' => $available_teachers[0]->id]);
-            // session(['teacher_id' => $available_teachers[0]->id]);
-        }else{
+        $this->available_teachers = $this->available_teachers->shuffle();
+        if (count($this->available_teachers) > 0) {
+            session(['first_teacher' => $this->available_teachers[0]->id]);
+        } else {
             session()->forget('first_teacher');
         }
 
-        // dd($available_teachers);
-
-        return view('livewire.teachers-carousel', compact('available_teachers'));
+        return view('livewire.teachers-carousel');
     }
 }

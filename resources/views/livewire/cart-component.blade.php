@@ -1,7 +1,7 @@
 <div class="flex justify-center my-6">
     <div class="flex flex-col w-full p-8 text-gray-800 bg-white shadow-lg pin-r pin-y md:w-4/5 lg:w-4/5">
         @if (Cart::count() > 0)
-        
+
             <div class="flex-1">
                 <table class="w-full text-sm lg:text-base" cellspacing="0">
                     <thead>
@@ -111,7 +111,7 @@
                         <div class="p-4 bg-gray-100 rounded-full">
                             <h1 class="ml-2 font-bold uppercase">Order Details</h1>
                         </div>
-                        <div class="p-4">
+                        <div class="p-4" x-data="{ loading_state: false, editBillingAddress: false }" x-cloak>
                             <p class="mb-6 italic">Shipping and additionnal costs are calculated based on values you
                                 have entered</p>
                             {{-- <div class="flex justify-between border-b">
@@ -160,18 +160,16 @@
                                 </div>
                             </div>
                             @if ($user->street == null || $user->city == null || $user->country == null || $user->zip_code == null)
-                                <div x-data="{ editBillingAddress: false }" x-cloak
+                                <div
                                     class="bg-red-200 border border-red-400 w-full rounded-md p-5 text-red-500 space-y-4">
                                     <p>
                                         In order to make the payment, you must complete your profile with your billing
                                         address.
                                     </p>
                                     <p>
-                                        You can go to your profile by clicking
+                                        You can edit your billing information by clicking
                                         <span @click="editBillingAddress = true"
-                                            class="text-blue-600 hover:underline cursor-pointer">here</span>, once there
-                                        click on the "Edit profile" button
-                                        and complete the address fields.
+                                            class="text-blue-600 hover:underline cursor-pointer">here</span>.
                                     </p>
 
 
@@ -308,10 +306,13 @@
                                     </x-modal>
 
                                 </div>
-                                <div wire:loading wire:target="saveBillingAddress">
+                                <div wire:loading wire:target="saveBillingAddress,applyCoupon">
                                     @include('components.loading-state')
                                 </div>
                             @else
+                                <div id="loading_state" class="hidden" style="z-index: 150; position: absolute">
+                                    @include('components.loading-state')
+                                </div>
                                 <a href="{{ route('payments.gateway') }}">
                                     <button
                                         class="flex justify-center w-full px-10 py-3 mt-6 font-medium text-white uppercase bg-gray-800 rounded-full shadow items-center hover:bg-gray-700 focus:shadow-outline focus:outline-none">
@@ -319,14 +320,16 @@
                                         <span class="ml-2 mt-5px">Credit/Debit Card</span>
                                     </button>
                                 </a>
-                                <a href="{{ route('paypal-checkout') }}">
+                                {{-- <a href="{{ route('paypal-checkout') }}">
                                     <button
                                         class="flex justify-center w-full px-10 py-3 mt-6 font-bold text-white uppercase rounded-full shadow items-center focus:shadow-outline focus:outline-none"
                                         style="background-color: #FFCC00; color: #2C2E2F;">
                                         <i class="fab fa-paypal h-full text-xl"></i>
                                         <span class="ml-2 mt-5px">PayPal</span>
                                     </button>
-                                </a>
+                                </a> --}}
+                                <!-- Set up a container element for the button -->
+                                <div id="paypal-button-container" class="mt-3"></div>
                             @endif
                         </div>
                     </div>
@@ -343,4 +346,68 @@
             </a>
         @endif
     </div>
+
+    <!-- Include the PayPal JavaScript SDK -->
+    <script
+        src="https://www.paypal.com/sdk/js?client-id=AUa2ToyOsBrbfUh0FwDR4wg8A2A7bvgVFaW3XuAN4-zttVI-XImVMP6Bllg-_UziMRfP5wOSrZqPNAMD&currency=USD"
+        defer></script>
+
+    <script defer>
+        function runPaypalButtonFunction() {
+            return new Promise(resolve => {
+                var intervalId = setInterval(() => {
+                    if (typeof paypal !== 'undefined') {
+                        clearInterval(intervalId);
+                        resolve();
+                    }
+                }, 100);
+            });
+        }
+
+        runPaypalButtonFunction().then(() => {
+            // Render the PayPal button into #paypal-button-container
+            paypal.Buttons({
+
+                style: {
+                    layout: 'horizontal',
+                    tagline: false,
+                    shape: 'pill',
+                },
+
+                // Set up the transaction
+                createOrder: function(data, actions) {
+                    return actions.order.create({
+                        purchase_units: [{
+                            amount: {
+                                value: @json(Cart::total())
+                            }
+                        }]
+                    });
+                },
+
+                // Finalize the transaction
+                onApprove: function(data, actions) {
+                    return actions.order.capture().then(function(orderData) {
+                        // Successful capture! For demo purposes:
+                        // console.log('Capture result', orderData, JSON.stringify(orderData, null,
+                        //     2));
+                        // var transaction = orderData.purchase_units[0].payments.captures[0];
+                        // alert('Transaction ' + transaction.status + ': ' + transaction.id +
+                        //     '\n\nSee console for all available details');
+
+                        // Replace the above to show a success message within this page, e.g.
+                        // const element = document.getElementById('paypal-button-container');
+                        // element.innerHTML = '';
+                        // element.innerHTML = '<h3>Thank you for your payment!</h3>';
+                        // Or go to another URL:  actions.redirect('thank_you.html');
+                        $('#loading_state').removeClass('hidden');
+                        Livewire.emit('paypalCheckout');
+                    });
+                }
+
+
+            }).render('#paypal-button-container');
+        });
+    </script>
+
 </div>

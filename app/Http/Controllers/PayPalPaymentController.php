@@ -198,7 +198,6 @@ class PayPalPaymentController extends Controller
         $data = [];
 
         if (Invoice::all()->last() != null) {
-
             $order_id = Invoice::all()->last()->id + 1;
         } else {
             $order_id = 1;

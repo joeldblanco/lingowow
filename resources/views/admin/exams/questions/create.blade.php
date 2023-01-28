@@ -140,7 +140,7 @@
             </div>
         </div>
         @if ($method == 'create')
-            <script>
+            <script  >
                 $("#question-type").change(function() {
                     var option = $("#question-type").find(":selected").text();
                     $('#options').empty();

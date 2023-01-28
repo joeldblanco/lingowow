@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\StudentClassCheck;
+use App\Jobs\TeacherClassCheck;
 use App\Models\Classes;
 use App\Models\Enrolment;
 use App\Models\Schedule;
@@ -12,6 +14,7 @@ use App\Models\Comment;
 use App\Models\Meeting;
 use App\Models\ScheduleReserve;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class ClassController extends Controller
 {
@@ -22,25 +25,7 @@ class ClassController extends Controller
      */
     public function index(Request $request)
     {
-        if(auth()->user()->getRoleNames()[0] == "guest") abort(403, 'USER DOES NOT HAVE THE RIGHT PERMISSIONS.');
-        $start_date = $request->start_date;
-        $end_date = $request->end_date;
-
-        if ($start_date == null || $end_date == null) return redirect()->route('classes.index', ['start_date' => ApportionmentController::currentPeriod(true)[0], 'end_date' => ApportionmentController::currentPeriod(true)[1]]);
-
-        if (auth()->user()->roles[0]->name == "teacher") {
-            $classes = User::find(auth()->id())->teacherClasses->where('start_date', '>=', $start_date)->where('end_date', '<=', $end_date)->sortBy('start_date');
-            $classes = Classes::whereIn('id', $classes->pluck('id'))->paginate(10);
-        } else if (auth()->user()->roles[0]->name == "student") {
-            $classes = User::find(auth()->id())->studentClasses->where('start_date', '>=', $start_date)->where('end_date', '<=', $end_date)->sortBy('start_date');
-            $classes = Classes::whereIn('id', $classes->pluck('id'))->paginate(10);
-        } else if (auth()->user()->roles[0]->name == "admin") {
-            $classes = Classes::where('start_date', '>=', $start_date)->where('end_date', '<=', $end_date)->orderBy('start_date');
-            $classes = Classes::whereIn('id', $classes->pluck('id'))->paginate(10);
-        }
-        $classes->appends(['start_date' => $start_date, 'end_date' => $end_date]);
-
-        return view('classes.index', compact('classes'));
+        //
     }
 
     /**
@@ -84,6 +69,7 @@ class ClassController extends Controller
     public function edit($id)
     {
         $class = Classes::find($id);
+        if (empty($class)) abort(404);
         $enrolment = Enrolment::find($class->enrolment_id);
         $teacher_id = $enrolment->teacher_id;
         $student_id = $enrolment->student_id;
@@ -232,7 +218,7 @@ class ClassController extends Controller
             $class->status = 1;
             $class->save();
 
-                                                        ////IMPORTANTE!!!! PREGUNTAR COMO SE MANEJA EL MODELO COMMENTS
+            ////IMPORTANTE!!!! PREGUNTAR COMO SE MANEJA EL MODELO COMMENTS
             // $type = "App\Models\Classes";
             // Comment::create([
             //     // 'class_id' => $id,
@@ -242,12 +228,11 @@ class ClassController extends Controller
             //     'commentable_type' => $type,
             // ]);
             $comment = new Comment();
-                $comment->author_id = auth()->user()->id;
-                $comment->content = $message;
-                $comment->commentable_id = $id;
-                $comment->commentable_type = 'App\Models\Classes';
+            $comment->author_id = auth()->user()->id;
+            $comment->content = $message;
+            $comment->commentable_id = $id;
+            $comment->commentable_type = 'App\Models\Classes';
             $comment->save();
-            
         } else {
             switch ($request->error) {
                 case "not_enough_days":
@@ -293,33 +278,24 @@ class ClassController extends Controller
         // }else{
 
         // }
+
+        return $recordings;
     }
 
     public function checkClasses(Request $request)
     {
         $request = $request->except(['_token', '_method']);
-        // dd($request);
         $role = Auth::user()->roles()->first()->name;
         foreach ($request as $key => $value) {
             $name = explode('_', $key)[0];
             $id = explode('_', $key)[1];
 
             if ($name == 'teacher' && ($role == "teacher" || $role == "admin")) {
-                $class = Classes::find($id);
-                $value = boolval($value) == true ? 1 : 0;
-                if ($class->teacher_check != $value) {
-                    $class->teacher_check = $value;
-                    $class->save();
-                }
+                dispatch(new TeacherClassCheck($id, $value));
             }
 
             if ($name == 'student' && ($role == "student" || $role == "admin")) {
-                $class = Classes::find($id);
-                $value = boolval($value) == true ? 1 : 0;
-                if ($class->student_check != $value) {
-                    $class->student_check = $value;
-                    $class->save();
-                }
+                dispatch(new StudentClassCheck($id, $value));
             }
         }
         return redirect()->back();

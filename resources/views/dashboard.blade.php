@@ -6,7 +6,6 @@
                 {{-- @if (isset($_GET['tz'])) --}}
 
                 {{-- {{ dd(session('affected_students')) }} --}}
-
                 @php
                     $users = \App\User::select('first_name', 'last_name', 'id')->get();
                     $affected_students = session('affected_students');
@@ -96,7 +95,7 @@
                 <div class="mt-10 w-full flex items-center space-x-4">
                     <div class="w-3/12">
                         @role('student')
-                            <a href="{{ route('classroom', auth()->id()) }}" target="_blank"
+                            <a href="{{ route('classroom', auth()->id()) }}"
                                 class="inline-block bg-lw-blue text-white px-4 py-2 rounded hover:bg-blue-900 hover:text-white hover:no-underline">Classroom</a>
                         @endrole
 
@@ -111,12 +110,12 @@
                             <script>
                                 var options = {
                                     series: [{
-                                            name: 'Progress',
+                                            name: 'Progress (Units)',
                                             data: [{{ auth()->user()->units->first()->order }}]
                                         },
                                         {
-                                            name: 'Remaining',
-                                            data: [{{ (count($enrolment->course->units()) - auth()->user()->units->first()->order) }}]
+                                            name: 'Remaining (Units)',
+                                            data: [{{ count($enrolment->course->units()) -auth()->user()->units->first()->order }}]
                                         },
                                     ],
                                     chart: {
@@ -158,6 +157,7 @@
                     @role('student')
                         @if ($course_modality == 'synchronous')
                             @livewire('schedule', ['user_id' => auth()->id(), 'mode' => 'show', 'course_id' => $course_id])
+                            {{-- @livewire('schedule-controller', ['user_id' => auth()->id(), 'mode' => 'show', 'course_id' => $course_id]) --}}
                         @endif
                     @endrole
                     @hasanyrole('teacher|guest')
@@ -208,6 +208,9 @@
                                             <a href="{{ route('profile.show', $student->id) }}">
                                                 <i class="fas fa-eye"></i>
                                             </a>
+                                            <a href="{{ route('classroom', $student->id) }}">
+                                                <i class="fas fa-door-open"></i>
+                                            </a>
                                         </td>
                                     </tr>
                                 @endforeach
@@ -216,7 +219,9 @@
                     @endif
                 @endrole
 
-                <livewire:rating-form />
+                @role('student')
+                    <livewire:rating-form />
+                @endrole
 
             </div>
         </div>
