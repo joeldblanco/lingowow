@@ -86,7 +86,10 @@ class EnrolmentController extends Controller
                 'student_id' => 'required|numeric|exists:App\Models\User,id',
             ]);
 
+            GatherController::editGuestsList([$request->student_id]);
             $this->store($request);
+
+            return redirect()->route('enrolments.index');
         }
     }
 

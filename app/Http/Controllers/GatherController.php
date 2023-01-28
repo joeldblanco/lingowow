@@ -8,6 +8,8 @@ use Illuminate\Support\Facades\Http;
 
 class GatherController extends Controller
 {
+    const SPACE_ID = "NMqppR61QkKUarTd\beach_bar";
+
     public function getGuestsList()
     {
         $path = "https://gather.town/api/getEmailGuestlist";
@@ -18,7 +20,7 @@ class GatherController extends Controller
 
         $body = [
             'apiKey' => env('GATHER_API_KEY', ''),
-            'spaceId'  => 'NMqppR61QkKUarTd/beach_bar',
+            'spaceId'  => self::SPACE_ID,
         ];
 
         $response = Http::withHeaders($headers)->get($path, $body);
@@ -32,10 +34,17 @@ class GatherController extends Controller
         $guestlist = array();
 
         foreach ($users as $user) {
+
+            if ($user->getRoleNames()->first() == "teacher" || $user->getRoleNames()->first() == "admin") {
+                $role = "moderator";
+            } else {
+                $role = "member";
+            }
+
             $guestList[$user->email] = [
                 'name' => $user->first_name . ' ' . $user->last_name,
                 'affiliation' => $user->getRoleNames()->first(),
-                'role' => $user->getRoleNames()->first() == ("teacher" || "admin") ? "moderator" : "member",
+                'role' => $role,
             ];
         }
 
@@ -47,7 +56,7 @@ class GatherController extends Controller
 
         $body = [
             'apiKey' => env('GATHER_API_KEY', ''),
-            'spaceId'  => 'NMqppR61QkKUarTd/beach_bar',
+            'spaceId'  => self::SPACE_ID,
             'guestlist' => $guestList,
             'overwrite' => 'true',
         ];
@@ -59,14 +68,22 @@ class GatherController extends Controller
 
     public static function editGuestsList($ids)
     {
-        $users = User::find($ids);
-        $guestlist = array();
 
+        $users = User::find($ids);
+
+        $guestlist = array();
         foreach ($users as $user) {
+
+            if ($user->getRoleNames()->first() == "teacher" || $user->getRoleNames()->first() == "admin") {
+                $role = "moderator";
+            } else {
+                $role = "member";
+            }
+
             $guestList[$user->email] = [
                 'name' => $user->first_name . ' ' . $user->last_name,
                 'affiliation' => $user->getRoleNames()->first(),
-                'role' => $user->getRoleNames()->first() == ("teacher" || "admin") ? "moderator" : "member",
+                'role' => $role,
             ];
         }
 
@@ -78,7 +95,7 @@ class GatherController extends Controller
 
         $body = [
             'apiKey' => env('GATHER_API_KEY', ''),
-            'spaceId'  => 'Z1brs5e4jun0FRSm\lingowow',
+            'spaceId'  => self::SPACE_ID,
             'guestlist' => $guestList,
         ];
 

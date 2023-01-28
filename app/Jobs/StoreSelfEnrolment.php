@@ -102,6 +102,7 @@ class StoreSelfEnrolment implements ShouldQueue
 
             // SchedulingCalendarController::store($student->id, $enrolment);
             dispatch(new CreateSchedule($student->id, $enrolment->id));
+            GatherController::editGuestsList([$student->id, $teacher->id]);
         } else {
 
             //CREATING STUDENT'S ENROLMENT (OR UPDATING IT, IN CASE IT ALREADY EXISTS BUT IS SOFTDELETED)//
@@ -109,11 +110,10 @@ class StoreSelfEnrolment implements ShouldQueue
                 ['student_id' => $student->id, 'course_id' => $course_id],
                 ['teacher_id' => NULL, 'deleted_at' => NULL]
             );
+            GatherController::editGuestsList([$student->id]);
         }
 
-        GatherController::editGuestsList($student->id);
-
-        if (($student->id != null)) {
+        if ($student->id != null) {
 
             User::find($student->id)->givePermissionTo('view units');
 
@@ -139,6 +139,11 @@ class StoreSelfEnrolment implements ShouldQueue
                     DB::table('module_user')->insertOrIgnore([
                         ['module_id' => $module->id, 'user_id' => $student->id],
                         ['module_id' => $module->id, 'user_id' => session('teacher_id')]
+                    ]);
+                } else {
+                    DB::table('module_user')->insertOrIgnore([
+                        ['module_id' => $module->module_id, 'user_id' => $student->id],
+                        ['module_id' => $module->module_id, 'user_id' => session('teacher_id')]
                     ]);
                 }
             } else {
