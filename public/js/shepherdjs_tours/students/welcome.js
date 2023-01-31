@@ -68,7 +68,7 @@ tour.addSteps([
         ],
     }
 ]);
-
+console.log("welcome")
 tour.start();
 
 tour.on('complete', () => {

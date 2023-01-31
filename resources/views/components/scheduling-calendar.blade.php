@@ -267,7 +267,7 @@
             $(function() {
 
                 var selectedCells = 0;
-                var nOfClasses = {{ $plan }};
+                var nOfClasses = {{ Plan }};
 
                 $(".cell_block").click(function() {
                     if ($(this).hasClass("selected")) {
