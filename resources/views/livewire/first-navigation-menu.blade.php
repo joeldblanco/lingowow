@@ -61,6 +61,10 @@
                                 <x-jet-nav-link href="{{ $nav_link['route'] }}" :active="$nav_link['status']" class="courses-link">
                                     {{ $nav_link['name'] }}
                                 </x-jet-nav-link>
+                            @elseif($nav_link['name'] == 'Gather')
+                                <x-jet-nav-link href="{{ $nav_link['route'] }}" :active="$nav_link['status']" class="gather-link">
+                                    {{ $nav_link['name'] }}
+                                </x-jet-nav-link>
                             @else
                                 <x-jet-nav-link href="{{ $nav_link['route'] }}" :active="$nav_link['status']">
                                     {{ $nav_link['name'] }}

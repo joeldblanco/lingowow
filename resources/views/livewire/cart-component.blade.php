@@ -1,9 +1,9 @@
 <div class="flex justify-center my-6">
-    <div class="flex flex-col w-full p-8 text-gray-800 bg-white shadow-lg pin-r pin-y md:w-4/5 lg:w-4/5">
+    <div class="flex flex-col w-full p-8 text-gray-800 bg-white shadow-lg pin-r pin-y md:w-4/5 lg:w-4/5 cart-general">
         @if (Cart::count() > 0)
 
             <div class="flex-1">
-                <table class="w-full text-sm lg:text-base" cellspacing="0">
+                <table class="w-full text-sm lg:text-base cart-info-buy" cellspacing="0">
                     <thead>
                         <tr class="h-12 uppercase">
                             <th class="hidden md:table-cell"></th>
@@ -73,30 +73,32 @@
                 <hr class="pb-6 mt-6">
                 <div class="my-4 mt-6 -mx-2 lg:flex">
                     <div class="lg:px-2 lg:w-1/2">
-                        <div class="p-4 bg-gray-100 rounded-full">
-                            <h1 class="ml-2 font-bold uppercase">Coupon Code</h1>
-                        </div>
-                        <div class="p-4">
-                            <p class="mb-4 italic">If you have a coupon code, please enter it in the box below</p>
-                            <div class="justify-center md:flex">
-                                <div class="flex items-center w-full h-13 pl-3 bg-gray-100 border rounded-full">
-                                    <input type="coupon" name="code" id="coupon" placeholder="Apply coupon"
-                                        value="90off"
-                                        class="w-full bg-gray-100 outline-none appearance-none focus:outline-none active:outline-none"
-                                        wire:model="coupon_code" />
-                                    <button
-                                        class="text-sm flex items-center px-3 py-1 text-white bg-gray-800 rounded-full outline-none md:px-4 hover:bg-gray-700 focus:outline-none active:outline-none"
-                                        wire:click="applyCoupon">
-                                        <svg aria-hidden="true" data-prefix="fas" data-icon="gift" class="w-8"
-                                            xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-                                            <path fill="currentColor"
-                                                d="M32 448c0 17.7 14.3 32 32 32h160V320H32v128zm256 32h160c17.7 0 32-14.3 32-32V320H288v160zm192-320h-42.1c6.2-12.1 10.1-25.5 10.1-40 0-48.5-39.5-88-88-88-41.6 0-68.5 21.3-103 68.3-34.5-47-61.4-68.3-103-68.3-48.5 0-88 39.5-88 88 0 14.5 3.8 27.9 10.1 40H32c-17.7 0-32 14.3-32 32v80c0 8.8 7.2 16 16 16h480c8.8 0 16-7.2 16-16v-80c0-17.7-14.3-32-32-32zm-326.1 0c-22.1 0-40-17.9-40-40s17.9-40 40-40c19.9 0 34.6 3.3 86.1 80h-86.1zm206.1 0h-86.1c51.4-76.5 65.7-80 86.1-80 22.1 0 40 17.9 40 40s-17.9 40-40 40z" />
-                                        </svg>
-                                        <span class="font-medium">Apply coupon</span>
-                                    </button>
-                                </div>
+                        <div class="cart-coupon">
+                            <div class="p-4 bg-gray-100 rounded-full">
+                                <h1 class="ml-2 font-bold uppercase">Coupon Code</h1>
                             </div>
-                            <p class="text-red-600 font-semibold">{{ $coupon_error_message }}</p>
+                            <div class="p-4">
+                                <p class="mb-4 italic">If you have a coupon code, please enter it in the box below</p>
+                                <div class="justify-center md:flex">
+                                    <div class="flex items-center w-full h-13 pl-3 bg-gray-100 border rounded-full">
+                                        <input type="coupon" name="code" id="coupon" placeholder="Apply coupon"
+                                            value="90off"
+                                            class="w-full bg-gray-100 outline-none appearance-none focus:outline-none active:outline-none"
+                                            wire:model="coupon_code" />
+                                        <button
+                                            class="text-sm flex items-center px-3 py-1 text-white bg-gray-800 rounded-full outline-none md:px-4 hover:bg-gray-700 focus:outline-none active:outline-none"
+                                            wire:click="applyCoupon">
+                                            <svg aria-hidden="true" data-prefix="fas" data-icon="gift" class="w-8"
+                                                xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+                                                <path fill="currentColor"
+                                                    d="M32 448c0 17.7 14.3 32 32 32h160V320H32v128zm256 32h160c17.7 0 32-14.3 32-32V320H288v160zm192-320h-42.1c6.2-12.1 10.1-25.5 10.1-40 0-48.5-39.5-88-88-88-41.6 0-68.5 21.3-103 68.3-34.5-47-61.4-68.3-103-68.3-48.5 0-88 39.5-88 88 0 14.5 3.8 27.9 10.1 40H32c-17.7 0-32 14.3-32 32v80c0 8.8 7.2 16 16 16h480c8.8 0 16-7.2 16-16v-80c0-17.7-14.3-32-32-32zm-326.1 0c-22.1 0-40-17.9-40-40s17.9-40 40-40c19.9 0 34.6 3.3 86.1 80h-86.1zm206.1 0h-86.1c51.4-76.5 65.7-80 86.1-80 22.1 0 40 17.9 40 40s-17.9 40-40 40z" />
+                                            </svg>
+                                            <span class="font-medium">Apply coupon</span>
+                                        </button>
+                                    </div>
+                                </div>
+                                <p class="text-red-600 font-semibold">{{ $coupon_error_message }}</p>
+                            </div>
                         </div>
                         <div class="p-4 mt-6 bg-gray-100 rounded-full">
                             <h1 class="ml-2 font-bold uppercase">Instruction for seller</h1>
@@ -111,7 +113,7 @@
                         <div class="p-4 bg-gray-100 rounded-full">
                             <h1 class="ml-2 font-bold uppercase">Order Details</h1>
                         </div>
-                        <div class="p-4" x-data="{ loading_state: false, editBillingAddress: false }" x-cloak>
+                        <div class="p-4 cart-payment" x-data="{ loading_state: false, editBillingAddress: false }" x-cloak>
                             <p class="mb-6 italic">Shipping and additionnal costs are calculated based on values you
                                 have entered</p>
                             {{-- <div class="flex justify-between border-b">
@@ -345,6 +347,9 @@
                 </button>
             </a>
         @endif
+        @role('guest')
+            <x-shepherd-tour tourName="guests/cart_view" role="guest" />
+        @endrole
     </div>
 
     <!-- Include the PayPal JavaScript SDK -->

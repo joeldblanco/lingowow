@@ -7,8 +7,8 @@
                 <div class="mt-10 mb-20">
                     <h3 class="text-4xl font-bold text-gray-800">Available Teachers</h3>
                     <h4 class="text-2xl font-bold text-gray-400">Please, select one to continue</h4>
-                    <div class="gallery js-flickity" data-flickity-options='{ "wrapAround": true }'>
-                        @foreach ($available_teachers as $teacher)
+                    <div class="gallery js-flickity teachers-carousel" data-flickity-options='{ "wrapAround": true }'>
+                        @foreach ($available_teachers as $key => $teacher)
                             {{-- @if ($teacher->id == $selectedTeacher)
                                 <div class="bg-red-600">This</div>
                             @endif --}}
@@ -36,7 +36,7 @@
                                         <div class="border-t-2"></div>
                                         <div class="flex justify-center">
                                             <button wire:click.prevent="loadSchedule({{ $teacher->id }})"
-                                                class="button-teacher inline-block bg-blue-800 text-white px-6 py-2 rounded hover:bg-blue-900 hover:text-white mt-5">Select</button>
+                                                class="button-teacher inline-block bg-blue-800 text-white px-6 py-2 rounded hover:bg-blue-900 hover:text-white mt-5 @if($key === 0)teacher-save @endif">Select</button>
 
                                         </div>
                                     </div>
@@ -65,4 +65,7 @@
     <div wire:loading>
         @include('components.loading-state')
     </div>
+
+    
+
 </div>
