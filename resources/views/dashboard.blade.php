@@ -94,19 +94,21 @@
 
                 <div class="mt-10 w-full flex items-center space-x-4">
                     <div class="w-3/12">
-                        @role('student')
-                            <a href="{{ route('classroom', auth()->id()) }}"
-                                class="inline-block bg-lw-blue text-white px-4 py-2 rounded hover:bg-blue-900 hover:text-white hover:no-underline">Classroom</a>
-                        @endrole
+                        <div class="buttons-dashboard-tour">
+                            @role('student')
+                                <a href="{{ route('classroom', auth()->id()) }}"
+                                    class="inline-block bg-lw-blue text-white px-4 py-2 rounded hover:bg-blue-900 hover:text-white hover:no-underline">Classroom</a>
+                            @endrole
 
-                        @hasanyrole('student|teacher')
-                            <a href="{{ route('classes.index', ['start_date' => App\Http\Controllers\ApportionmentController::currentPeriod(true)[0], 'end_date' => App\Http\Controllers\ApportionmentController::currentPeriod(true)[1]]) }}"
-                                class="inline-block bg-lw-light_blue text-white px-4 py-2 rounded hover:bg-lw-light_blue hover:text-white hover:no-underline">Classes</a>
-                        @endhasanyrole
+                            @hasanyrole('student|teacher')
+                                <a href="{{ route('classes.index', ['start_date' => App\Http\Controllers\ApportionmentController::currentPeriod(true)[0], 'end_date' => App\Http\Controllers\ApportionmentController::currentPeriod(true)[1]]) }}"
+                                    class="inline-block bg-lw-light_blue text-white px-4 py-2 rounded hover:bg-lw-light_blue hover:text-white hover:no-underline">Classes</a>
+                            @endhasanyrole
+                        </div>
                     </div>
                     @role('student')
                         <div class="w-9/12">
-                            <div id="chart"></div>
+                            <div id="chart" class="barprogress-tour"></div>
                             <script>
                                 var options = {
                                     series: [{
@@ -231,6 +233,9 @@
     @endrole
     @role('teacher')
         <x-shepherd-tour tourName="teachers/welcome" role="teacher" />
+    @endrole
+    @role('student')
+        <x-shepherd-tour tourName="students/welcome" role="student" />
     @endrole
 
 </x-app-layout>
