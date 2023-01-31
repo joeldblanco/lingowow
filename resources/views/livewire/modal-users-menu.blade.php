@@ -1,6 +1,3 @@
-@php
-    // dd($students);
-@endphp
 <div>
     <x-jet-dialog-modal wire:model="showModalMenuUsers">
 
@@ -53,7 +50,7 @@
         </x-slot>
 
         <x-slot name="content">
-            <!-- {{dd($activity)}} -->
+            <!-- {{ dd($activity) }} -->
             <div class="mb-2">
                 <div class="w-full center-h">Do you want to assign the activity "{{ $activity->name }}" to the student
                     {{ $student_assign->first_name }} {{ $student_assign->last_name }}?</div>

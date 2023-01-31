@@ -2,16 +2,22 @@
     <div class="bg-white font-sans">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="p-6 sm:px-20 bg-white border-b border-gray-200" x-data="{ fileExplorer: false }" x-cloak>
+                <div>
+                    @if ($content->content->type == 'embeddable')
 
-                <div class="bg-white rounded-md p-6 my-4 mx-auto border border-gray-400">
-                    <div class="divide-y">
-                        <p class="font-bold text-2xl mb-6">
-                            Edit Content
-                        </p>
-                        <input type="hidden" name="type" value="{{ $content->content->type }}">
-                        <input type="hidden" name="unit_id" value="{{ $content->unit->id }}">
-                        <div>
-                            @if ($content->content->type == 'embeddable')
+                        <form method="POST" action="{{ route('contents.update', $content->id) }}"
+                            class="bg-white rounded-md p-6 my-4 mx-auto border border-gray-400">
+                            @csrf
+                            @method('PATCH')
+
+                            <div class="divide-y">
+                                <p class="font-bold text-2xl mb-6">
+                                    Edit Content
+                                </p>
+                                <input type="hidden" name="type" value="{{ $content->content->type }}">
+                                <input type="hidden" name="unit_id" value="{{ $content->unit->id }}">
+
+
                                 <div class="py-6 space-y-1">
                                     <p class="font-bold text-gray-600 mb-1">Embeddable data</p>
                                     <textarea name="embeddable_data" id="embeddable_data" required
@@ -31,36 +37,73 @@
                                             onclick="preview_embeddable()">Preview embeddable</button>
                                     </div>
                                 </div>
-                            @endif
 
-                            @if ($content->content->type == 'url')
-                                <div class="py-6 space-y-1">
-                                    <p class="font-bold text-gray-600 mb-1">Link title</p>
-                                    <input type="text" name="link_title" id="link_title" required
-                                        value="{{ $content->content->link_title }}"
-                                        class="w-full rounded-md p-3 text-gray-600 hover:border-gray-600 @if ($errors->has('link_title')) border-red-600 @else border-gray-300 @endif">
-                                    @if ($errors->has('link_title'))
-                                        <p class="text-xs font-light text-red-600">{{ $errors->get('link_title')[0] }}
-                                        </p>
-                                    @endif
-                                    <p class="text-gray-500 text-sm font-light">Enter link title</p>
-                                </div>
-                                <div class="py-6 space-y-1">
-                                    <p class="font-bold text-gray-600 mb-1">URL</p>
-                                    <input type="text" name="link_url" id="link_url" required
-                                        value="{{ $content->content->link_url }}"
-                                        class="w-full rounded-md p-3 text-gray-600 hover:border-gray-600 @if ($errors->has('link_url')) border-red-600 @else border-gray-300 @endif">
-                                    @if ($errors->has('link_url'))
-                                        <p class="text-xs font-light text-red-600">{{ $errors->get('link_url')[0] }}</p>
-                                    @endif
-                                    <p class="text-gray-500 text-sm font-light">Enter url</p>
-                                </div>
-                            @endif
 
-                            @if ($content->content->type == 'media')
-                                <div class="py-6 space-y-1 w-full">
-                                    <p class="font-bold text-gray-600 mb-1">Media file</p>
-                                    <input type="file" name="media_file" id="media_file" required class="hidden">
+                            </div>
+                            <div class="w-full flex justify-end">
+                                <button id="saveButton"
+                                    class="bg-blue-500 py-1 px-3 rounded-md font-semibold text-white shadow-lg text-lg">
+                                    Save
+                                </button>
+                            </div>
+                        </form>
+
+                    @endif
+
+                    @if ($content->content->type == 'url')
+                        <form method="POST" action="{{ route('contents.update', $content->id) }}" {{-- enctype="multipart/form-data" --}}
+                            class="bg-white rounded-md p-6 my-4 mx-auto border border-gray-400">
+                            @csrf
+                            @method('PATCH')
+
+                            <input type="hidden" name="type" value="{{ $content->content->type }}">
+                            <input type="hidden" name="unit_id" value="{{ $content->unit->id }}">
+
+                            <div class="divide-y">
+                                <p class="font-bold text-2xl mb-6">
+                                    New Content
+                                </p>
+                                <div>
+                                    @if ($content->content->type == 'url')
+                                        <div class="py-6 space-y-1">
+                                            <p class="font-bold text-gray-600 mb-1">Link title</p>
+                                            <input type="text" name="link_title" id="link_title"
+                                                value="{{ $content->content->link_title }}" required
+                                                class="w-full rounded-md p-3 text-gray-600 hover:border-gray-600 @if ($errors->has('link_title')) border-red-600 @else border-gray-300 @endif">
+                                            @if ($errors->has('link_title'))
+                                                <p class="text-xs font-light text-red-600">
+                                                    {{ $errors->get('link_title')[0] }}</p>
+                                            @endif
+                                            <p class="text-gray-500 text-sm font-light">Enter link title</p>
+                                        </div>
+                                        <div class="py-6 space-y-1">
+                                            <p class="font-bold text-gray-600 mb-1">URL</p>
+                                            <input type="text" name="link_url" id="link_url"
+                                                value="{{ $content->content->link_url }}" required
+                                                class="w-full rounded-md p-3 text-gray-600 hover:border-gray-600 @if ($errors->has('link_url')) border-red-600 @else border-gray-300 @endif">
+                                            @if ($errors->has('link_url'))
+                                                <p class="text-xs font-light text-red-600">
+                                                    {{ $errors->get('link_url')[0] }}
+                                                </p>
+                                            @endif
+                                            <p class="text-gray-500 text-sm font-light">Enter url</p>
+                                        </div>
+                                    @endif
+
+                                </div>
+                                <div class="w-full flex justify-end">
+                                    <button
+                                        class="bg-blue-500 py-1 px-3 rounded-md font-semibold text-white shadow-lg text-lg">
+                                        Save
+                                    </button>
+                                </div>
+                        </form>
+                    @endif
+
+                    @if ($content->content->type == 'media')
+                        <div class="py-6 space-y-1 w-full">
+                            {{-- <p class="font-bold text-gray-600 mb-1">Media file</p> --}}
+                            {{-- <input type="file" name="media_file" id="media_file" required class="hidden">
                                     <div class="flex flex-col justify-center items-center">
                                         <img id="image" src="" alt="preview image"
                                             class="object-none w-full max-h-56 hidden">
@@ -90,18 +133,58 @@
                                             <p class="text-xs font-light text-red-600">
                                                 {{ $errors->get('media_file')[0] }}</p>
                                         @endif
-                                    </div>
-                                    <p class="text-gray-500 text-sm font-light">Upload media file</p>
-                            @endif
+                                    </div> --}}
 
+
+
+
+
+
+
+
+
+
+
+
+
+                            <form method="POST" action="{{ route('contents.update', $content->id) }}"
+                                enctype="multipart/form-data" class="bg-white rounded-md mx-auto">
+                                @csrf
+                                @method('PATCH')
+                                <div class="divide-y">
+                                    {{-- <p class="font-bold text-2xl mb-6">
+                                                New Content
+                                            </p> --}}
+                                    <input type="hidden" name="type" value="{{ $content->content->type }}">
+                                    <div>
+
+                                        <div class="py-6 space-y-1">
+                                            <p class="font-bold text-gray-600 mb-1">Media file</p>
+                                            <input type="file" name="new_media_file" id="new_media_file"
+                                                class="w-full rounded-md p-3 text-gray-600 hover:border-gray-600 @if ($errors->has('new_media_file')) border-red-600 @else border-gray-300 @endif">
+                                            @if ($errors->has('new_media_file'))
+                                                <p class="text-xs font-light text-red-600">
+                                                    {{ $errors->get('new_media_file')[0] }}</p>
+                                            @endif
+                                            <p class="text-gray-500 text-sm font-light">Upload media file</p>
+
+                                        </div>
+                                        <div class="w-full flex justify-end">
+                                            <button
+                                                class="bg-blue-500 py-1 px-3 rounded-md font-semibold text-white shadow-lg text-lg">
+                                                Save
+                                            </button>
+                                        </div>
+                                    </div>
+                            </form>
+
+
+
+
+
+                            {{-- <p class="text-gray-500 text-sm font-light">Upload media file</p> --}}
                         </div>
-                        <div class="w-full flex justify-end">
-                            <button id="saveButton"
-                                class="bg-blue-500 py-1 px-3 rounded-md font-semibold text-white shadow-lg text-lg">
-                                Save
-                            </button>
-                        </div>
-                    </div>
+                    @endif
 
                     <x-modal type="info" name="fileExplorer">
                         <x-slot name="title">
@@ -185,57 +268,6 @@
                 }
 
                 preview_embeddable();
-
-                var data = [];
-
-                data.push({
-                    "type": "embeddable",
-                    "embeddable_data": document.getElementById('embeddable_data').value,
-                });
-
-                $("#saveButton").on('click', function() {
-                    // console.log(data);
-                    post(route('contents.update', {{ $content->id }}), {
-                        "type": "media",
-                        data: data,
-                        "_token": $("meta[name='csrf-token']").attr("content"),
-                        "_method": "PATCH"
-                    });
-                })
-
-                // method="POST" action="{{ route('contents.update', $content->id) }}" enctype="multipart/form-data"
-
-                /**
-                 * sends a request to the specified url from a form. this will change the window location.
-                 * @param {string} path the path to send the post request to
-                 * @param {object} params the parameters to add to the url
-                 * @param {string} [method=post] the method to use on the form
-                 */
-
-                function post(path, params, method = 'post') {
-
-                    // The rest of this code assumes you are not using a library.
-                    // It can be made less verbose if you use one.
-                    const form = document.createElement('form');
-                    form.method = method;
-                    form.action = path;
-
-                    console.log(form);
-
-                    for (const key in params) {
-                        if (params.hasOwnProperty(key)) {
-                            const hiddenField = document.createElement('input');
-                            hiddenField.type = 'hidden';
-                            hiddenField.name = key;
-                            hiddenField.value = params[key];
-
-                            form.appendChild(hiddenField);
-                        }
-                    }
-
-                    document.body.appendChild(form);
-                    form.submit();
-                }
             </script>
         @elseif($content->content->type == 'media')
             <script type="text/javascript">
@@ -280,47 +312,39 @@
 
                     $('#media_file').change(function() {
 
-                        let reader = new FileReader();
+                        if (e.target.result.split(";")[0].includes("audio")) {
+                            $('#audio').attr('src', e.target.result);
+                            $('#audio').removeClass('hidden');
 
-                        reader.onload = (e) => {
+                            $('#findOrUpload').addClass('hidden');
+                            $('#image').addClass('hidden');
+                            $("#video").addClass('hidden');
+                            $('#cancelButton').removeClass('hidden');
 
-                            if (e.target.result.split(";")[0].includes("audio")) {
-                                $('#audio').attr('src', e.target.result);
-                                $('#audio').removeClass('hidden');
+                        } else if (e.target.result.split(";")[0].includes("image")) {
+                            $('#image').attr('src', e.target.result);
+                            $('#image').removeClass('hidden');
 
-                                $('#findOrUpload').addClass('hidden');
-                                $('#image').addClass('hidden');
-                                $("#video").addClass('hidden');
-                                $('#cancelButton').removeClass('hidden');
+                            $('#findOrUpload').addClass('hidden');
+                            $('#audio').addClass('hidden');
+                            $("#video").addClass('hidden');
+                            $('#cancelButton').removeClass('hidden');
 
-                            } else if (e.target.result.split(";")[0].includes("image")) {
-                                $('#image').attr('src', e.target.result);
-                                $('#image').removeClass('hidden');
+                        } else if (e.target.result.split(";")[0].includes("video")) {
+                            $('#video').attr('src', e.target.result);
+                            $('#video').removeClass('hidden');
 
-                                $('#findOrUpload').addClass('hidden');
-                                $('#audio').addClass('hidden');
-                                $("#video").addClass('hidden');
-                                $('#cancelButton').removeClass('hidden');
-
-                            } else if (e.target.result.split(";")[0].includes("video")) {
-                                $('#video').attr('src', e.target.result);
-                                $('#video').removeClass('hidden');
-
-                                $('#findOrUpload').addClass('hidden');
-                                $('#audio').addClass('hidden');
-                                $("#image").addClass('hidden');
-                                $('#cancelButton').removeClass('hidden');
-                            }
+                            $('#findOrUpload').addClass('hidden');
+                            $('#audio').addClass('hidden');
+                            $("#image").addClass('hidden');
+                            $('#cancelButton').removeClass('hidden');
                         }
 
-                        reader.readAsDataURL(this.files[0]);
-
-                        // $("#image").toggleClass("hidden");
                         $("#post_content").attr('required', false);
 
                     });
 
-                    $('#cancelButton').on('click', function() {
+                    $('#cancelButton').click(function() {
                         $('#findOrUpload').removeClass('hidden');
                         $('#audio').addClass('hidden');
                         $('#cancelButton').addClass('hidden');
@@ -328,103 +352,7 @@
                         $("#video").addClass('hidden');
                     });
 
-                    $("#saveButton").on('click', function() {
-                        console.log(data);
-                        post(route('contents.update', {{ $content->id }}), {
-                            "type": "media",
-                            data: data,
-                            "_token": $("meta[name='csrf-token']").attr("content"),
-                            "_method": "PATCH"
-                        });
-                    })
-
                 });
-
-                // method="POST" action="{{ route('contents.update', $content->id) }}" enctype="multipart/form-data"
-
-                /**
-                 * sends a request to the specified url from a form. this will change the window location.
-                 * @param {string} path the path to send the post request to
-                 * @param {object} params the parameters to add to the url
-                 * @param {string} [method=post] the method to use on the form
-                 */
-
-                function post(path, params, method = 'post') {
-
-                    // The rest of this code assumes you are not using a library.
-                    // It can be made less verbose if you use one.
-                    const form = document.createElement('form');
-                    form.method = method;
-                    form.action = path;
-
-                    for (const key in params) {
-                        if (params.hasOwnProperty(key)) {
-                            const hiddenField = document.createElement('input');
-                            hiddenField.type = 'hidden';
-                            hiddenField.name = key;
-                            hiddenField.value = params[key];
-
-                            form.appendChild(hiddenField);
-                        }
-                    }
-
-                    document.body.appendChild(form);
-                    form.submit();
-                }
-            </script>
-        @elseif($content->content->type == 'url')
-            <script>
-                var data = [];
-
-                data.push({
-                    "type": "url",
-                    "link_title": document.getElementById('link_title').value,
-                    "link_url": document.getElementById('link_url').value,
-                });
-
-                $("#saveButton").on('click', function() {
-                    // console.log(data);
-                    post(route('contents.update', {{ $content->id }}), {
-                        "type": "media",
-                        data: data,
-                        "_token": $("meta[name='csrf-token']").attr("content"),
-                        "_method": "PATCH"
-                    });
-                })
-
-                // method="POST" action="{{ route('contents.update', $content->id) }}" enctype="multipart/form-data"
-
-                /**
-                 * sends a request to the specified url from a form. this will change the window location.
-                 * @param {string} path the path to send the post request to
-                 * @param {object} params the parameters to add to the url
-                 * @param {string} [method=post] the method to use on the form
-                 */
-
-                function post(path, params, method = 'post') {
-
-                    // The rest of this code assumes you are not using a library.
-                    // It can be made less verbose if you use one.
-                    const form = document.createElement('form');
-                    form.method = method;
-                    form.action = path;
-
-                    console.log(form);
-
-                    for (const key in params) {
-                        if (params.hasOwnProperty(key)) {
-                            const hiddenField = document.createElement('input');
-                            hiddenField.type = 'hidden';
-                            hiddenField.name = key;
-                            hiddenField.value = params[key];
-
-                            form.appendChild(hiddenField);
-                        }
-                    }
-
-                    document.body.appendChild(form);
-                    form.submit();
-                }
             </script>
         @endif
 

@@ -25,7 +25,7 @@ class QuestionController extends Controller
      */
     public function create(Request $request)
     {
-        $method = $request->method();
+        $method = $request->method;
         return view('admin.exams.questions.create', compact('method'));
     }
 
@@ -160,7 +160,7 @@ class QuestionController extends Controller
                         'path-to-file' => NULL,
                         'options' => $options,
                     ]);
-                    
+
                     $question->save();
                     $question->exams()->attach([$exam_id]);
 
@@ -188,8 +188,11 @@ class QuestionController extends Controller
      * @param  \App\Models\Question  $question
      * @return \Illuminate\Http\Response
      */
-    public function edit($exam_id, $question_id)
+    public function edit(Request $request)
     {
+        $exam_id = $request->exam_id;
+        $question_id = $request->question_id;
+
         $question = Question::find($question_id);
 
         return view('admin.exams.questions.show', compact('question', 'exam_id'));
@@ -251,9 +254,12 @@ class QuestionController extends Controller
      * @param  \App\Models\Question  $question
      * @return \Illuminate\Http\Response
      */
-    public function destroy($exam_id, $question_id)
+    public function destroy(Question $question)
     {
-        $question = Question::find($question_id);
+        $exam_id = $question->exam->id;
+        // $question_id = $request->question_id;
+        // dd($question->exams);
+        // $question = Question::find($question_id);
         $question->delete();
         return redirect()->route('exam.show', $exam_id);
     }

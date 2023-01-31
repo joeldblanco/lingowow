@@ -2,9 +2,9 @@
     
     $nav_links = [
         [
-            'name' => 'Home',
-            'route' => route('home'),
-            'status' => request()->routeIs('home'),
+            'name' => 'Announcements',
+            'route' => route('announcements'),
+            'status' => request()->routeIs('announcements'),
             'roles' => ['student', 'guest', 'teacher', 'admin'],
         ],
         [

@@ -4,10 +4,13 @@ namespace App\Http\Controllers;
 
 use App\Models\Attempt;
 use App\Models\Exam;
+use App\Models\Module;
 use App\Models\Question;
 use App\Models\Unit;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Database\Eloquent\Collection;
+
 
 class ExamController extends Controller
 {
@@ -28,9 +31,15 @@ class ExamController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
+    public function create(Request $request)
     {
-        return view('admin.exams.create');
+        if (empty($request->module_id)) {
+            $units = Module::all()->pluck('units')->sortBy('order');
+        } else {
+            $units = Module::find($request->module_id)->units->sortBy('order');
+        }
+
+        return view('admin.exams.create', compact('units'));
     }
 
     /**
@@ -41,7 +50,14 @@ class ExamController extends Controller
      */
     public function store(Request $request)
     {
+        $request->validate([
+            'unit_id' => 'required|numeric|exists:App\Models\Unit,id',
+            'min_score' => 'required|numeric|min:0|max:100',
+        ]);
+
         $exam = new Exam;
+        $exam->unit_id = $request->unit_id;
+        $exam->min_score = $request->min_score;
         $exam->save();
         return redirect()->route('exam.show', $exam->id);
     }
@@ -111,7 +127,7 @@ class ExamController extends Controller
 
             if ($attempt->score >= $exam->min_score) {
                 $user = new UsersController;
-                $unit = Unit::where('course_id', $exam->unit->course->id)->where('order','>',$exam->unit->order)->orderBy('order')->first();
+                $unit = Unit::where('course_id', $exam->unit->course->id)->where('order', '>', $exam->unit->order)->orderBy('order')->first();
                 $user->addUnit(auth()->id(), $unit);
             }
 
