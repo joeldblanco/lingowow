@@ -74,9 +74,10 @@
                                             @php
                                                 $unit_content = json_decode($content->content);
                                                 $mimeType = '';
-                                                if ($unit_content->type == 'media') {
+                                                if ($unit_content->type == 'media' && !empty($unit_content->media_url)) {
                                                     $mimeType = explode('/', Storage::mimeType($unit_content->media_url))[0];
                                                 }
+                                                // dd($content->content);
                                             @endphp
 
                                             @if ($unit_content->type == 'embeddable')

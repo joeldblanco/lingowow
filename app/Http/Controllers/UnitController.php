@@ -27,10 +27,10 @@ class UnitController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
+    public function create(Request $request)
     {
         if (auth()->user()->getRoleNames()->first() == "admin") {
-            $modules = Module::all()->orderBy('order');
+            $modules = new Collection([Module::find($request->module_id)]);
         } else {
             $modules = auth()->user()->modules->sortBy('order');
         }

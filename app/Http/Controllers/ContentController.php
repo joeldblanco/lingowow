@@ -157,13 +157,16 @@ class ContentController extends Controller
 
         if ($request->type == 'media') {
 
+            $file = $request->file('new_media_file');
+            $path_to_file = $file == null ? null : $request->file('new_media_file')->storeAs('public/content/files', time() . '.' . $file->getClientOriginalExtension());
+
             $content->content = json_encode([
                 'type' => $request->type,
-                'media_url' => 'public/' . $request->data,
+                'media_url' => $path_to_file,
             ]);
         }
+        $content->save();
 
-        $content->unit_id = $content->unit_id;
         return redirect()->route('units.show', ['unit' => $content->unit_id]);
     }
 

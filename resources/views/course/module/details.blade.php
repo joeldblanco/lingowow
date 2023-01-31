@@ -10,7 +10,7 @@
 
                     @role('admin')
                         <div class="w-full flex justify-end mb-6">
-                            <a href="{{ route('units.create') }}"
+                            <a href="{{ route('units.create', ['module_id' => $module->id]) }}"
                                 class="text-center leading-10 text-3xl font-bold text-white capitalize rounded-full bg-lw-blue w-10 mr-48 hover:bg-lw-light_blue">+</a>
                         </div>
                     @endrole
@@ -38,7 +38,8 @@
                         </thead>
                         <tbody>
                             @foreach ($module->units->sortBy('order') as $unit)
-                                <tr class="hover:bg-gray-200 unit bg-white" id="{{ $unit->id }}-{{ $unit->order }}">
+                                <tr class="hover:bg-gray-200 unit bg-white"
+                                    id="{{ $unit->id }}-{{ $unit->order }}">
                                     <td class="py-4 px-6 border-b border-gray-400">
                                         <div class="w-full text-gray-600">
                                             <img src="{{ Storage::url($unit->image) }}" alt="Unit Image">
@@ -80,8 +81,8 @@
             </div>
         </div>
     </div>
-    <script   src="https://cdn.jsdelivr.net/npm/@shopify/draggable@1.0.0-beta.11/lib/sortable.js"></script>
-    <script  >
+    <script src="https://cdn.jsdelivr.net/npm/@shopify/draggable@1.0.0-beta.11/lib/sortable.js"></script>
+    <script>
         const sortable = new Sortable.default(document.querySelectorAll('tbody'), {
             draggable: 'tr',
             handle: '.cursor-move',

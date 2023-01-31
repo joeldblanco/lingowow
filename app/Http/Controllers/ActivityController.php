@@ -24,11 +24,8 @@ class ActivityController extends Controller
      */
     public function index()
     {
-
-        
-
         // dd($activities->first()->unit->group->module->course);
-        $activities = Activity::Where('status', '1')->get();
+        $activities = Activity::where('status', '1')->get();
         return view('activities.index', compact('activities'));
     }
 
@@ -254,12 +251,13 @@ class ActivityController extends Controller
             $detalles[] = $value->detalles->first();
         }
 
-        
+
 
         return view('course.module.unit.activity.show', compact('id', 'activity', 'detalles'), compact('activity_contents'));
     }
 
-    public function edit_activity($id){
+    public function edit_activity($id)
+    {
         // dd($id);
         // return view('livewire.activity-create');
         $activity = Activity::find($id);
@@ -294,23 +292,23 @@ class ActivityController extends Controller
     public function update(Request $request, $activity)
     {
         //
-        
-        
+
+
         $data = json_decode($request->data, true);
         $unit = $request->unit;
         $file = $request->files;
         // dd($data);
         $ruta = "";
-        
+
         foreach ($file as $key => $value) {
-            
+
             if (explode("-", $key)[0] == "inputImage") {
                 $ruta = "activity-cards";
             }
             if (explode("-", $key)[0] == "inputAudio") {
                 $ruta = "activity-dictation";
             }
-            
+
             if ($ruta != "") {
                 foreach ($value as $keyFile => $valueFile) {
                     $id = explode("-", $key)[1];
@@ -319,32 +317,32 @@ class ActivityController extends Controller
                     // dump($id . "-" . $keyFile . "-" . $valueFile->getClientOriginalName(), $ruta, explode("-", $key)[0]);
                 }
             }
-            
+
             $ruta = "";
         }
-        
+
         // dd($request->files, $unit, $data);
-        
+
         $activity = Activity::find($activity);
         $activity->name = $request->activity;
-        $activity->unit_id = $unit; 
+        $activity->unit_id = $unit;
         $activity->save();
-        
+
         // $activity = Activity::all()->last();
 
-        
+
         foreach ($data as $key => $value) {
             // dd($value);
             // dd(json_encode(explode("-", $value['words'])));
             if ($value["type"] == 'words') {
                 $content = ContentOfAct::find($value['id']);
-                $content->unit_id = $unit; 
+                $content->unit_id = $unit;
                 $content->titulo = $value["activity_name"];
                 $content->type = $value["type"];
                 $content->save();
-                
+
                 // $content->activities()->attach($activity->id);
-                
+
                 $details = DetallesWords::Where('content_id', $value['id'])->get()->first();
                 // $details->content_id = $content->id;
                 if ($value['mode'] != 'find-the-words') {
@@ -356,7 +354,7 @@ class ActivityController extends Controller
 
                 // dd($request, $activity, $value, $details);
             }
-            
+
             if ($value['type'] == 'cards') {
                 $cards = $value['cards-images'];
                 $data_cards = explode(',', $cards);
@@ -407,8 +405,6 @@ class ActivityController extends Controller
         // $activities = Activity::Where('status', '1')->get();
         // return view('activities.index', compact('activities'));
         return redirect()->route('activities.index');
-        
-
     }
 
     /**
@@ -430,6 +426,5 @@ class ActivityController extends Controller
 
         $activities = Activity::all()->where('status', '=', '1');
         return redirect()->back();
-
     }
 }

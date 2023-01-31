@@ -187,9 +187,11 @@ class CourseController extends Controller
      * @param  \App\Models\Course  $course
      * @return \Illuminate\Http\Response
      */
-    public function edit(Course $course)
+    public function edit($course)
     {
-        //
+        $course = Course::findOrFail($course);
+        $categories = Category::all();
+        return view('course.edit', compact('course', 'categories'));
     }
 
     /**
