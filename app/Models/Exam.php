@@ -9,6 +9,11 @@ class Exam extends Model
 {
     use HasFactory;
 
+    protected $fillable = [
+        'unit_id',
+        'min_score',
+    ];
+
     /**
      * The questions that belong to the exam.
      */

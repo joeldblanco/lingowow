@@ -163,18 +163,23 @@
                                     <a href="{{route('questions.show',[$exam_id,$question->id])}}" class="text-gray-600 font-bold py-1 px-3 rounded text-xs bg-blue-100 hover:bg-blue-500 hover:text-white">View</a>
                                 </td> --}}
                                 <td class="py-4 px-6 border-b border-gray-400 text-center">
-                                    <a href="{{ route('questions.edit', [$exam_id, $question->id]) }}"
+                                    <a href="{{ route('questions.edit', ['exam_id' => $exam_id, 'question' => $question->id, 'question_id' => $question->id]) }}"
                                         class="text-gray-600 font-bold py-1 px-3 rounded text-xs bg-blue-100 hover:bg-blue-500 hover:text-white">Edit</a>
                                 </td>
                                 <td class="py-4 px-6 border-b border-gray-400 text-center">
-                                    <a href="{{ route('questions.destroy', [$exam_id, $question->id]) }}"
-                                        class="text-gray-600 font-bold py-1 px-3 rounded text-xs bg-red-100 hover:bg-red-500 hover:text-white">Delete</a>
+                                    <form action="{{ route('questions.destroy', $question->id) }}" method="POST">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit"
+                                            class="text-gray-600 font-bold py-1 px-3 rounded text-xs bg-red-100 hover:bg-red-500 hover:text-white">Delete</button>
+                                    </form>
                                 </td>
                             </tr>
                         @endforeach
                     @else
                         <tr>
-                            <td colspan="8" class="py-4 px-6 border-b border-gray-400 text-center">There are no questions</td>
+                            <td colspan="8" class="py-4 px-6 border-b border-gray-400 text-center">There are no
+                                questions</td>
                         </tr>
                     @endif
                 </tbody>

@@ -2,10 +2,10 @@
     <div class="bg-white font-sans" x-data="{ import_create: true }" x-cloak>
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="p-6 sm:px-20 bg-white border-b border-gray-200">
-                <div class="flex w-full space-x-12 justify-evenly" x-show="import_create">
-                    <a href="{{ route('questions.create', 'import') }}"
+                {{-- <div class="flex w-full space-x-12 justify-evenly" x-show="import_create">
+                    <a href="{{ route('questions.create', ['method' => 'import']) }}"
                         class="w-52 text-center border rounded-md p-4">Import</a>
-                    <a href="{{ route('questions.create', 'create') }}"
+                    <a href="{{ route('questions.create', ['method' => 'create']) }}"
                         class="w-52 text-center border rounded-md p-4">Create</a>
                 </div>
                 @php
@@ -69,8 +69,48 @@
                             </tr>
                         @endif
                     </tbody>
-                </table>
+                </table> --}}
+
+                <form action="{{ route('exam.store') }}" enctype="multipart/form-data" method="POST" id="exam-form">
+                    @csrf
+                    <div class="w-full h-full flex items-center justify-center">
+                        <div class="leading-loose">
+                            <div id="create-questions-form"
+                                class="max-w-xl m-4 p-10 bg-white rounded shadow-2xl space-y-1">
+                                <div class="flex justify-between border-b mb-5 py-4 text-3xl">
+                                    <h1 class="">New Exam</h1>
+                                    <i class="fas fa-times cursor-pointer text-xl"></i>
+                                </div>
+                                <div class="flex flex-col">
+                                    <label for="min_score" class="text-sm">Min Score</label>
+                                    <input type="number" name="min_score" id="min_score" value="min_score"
+                                        class="w-1/2 px-2 py-2 text-gray-700 bg-gray-200 rounded" placeholder="0"
+                                        min="0" max="100" required>
+                                </div>
+                                <select id="unit_id" class="w-full px-2 py-2 text-gray-700 bg-gray-200 rounded"
+                                    name="unit_id">
+                                    <option selected disabled hidden required>Unit</option>
+                                    @foreach ($units as $unit)
+                                        <option value="{{ $unit->id }}">{{ $unit->name }}</option>
+                                    @endforeach
+                                </select>
+                                {{-- <textarea class="w-full px-2 py-2 text-gray-700 bg-gray-200 rounded" placeholder="Description" style="resize: none"
+                                    rows="4" name="question-description" required></textarea>
+                                <div id="options"> --}}
+
+                                <div class="flex pt-4 justify-end">
+                                    <button
+                                        class="px-4 py-1 text-white font-light tracking-wider bg-gray-900 rounded">Create</button>
+                                </div>
+
+                            </div>
+
+                        </div>
+                    </div>
             </div>
+            </form>
+
         </div>
+    </div>
     </div>
 </x-app-layout>

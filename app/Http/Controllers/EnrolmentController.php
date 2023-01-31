@@ -57,14 +57,16 @@ class EnrolmentController extends Controller
         $course = Course::find($request->course_id);
 
         if ($course->categories->pluck('name')->contains("Synchronous")) {
+
             $request->validate([
                 'teacher_id' => 'required|numeric|exists:App\Models\User,id',
                 'student_id' => 'numeric|exists:App\Models\User,id',
-                'plan' => 'required|numeric',
+                'plan' => 'numeric',
             ]);
 
             if ($request->student_id == null) {
                 $this->store($request);
+                return redirect()->route('enrolments.index');
             } else {
                 $selected_teacher = $request->teacher_id;
                 $student_id = $request->student_id;
