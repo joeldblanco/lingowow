@@ -73,7 +73,7 @@
     <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
     <script src="{{ asset('js/jquery.datetimepicker.full.min.js') }}"></script>
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
-    <script src="https://cdn.tiny.cloud/1/xmua6246us3vdfealnkl1yf7ja0zafr4cttuehqtyz7nen6o/tinymce/5/tinymce.min.js"
+    <script src="https://cdn.tiny.cloud/1/jy6nhm56ocupzi0w2x4amhox5z3e948f2838lr8uuyxovpck/tinymce/5/tinymce.min.js"
         referrerpolicy="origin"></script>
     <script src="{{ asset('js/wordfind.js') }}"></script>
     <script src="{{ asset('js/wordfindgame.js') }}"></script>

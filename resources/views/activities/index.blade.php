@@ -94,7 +94,7 @@
                 </table>
 
                 <div class="grid place-content-center">
-                    @livewire('modal-users-menu')
+                    <livewire:modal-users-menu />
                 </div>
             </div>
         </div>

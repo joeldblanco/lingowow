@@ -17,10 +17,10 @@
                                     class="text-center leading-10 text-3xl font-bold text-white capitalize rounded-full bg-lw-blue w-10 mr-10 hover:bg-blue-800">+</button>
                                 <div x-show="unitOrExam" @click.outside="unitOrExam = false"
                                     class="right-4 top-8 absolute flex flex-col border border-gray-400 rounded-xl divide-y divide-opacity-100 divide-gray-300 bg-white">
-                                    <a href="{{ route('units.create') }}" class="hover:bg-gray-200 p-2 rounded-xl"
-                                        @click="unitOrExam = false">Unit</a>
-                                    <a href="{{ route('exam.create') }}" class="hover:bg-gray-200 p-2 rounded-xl"
-                                        @click="unitOrExam = false">Exam</a>
+                                    <a href="{{ route('units.create', ['module_id' => $module->id]) }}"
+                                        class="hover:bg-gray-200 p-2 rounded-xl" @click="unitOrExam = false">Unit</a>
+                                    <a href="{{ route('exam.create', ['module_id' => $module->id]) }}"
+                                        class="hover:bg-gray-200 p-2 rounded-xl" @click="unitOrExam = false">Exam</a>
                                 </div>
                             </div>
                         @endhasanyrole
@@ -36,10 +36,10 @@
                                     class="text-center leading-10 text-3xl font-bold text-white capitalize rounded-full bg-lw-blue w-10 mr-10 hover:bg-blue-800">+</button>
                                 <div x-show="unitOrExam" @click.outside="unitOrExam = false"
                                     class="right-4 top-8 absolute flex flex-col border border-gray-400 rounded-xl divide-y divide-opacity-100 divide-gray-300 bg-white">
-                                    <a href="{{ route('units.create') }}" class="hover:bg-gray-200 p-2 rounded-xl"
-                                        @click="unitOrExam = false">Unit</a>
-                                    <a href="{{ route('exam.create') }}" class="hover:bg-gray-200 p-2 rounded-xl"
-                                        @click="unitOrExam = false">Exam</a>
+                                    <a href="{{ route('units.create', ['module_id' => $module->id]) }}"
+                                        class="hover:bg-gray-200 p-2 rounded-xl" @click="unitOrExam = false">Unit</a>
+                                    <a href="{{ route('exam.create', ['module_id' => $module->id]) }}"
+                                        class="hover:bg-gray-200 p-2 rounded-xl" @click="unitOrExam = false">Exam</a>
                                 </div>
                             </div>
                         @endrole

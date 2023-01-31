@@ -22,7 +22,7 @@
         @endif
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="p-6 sm:px-20 bg-white border-b border-gray-200">
-                <form action="{{ route('question.update', [$exam_id, $question->id]) }}" enctype="multipart/form-data"
+                <form action="{{ route('questions.update', [$exam_id, $question->id]) }}" enctype="multipart/form-data"
                     method="POST" id="exam-form">
                     <div class="w-full h-full flex items-center justify-center">
                         <div class="leading-loose">
@@ -43,22 +43,23 @@
                                 <select id="question-type" class="w-full px-2 py-2 text-gray-700 bg-gray-200 rounded"
                                     name="question-type" disabled>
                                     <option disabled hidden required>Type</option>
-                                    <option value="info" @if ($question->type == 'info') selected @endif>Info</option>
+                                    <option value="info" @if ($question->type == 'info') selected @endif>Info
+                                    </option>
                                     <option value="multiple-choice" @if ($question->type == 'multiple-choice') selected @endif>
                                         Multiple choice</option>
                                     <option value="essay" @if ($question->type == 'essay') selected @endif>Essay
                                     </option>
                                 </select>
                                 <select id="question-type" class="hidden" name="question-type">
-                                    <option value="info" @if ($question->type == 'info') selected @endif>Info</option>
+                                    <option value="info" @if ($question->type == 'info') selected @endif>Info
+                                    </option>
                                     <option value="multiple-choice" @if ($question->type == 'multiple-choice') selected @endif>
                                         Multiple choice</option>
                                     <option value="essay" @if ($question->type == 'essay') selected @endif>Essay
                                     </option>
                                 </select>
                                 <textarea id="question-description" class="w-full px-2 py-2 text-gray-700 bg-gray-200 rounded" placeholder="Description"
-                                    style="resize: none" rows="4" name="question-description"
-                                    required>{{ $question->description }}</textarea>
+                                    style="resize: none" rows="4" name="question-description" required>{{ $question->description }}</textarea>
                                 @if ($question->type == 'multiple-choice')
                                     @php
                                         $data = json_decode($question->data, 1);
@@ -67,10 +68,11 @@
                                     <div id="options">
                                         @for ($i = 1; $i <= 3; $i++)
                                             <div class="flex flex-row space-x-4 my-3 items-center">
-                                                <input type="radio" id="option" value="1" name="selected-option"
-                                                    required @if ($options['selected-option'] == $i) checked @endif>
+                                                <input type="radio" id="option" value="1"
+                                                    name="selected-option" required
+                                                    @if (!empty($options['selected-option']) && $options['selected-option'] == $i) checked @endif>
                                                 <input type="text" id="option-text"
-                                                    value="{{ $options['option-text-' . $i] }}"
+                                                    value="{{ !empty($options['option-text-' . $i]) &&  $options['option-text-' . $i] }}"
                                                     placeholder="Option {{ $i }}"
                                                     name="option-text-{{ $i }}"
                                                     class="w-full px-2 py-2 text-gray-700 bg-gray-200 rounded" required>
@@ -82,10 +84,10 @@
                                     </div>
                                 @endif
                                 <div class="flex pt-4 justify-end space-x-2">
-                                    <a href="{{ route('question.destroy', [$exam_id, $question->id]) }}"
-                                        class="px-4 py-1 text-white font-light tracking-wider bg-red-700 rounded">Delete</a>
+                                    <a href="{{ url()->previous() }}"
+                                        class="px-4 py-1 text-white font-light tracking-wider bg-gray-400 rounded">Cancel</a>
                                     <button
-                                        class="px-4 py-1 text-white font-light tracking-wider bg-gray-900 rounded">Save</button>
+                                        class="px-4 py-1 text-white font-light tracking-wider bg-green-900 rounded">Save</button>
                                 </div>
                             </div>
                         </div>
@@ -95,13 +97,13 @@
             </div>
         </div>
     </div>
-    <script  >
+    <script>
         tinymce.init({
             selector: '#question-description',
             plugins: 'wordcount',
         });
     </script>
-    <script  >
+    <script>
         $("#question-type").change(function() {
             var option = $("#question-type").find(":selected").text();
             $('#options').empty();

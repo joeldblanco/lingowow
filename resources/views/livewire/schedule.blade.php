@@ -380,7 +380,7 @@
                         <div class="flex items-center flex-col">
                             <button onclick="toggleCellBlock()" @click=" edit = true, editBtn = false "
                                 wire:click="edit()"
-                                class="inline-block bg-green-800 text-white px-4 py-2 my-5 rounded hover:bg-green-900 hover:text-white hover:no-underline"
+                                class="teachers-edit-schedule-button inline-block bg-green-800 text-white px-4 py-2 my-5 rounded hover:bg-green-900 hover:text-white hover:no-underline"
                                 x-show="editBtn" x-transition>Edit Schedule
                             </button>
                         </div>
