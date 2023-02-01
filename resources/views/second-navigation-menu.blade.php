@@ -49,6 +49,12 @@
             'parent_link' => request()->is('admin', 'admin/*'),
         ],
         [
+            'name' => 'Courses',
+            'route' => route('admin.courses.index'),
+            'status' => request()->routeIs('admin.courses.index'),
+            'parent_link' => request()->is('admin', 'admin/*'),
+        ],
+        [
             'name' => 'Grades',
             'route' => route('gradings.index'),
             'status' => request()->routeIs('gradings.index'),
@@ -70,6 +76,18 @@
             'name' => 'Products',
             'route' => route('products.index'),
             'status' => request()->routeIs('products.index'),
+            'parent_link' => request()->is('admin', 'admin/*'),
+        ],
+        [
+            'name' => 'Categories',
+            'route' => route('categories.index'),
+            'status' => request()->routeIs('categories.index'),
+            'parent_link' => request()->is('admin', 'admin/*'),
+        ],
+        [
+            'name' => 'Features',
+            'route' => route('features.index'),
+            'status' => request()->routeIs('features.index'),
             'parent_link' => request()->is('admin', 'admin/*'),
         ],
         [

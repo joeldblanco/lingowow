@@ -46,7 +46,7 @@
                                 <select name="modality" id="modality" required
                                     class="w-full rounded-md hover:border-gray-600 p-3 text-gray-600 @if ($errors->has('modality')) border-red-600 @else border-gray-300 @endif">
                                     <option value="" selected disabled hidden>Select a modality</option>
-                                    @foreach (['Synchronous', 'Asynchronous'] as $modality)
+                                    @foreach (['synchronous', 'asynchronous'] as $modality)
                                         //TO-DO: Get modalities from DB
                                         <option value="{{ $modality }}">
                                             {{ $modality }}

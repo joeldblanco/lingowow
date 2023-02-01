@@ -208,7 +208,7 @@ class EnrolmentController extends Controller
                 // $student->schedules->where('enrolment_id', $student->enrolments->first()->id)->first()->delete();
                 $student->enrolments->first()->delete();
                 if ($student->schedules->first() != null) {
-                    $student->schedules->first()->next_schedule = null;
+                    // $student->schedules->first()->next_schedule = null;
                     $student->schedules->first()->save();
                     $student->schedules->first()->delete();
                 }
