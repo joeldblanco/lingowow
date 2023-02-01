@@ -99,7 +99,7 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script type="text/javascript" src="{{ asset('js/pricingTable.js') }}" defer></script>
 
-    @role('guest')
+    {{-- @role('guest')
         <x-shepherd-tour tourName="guests/pricing-table" role="guest" />
-    @endrole
+    @endrole  --}}
 </div>
