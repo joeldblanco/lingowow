@@ -10,8 +10,10 @@ use App\Mail\InvoicePaid;
 use App\Models\Course;
 use App\Models\Enrolment;
 use App\Models\Module;
+use App\Models\Preselection;
 use App\Models\Unit;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -71,7 +73,6 @@ class StoreSelfEnrolment implements ShouldQueue
             $invoice->paid = 1;
             $invoice->user_id = $student->id;
             $invoice->save();
-            Mail::to($student)->send(new InvoicePaid($invoice));
 
             collect($cart['items'])->each(function ($product) use ($invoice) {
                 $item = new Item();
@@ -82,6 +83,10 @@ class StoreSelfEnrolment implements ShouldQueue
 
                 $item->save();
             });
+
+            Mail::to($student)->send(new InvoicePaid($invoice));
+
+            session(['invoice_id' => $invoice->id]);
         }
 
         $course_id = session('selected_course');
@@ -94,11 +99,34 @@ class StoreSelfEnrolment implements ShouldQueue
         if ($modality_course == "synchronous" || $modality_course == "exam") {
             $teacher = User::find(session('teacher_id'));
 
-            //CREATING STUDENT'S ENROLMENT (OR UPDATING IT, IN CASE IT ALREADY EXISTS BUT IS SOFTDELETED)//
-            $enrolment = Enrolment::withTrashed()->updateOrCreate(
-                ['student_id' => $student->id, 'course_id' => $course_id],
-                ['teacher_id' => $teacher->id, 'deleted_at' => NULL]
-            );
+            $enrolment = Enrolment::where('student_id', $student->id)
+                ->withTrashed()
+                ->first();
+
+            if (!empty($enrolment)) {
+                $deleted = $enrolment->trashed();
+            }
+
+            if ($enrolment && !$deleted) {
+                $current_period = json_decode(DB::table('metadata')->where('key', '=', 'current_period')->first()->value);
+                $now = Carbon::now();
+                $current_period_end = new Carbon($current_period->end_date);
+
+                if ($enrolment->course_id == session('selected_course') && ($now->greaterThan($current_period_end->copy()->subDays(7))) && empty($enrolment->preselection)) {
+                    $preselection = Preselection::withTrashed()->updateOrCreate(
+                        ['enrolment_id' => $enrolment->id],
+                        ['teacher_id' => $teacher->id, 'schedule' => json_decode(session('user_schedule')), 'deleted_at' => NULL]
+                    );
+
+                    return redirect()->route('invoices.show', $invoice->id);
+                }
+            } else {
+                //CREATING STUDENT'S ENROLMENT (OR UPDATING IT, IN CASE IT ALREADY EXISTS BUT IS SOFTDELETED)//
+                $enrolment = Enrolment::withTrashed()->updateOrCreate(
+                    ['student_id' => $student->id, 'course_id' => $course_id],
+                    ['teacher_id' => $teacher->id, 'deleted_at' => NULL]
+                );
+            }
 
             // SchedulingCalendarController::store($student->id, $enrolment);
             dispatch(new CreateSchedule($student->id, $enrolment->id));
@@ -156,7 +184,9 @@ class StoreSelfEnrolment implements ShouldQueue
                 } else {
                     $unit_id = $unit->unit_id;
                 }
+
                 $current_unit = Unit::find(DB::table('unit_user')->select('unit_id')->where('user_id', $student->id)->first()->unit_id);
+
                 if (empty($current_unit)) {
                     DB::table('unit_user')->insertOrIgnore([
                         ['unit_id' => $unit_id, 'user_id' => $student->id]

@@ -1,4 +1,4 @@
-console.log("Funcionando");
+// console.log("Funcionando");
 function saveSchedulee(plan, routeTo, role = 2){ // AQUI TENGO QUE ELIMINAR LA ULTIMA E EN EL NOMBRE DE LA FUNCION POR SI SE ME OLVIDA.
     
     var cells = $(".selected, .selectable .ui-selected");
@@ -281,7 +281,7 @@ let identificadorIntervaloDeTiempo;
 let listPastOfSchedules = [];
 let listPastOfSchedulesExam = [];
 
-console.log("prueba de setInterval");
+// console.log("prueba de setInterval");
 repetirCadaMinuto();
 mandarMensaje();
 function repetirCadaMinuto() {
@@ -290,7 +290,7 @@ function repetirCadaMinuto() {
 }
 
 function mandarMensaje() {
-    console.log("Ha pasado 1 minuto.");
+    // console.log("Ha pasado 1 minuto.");
     $cells = $(".selected");
     Livewire.emitTo('schedule', 'findReserves');
     
