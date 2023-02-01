@@ -75,6 +75,9 @@
                 @endif
                 {{-- <livewire:scheduling-calendar plan="{{$plan}}" /> --}}
 
+                @role('guest')
+                    <x-shepherd-tour tourName="guests/teachers-carousel" role="guest" />
+                @endrole
 
             </div>
         </div>

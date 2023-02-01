@@ -120,7 +120,7 @@
         }
     </script>
 
-    @role('guest')
+    {{-- @role('guest')
         <x-shepherd-tour tourName="guests/courses-carousel" role="guest" />
-    @endrole
+    @endrole --}}
 </div>

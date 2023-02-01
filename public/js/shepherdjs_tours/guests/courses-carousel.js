@@ -33,14 +33,62 @@ tour.addSteps([
         },
         buttons: [
             {
-                text: 'Great!',
-                action: tour.complete
+                text: 'Next!',
+                action: tour.next
             }
         ],
     },
+    {
+        id: 'pricing-table',
+        text: 'Here you will see the plans and prices for the courses you select. If the course you selected is an asynchronous course or a test, you will only see one card with the price.',
+        attachTo: {
+            element: '.pricing-table',
+            on: 'top'
+        },
+        buttons: [
+            {
+                text: 'Next',
+                action: tour.next
+            }
+        ]
+    },
+    {
+        id: 'select-button',
+        text: 'To select a plan, click on the "Select" button below.',
+        attachTo: {
+            element: '.select-button',
+            on: 'top'
+        },
+        buttons: [
+            {
+                text: 'Next',
+                action: tour.next
+            }
+        ],
+    },
+    {
+        id: 'courses-link',
+        text: 'Once you click the select button on the plan you prefer you will be able to select the teacher and schedule for your classes.',
+        // attachTo: {
+        //     element: '.courses-link',
+        //     on: 'bottom'
+        // },
+        buttons: [
+            {
+                text: 'Got it!',
+                action: tour.complete
+            }
+        ],
+        canClickTarget: false
+    }
 ]);
 
-tour.start();
+function start() {
+    tour.start()
+    clearTimeout(timerId)
+}
+
+let timerId = setTimeout(start, 1000);
 
 tour.on('complete', () => {
     $.ajax({

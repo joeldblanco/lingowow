@@ -1,5 +1,5 @@
 <div>
-    <div>
+    <div class="">
         <link rel="stylesheet" type="text/css" href="{{ asset('css/jquery.datetimepicker.min.css') }}">
 
         <a id="link-schedule" href="#link-s"></a>
@@ -12,7 +12,7 @@
 
 
         {{-- @if ($role != 'admin') --}}
-        <div class="container mx-auto mt-10 text-gray-600" x-data="{ editBtn: true, edit: false, showModal1: false, showModal2: false, showModal3: false, showModalAbsence: @entangle('showModalAbsence'), event: {{ $event }}, loadingState: false }" x-cloak>
+        <div class="container mx-auto mt-10 text-gray-600 table-tour-seccion" x-data="{ editBtn: true, edit: false, showModal1: false, showModal2: false, showModal3: false, showModalAbsence: @entangle('showModalAbsence'), event: {{ $event }}, loadingState: false }" x-cloak>
             <div class="wrapper bg-white rounded w-full">
                 {{-- <p x-show="event">Event</p> --}}
 
@@ -42,7 +42,7 @@
                             <!-- INICIO DEL HORARIO -->
                             <div>
 
-                                <table class="border" style="width: 100%">
+                                <table  class="border table-tour" style="width: 100%">
                                     <!--fila de los titulos-->
                                     <tr>
                                         <th class="width border">UTC</th>
@@ -805,7 +805,7 @@
 
             </div>
 
-            <div class="mt-10 grid grid-rows-2 grid-flow-col gap-4 justify-center ...">
+            {{-- <div class="mt-10 grid grid-rows-2 grid-flow-col gap-4 justify-center ...">
                 <div class="flex space-x-3 items-center">
                     <input class="@error('message') border-red-500 @enderror" type="checkbox" name="consent_checkbox"
                         id="consent_checkbox" required>
@@ -819,7 +819,7 @@
                     <button class="bg-blue-500 rounded-lg text-white font-bold px-6 py-1 my-3 shadow-md"
                         onclick="saveAbsence({{ $id_class }},'classes.update')">Submit</button>
                 </div>
-            </div>
+            </div> --}}
 
             @endif
 
