@@ -10,7 +10,7 @@
                     $users = \App\User::select('first_name', 'last_name', 'id')->get();
                     $affected_students = session('affected_students');
                 @endphp
-
+                
                 @if (session('message'))
 
                     <div x-data="{ showModal1: true }">

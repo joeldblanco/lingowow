@@ -440,7 +440,7 @@ class SchedulingCalendarController extends Controller
                 ]);
 
                 // dd("hola que tal", $teachers, $teachers_available, count($teachers_available), rand(0, count($teachers_available) - 1), session()->all(), $cells);
-
+                // dd(session()->exists('enrolment_type'), session('enrolment_type') == "manual_enrolment");
                 if (session()->exists('enrolment_type') && session('enrolment_type') == "manual_enrolment") {
                     // dd(session()->all());
                     $student = User::find(session('student_id'));

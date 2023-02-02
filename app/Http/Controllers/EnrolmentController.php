@@ -193,28 +193,30 @@ class EnrolmentController extends Controller
      */
     public function destroy(Enrolment $enrolment)
     {
-        $user = User::find($enrolment->student_id);
+        $student = User::find($enrolment->student_id);
 
-        if ($user->roles[0]->name == 'student') {
-            $user->studentClasses->each(function ($class) {
+        if (!empty($student)) {
+            // if ($student->roles[0]->name == 'student') {
+            $student->studentClasses->each(function ($class) {
                 // $deleted_class = $class->delete();
                 // dd($class);
                 if ($class->meeting != null) (new MeetingController)->destroy($class->meeting);
                 $class->delete();
             });
 
-            if ($user->enrolments->count()) {
-                // $user->schedules->where('enrolment_id', $user->enrolments->first()->id)->first()->delete();
-                $user->enrolments->first()->delete();
-                if ($user->schedules->first() != null) {
-                    $user->schedules->first()->next_schedule = null;
-                    $user->schedules->first()->save();
-                    $user->schedules->first()->delete();
+            if ($student->enrolments->count()) {
+                // $student->schedules->where('enrolment_id', $student->enrolments->first()->id)->first()->delete();
+                $student->enrolments->first()->delete();
+                if ($student->schedules->first() != null) {
+                    $student->schedules->first()->next_schedule = null;
+                    $student->schedules->first()->save();
+                    $student->schedules->first()->delete();
                 }
             }
 
-            $user->removeRole('student');
-            $user->assignRole('guest');
+            $student->removeRole('student');
+            $student->assignRole('guest');
+            // }
         }
 
         $enrolment->delete();

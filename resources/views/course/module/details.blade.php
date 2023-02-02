@@ -50,7 +50,7 @@
                                             <div class="w-full text-gray-600">
                                                 <p class="text-xl font-bold">{{ $unit->name }}</p>
                                             </div>
-                                            <div class="flex justify-end items-center">
+                                            <div class="flex justify-end items-center options-details">
                                                 <a href="{{ route('units.edit', $unit->id) }}" title="Edit"><i
                                                         class="fas fa-pen m-1"></i></a>
                                                 <a href="{{ route('units.details', $unit->id) }}" title="Details"><i
@@ -63,7 +63,7 @@
                                                 </form>
 
                                                 <button title="Reorder" class="ml-8 cursor-move">
-                                                    <i class="fas fa-grip-lines"></i>
+                                                    <i class="fas fa-grip-lines reorder-button reorder-unit"></i>
                                                 </button>
                                             </div>
                                         </div>
@@ -73,13 +73,16 @@
                         </tbody>
                     </table>
                     <div class="flex justify-end my-2">
-                        <button class="mt-4 px-4 py-2 bg-lw-blue rounded-lg text-white font-bold mr-48"
+                        <button class="mt-4 px-4 py-2 bg-lw-blue rounded-lg text-white font-bold mr-48 reorder-unit-save"
                             onclick="sendRequest()">Save</button>
                     </div>
                 </div>
 
             </div>
         </div>
+        @role('teacher')
+            <x-shepherd-tour tourName="teachers/reorder_unit" role="teacher" />
+        @endrole
     </div>
     <script src="https://cdn.jsdelivr.net/npm/@shopify/draggable@1.0.0-beta.11/lib/sortable.js"></script>
     <script>
