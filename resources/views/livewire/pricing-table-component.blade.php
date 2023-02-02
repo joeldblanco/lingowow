@@ -78,7 +78,7 @@
         @endforeach
         {{-- <button @click="open=true; setTimeout(() => open = false, 3000)" class="inline-block bg-blue-800 text-white px-6 py-4 rounded-lg hover:bg-blue-900 hover:text-white hover:no-underline">Add to Cart</button> --}}
     </div>
-    <div x-show="open; setTimeout(() => open = false, 3000)" x-transition.duration.100ms @click.outside="open=false"
+    <div x-show="open; setTimeout(() => open = false, 5000)" x-transition.duration.100ms @click.outside="open=false"
         class="flex justify-center fixed bottom-5 left-5 z-20">
         <div
             class="w-full px-6 py-3 shadow-2xl flex flex-col items-center border-t sm:w-auto sm:m-4 sm:rounded-lg sm:flex-row sm:border bg-{{ $popup_color }}-600 border-{{ $popup_color }}-600 text-white">

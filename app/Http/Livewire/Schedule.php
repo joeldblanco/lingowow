@@ -80,7 +80,7 @@ class Schedule extends Component
             ['teacher_id' => NULL, 'selected_schedule' => NULL, 'type' => ""]
             // ['type' => 'exam']
         );
-        
+
         session(['schedule_reserve' => []]);
         if (!is_null($course_id)) {
             $this->course = Course::find($course_id);
@@ -156,9 +156,9 @@ class Schedule extends Component
         $this->now = new Carbon();
         // dd(new CarbonPeriod($this->now, $period_end_c));
         foreach (new CarbonPeriod($this->now, $period_end_c) as $key => $date) {
-                
-                // $this->days_rest++;
-                $this->days_rest[] = $date->isoFormat('d');
+
+            // $this->days_rest++;
+            $this->days_rest[] = $date->isoFormat('d');
         }
 
         if ($mode == "one" || $mode == "absence") {
@@ -225,8 +225,8 @@ class Schedule extends Component
             $this->students_schedules = [];
             foreach ($students as $student) {
                 $this->students_schedules[] = $student->schedules->first()->selected_schedule;
-                if ($student->schedules->first()->next_schedule != null) {
-                    array_push($next_students_schedule, $student->schedules->first()->next_schedule);
+                if (!empty($student->enrolments->first()->preselection)) {
+                    array_push($next_students_schedule, $student->enrolments->first()->preselection->schedule);
                 }
             }
             $this->students_schedules = array_filter($this->students_schedules);
@@ -364,7 +364,7 @@ class Schedule extends Component
         }
         // dd($this->abcense_classes);
     }
-    
+
     public function loadStudentSchedule($user_id)
     {
         $user = User::find($user_id);
@@ -380,12 +380,10 @@ class Schedule extends Component
                 $this->schedule_user[$key] = implode('-', $value);
             }
 
-            $this->next_schedule = ModelsSchedule::select('next_schedule')
-                ->where('enrolment_id', $enrolment->id)
-                ->first();
+            $this->next_schedule = $enrolment->preselection;
 
-            if ($this->next_schedule != null) {
-                $this->next_schedule = $this->next_schedule->next_schedule;
+            if (!empty($this->next_schedule)) {
+                $this->next_schedule = $this->next_schedule->schedule;
             } else {
                 $this->next_schedule = [];
             }
@@ -425,8 +423,8 @@ class Schedule extends Component
             foreach ($this->students as $student) {
                 // dd($student->schedules->first());
                 $this->students_schedules[] = $student->schedules->first()->selected_schedule;
-                if ($student->schedules->first()->next_schedule != null) {
-                    array_push($next_students_schedule, $student->schedules->first()->next_schedule);
+                if (!empty($student->enrolments->first()->preselection)) {
+                    array_push($next_students_schedule, $student->enrolments->first()->preselection->schedule);
                 }
             }
 
@@ -486,7 +484,7 @@ class Schedule extends Component
                 }
             }
             foreach ($days as $v) {
-                if (explode("-",$buscado)[1] === $v) {
+                if (explode("-", $buscado)[1] === $v) {
                     $j++;
                 }
             }
@@ -494,7 +492,7 @@ class Schedule extends Component
         }
         if ($i > 0) {
             // if ($i < ($days / 7)) {
-            if( $i < $j ){
+            if ($i < $j) {
                 return false;
             } else {
                 return true;
@@ -527,35 +525,36 @@ class Schedule extends Component
         $this->showModalAbsence = true;
     }
 
-    public function schedulesReserves($mode = "schedule"){
+    public function schedulesReserves($mode = "schedule")
+    {
 
         $schedules_exam_not_free = [];
         $schedules_reserve = [];
         $schedules_exam = [];
-        $schedules = []; 
+        $schedules = [];
         $classes = [];
         $current_period = ApportionmentController::currentPeriod();
         $schedules_exam_reserve = [];
 
         $teacher_id = null;
 
-        if($this->teacher_id != null){
+        if ($this->teacher_id != null) {
             $teacher_id = $this->teacher_id;
-        }else{
+        } else {
             $teacher_id = session('teacher_id');
         }
         // dd($teacher_id);
         $schedules = ScheduleReserve::all()->where('teacher_id', $teacher_id)->where('type', 'schedule')->whereNotNull('selected_schedule')->pluck('selected_schedule');
         $schedules_exam = ScheduleReserve::all()->where('teacher_id', $teacher_id)->where('type', 'exam')->whereNotNull('selected_schedule')->pluck('selected_schedule');
         $classes = User::find($teacher_id)->teacherClasses()->where('status', 1)->whereDate('start_date', '>=', $current_period[0])->orderBy('start_date', 'asc')->get()->pluck('start_date');
-        
-        foreach($schedules as $schedule){
+
+        foreach ($schedules as $schedule) {
             $schedules_reserve = array_merge($schedules_reserve, json_decode($schedule));
         }
-        
-        if($mode == "edit"){
-            
-            foreach($schedules_exam as $schedule){
+
+        if ($mode == "edit") {
+
+            foreach ($schedules_exam as $schedule) {
                 // dd(json_decode($schedule)[0][0]);
                 $schedules_exam_reserve = array_merge($schedules_exam_reserve, [[(json_decode($schedule))[0][0], (json_decode($schedule))[0][1]]]);
             }
@@ -564,17 +563,17 @@ class Schedule extends Component
                 $schedules_exam_reserve = array_merge($schedules_exam_reserve, [[$date_class->isoFormat('H'), $date_class->isoFormat('d')]]);
             }
 
-            foreach($schedules_exam_reserve as $day){
-                if($this->notFree($schedules_exam_reserve, $day[0].'-'.$day[1], $this->days_rest) && !in_array($day, $schedules_exam_not_free)){
+            foreach ($schedules_exam_reserve as $day) {
+                if ($this->notFree($schedules_exam_reserve, $day[0] . '-' . $day[1], $this->days_rest) && !in_array($day, $schedules_exam_not_free)) {
                     $schedules_exam_not_free[] = $day;
                 }
             }
-        }elseif ($mode == "one" || $mode == "absence"){
-            
-            foreach($schedules_exam as $schedule){
+        } elseif ($mode == "one" || $mode == "absence") {
+
+            foreach ($schedules_exam as $schedule) {
                 $schedules_exam_reserve = array_merge($schedules_exam_reserve, json_decode($schedule));
             }
-            
+
             // foreach($classes as $key => $class){
             //     $date_class = new Carbon($class); 
             //     $schedules_exam_reserve = array_merge($schedules_exam_reserve, [[$date_class->isoFormat('H'), $date_class->isoFormat('d'), (string)($date_class->weekOfMonth-1), $date_class->isoFormat('MM'), $date_class->isoFormat('DD')]]);
@@ -583,7 +582,7 @@ class Schedule extends Component
         }
         // dd($schedules,$schedules_exam, $schedules_exam_reserve);
 
-        
+
         foreach ($schedules_exam_reserve as $day) {
             if ($this->notFree($schedules_exam_reserve, $day, $this->days_rest) && !in_array($day, $schedules_exam_not_free)) {
                 $schedules_exam_not_free[] = $day;
@@ -591,23 +590,22 @@ class Schedule extends Component
         }
 
         return [$schedules_reserve, $schedules_exam_not_free];
-
     }
 
-    public function findReservesAndRetun(){
+    public function findReservesAndRetun()
+    {
         // dd("entro!");
         // $reserve = ScheduleReserve::all()->whereNotNull('selected_schedule');
         // $schedules_exam_not_fre = array_unique($schedules_exam_not_fre);
         // dd($schedules_reserve, $schedules_exam_not_free);
         // dd($this->teacher_id, session('teacher_id'));
-        if($this->mode != "show" && ($this->teacher_id != null || session('teacher_id') != null)){
+        if ($this->mode != "show" && ($this->teacher_id != null || session('teacher_id') != null)) {
             $data_reserve = $this->schedulesReserves($this->mode);
-    
+
             $schedules_reserve = $data_reserve[0];
             $schedules_exam_not_free = $data_reserve[1];
             $this->dispatchBrowserEvent('reserves_schedules_event_js', ['schedules' => $schedules_reserve, 'schedules_exam' => $schedules_exam_not_free, 'mode' => $this->mode, 'plan' => $this->plan]);
         }
-
     }
 
     /**

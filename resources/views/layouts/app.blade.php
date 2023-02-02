@@ -3,7 +3,7 @@
 
 <head>
     @php
-        // dd(Auth::user()->canBeImpersonated());
+        // dd(session('selected_course'));
         $session_info = json_decode((new Illuminate\Http\Client\PendingRequest())->get('http://ipwho.is/' . $_SERVER['REMOTE_ADDR'])->getBody(), true);
         if ($session_info['success'] == false) {
             session()->forget('session_info');

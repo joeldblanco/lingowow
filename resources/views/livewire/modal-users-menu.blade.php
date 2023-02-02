@@ -50,11 +50,13 @@
         </x-slot>
 
         <x-slot name="content">
-            <!-- {{ dd($activity) }} -->
-            <div class="mb-2">
-                <div class="w-full center-h">Do you want to assign the activity "{{ $activity->name }}" to the student
-                    {{ $student_assign->first_name }} {{ $student_assign->last_name }}?</div>
-            </div>
+            @if (!empty($activity))
+                <div class="mb-2">
+                    <div class="w-full center-h">Do you want to assign the activity "{{ $activity->name }}" to the
+                        student
+                        {{ $student_assign->first_name }} {{ $student_assign->last_name }}?</div>
+                </div>
+            @endif
 
 
         </x-slot>
@@ -75,32 +77,35 @@
             <div class="w-full center-h">Delete?</div>
         </x-slot>
 
-        <x-slot name="content">
+        @if (!empty($activity))
+            {{ dd($activity) }}
+            <x-slot name="content">
 
-            <div class="mb-2">
-                <div class="w-full center-h">Do you want to delete this activity ?</div>
-                <br>
-                <div class="w-full center-h">
-                    <div>Name: {{ $activity->name }}</div>
-                    <div>Unit: {{ $activity->unit->unit_name }}</div>
+                <div class="mb-2">
+                    <div class="w-full center-h">Do you want to delete this activity ?</div>
+                    <br>
+                    <div class="w-full center-h">
+                        <div>Name: {{ $activity->name }}</div>
+                        <div>Unit: {{ $activity->unit->unit_name }}</div>
+                    </div>
                 </div>
-            </div>
 
 
-        </x-slot>
+            </x-slot>
 
-        <x-slot name="footer">
-            <div class="flex justify-center gap-x-5 mt-5">
-                {{-- <button class="btn-black-outliner btn-assign-student-confirm">Delete</button> --}}
-                <form action="{{ route('activities.destroy', $activity->id) }}" method="POST">
-                    @csrf
-                    @method('DELETE')
-                    <button class="btn-black-outliner" type="submit">Delete</button>
-                </form>
-                <button class="btn-black-outliner btn-assign-student-close">Cancel</button>
-            </div>
-            {{-- <button class="">Cancel</button> --}}
-        </x-slot>
+            <x-slot name="footer">
+                <div class="flex justify-center gap-x-5 mt-5">
+                    {{-- <button class="btn-black-outliner btn-assign-student-confirm">Delete</button> --}}
+                    <form action="{{ route('activities.destroy', $activity->id) }}" method="POST">
+                        @csrf
+                        @method('DELETE')
+                        <button class="btn-black-outliner" type="submit">Delete</button>
+                    </form>
+                    <button class="btn-black-outliner btn-assign-student-close">Cancel</button>
+                </div>
+                {{-- <button class="">Cancel</button> --}}
+            </x-slot>
+        @endif
 
     </x-jet-dialog-modal>
 </div>

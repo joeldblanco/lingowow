@@ -51,4 +51,9 @@ class Enrolment extends Model
      * @var array
      */
     protected $fillable = ['student_id', 'teacher_id', 'course_id', 'deleted_at'];
+
+    public function preselection()
+    {
+        return $this->hasOne(Preselection::class);
+    }
 }

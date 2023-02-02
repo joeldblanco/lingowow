@@ -5,6 +5,7 @@ namespace App\Http\Livewire;
 use App\Models\Course;
 use App\Models\Enrolment;
 use App\Models\Product;
+use Carbon\Carbon;
 use Livewire\Component;
 use Cart;
 use Illuminate\Support\Facades\DB;
@@ -33,15 +34,26 @@ class PricingTableComponent extends Component
             ->withTrashed()
             ->first();
 
-        if ($enroled != null) {
+        if (!empty($enroled)) {
             $deleted = $enroled->trashed();
         }
 
         if ($enroled && !$deleted) {
-            // dd("User already enroled in this course.");
+
+            // $current_period = json_decode(DB::table('metadata')->where('key', '=', 'current_period')->first()->value);
+            // $now = Carbon::now();
+            // $current_period_end = new Carbon($current_period->end_date);
+
+            // if ($enroled->course_id == session('selected_course') && $synchronous && ($now->greaterThan($current_period_end->copy()->subDays(7))) && empty($enroled->preselection)) {
+            //     $course_id = session('selected_course');
+            //     $product = Course::find($course_id)->products->first();
+            //     session(['plan' => $nOfClasses]);
+            //     redirect()->route("schedule.create");
+            // } else {
             $this->popup_message = "User already enroled in a course.";
             $this->popup_color = "red";
             $this->popup = true;
+            // }
         } else {
             $course_id = session('selected_course');
             $product = Course::find($course_id)->products->first();
@@ -58,15 +70,7 @@ class PricingTableComponent extends Component
 
     public function render()
     {
-        if (in_array(auth()->user()->id, [5])) {
-            $product = Course::find($this->selectedProduct)->products();
-            $product = $product->where('slug', 'like', '%old%')->first();
-            if (empty($product))
-                $product = Course::find($this->selectedProduct)->products->first();
-        } else {
-            $product = Course::find($this->selectedProduct)->products;
-            $product = $product->first();
-        }
+        $product = Product::find($this->selectedProduct);
 
         $plans = $product->plans;
 
