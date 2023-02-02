@@ -132,8 +132,9 @@ Route::middleware(['web', 'auth', 'verified', 'impersonate'])->group(function ()
     Route::middleware(['role:admin'])->post('/courses', [CourseController::class, 'store'])->name('courses.store');
     Route::get('/courses/{id}', [CourseController::class, 'show'])->name('courses.show');
     Route::middleware(['role:admin'])->get('/courses/{id}/edit', [CourseController::class, 'edit'])->name('courses.edit');
-    Route::middleware(['role:admin'])->patch('/courses/{id}', [CourseController::class, 'update'])->name('courses.update');
-    Route::middleware(['role:admin'])->delete('/courses/{id}', [CourseController::class, 'destroy'])->name('courses.destroy');
+    Route::middleware(['role:admin'])->patch('/courses/{course}', [CourseController::class, 'update'])->name('courses.update');
+    Route::middleware(['role:admin'])->delete('/courses/{course}', [CourseController::class, 'destroy'])->name('courses.destroy');
+    Route::middleware(['role:admin'])->get('admin/courses', [CourseController::class, 'adminIndex'])->name('admin.courses.index');
 
     Route::get('courses/{id}/details', [CourseController::class, 'details'])->name('courses.details');
 
@@ -239,12 +240,12 @@ Route::middleware(['web', 'auth', 'verified', 'impersonate'])->group(function ()
 
 
         //ROUTES FOR GRADINGS//
-        Route::resource('/gradings', GradingController::class);
+        Route::resource('admin/gradings', GradingController::class);
 
 
 
         //ROUTES FOR PRODUCTS//
-        Route::resource('/products', ProductController::class);
+        Route::resource('admin/products', ProductController::class);
 
 
 
@@ -287,13 +288,13 @@ Route::middleware(['web', 'auth', 'verified', 'impersonate'])->group(function ()
 
 
         //ROUTES FOR CATEGORIES//
-        Route::resource('/categories', CategoryController::class);
+        Route::resource('admin/categories', CategoryController::class);
 
 
 
 
         //ROUTES FOR FEATURES//
-        Route::resource('/features', FeatureController::class);
+        Route::resource('admin/features', FeatureController::class);
 
 
 
@@ -351,7 +352,7 @@ Route::middleware(['web', 'auth', 'verified', 'impersonate'])->group(function ()
         Route::resource('/meetings', MeetingController::class);
 
         //ROUTES FOR ENROLMENTS//
-        Route::resource('enrolments', EnrolmentController::class);
+        Route::resource('admin/enrolments', EnrolmentController::class);
         Route::post('enrolments/checkSchedule', [EnrolmentController::class, 'isScheduleNeeded'])->name('enrolments.checkSchedule');
 
         //USER RESET//
@@ -370,7 +371,7 @@ Route::middleware(['web', 'auth', 'verified', 'impersonate'])->group(function ()
                         // $user->schedules->where('enrolment_id', $user->enrolments->first()->id)->first()->delete();
                         $user->enrolments->first()->delete();
                         if ($user->schedules->first() != null) {
-                            $user->schedules->first()->next_schedule = null;
+                            // $user->schedules->first()->next_schedule = null;
                             $user->schedules->first()->save();
                             $user->schedules->first()->delete();
                         }
@@ -428,7 +429,7 @@ Route::middleware(['web', 'auth', 'verified', 'impersonate'])->group(function ()
     Route::post('/payment/notify', [PayPalPaymentController::class, 'notify'])->name("notify");
 
     Route::get('/payment/gateway', [PaymentController::class, 'createButton'])->name("payments.gateway");
-    Route::get('/payment/checkout', [PaymentController::class, 'checkout'])->name("payments.checkout");
+    Route::post('/payment/checkout', [PaymentController::class, 'checkout'])->name("payments.checkout");
 
     //ROUTES FOR NOTIFICATIONS//
     Route::get('/notifications', [NotificationsController::class, 'index'])->name('notifications.index');

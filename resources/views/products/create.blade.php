@@ -57,7 +57,7 @@
                             <div class="pb-6 space-y-1">
                                 <p class="font-bold text-gray-600 mb-1">Sale price</p>
                                 <input type="number" name="sale_price" id="sale_price" placeholder="0" min="0"
-                                    step="0.01"
+                                    step="0.01" value="0"
                                     class="w-full rounded-md p-3 text-gray-600 hover:border-gray-600 @if ($errors->has('sale_price')) border-red-600 @else border-gray-300 @endif ">
                                 @if ($errors->has('sale_price'))
                                     <p class="text-xs font-light text-red-600">{{ $errors->get('sale_price')[0] }}</p>
