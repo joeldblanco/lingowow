@@ -11,11 +11,25 @@ const tour2 = new Shepherd.Tour({
 
 tour2.addSteps([
     {
-        id: 'rescheduling-button',
-        text: 'If you wish to reschedule a class, you can do it from this button.',
+        id: 'unit-created',
+        text: 'Congratulations! You have created your first unit!<br><br>Click on it to add content.',
         attachTo: {
-            element: '.rescheduling-button',
-            // on: 'top'
+            element: '.first-unit',
+            on: 'top'
+        },
+        buttons: [
+            {
+                text: 'Next!',
+                action: tour2.next
+            }
+        ],
+    },
+    {
+        id: 'unit-created-edit',
+        text: 'In this button you can directly edit the unit information.',
+        attachTo: {
+            element: '.first-unit-edit',
+            on: 'top'
         },
         buttons: [
             {
@@ -36,7 +50,7 @@ let timerID2;
 function runReschedulingButtonFunction() {
     return new Promise(resolve => {
         var intervalId = setInterval(() => {
-            let button = $('.rescheduling-button');
+            let button = $('.first-unit');
             // console.log(button.length)
             if (button.length > 0) {
                 clearInterval(intervalId);
@@ -57,7 +71,7 @@ tour2.on('complete', () => {
         type: 'POST',
         url: route('complete-tour'),
         data: {
-            tourName: 'students/rescheduling-button',
+            tourName: 'teachers/unit_created',
             '_token': $('meta[name="csrf-token"]').attr('content'),
         },
         success: function (data) {
