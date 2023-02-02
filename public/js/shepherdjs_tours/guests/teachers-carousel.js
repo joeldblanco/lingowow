@@ -67,8 +67,8 @@ tour.addSteps([
             {
                 text: 'Next',
                 action(){
-                    console.log("una prueba SIUUUU")
-                    return this.next()
+                    // console.log("una prueba SIUUUU")
+                    return this.complete()
                 }
             }
         ]
