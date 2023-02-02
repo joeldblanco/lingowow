@@ -34,7 +34,6 @@ class StoreSelfEnrolment implements ShouldQueue
      */
     public function __construct($student = null)
     {
-
         if (empty($student)) {
             $student = auth()->user();
         } else {
@@ -73,14 +72,13 @@ class StoreSelfEnrolment implements ShouldQueue
             $invoice->paid = 1;
             $invoice->user_id = $student->id;
             $invoice->save();
-
             collect($cart['items'])->each(function ($product) use ($invoice) {
                 $item = new Item();
                 $item->invoice_id = $invoice->id;
                 $item->item_name = $product['name'];
                 $item->item_price = $product['price'];
                 $item->item_qty = $product['qty'];
-
+                
                 $item->save();
             });
 
