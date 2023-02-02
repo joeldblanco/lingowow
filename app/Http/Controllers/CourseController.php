@@ -139,6 +139,7 @@ class CourseController extends Controller
                     if (!empty($user_module)) {
                         $user_module = Module::findOrFail($user_module->module_id);
                         $user_modules->push($user_module);
+                        $modules = $user_modules;
                     }
                 } else {
                     foreach ($modules as $module) {

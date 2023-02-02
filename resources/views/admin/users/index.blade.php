@@ -1,5 +1,4 @@
 <x-app-layout>
-
     <div class="bg-white font-sans" x-data="{ createUser: false, editUser: false, deleteConfirmation: false }" x-cloak>
         <div class="w-full mx-auto sm:px-6 lg:px-8">
             <div class="p-6 sm:px-20 bg-white border-b border-gray-200">
@@ -44,7 +43,7 @@
                     <div class="flex flex-row w-full gap-x-4 gap-y-4 flex-wrap justify-evenly items-stretch">
                         @foreach ($users as $user)
                             {{-- @if (!$user->trashed()) --}}
-                                @livewire('user-component', ['user' => $user, 'role' => $role, 'key' => $user->id])
+                            @livewire('user-component', ['user' => $user, 'role' => $role, 'key' => $user->id])
                             {{-- @endif --}}
                         @endforeach
                         {{-- @foreach ($users as $user)

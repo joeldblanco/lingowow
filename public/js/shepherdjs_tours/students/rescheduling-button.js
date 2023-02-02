@@ -47,7 +47,7 @@ function runReschedulingButtonFunction() {
 }
 
 runReschedulingButtonFunction().then(() => {
-    console.log("hola ya aparecio");
+    // console.log("hola ya aparecio");
     timerID2 = setTimeout(start, 1000);
 });
 

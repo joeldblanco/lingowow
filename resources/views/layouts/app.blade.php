@@ -11,7 +11,7 @@
             session(['session_info' => $session_info]);
             session(['tz' => session('session_info')['timezone']['id']]);
         }
-        // dd(session('session_info'));
+        // dd(session()->all());
         
         // if (isset($_GET['tz']) && session('tz') == null) {
         //     // This is just an example. In application this will come from Javascript (via an AJAX or something)
