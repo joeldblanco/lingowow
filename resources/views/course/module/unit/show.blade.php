@@ -272,9 +272,9 @@
         }
     </script>
 
-    @role('guest')
+    {{-- @role('guest')
         <x-shepherd-tour tourName="guests/contents_preview" role="guest" />
-    @endrole
+    @endrole --}}
 
     @role('teacher')
         <x-shepherd-tour tourName="teachers/contents_preview" role="teacher" />

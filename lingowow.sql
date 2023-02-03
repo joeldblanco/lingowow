@@ -2128,7 +2128,7 @@ insert  into `plan_product`(`plan_id`,`product_id`) values
 
 /*Data for the table `plans` */
 
-insert  into `plans`(`id`,`plan_name`,`n_classes`,`slug`,`created_at`,`updated_at`,`deleted_at`) values 
+insert  into `plans`(`id`,`name`,`n_classes`,`slug`,`created_at`,`updated_at`,`deleted_at`) values 
 (1,'Simple Plan',8,'simple-plan',NULL,NULL,NULL),
 (2,'Regular Plan',12,'regular-plan',NULL,NULL,NULL),
 (3,'Intensive Plan',16,'intensive-plan',NULL,NULL,NULL),

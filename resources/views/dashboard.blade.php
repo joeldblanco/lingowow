@@ -10,7 +10,7 @@
                     $users = \App\User::select('first_name', 'last_name', 'id')->get();
                     $affected_students = session('affected_students');
                 @endphp
-                
+
                 @if (session('message'))
 
                     <div x-data="{ showModal1: true }">
@@ -162,8 +162,16 @@
                             {{-- @livewire('schedule-controller', ['user_id' => auth()->id(), 'mode' => 'show', 'course_id' => $course_id]) --}}
                         @endif
                     @endrole
-                    @hasanyrole('teacher|guest')
+                    @hasanyrole('teacher')
                         @livewire('schedule', ['user_id' => auth()->id(), 'mode' => 'show', 'course_id' => $course_id])
+                    @endrole
+                    @role('guest')
+                        <div class="flex flex-col items-center h-screen pt-20">
+                            <i class="fas fa-ghost text-9xl text-gray-300 mb-10"></i>
+                            <p class="text-4xl text-gray-500">Nothing to show here</p>
+                            <p class="text-2xl text-gray-400 mb-10">You are not enrolled in any course</p>
+                            <a href="{{ route('courses.index') }}" class="bg-lw-blue py-2 px-4 rounded-md text-white hover:bg-blue-800 preview-courses-button">Preview Courses 👀</a>
+                        </div>
                     @endrole
                 </div>
 

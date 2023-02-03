@@ -19,12 +19,14 @@ class PricingTableComponent extends Component
     public $popup = false;
     public $popup_message = "";
     public $popup_color = "";
+    public $pricingTableModal = false;
 
     public function showSelectedProduct($course_id)
     {
         session(['selected_course' => $course_id]);
         $this->selectedProduct = $course_id;
-        $this->emit('loadingState', false);
+        $this->pricingTableModal = true;
+        // $this->emit('loadingState', false);
     }
 
     public function store($nOfClasses = null, $synchronous = false)

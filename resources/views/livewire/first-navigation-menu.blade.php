@@ -2,19 +2,19 @@
     
     $nav_links = [
         [
-            'name' => 'Announcements',
+            'name' => 'Announcements 📢',
             'route' => route('announcements'),
             'status' => request()->routeIs('announcements'),
             'roles' => ['student', 'guest', 'teacher', 'admin'],
         ],
         [
-            'name' => 'Dashboard',
+            'name' => 'Dashboard 📊',
             'route' => auth()->user()->roles[0]->name == 'admin' ? route('admin.dashboard') : route('dashboard'),
             'status' => auth()->user()->roles[0]->name == 'admin' ? request()->routeIs('admin.dashboard') : request()->routeIs('dashboard'),
             'roles' => auth()->user()->roles[0]->name == 'admin' ? ['admin'] : ['student', 'guest', 'teacher'],
         ],
         [
-            'name' => 'Courses',
+            'name' => 'Courses 📖',
             'route' => route('courses.index'),
             'status' => request()->is('courses', 'courses/*'),
             'roles' => ['student', 'guest', 'teacher', 'admin'],
@@ -26,7 +26,7 @@
         //     'roles' => ['student','guest','teacher','admin'],
         // ],
         [
-            'name' => 'Shop',
+            'name' => 'Shop 🛍️',
             'route' => route('shop'),
             'status' => request()->is('shop', 'shop/*'),
             'roles' => ['student', 'guest', 'admin'],
