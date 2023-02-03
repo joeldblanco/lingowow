@@ -60,7 +60,8 @@
                                         {{-- <div class="flex space-x-8 w-full items-center justify-evenly"> --}}
                                         <a href="{{ route('products.show', $product->id) }}"
                                             class="w-2/12 text-gray-600">
-                                            <img src="{{ Storage::url($product->image) }}" class="cover max-w-full max-h-36" alt="Product Image">
+                                            <img src="{{ Storage::url($product->image) }}"
+                                                class="cover max-w-full max-h-36" alt="Product Image">
                                         </a>
                                     </td>
                                     <td class="py-4 px-6 border-b border-gray-400 text-gray-500 bg-white">
@@ -86,6 +87,8 @@
                                     </td>
                                     <td class="py-4 px-6 border-b border-gray-400 text-gray-500 bg-white">
                                         <div class="flex justify-end items-center">
+                                            <a href="{{ route('products.edit', $product->id) }}" title="Edit"><i
+                                                    class="fas fa-clipboard-check"></i></a>
                                             <a href="{{ route('products.edit', $product->id) }}" title="Edit"><i
                                                     class="fas fa-pen m-1"></i></a>
                                             {{-- <a href="{{ route('products.details', $product->id) }}"

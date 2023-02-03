@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Category;
 use App\Models\Course;
+use App\Models\Feature;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -106,7 +107,8 @@ class ProductController extends Controller
     {
         $courses = Course::all();
         $categories = Category::all();
-        return view('products.edit', compact('product', 'courses', 'categories'));
+        $features = Feature::all();
+        return view('products.edit', compact('product', 'courses', 'categories', 'features'));
     }
 
     /**
@@ -133,6 +135,10 @@ class ProductController extends Controller
         if (!empty($request->courses)) {
             $request->validate(['courses' => 'exists:App\Models\Course,id']);
         }
+
+        // if (!empty($request->features)) {
+        //     $request->validate(['features' => 'exists:App\Models\Feature,id']);
+        // }
 
         $image = $request->file('product_image');
         $path_to_file = $image == null ? DB::table('metadata')->where('key', 'sample_image_url')->first()->value : $image->storeAs('public/images/products/covers', str_replace(" ", "_", $product->slug) . '.' . $image->getClientOriginalExtension());
@@ -169,6 +175,13 @@ class ProductController extends Controller
         } else {
             $product->courses()->detach();
         }
+
+        // if (!empty($request->features)) {
+        //     $features = explode(',', $request->features);
+        //     $product->features()->sync($features);
+        // } else {
+        //     $product->features()->detach();
+        // }
 
         return redirect()->route('products.index')->with('success', 'Product updated successfully.');
     }

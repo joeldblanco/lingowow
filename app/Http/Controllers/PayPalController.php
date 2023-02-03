@@ -24,45 +24,45 @@ class PaypalController extends Controller
      */
     public function create($access_token)
     {
-        $token = $this->getAuthToken();
+        // $token = $this->getAuthToken();
 
-        $headers = [
-            'Content-Type' => 'application/json',
-            'Authorization' => $token['token_type'] . ' ' . $token['access_token'],
-            // 'PayPal-Request-Id' => '7b92603e-77ed-4896-8e78-5dea2050476a'
-        ];
+        // $headers = [
+        //     'Content-Type' => 'application/json',
+        //     'Authorization' => $token['token_type'] . ' ' . $token['access_token'],
+        //     // 'PayPal-Request-Id' => '7b92603e-77ed-4896-8e78-5dea2050476a'
+        // ];
 
-        $payload = [
-            "intent" => "CAPTURE",
-            "purchase_units" => [
-                [
-                    "reference_id" => "d9f80740-38f0-11e8-b467-0ed5f89f718b",
-                    "amount" => [
-                        "currency_code" => "USD",
-                        "value" => "100.00"
-                    ]
-                ]
-            ],
-            "payment_source" => [
-                "paypal" => [
-                    "experience_context" => [
-                        "payment_method_preference" => "IMMEDIATE_PAYMENT_REQUIRED",
-                        "payment_method_selected" => "PAYPAL",
-                        "brand_name" => "EXAMPLE INC",
-                        "locale" => "en-US",
-                        "landing_page" => "LOGIN",
-                        "shipping_preference" => "SET_PROVIDED_ADDRESS",
-                        "user_action" => "PAY_NOW",
-                        "return_url" => "https://example.com/returnUrl",
-                        "cancel_url" => "https://example.com/cancelUrl"
-                    ]
-                ]
-            ]
-        ];
+        // $payload = [
+        //     "intent" => "CAPTURE",
+        //     "purchase_units" => [
+        //         [
+        //             "reference_id" => "d9f80740-38f0-11e8-b467-0ed5f89f718b",
+        //             "amount" => [
+        //                 "currency_code" => "USD",
+        //                 "value" => "100.00"
+        //             ]
+        //         ]
+        //     ],
+        //     "payment_source" => [
+        //         "paypal" => [
+        //             "experience_context" => [
+        //                 "payment_method_preference" => "IMMEDIATE_PAYMENT_REQUIRED",
+        //                 "payment_method_selected" => "PAYPAL",
+        //                 "brand_name" => "EXAMPLE INC",
+        //                 "locale" => "en-US",
+        //                 "landing_page" => "LOGIN",
+        //                 "shipping_preference" => "SET_PROVIDED_ADDRESS",
+        //                 "user_action" => "PAY_NOW",
+        //                 "return_url" => "https://example.com/returnUrl",
+        //                 "cancel_url" => "https://example.com/cancelUrl"
+        //             ]
+        //         ]
+        //     ]
+        // ];
 
-        $response = Http::withHeaders($headers)->post('https://api-m.sandbox.paypal.com/v2/checkout/orders', $payload);
+        // $response = Http::withHeaders($headers)->post('https://api-m.sandbox.paypal.com/v2/checkout/orders', $payload);
 
-        return $response->getStatusCode() == 201 ? json_decode($response->getBody(), true) : null;
+        // return $response->getStatusCode() == 201 ? json_decode($response->getBody(), true) : null;
     }
 
     /**
@@ -129,15 +129,15 @@ class PaypalController extends Controller
      */
     public function getAuthToken()
     {
-        $url = 'https://api-m.sandbox.paypal.com/v1/oauth2/token?grant_type=client_credentials';
+        // $url = 'https://api-m.sandbox.paypal.com/v1/oauth2/token?grant_type=client_credentials';
 
-        $body = [];
+        // $body = [];
 
-        $response = Http::withHeaders([
-            'Authorization' => 'Basic ' . base64_encode('Af_I11EdYdIS6aMYynZaJh9b6tIjESm3awzI8vN-GwHYNlVMPoQuK8vpppM6gJf8pWAmirWQHIVlRWZq:EL6-cKYicub9x03THrCwb46DrdkEmeEkuCKOH6_2aVDdoC34LEtPPN6nNy3HI7e8H_1ghFHbz6JoZBBZ'),
-            'Content-Type'  => ' application/x-www-form-urlencoded',
-        ])->post($url, $body);
+        // $response = Http::withHeaders([
+        //     'Authorization' => 'Basic ' . base64_encode('Af_I11EdYdIS6aMYynZaJh9b6tIjESm3awzI8vN-GwHYNlVMPoQuK8vpppM6gJf8pWAmirWQHIVlRWZq:EL6-cKYicub9x03THrCwb46DrdkEmeEkuCKOH6_2aVDdoC34LEtPPN6nNy3HI7e8H_1ghFHbz6JoZBBZ'),
+        //     'Content-Type'  => ' application/x-www-form-urlencoded',
+        // ])->post($url, $body);
 
-        return $response->getStatusCode() == 200 ? json_decode($response->getBody(), true) : null;
+        // return $response->getStatusCode() == 200 ? json_decode($response->getBody(), true) : null;
     }
 }

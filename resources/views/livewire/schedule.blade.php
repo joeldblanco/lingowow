@@ -289,7 +289,7 @@
                                 <h2 class="text-2xl font-bold text-gray-800">You can select a schedule after you buy
                                     a plan of classes.</h2>
                                 <a href="{{ route('shop') }}"
-                                    class="inline-block bg-blue-800 text-white px-6 py-4 mt-8 rounded-lg hover:bg-blue-900 hover:text-white hover:no-underline">Shop</a>
+                                    class="shop-button inline-block bg-blue-800 text-white px-6 py-4 mt-8 rounded-lg hover:bg-blue-900 hover:text-white hover:no-underline">Shop</a>
                             </div>
                         @endif
                     @endif

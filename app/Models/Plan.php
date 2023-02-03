@@ -18,4 +18,9 @@ class Plan extends Model
     {
         return $this->belongsToMany(Feature::class)->withPivot('status');
     }
+
+    public function product()
+    {
+        return $this->belongsTo(Product::class);
+    }
 }
