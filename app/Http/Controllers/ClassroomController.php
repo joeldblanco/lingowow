@@ -49,8 +49,8 @@ class ClassroomController extends Controller
         $enrolment = Enrolment::where('student_id', $id)->first();
         if (isset($enrolment)) {
             $classes = Classes::where('enrolment_id', $enrolment->id)->whereDate('start_date', '>=', $current_period[0])->orderBy('start_date', 'asc')->get();
-            // dd($classes);
-            $current_tz = session('tz');
+
+            // $current_tz = session('tz');
             $student = User::find($id);
             $enter_classroom = false;
             $message = "Student doesn't have any class left.";
@@ -59,8 +59,9 @@ class ClassroomController extends Controller
             $user = $user[0];
 
             foreach ($classes as $key => $value) {
-                $classes[$key] = Carbon::createFromTimeString($value->start_date, 'America/Lima');
-                $now = Carbon::now($current_tz);
+                $classes[$key] = Carbon::createFromTimeString($value->start_date);
+                $now = Carbon::now(session('session_info')['timezone']['id']);
+                // dd($now);
                 $enter_classroom = false;
                 $message = "";
 
@@ -68,26 +69,28 @@ class ClassroomController extends Controller
                     $diffInSeconds = $classes[$key]->diffInSeconds();
 
                     if (($diffInSeconds < 600 && $user == 'teacher') || ($diffInSeconds < 20 && $user == 'student') || $user == 'admin') {
-                        // $message = "This student's next class is in " . $classes[$key]->diffForHumans(['parts' => 2]) . ". On " . $classes[$key]->format('l') . ' at ' . $classes[$key]->format('g:00 a') . " UTC.";
-                        // $enter_classroom = true;
+
                         return redirect(auth()->user()->studentClasses->sortBy('start_date')->first()->meeting->join_url);
 
                         break;
                     } else {
+
+                        $message2 = "On " . $classes[$key]->format('l') . ' at ' . $classes[$key]->format('g:00 a') . " UTC " . "(" . $classes[$key]->setTimezone(session('session_info')['timezone']['id'])->format('l') . " at " . $classes[$key]->setTimezone(session('session_info')['timezone']['id'])->format('g:00 a') . " " . session('session_info')['timezone']['id'] . ").";
+
                         if ($user == 'student') {
-                            $message = "Your next class is in " . $classes[$key]->diffForHumans(['parts' => 2]) . ". On " . $classes[$key]->format('l') . ' at ' . $classes[$key]->format('g:00 a') . " UTC.";
+                            $message1 = "Your next class is in " . $classes[$key]->diffForHumans(['parts' => 2]) . ".";
                             break;
                         }
 
                         if ($user == 'teacher') {
-                            $message = "This student's next class is in " . $classes[$key]->diffForHumans(['parts' => 2]) . ". On " . $classes[$key]->format('l') . ' at ' . $classes[$key]->format('g:00 a') . " UTC.";
+                            $message1 = "This student's next class is in " . $classes[$key]->diffForHumans(['parts' => 2]) . ".";
                             break;
                         }
                     }
                 }
             }
 
-            return view('classroom.show', compact('enter_classroom', 'message', 'student', 'user'));
+            return view('classroom.show', compact('enter_classroom', 'message1', 'message2', 'student', 'user'));
         } else {
             abort(403, 'USER DOES NOT HAVE THE RIGHT PERMISSIONS.');
             // $message = "User is not enroled in any course.";

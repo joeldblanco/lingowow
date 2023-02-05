@@ -3,7 +3,7 @@
 
 <head>
     @php
-        // dd(Auth::user()->canBeImpersonated());
+        // dd(session('selected_course'));
         $session_info = json_decode((new Illuminate\Http\Client\PendingRequest())->get('http://ipwho.is/' . $_SERVER['REMOTE_ADDR'])->getBody(), true);
         if ($session_info['success'] == false) {
             session()->forget('session_info');
@@ -11,7 +11,7 @@
             session(['session_info' => $session_info]);
             session(['tz' => session('session_info')['timezone']['id']]);
         }
-        // dd(session('session_info'));
+        // dd(session()->all());
         
         // if (isset($_GET['tz']) && session('tz') == null) {
         //     // This is just an example. In application this will come from Javascript (via an AJAX or something)
@@ -94,14 +94,13 @@
         @endif
 
         @if (auth()->user()->roles->first()->name == 'guest' &&
-                (Route::currentRouteName() == 'courses.show' ||
+                (Route::currentRouteName() == 'courses.index' ||
+                    Route::currentRouteName() == 'courses.show' ||
                     Route::currentRouteName() == 'modules.show' ||
                     Route::currentRouteName() == 'units.show'))
             <div class="bg-yellow-300 text-center py-3">
-                <p class="text-red-500 font-semibold">You are previewing a course. If you want to buy it click in the
-                    link
-                    below.</p>
-                <a href="{{ route('shop') }}" class="text-md font-bold hover:underline">Shop</a>
+                <p class="text-red-500 font-semibold">You are previewing our courses. If you want to buy one click <a
+                        href="{{ route('shop') }}" class="text-md font-bold hover:underline">here</a>.</p>
             </div>
         @endif
 

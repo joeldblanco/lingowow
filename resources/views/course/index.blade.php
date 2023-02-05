@@ -1,4 +1,3 @@
-{{-- VISTA DE LOS CURSOS --}}
 <x-app-layout>
 
     <div class="bg-white font-sans">
@@ -14,18 +13,16 @@
                 </div>
                 <hr class="mb-10">
 
-
                 @forelse ($courses as $course)
-                    {{-- <x-course_card id="{{$course->id}}" name="{{$course->name}}" image="https://img.pixers.pics/pho_wat(s3:700/FO/60/89/19/91/700_FO60891991_9eb8248aebe7688d0b16c848c91d86e9.jpg,700,467,cms:2018/10/5bd1b6b8d04b8_220x50-watermark.png,over,480,417,jpg)/almohadas-largas-ee-uu-y-el-reino-unido-de-la-bandera.jpg.jpg"/> --}}
                     <div
                         class="flex items-center justify-between mb-10 @if ($loop->first) course-div @endif">
                         <div onclick="location.href='{{ route('courses.show', $course->id) }}';"
-                            class="group flex flex-col bg-gray-100 rounded-lg w-full justify-between shadow-md hover:shadow-xl cursor-pointer items-center pl-5 pt-5">
+                            class="group flex flex-col bg-gray-100 rounded-lg w-full justify-between shadow-md hover:shadow-xl cursor-pointer items-center pl-5 pt-5 @hasanyrole('guest|teacher|admin') pb-5 pr-5 @endrole">
                             <div class="flex w-full items-center">
                                 <div class="w-3/12 mr-5">
-                                    <img class="rounded-lg rounded-b-none"
-                                        src="https://img.pixers.pics/pho_wat(s3:700/FO/60/89/19/91/700_FO60891991_9eb8248aebe7688d0b16c848c91d86e9.jpg,700,467,cms:2018/10/5bd1b6b8d04b8_220x50-watermark.png,over,480,417,jpg)/almohadas-largas-ee-uu-y-el-reino-unido-de-la-bandera.jpg.jpg"
-                                        alt="thumbnail" loading="lazy" />
+                                    <div class="rounded-lg h-36"
+                                        style="background-image: url('{{ url(Storage::url($course->image_url)) }}'); background-size: cover; ">
+                                    </div>
                                 </div>
                                 <div class="w-full flex flex-col justify-start">
                                     <div class="py-2 px-4 mb-5">
@@ -42,31 +39,35 @@
                                                 <p class="my-auto capitalize">{{ $category->name }}</p>
                                             </span>
                                         @endforeach
-                                        {{-- <span
-                                            class="flex flex-col @if ($course->category == 'Spanish') bg-blue-500 @else bg-red-500 @endif rounded-full font-medium text-gray-100 px-3 pt-0.5">
-                                            <p class="my-auto capitalize">{{ $course->category }}</p>
-                                        </span>
-                                        <span
-                                            class="flex flex-col @if ($course->modality == 'synchronous') bg-green-500 @else bg-purple-500 @endif rounded-full font-medium text-gray-100 px-3 pt-0.5">
-                                            <p class="my-auto capitalize">{{ $course->modality }}</p>
-                                        </span> --}}
                                     </div>
                                 </div>
                                 <div class="text-3xl text-gray-400 w-1/12 group-hover:text-blue-500">
                                     <i class="fas fa-chevron-right"></i>
                                 </div>
                             </div>
+                            
                             @role('student')
+                            @if (!$course->categories->pluck('name')->contains('Conversational'))
                                 <div class="flex w-full" id="chart"></div>
+                                @php
+                                    $user_units = auth()->user()->units;
+                                    if (count($user_units) <= 0) {
+                                        $user_units = 0;
+                                    } else {
+                                        $user_units = auth()
+                                            ->user()
+                                            ->units->first()->order;
+                                    }
+                                @endphp
                                 <script>
                                     var options = {
                                         series: [{
                                                 name: 'Progress (Units)',
-                                                data: [{{ auth()->user()->units->first()->order }}]
+                                                data: [{{ $user_units }}]
                                             },
                                             {
                                                 name: 'Remaining (Units)',
-                                                data: [{{ count($course->units()) -auth()->user()->units->first()->order }}]
+                                                data: [{{ count($course->units()) - $user_units }}]
                                             },
                                         ],
                                         grid: {
@@ -117,24 +118,23 @@
                                     var chart = new ApexCharts(document.querySelector("#chart"), options);
                                     chart.render();
                                 </script>
+                            @endif
                             @endrole
                         </div>
                         @role('admin')
-                            <div onclick="location.href='{{ route('courses.details', $course->id) }}';"
-                                class="flex justify-center text-3xl text-gray-400 hover:text-gray-600 cursor-pointer mx-6">
-                                <i class="fas fa-info-circle mx-auto"></i>
-                            </div>
-                        @endrole
-                    </div>
+                        <div onclick="location.href='{{ route('courses.details', $course->id) }}';"
+                            class="flex justify-center text-3xl text-gray-400 hover:text-gray-600 cursor-pointer mx-6">
+                            <i class="fas fa-info-circle mx-auto"></i>
+                        </div>
+                    @endrole
+                </div>
                 @empty
                     <div class="flex justify-center items-center">
                         <h1 class="text-2xl text-gray-500">You are not enroled in any course.</h1>
                     </div>
                 @endforelse
-                {{-- </div> --}}
 
                 <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg">
-                    {{-- <x-jet-welcome /> --}}
 
 
 

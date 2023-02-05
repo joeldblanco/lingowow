@@ -46,6 +46,7 @@ class Kernel extends ConsoleKernel
             $current_period = json_decode(DB::table('metadata')->where('key', '=', 'current_period')->first()->value);
             $now = Carbon::now();
             $current_period_end = new Carbon($current_period->end_date);
+            // $current_period_end = (new Carbon($now))->subDays(1);
 
             if ($now->greaterThan($current_period_end)) {
 
@@ -64,19 +65,22 @@ class Kernel extends ConsoleKernel
 
                     if ($pending_classes <= 0) {
                         $enrolment = Enrolment::where('student_id', $user->id)->first();
-                        if ($enrolment && $enrolment->course->mdoality == 'synchronous') {
-                            $user_schedule = ModelsSchedule::where('user_id', $user->id)->where('enrolment_id', $enrolment->id)->where('next_schedule', null)->first();
-                            // dump($user_schedule);
-                            if ($user_schedule) {
+                        if ($enrolment && $enrolment->course->modality == 'synchronous') {
+                            $user_schedule = ModelsSchedule::where('user_id', $user->id)->where('enrolment_id', $enrolment->id)->first();
+                            $preselection = $enrolment->preselection;
+                            if (empty($preselection)) {
                                 $enrolment->delete();
                                 $user_schedule->delete();
                                 $user->removeRole('student');
                                 $user->assignRole('guest');
                             } else {
                                 $user_schedule = ModelsSchedule::where('user_id', $user->id)->where('enrolment_id', $enrolment->id)->first();
-                                $user_schedule->selected_schedule = $user_schedule->next_schedule;
-                                $user_schedule->next_schedule = null;
+                                $user_schedule->selected_schedule = $preselection->schedule;
                                 $user_schedule->save();
+
+                                $enrolment->teacher_id = $preselection->teacher_id;
+                                $enrolment->save();
+                                $preselection->delete();
 
                                 $classes_dates = ApportionmentController::calculateApportionment(count($user_schedule->selected_schedule), json_encode($user_schedule->selected_schedule), $enrolment->course->id)[2];
                                 // dump();
@@ -103,25 +107,20 @@ class Kernel extends ConsoleKernel
                     }
                 }
 
-                $today = (new carbon())->hour(0)->minute(0)->second(0);
-                $end_period = (new Carbon(ApportionmentController::currentPeriod(true)[1]))->hour(0)->minute(0)->second(0);
-                if ($today->greaterThan($end_period)) {
-                    DB::table('metadata')->where('key', '=', 'current_period')->update([
-                        'value' => json_encode([
-                            "start_date" => ApportionmentController::nextPeriod(true)[0],
-                            "end_date" => ApportionmentController::nextPeriod(true)[1],
-                        ])
-                    ]);
-                }
+                // $today = (new carbon())->hour(0)->minute(0)->second(0);
+                // $end_period = (new Carbon(ApportionmentController::currentPeriod(true)[1]))->hour(0)->minute(0)->second(0);
+                // if ($today->greaterThan($end_period)) {
+                DB::table('metadata')->where('key', '=', 'current_period')->update([
+                    'value' => json_encode([
+                        "start_date" => ApportionmentController::nextPeriod(true)[0],
+                        "end_date" => ApportionmentController::nextPeriod(true)[1],
+                    ])
+                ]);
+                // }
 
                 GatherController::setGuestsList();
-
-                
             }
-        })->everyMinute();
 
-
-        $schedule->call(function () {
             $notified_students = User::find(DB::table('notifications')->where('created_at', '>=', Carbon::now()->subHours(1))->where('notifiable_type', 'App\Models\User')->where('type', 'App\Notifications\UpcomingClassForStudent')->get('notifiable_id')->pluck('notifiable_id')->unique());
             $notified_teachers = User::find(DB::table('notifications')->where('created_at', '>=', Carbon::now()->subHours(1))->where('notifiable_type', 'App\Models\User')->where('type', 'App\Notifications\UpcomingClassForTeacher')->get('notifiable_id')->pluck('notifiable_id')->unique());
             $classes = Classes::where('start_date', '<=', Carbon::now()->addHour())->where('start_date', '>', Carbon::now())->get();
