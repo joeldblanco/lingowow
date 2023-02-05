@@ -38,6 +38,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Notification;
 use App\Http\Controllers\MeetingController;
 use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\PlanController;
 // use App\Http\Controllers\PaypalController;
 use App\Http\Controllers\ProductController;
 use App\Models\Attempt;
@@ -52,6 +53,11 @@ use App\Models\Unit;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Mail;
+use Laravel\Jetstream\Jetstream;
+// use Inertia\Inertia;
+use Illuminate\Support\Str;
+
+
 
 /*
 |--------------------------------------------------------------------------
@@ -101,7 +107,22 @@ Route::middleware(['web', 'auth', 'verified', 'impersonate'])->group(function ()
 
 
 
-    Route::get('chatwoot/createContact', [ChatwootController::class, 'createContact']);
+    // ROUTES FOR GENERAL GUIDELINES AND GUIDELINES FOR CLASS RECOVERY
+    Route::get('/guidelines', function () {
+        $guidelines = Jetstream::localizedMarkdownPath('guidelines.md');
+        $guidelines = Str::markdown(file_get_contents($guidelines));
+
+        return view('guidelines', compact('guidelines'));
+    })->name('guidelines');
+
+    Route::get('/guidelines-for-class-recovery', function () {
+        $classRecovery = Jetstream::localizedMarkdownPath('class_recovery.md');
+        $classRecovery = Str::markdown(file_get_contents($classRecovery));
+
+        return view('class_recovery', compact('classRecovery'));
+    })->name('guidelines-for-class-recovery');
+
+    // Route::get('chatwoot/createContact', [ChatwootController::class, 'createContact']);
 
 
 
@@ -251,6 +272,13 @@ Route::middleware(['web', 'auth', 'verified', 'impersonate'])->group(function ()
 
 
 
+        //ROUTES FOR PLANS//
+        Route::resource('admin/plans', PlanController::class);
+
+
+
+
+
         //DASHBOARD//
         Route::get('/admin/dashboard', [AnalyticsController::class, 'index'])->name('admin.dashboard');
 
@@ -378,7 +406,7 @@ Route::middleware(['web', 'auth', 'verified', 'impersonate'])->group(function ()
                     }
 
                     $user->removeRole('student');
-                    $user->removePermission('view units');
+                    $user->revokePermissionTo('view units');
                     $user->assignRole('guest');
                 }
             }

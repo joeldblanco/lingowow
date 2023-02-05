@@ -19,7 +19,7 @@
     <script>
         tinymce.init({
             selector: '#essay-content',
-            plugins: 'wordcount',
+            plugins: ['wordcount','code'],
         });
     </script>
 </x-app-layout>

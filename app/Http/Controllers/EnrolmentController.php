@@ -110,10 +110,19 @@ class EnrolmentController extends Controller
         // ]);
         // $enrolment->save();
 
-        $enrolment = Enrolment::withTrashed()->updateOrCreate(
-            ['student_id' => $request->get('student_id'), 'course_id' => $request->get('course_id')],
-            ['teacher_id' => $request->get('teacher_id'), 'deleted_at' => NULL]
-        );
+        if (empty($request->get('student_id'))) {
+            Enrolment::withTrashed()->updateOrCreate(
+                ['teacher_id' => $request->get('teacher_id'), 'course_id' => $request->get('course_id')],
+                ['deleted_at' => NULL]
+            );
+        }
+
+        if (empty($request->get('teacher_id'))) {
+            Enrolment::withTrashed()->updateOrCreate(
+                ['student_id' => $request->get('student_id'), 'course_id' => $request->get('course_id')],
+                ['deleted_at' => NULL]
+            );
+        }
 
         if (Course::find($request->get('course_id'))->categories->pluck('name')->contains('Conversational') && ($request->get('student_id') == null) && ($request->get('teacher_id') != null)) {
             User::find($request->get('teacher_id'))->givePermissionTo('edit conversational courses');

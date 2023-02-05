@@ -45,17 +45,29 @@
                                     <i class="fas fa-chevron-right"></i>
                                 </div>
                             </div>
+                            
                             @role('student')
+                            @if (!$course->categories->pluck('name')->contains('Conversational'))
                                 <div class="flex w-full" id="chart"></div>
+                                @php
+                                    $user_units = auth()->user()->units;
+                                    if (count($user_units) <= 0) {
+                                        $user_units = 0;
+                                    } else {
+                                        $user_units = auth()
+                                            ->user()
+                                            ->units->first()->order;
+                                    }
+                                @endphp
                                 <script>
                                     var options = {
                                         series: [{
                                                 name: 'Progress (Units)',
-                                                data: [{{ auth()->user()->units->first()->order }}]
+                                                data: [{{ $user_units }}]
                                             },
                                             {
                                                 name: 'Remaining (Units)',
-                                                data: [{{ count($course->units()) -auth()->user()->units->first()->order }}]
+                                                data: [{{ count($course->units()) - $user_units }}]
                                             },
                                         ],
                                         grid: {
@@ -106,15 +118,16 @@
                                     var chart = new ApexCharts(document.querySelector("#chart"), options);
                                     chart.render();
                                 </script>
+                            @endif
                             @endrole
                         </div>
                         @role('admin')
-                            <div onclick="location.href='{{ route('courses.details', $course->id) }}';"
-                                class="flex justify-center text-3xl text-gray-400 hover:text-gray-600 cursor-pointer mx-6">
-                                <i class="fas fa-info-circle mx-auto"></i>
-                            </div>
-                        @endrole
-                    </div>
+                        <div onclick="location.href='{{ route('courses.details', $course->id) }}';"
+                            class="flex justify-center text-3xl text-gray-400 hover:text-gray-600 cursor-pointer mx-6">
+                            <i class="fas fa-info-circle mx-auto"></i>
+                        </div>
+                    @endrole
+                </div>
                 @empty
                     <div class="flex justify-center items-center">
                         <h1 class="text-2xl text-gray-500">You are not enroled in any course.</h1>

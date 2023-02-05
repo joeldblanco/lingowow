@@ -87,7 +87,7 @@
         </div>
         <div class="w-2/5 bg-lw-blue">
             <img src="{{ Storage::url('images/login_cover.jpg') }}" alt=""
-                class="object-cover h-screen opacity-50">
+                class="object-cover h-full opacity-50">
         </div>
     </div>
 </x-guest-layout>

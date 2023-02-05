@@ -12,23 +12,9 @@ const tour = new Shepherd.Tour({
 tour.addSteps([
     {
         id: 'teachers-carousel',
-        text: 'Here you will find a carousel with the teachers availables. You can drag right or left to see other teachers.',
+        text: 'Here\'s a carousel showcasing our talented teachers! 🧑‍🏫 You can swipe right or left to see more of them. 💡 Let\'s find the perfect match for your learning needs! 🔍',
         attachTo: {
             element: '.teachers-carousel',
-            on: 'top'
-        },
-        buttons: [
-            {
-                text: 'Next',
-                action: tour.next
-            }
-        ]
-    },
-    {
-        id: 'teacher-save',
-        text: 'Once you find a teacher you like, you can select it to proceed to choose your schedule.',
-        attachTo: {
-            element: '.teacher-save',
             on: 'top'
         },
         buttons: [
@@ -36,11 +22,25 @@ tour.addSteps([
                 text: 'Next!',
                 action: tour.next
             }
+        ]
+    },
+    {
+        id: 'teacher-save',
+        text: 'Great news! Once you\'ve found a teacher that you connect with, simply select them to proceed with choosing your schedule. 🗓️ Let\'s make sure we find a time that works for you! ✨',
+        attachTo: {
+            element: '.teacher-save',
+            on: 'top'
+        },
+        buttons: [
+            {
+                text: 'Great!',
+                action: tour.next
+            }
         ],
     },
     {
         id: 'table-schedule-seccion',
-        text: 'In this section you will be able to choose your class schedule according to your selected plan.',
+        text: '🗓️ Welcome to the scheduling section! Here, you can choose the perfect class schedule that fits your selected plan. 💻 Let\'s make sure your learning journey is as convenient as possible! 💡',
         attachTo: {
             element: '.table-tour-seccion',
             // on: 'right'
@@ -48,7 +48,7 @@ tour.addSteps([
         buttons: [
             {
                 text: 'Next',
-                action(){
+                action() {
                     // console.log("una prueba SIUUUU")
                     // $('#2-2').toggleClass('border-block-tour');
                     return this.next()
@@ -58,16 +58,32 @@ tour.addSteps([
     },
     {
         id: 'table-schedule',
-        text: 'It is represented by blocks, each block has a duration of one hour. <br>On the left side is shown the UTC time and your local time to which each block belongs.<br>Take this into account your local time when selecting your class schedule.',
+        text: 'In this section, class schedules are represented by blocks, with each block representing one class. 🕰️',
         attachTo: {
             element: '.table-tour',
             on: 'top'
         },
         buttons: [
             {
-                text: 'Next',
-                action(){
+                text: 'Okay!',
+                action() {
                     // console.log("una prueba SIUUUU")
+                    return this.next()
+                }
+            }
+        ]
+    },
+    {
+        id: 'utc-local',
+        text: '👈 On the left side, you\'ll see both UTC time and your local time, so you can make sure you\'re selecting the right schedule for you. 🗓️ Keep that in mind while making your selection! 💡',
+        // attachTo: {
+        //     elements: '.utc-local',
+        //     on: 'top'
+        // },
+        buttons: [
+            {
+                text: 'Got it!',
+                action() {
                     return this.complete()
                 }
             }

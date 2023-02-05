@@ -49,9 +49,15 @@ class ProductController extends Controller
             'name' => 'required',
             'description' => 'required',
             'regular_price' => 'required|numeric',
-            'sale_price' => 'numeric',
+            'sale_price' => 'numeric|nullable',
             'course_id' => 'numeric|exists:App\Models\Course,id',
         ]);
+
+        if ((int) $request->sale_price <= 0) {
+            $sale_price = null;
+        } else {
+            $sale_price = $request->sale_price;
+        }
 
         if (!empty($request->categories)) {
             $request->validate(['categories' => 'exists:App\Models\Category,id']);
@@ -74,7 +80,7 @@ class ProductController extends Controller
             'slug' => $newSlug,
             'description' => $request->description,
             'regular_price' => $request->regular_price,
-            'sale_price' => $request->sale_price,
+            'sale_price' => $sale_price,
             'image' => $product_image,
         ]);
 
@@ -136,29 +142,21 @@ class ProductController extends Controller
             $request->validate(['courses' => 'exists:App\Models\Course,id']);
         }
 
-        // if (!empty($request->features)) {
-        //     $request->validate(['features' => 'exists:App\Models\Feature,id']);
-        // }
+        if ((int) $request->sale_price <= 0) {
+            $sale_price = null;
+        } else {
+            $sale_price = $request->sale_price;
+        }
 
         $image = $request->file('product_image');
-        $path_to_file = $image == null ? DB::table('metadata')->where('key', 'sample_image_url')->first()->value : $image->storeAs('public/images/products/covers', str_replace(" ", "_", $product->slug) . '.' . $image->getClientOriginalExtension());
+        $path_to_file = $image == null ? $product->image : $image->storeAs('public/images/products/covers', str_replace(" ", "_", $product->slug) . '.' . $image->getClientOriginalExtension());
         $product_image = $path_to_file;
-
-
-        // $slug = Str::slug($request->name, '-');
-        // $counter = 1;
-        // $newSlug = $slug;
-        // while (Product::where('slug', $newSlug)->exists()) {
-        //     $newSlug = $slug . '-' . $counter;
-        //     $counter++;
-        // }
 
         $product->update([
             'name' => $request->name,
-            // 'slug' => $newSlug,
             'description' => $request->description,
             'regular_price' => $request->regular_price,
-            'sale_price' => $request->sale_price == null ? $product->sale_price : $request->sale_price,
+            'sale_price' => $sale_price,
             'image' => $product_image,
         ]);
 
@@ -175,13 +173,6 @@ class ProductController extends Controller
         } else {
             $product->courses()->detach();
         }
-
-        // if (!empty($request->features)) {
-        //     $features = explode(',', $request->features);
-        //     $product->features()->sync($features);
-        // } else {
-        //     $product->features()->detach();
-        // }
 
         return redirect()->route('products.index')->with('success', 'Product updated successfully.');
     }

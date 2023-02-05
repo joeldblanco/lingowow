@@ -11,7 +11,7 @@
                 style="width: calc(100vw - 6rem);">
                 @foreach ($plans->sortBy('id') as $plan)
                     <div
-                        class="sm:flex-1 flex-initial w-1/4 rounded-t-lg rounded-tr-none bg-white @if ($loop->index == 1) z-10 @else mt-4 @endif flex flex-col shadow-2xl">
+                        class="sm:flex-1 lg:flex-none flex-initial w-1/3 rounded-t-lg rounded-tr-none bg-white @if ($loop->index == 1) z-10 @else mt-4 @endif flex flex-col shadow-2xl">
                         <div class="p-8 text-3xl font-bold text-center">{{ ucfirst($plan->name) }}</div>
                         <div class="border-0 border-gray-light border-t border-solid text-sm">
                             @foreach ($plan->features as $feature)
@@ -28,7 +28,7 @@
                                         <p
                                             class="text-md @if (!$feature->pivot->status) text-gray-400 line-through @endif">
                                             @if (Str::contains($feature->name, 'Personalized Classes'))
-                                                {{ $plan->n_classes / 4 }} {{ $feature->name }} per week
+                                                {{ $plan->monthly_classes / 4 }} {{ $feature->name }} per week
                                             @else
                                                 {{ $feature->name }}
                                             @endif
@@ -61,23 +61,39 @@
                         </div>
                         {{-- {{dd($product->sale_price)}} --}}
                         <div class="w-full text-center px-8 pt-8 text-xl mt-auto flex-col flex">
-                            @if ($product->sale_price == null)
-                                <div>
+                            @if ($product->categories->pluck('name')->contains('Synchronous'))
+                                @if ($product->sale_price == null)
+                                    <div>
+                                        <span
+                                            class="font-bold text-3xl text-gray-800">${{ $product->regular_price * $plan->monthly_classes }}</span>
+                                        <span class="text-gray-400">/mo</span>
+                                    </div>
+                                @else
+                                    <span class="text-gray-400 italic line-through">
+                                        ${{ $product->regular_price * $plan->monthly_classes }}
+                                    </span>
                                     <span
-                                        class="font-bold text-3xl text-gray-800">${{ $product->regular_price * $plan->n_classes }}</span>
-                                    <span class="text-gray-400">/mo</span>
-                                </div>
+                                        class="font-bold text-2xl">{{ $product->sale_price * $plan->monthly_classes }}</span>
+                                @endif
                             @else
-                                <span class="text-gray-400 italic line-through">
-                                    ${{ $product->regular_price * $plan->n_classes }}
-                                </span>
-                                <span class="font-bold text-2xl">{{ $product->sale_price * $plan->n_classes }}</span>
+                                @if ($product->sale_price == null)
+                                    <div>
+                                        <span
+                                            class="font-bold text-3xl text-gray-800">${{ $product->regular_price }}</span>
+                                        <span class="text-gray-400">/mo</span>
+                                    </div>
+                                @else
+                                    <span class="text-gray-400 italic line-through">
+                                        ${{ $product->regular_price }}
+                                    </span>
+                                    <span class="font-bold text-2xl">{{ $product->sale_price }}</span>
+                                @endif
                             @endif
                         </div>
                         <div class="text-center
                                                 mb-8 mt-4">
                             @if ($product->courses->first()->modality == 'synchronous')
-                                <button wire:click="store('{{ $plan->n_classes / 4 }}', true)"
+                                <button wire:click="store('{{ $plan->monthly_classes / 4 }}', true)"
                                     class=" @if ($loop->index == 1) select-button @endif inline-block bg-blue-800 text-white px-4 py-2 rounded-lg hover:bg-blue-900 hover:text-white hover:no-underline">Select</button>
                             @else
                                 <button wire:click="store()"

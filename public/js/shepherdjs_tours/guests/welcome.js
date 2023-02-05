@@ -20,7 +20,7 @@ tour.addSteps([
         // classes: 'example-step-extra-class',
         buttons: [
             {
-                text: 'Let\'s do it!',
+                text: 'Let\'s go!',
                 action: tour.next
             }
         ]

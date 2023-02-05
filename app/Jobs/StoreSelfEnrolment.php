@@ -116,7 +116,7 @@ class StoreSelfEnrolment implements ShouldQueue
                         ['teacher_id' => $teacher->id, 'schedule' => json_decode(session('user_schedule')), 'deleted_at' => NULL]
                     );
 
-                    return redirect()->route('invoices.show', $invoice->id);
+                    return redirect()->route('invoice.show', $invoice->id);
                 }
             } else {
                 //CREATING STUDENT'S ENROLMENT (OR UPDATING IT, IN CASE IT ALREADY EXISTS BUT IS SOFTDELETED)//
