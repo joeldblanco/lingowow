@@ -49,6 +49,30 @@
             @click="editUser = true" wire:click="editUser({{ $user->id }})">Edit</button>
     </div>
 
+    <div class="bg-black bg-opacity-50 z-30 fixed top-0 left-0 w-full h-full flex items-center justify-center"
+        x-show="deleteConfirmation" x-transition x-cloak>
+        <div class="leading-loose">
+            <div class="max-w-xl m-4 p-10 bg-white rounded shadow-2xl space-y-1"
+                @click.outside="deleteConfirmation = false">
+                <div class="flex justify-between border-b mb-5 py-4 text-3xl">
+                    <h1 class="">Confirm</h1>
+                    <i class="fas fa-times cursor-pointer text-xl" @click="deleteConfirmation = false"></i>
+                </div>
+                @if (isset($current_user) && $current_user != null)
+                    <p>Are you sure you want to delete this user?</p>
+                @endif
+                <div class="flex pt-4 justify-between w-full">
+                    <button
+                        class="px-4 py-1 text-white font-light tracking-wider bg-red-700 rounded border hover:border-red-700 hover:bg-white hover:text-red-700 transition-all"
+                        @click="deleteConfirmation = false, editUser = false" wire:click="deleteUser">Yes</button>
+                    <button
+                        class="px-4 py-1 text-white font-light tracking-wider bg-gray-900 rounded border hover:border-gray-900 hover:bg-white hover:text-gray-900 transition-all"
+                        @click="deleteConfirmation = false, editUser = true">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <x-modal type="info" name="editUser">
         <x-slot name="title">
         </x-slot>
