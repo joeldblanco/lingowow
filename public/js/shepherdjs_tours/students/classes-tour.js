@@ -11,8 +11,8 @@ const tour = new Shepherd.Tour({
 
 tour.addSteps([
     {
-        id: 'Teacher_tour',
-        text: "By clicking on your teacher's name, you can go directly to his or her user profile.",
+        id: 'classes_welcome',
+        text: "Welcome to your classes page! 🎉 This is where you'll find all the information related to your classes in one place. From class dates to class recordings, it's all here. Let's take a look! 🔍",
         attachTo: {
             element: '.teacher-tour',
             on: 'top'
@@ -25,8 +25,22 @@ tour.addSteps([
         ],
     },
     {
+        id: 'teacher_tour',
+        text: "📝 On the left side, you'll see the teacher's name and a link to their profile. On the right side, you'll find the class date and time. 🕰️ This way, you'll have all the important details at a quick glance. 🔍",
+        // attachTo: {
+        //     element: '.teacher-tour',
+        //     on: 'top'
+        // },
+        buttons: [
+            {
+                text: 'Next!',
+                action: tour.next
+            }
+        ],
+    },
+    {
         id: 'Class_tour',
-        text: 'You can view the details of your class by clicking directly on the class date.',
+        text: "👀 To view the details of a class, simply click on the class date. 💡 That's all it takes to access important information about your class. 🔍",
         attachTo: {
             element: '.class-tour',
             on: 'top'
@@ -37,7 +51,21 @@ tour.addSteps([
                 action: tour.complete
             }
         ],
-    }
+    },
+    {
+        id: 'class_recordings',
+        text: "👀 To view the details of a class, simply click on the class date. 💡 That's all it takes to access important information about your class. 🔍",
+        attachTo: {
+            element: '.class-tour',
+            on: 'top'
+        },
+        buttons: [
+            {
+                text: 'Got it!',
+                action: tour.complete
+            }
+        ],
+    },
 ]);
 
 function start() {

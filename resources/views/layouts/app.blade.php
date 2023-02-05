@@ -99,7 +99,8 @@
                     Route::currentRouteName() == 'modules.show' ||
                     Route::currentRouteName() == 'units.show'))
             <div class="bg-yellow-300 text-center py-3">
-                <p class="text-red-500 font-semibold">You are previewing our courses. If you want to buy one click <a href="{{ route('shop') }}" class="text-md font-bold hover:underline">here</a>.</p>
+                <p class="text-red-500 font-semibold">You are previewing our courses. If you want to buy one click <a
+                        href="{{ route('shop') }}" class="text-md font-bold hover:underline">here</a>.</p>
             </div>
         @endif
 

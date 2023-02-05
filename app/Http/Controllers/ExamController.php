@@ -131,7 +131,7 @@ class ExamController extends Controller
                 $user->addUnit(auth()->id(), $unit);
             }
 
-            return view('exams.result', compact('result', 'answers', 'questions'));
+            return view('exams.result', compact('result', 'answers', 'questions','attempt'));
         } else {
             abort(404);
         }

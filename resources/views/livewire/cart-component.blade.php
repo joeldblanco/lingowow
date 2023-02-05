@@ -19,11 +19,13 @@
                     <tbody>
                         {{-- {{dd(Cart::content())}} --}}
                         @foreach (Cart::content() as $item)
-                            {{-- {{dd(Cart::content())}} --}}
+                            @php
+                                $product = App\Models\Product::find($item->id);
+                            @endphp
                             <tr>
                                 <td class="hidden pb-4 md:table-cell">
                                     <a href="#">
-                                        <img src="{{ $item->image }}" class="w-20 rounded" alt="Thumbnail">
+                                        <img src="{{ Storage::url($product->image) }}" class="w-20 rounded" alt="Thumbnail">
                                     </a>
                                 </td>
                                 <td>

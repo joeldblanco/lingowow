@@ -12,7 +12,7 @@ const tour = new Shepherd.Tour({
 tour.addSteps([
     {
         id: 'no-classes-div',
-        text: "Congratulations! You are now part of this great family!<br><br>This is your dashboard, join me to see what's new in it.",
+        text: "Congratulations!🎉 You're now a part of this wonderful community! 🤗 Let me show you around your dashboard and see what's new. 💡 <br><br>This is where you'll keep track of your progress, receive updates and connect with others.",
         // attachTo: {
         //     element: '.no-classes-div',
         //     on: 'top'
@@ -20,14 +20,14 @@ tour.addSteps([
         // classes: 'example-step-extra-class',
         buttons: [
             {
-                text: 'Next',
+                text: "Let's dive in! 🚀",
                 action: tour.next
             }
         ]
     },
     {
         id: 'dasboard-buttons-tour',
-        text: 'In the first instance, you have a "<b>Classroom</b>" button that will take you directly to your virtual classroom with your teacher on the corresponding day.<br><br>And a "<b>Classes</b>" button where you can view and interact with your classes individually.',
+        text: 'On your dashboard, you have two buttons: <br><br> "Classroom" - takes you straight to your virtual classroom with your teacher on the designated day.<br><br>"Classes" - lets you view and interact with each of your classes individually. 💡',
         attachTo: {
             element: '.buttons-dashboard-tour',
             on: 'right'
@@ -41,7 +41,7 @@ tour.addSteps([
     },
     {
         id: 'barprogres-your',
-        text: 'You will also see a progress bar, in which you will be able to see the progress of your course.',
+        text: '📈 Additionally, you\'ll find a progress bar on your dashboard to track your course progress. 🚀 <br><br>Keep an eye on it to see how far you\'ve come and where you\'re headed! 💡',
         attachTo: {
             element: '.barprogress-tour',
             on: 'bottom'
@@ -55,7 +55,7 @@ tour.addSteps([
     },
     {
         id: 'gather-link',
-        text: '<b>¡Important!</b> a new section has been added! "GATHER", this section is special for you, it is a real time group meeting place for teachers and students!<br><br>When you feel ready, feel free to check it out.',
+        text: '📣 Attention! A new section has been added: "GATHER." 🎉<br><br>This is a special space for real-time group meetings with your teachers and fellow students.<br><br>When you\'re ready, go ahead and explore! 💬',
         attachTo: {
             element: '.gather-link',
             on: 'bottom'

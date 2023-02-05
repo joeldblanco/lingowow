@@ -79,6 +79,12 @@
             'parent_link' => request()->is('admin', 'admin/*'),
         ],
         [
+            'name' => 'Plans',
+            'route' => route('plans.index'),
+            'status' => request()->routeIs('plans.index'),
+            'parent_link' => request()->is('admin', 'admin/*'),
+        ],
+        [
             'name' => 'Categories',
             'route' => route('categories.index'),
             'status' => request()->routeIs('categories.index'),

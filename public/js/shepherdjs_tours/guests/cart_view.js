@@ -10,23 +10,23 @@ const tour = new Shepherd.Tour({
 });
 
 tour.addSteps([
-    {
-        id: 'cart-general',
-        text: 'This is your shopping cart.',
-        attachTo: {
-            element: '.cart-general',
-            on: 'top'
-        },
-        buttons: [
-            {
-                text: 'Next',
-                action: tour.next
-            }
-        ]
-    },
+    // {
+    //     id: 'cart-general',
+    //     text: 'This is your shopping cart.',
+    //     attachTo: {
+    //         element: '.cart-general',
+    //         on: 'top'
+    //     },
+    //     buttons: [
+    //         {
+    //             text: 'Next',
+    //             action: tour.next
+    //         }
+    //     ]
+    // },
     {
         id: 'cart-info-buy',
-        text: 'Here you can see the information about your selected products and courses.',
+        text: 'Hi there! Welcome to your shopping cart. 🛍️ Here, you can find all the details about the products and courses you\'ve selected. Let\'s make sure you have everything you need before checking out! 💳💡',
         attachTo: {
             element: '.cart-info-buy',
             on: 'top'
@@ -40,17 +40,15 @@ tour.addSteps([
     },
     {
         id: 'cart-coupon',
-        text: 'If you have a special coupon, feel free to redeem it in this section.',
+        text: 'Good news! If you have a special coupon, this is the place to redeem it. 🎉 Simply enter your code and enjoy the savings! 💳💰 Let\'s make the most of your shopping experience! 🛍️',
         attachTo: {
             element: '.cart-coupon',
             on: 'top'
         },
         buttons: [
             {
-                text: 'Next',
+                text: 'Okay!',
                 action(){
-                    // console.log("una prueba SIUUUU")
-                    // $('#2-2').toggleClass('border-block-tour');
                     return this.next()
                 }
             }
@@ -58,16 +56,16 @@ tour.addSteps([
     },
     {
         id: 'cart-payment',
-        text: 'Finally, use your preferred payment method.',
+        text: '💳 Finally, you can use your preferred payment method to make the transaction. 💰 Whether it\'s a credit card or PayPal, we\'ve got you covered! 🛍️ Let\'s finish this up and get you on your way to your learning journey! 🚀',
         attachTo: {
             element: '.cart-payment',
             on: 'top'
         },
         buttons: [
             {
-                text: 'Great!',
+                text: 'Thanks!',
                 action(){
-                    console.log("una prueba SIUUUU")
+                    // console.log("una prueba SIUUUU")
                     return this.complete()
                 }
             }

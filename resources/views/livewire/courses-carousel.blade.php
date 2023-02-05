@@ -88,7 +88,7 @@
                             <div class="py-8 px-4 bg-white rounded-b-md fd-cl group-hover:opacity-25 w-10/12">
                                 <span
                                     class="block text-lg text-gray-800 font-bold tracking-wide">{{ $product->name }}</span>
-                                <span class="block text-gray-600 text-sm">{{ $product->description }}
+                                {{-- <span class="block text-gray-600 text-sm">{{ $product->description }} --}}
                                 </span>
                             </div>
                         </div>
@@ -97,7 +97,8 @@
                                 class="text-3xl font-bold text-white tracking-wider leading-relaxed font-sans">{{ $product->name }}</span>
                             <div class="pt-8 text-center">
                                 <button wire:click="selectProduct({{ $product->id }})"
-                                    class="text-center rounded-lg p-4 bg-white  text-gray-700 font-bold text-lg">Select</button>
+                                    class="text-center rounded-lg p-4 bg-white  text-gray-700 font-bold text-lg"
+                                    @if ($loop->first) id="select-button" @endif>Select</button>
                             </div>
                         </div>
                     </div>

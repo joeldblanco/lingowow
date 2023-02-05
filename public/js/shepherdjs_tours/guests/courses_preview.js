@@ -12,7 +12,7 @@ const tour = new Shepherd.Tour({
 tour.addSteps([
     {
         id: 'courses-list',
-        text: 'Here you can preview our programs.📖 The available programs will be listed here. ⬇️',
+        text: 'Here you can preview our available programs.📖 All of them will be listed here. ⬇️',
         attachTo: {
             element: '.courses-list',
             on: 'top'

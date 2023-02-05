@@ -70,7 +70,7 @@
                                 <input type="hidden" id="selected-categories-input" name="categories">
                                 <select id="categories-select"
                                     class="w-full rounded-md hover:border-gray-600 p-3 text-gray-600 @if ($errors->has('categories')) border-red-600 @else border-gray-300 @endif">
-                                    <option value="">Selecciona una categoría</option>
+                                    <option value="">Select a category</option>
                                     @foreach ($categories as $category)
                                         @if (!$product->categories->pluck('name')->contains($category->name))
                                             <option value="{{ $category->id }}" data-value="{{ $category->id }}">

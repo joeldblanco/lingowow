@@ -11,6 +11,13 @@ class Plan extends Model
     use HasFactory;
     use SoftDeletes;
 
+    protected $fillable = [
+        'name',
+        'slug',
+        'monthly_classes',
+        'product_id',
+    ];
+
     /**
      * Get all of the features for the plan.
      */

@@ -16,7 +16,7 @@ class CreatePlansTable extends Migration
         Schema::create('plans', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->string('plan_name',250);
-            $table->integer('n_classes');
+            $table->integer('monthly_classes');
             $table->string('slug',250);
             $table->timestamps();
             $table->softDeletes();
