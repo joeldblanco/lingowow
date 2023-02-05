@@ -7,6 +7,7 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Cart;
 use App\Item;
+use App\Jobs\StoreSelfEnrolment;
 use App\Mail\InvoicePaid;
 use App\Models\Course;
 use App\Models\Enrolment;
@@ -122,55 +123,57 @@ class PaymentController extends Controller
 
         // return $response->getStatusCode() === 200 ? $response->body() : null;
 
-        $invoice = $this->createInvoice($response->getStatusCode());
+        // $invoice = $this->createInvoice($response->getStatusCode());
 
-        if ($invoice->paid) {
-            // session()->put(['code' => 'success', 'message' => "Order $invoice->id has been paid successfully!"]);
-            // $users = User::all();
-            // $items = Item::all();
+        if ($response->getStatusCode() === 200) {
+            // // session()->put(['code' => 'success', 'message' => "Order $invoice->id has been paid successfully!"]);
+            // // $users = User::all();
+            // // $items = Item::all();
 
-            foreach (Cart::content() as $item) {
-                if ($item->name === "Enrolment") {
-                    $current_user = User::find(auth()->id());
-                    $current_user->removeRole('guest');
-                    $current_user->assignRole('student');
-                }
-            }
+            // foreach (Cart::content() as $item) {
+            //     if ($item->name === "Enrolment") {
+            //         $current_user = User::find(auth()->id());
+            //         $current_user->removeRole('guest');
+            //         $current_user->assignRole('student');
+            //     }
+            // }
 
             $student = auth()->user(); //EDITAR: EN LUGAR DEL USUARIO LOGUEADO, DEBERÍA SER EL USUARIO QUE SE ENVÍE POR PARAMETRO//
-            $course_id = session('selected_course');
+            // $course_id = session('selected_course');
 
-            //CHANGING STUDENT'S ROLE FROM 'GUEST' TO 'STUDENT'//
-            $student->removeRole('guest');
-            $student->assignRole('student');
+            // //CHANGING STUDENT'S ROLE FROM 'GUEST' TO 'STUDENT'//
+            // $student->removeRole('guest');
+            // $student->assignRole('student');
 
-            $product = Course::find($course_id)->products->first();
-            if ($product->courses->first()->modality == "synchronous") {
-                $teacher = User::find(session('teacher_id'));
+            // $product = Course::find($course_id)->products->first();
+            // if ($product->courses->first()->modality == "synchronous") {
+            //     $teacher = User::find(session('teacher_id'));
 
-                //CREATING STUDENT'S ENROLMENT (OR UPDATING IT, IN CASE IT ALREADY EXISTS BUT IS SOFTDELETED)//
-                $enrolment = Enrolment::withTrashed()->updateOrCreate(
-                    ['student_id' => $student->id, 'course_id' => $course_id],
-                    ['teacher_id' => $teacher->id, 'deleted_at' => NULL]
-                );
+            //     //CREATING STUDENT'S ENROLMENT (OR UPDATING IT, IN CASE IT ALREADY EXISTS BUT IS SOFTDELETED)//
+            //     $enrolment = Enrolment::withTrashed()->updateOrCreate(
+            //         ['student_id' => $student->id, 'course_id' => $course_id],
+            //         ['teacher_id' => $teacher->id, 'deleted_at' => NULL]
+            //     );
 
-                SchedulingCalendarController::store(auth()->user()->id, $enrolment);
-            } else {
+            //     SchedulingCalendarController::store(auth()->user()->id, $enrolment);
+            // } else {
 
-                //CREATING STUDENT'S ENROLMENT (OR UPDATING IT, IN CASE IT ALREADY EXISTS BUT IS SOFTDELETED)//
-                $enrolment = Enrolment::withTrashed()->updateOrCreate(
-                    ['student_id' => $student->id, 'course_id' => $course_id],
-                    ['teacher_id' => NULL, 'deleted_at' => NULL]
-                );
-            }
+            //     //CREATING STUDENT'S ENROLMENT (OR UPDATING IT, IN CASE IT ALREADY EXISTS BUT IS SOFTDELETED)//
+            //     $enrolment = Enrolment::withTrashed()->updateOrCreate(
+            //         ['student_id' => $student->id, 'course_id' => $course_id],
+            //         ['teacher_id' => NULL, 'deleted_at' => NULL]
+            //     );
+            // }
 
 
 
-            Cart::destroy();
-            // Mail::to($student)->send(new InvoicePaid($invoice));
-            return redirect()->route('invoice.show', ['id' => $invoice->id]);
+            // Cart::destroy();
+            // // Mail::to($student)->send(new InvoicePaid($invoice));
+
+            dispatch(new StoreSelfEnrolment($student));
+            return redirect()->route('invoice.show', ['id' => session('invoice_id')]);
         } else {
-            session()->put(['code' => 'danger', 'message' => "Error processing payment for Order $invoice->id!"]);
+            session()->put(['code' => 'danger', 'message' => "Error processing payment"]);
         }
 
         return redirect()->route('shop');

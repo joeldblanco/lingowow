@@ -7,6 +7,7 @@ use App\Models\Course;
 use App\Models\Module;
 use App\Models\User;
 use App\Models\Group_unit;
+use App\Models\Product;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -46,27 +47,11 @@ class CourseController extends Controller
         return view('course.index', compact('courses'));
     }
 
-    // public function show_module($id_course, $id_module){
-
-    //     $user_id = auth()->id();
-    //     $user = User::find($user_id);
-    //     $role = Auth::user()->roles->pluck('name')[0];
-    //     $enrolment = Enrolment::where('student_id',$user_id)->orWhere('teacher_id',$user_id)->get();
-    //     $units = Module::find($id_module)->units;
-    //     $units = $units->intersect($user->units);
-    //     // dd($user->units);
-
-    //     if($role != "student" && $role != "guest"){
-    //         $units = Module::find($id_module)->units;
-    //     }
-
-    //     // dd($units, $role);
-
-    //     return view('Modules.Units', compact('units'));
-    // }
-
-
-
+    public function adminIndex()
+    {
+        $courses = Course::all();
+        return view('admin.courses.index', compact('courses'));
+    }
 
     /**
      * Show the form for creating a new resource.
@@ -88,12 +73,11 @@ class CourseController extends Controller
      */
     public function store(Request $request)
     {
-        // dd($request);
         $request->validate([
             'name' => 'required',
             'description' => 'required',
             'image' => 'image|mimes:jpeg,png,jpg|max:2048',
-            'modality' => 'required|in:Synchronous,Asynchronous,synchronous,asynchronous',
+            'modality' => 'required|in:synchronous,asynchronous',
             'categories' => 'exists:App\Models\Category,id',
         ]);
 
@@ -108,9 +92,9 @@ class CourseController extends Controller
             'image_url' => $course_image,
         ]);
 
-        $categories = explode(',', $request->categories);
-        if (!empty($categories)) {
-            $course->categories()->attach($categories);
+        if (!empty($request->categories)) {
+            $categories = explode(',', $request->categories);
+            $course->categories()->sync($categories);
         }
 
         return redirect()->route('courses.index')->with('success', 'Course created successfully.');
@@ -160,6 +144,7 @@ class CourseController extends Controller
                     $user_module = Module::findOrFail($user_module->module_id);
                     $user_modules->push($user_module);
                 }
+                $modules = $user_modules;
             } else {
                 foreach ($modules as $module) {
                     if ($module->id <= $user->units->first()->module->order) {
@@ -192,7 +177,8 @@ class CourseController extends Controller
     {
         $course = Course::findOrFail($course);
         $categories = Category::all();
-        return view('course.edit', compact('course', 'categories'));
+        $products = Product::all();
+        return view('course.edit', compact('course', 'categories', 'products'));
     }
 
     /**
@@ -204,7 +190,47 @@ class CourseController extends Controller
      */
     public function update(Request $request, Course $course)
     {
-        //
+        $request->validate([
+            'name' => 'required',
+            'description' => 'required',
+            'image' => 'image|mimes:jpeg,png,jpg|max:2048',
+            'modality' => 'required|in:synchronous,asynchronous',
+        ]);
+
+        if (!empty($request->categories)) {
+            $request->validate(['categories' => 'exists:App\Models\Category,id']);
+        }
+
+        if (!empty($request->products)) {
+            $request->validate(['products' => 'exists:App\Models\Product,id']);
+        }
+
+        $image = $request->file('course_image');
+        $path_to_file = $image == null ? DB::table('metadata')->where('key', 'sample_image_url')->first()->value : $image->storeAs('public/images/courses/covers', str_replace(" ", "_", $request->name) . '.' . $image->getClientOriginalExtension());
+        $course_image = $path_to_file;
+
+        $course->update([
+            'name' => $request->name,
+            'description' => $request->description,
+            'course_image' => $course_image,
+            'modality' => $request->modality,
+        ]);
+
+        if (!empty($request->categories)) {
+            $categories = explode(',', $request->categories);
+            $course->categories()->sync($categories);
+        } else {
+            $course->categories()->detach();
+        }
+
+        if (!empty($request->products)) {
+            $products = explode(',', $request->products);
+            $course->products()->sync($products);
+        } else {
+            $course->products()->detach();
+        }
+
+        return redirect()->route('admin.courses.index')->with('success', 'Course updated successfully.');
     }
 
     /**
@@ -215,7 +241,11 @@ class CourseController extends Controller
      */
     public function destroy(Course $course)
     {
-        //
+        $course->categories()->detach();
+        $course->products()->detach();
+        $course->delete();
+
+        return redirect()->route('admin.courses.index')->with('success', 'Course deleted successfully.');
     }
 
     /**
@@ -229,61 +259,4 @@ class CourseController extends Controller
         $course = Course::find($id);
         return view('course.details', compact('course'));
     }
-
-    //REVIEW: MODIFICAR MODULO DE LA FUNCION
-
-    // static function module_passed($module, $user_id)
-    // {
-    //     $group = $module->groups->first();
-    //     // dump($group);
-    //     if ($group == null) return false;
-
-    //     $passed = (new CourseController)->is_passed($group->isPassed($user_id, $group->id)->first(), $group->id);
-
-    //     return $passed;
-    // }
-
-    // public function is_passed($nota, $id)
-    // {
-
-    //     if ($nota != null) {
-
-    //         if (GroupUnit::find($id)->priority == 'FIRST') {
-    //             return true;
-    //         } else {
-    //             $nota = $nota->pivot->nota;
-    //             if ($nota >= 10) {
-    //                 return true;
-    //             } else {
-    //                 return false;
-    //             }
-    //         }
-    //     } else {
-    //         if (GroupUnit::find($id)->priority == 'FIRST') {
-    //             return true;
-    //         } else {
-    //             return false;
-    //         }
-    //     }
-    // }
-
-    // public function module_priority($modules, $module_priority, $module_id)
-    // {
-
-    //     // $modules[] = Module::where('priority', $module_id);
-    //     $id = $module_id;
-    //     foreach ($modules as $key => $value) {
-
-
-
-    //         foreach ($modules as $key2 => $value2) {
-    //             if ($value2->priority == $id) {
-    //                 $module_priority[] = $value2;
-    //                 $id = $value2->id;
-    //                 break;
-    //             }
-    //         }
-    //     }
-    //     return $module_priority;
-    // }
 }

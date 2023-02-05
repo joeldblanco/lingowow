@@ -1,10 +1,20 @@
 <div x-data="{ showCommentsModal: false, classDetails: @entangle('classDetails') }" id="classes_main" class="px-20 pt-10">
-    <div class="flex justify-start w-full my-4 space-x-4">
+    <div class="flex justify-start w-1/2 my-4 space-x-4 range-date-tour">
         {{-- <form action="{{ route('classes.index') }}"> --}}
-        <input autocomplete="off" wire:model="start_date" type="text" id="start_date" name="start_date"
-            class="text-gray-500 border-gray-300 rounded-lg hover:border-gray-400">
-        <input autocomplete="off" wire:model="end_date" type="text" id="end_date" name="end_date"
-            class="text-gray-500 border-gray-300 rounded-lg hover:border-gray-400">
+        <div>
+            <label class="block text-gray-700 text-sm font-bold mb-2" for="start_date">
+                Start Date
+            </label>
+            <input autocomplete="off" wire:model="start_date" type="text" id="start_date" name="start_date"
+                class="text-gray-500 border-gray-300 rounded-lg hover:border-gray-400">
+        </div>
+        <div>
+            <label class="block text-gray-700 text-sm font-bold mb-2" for="end_date">
+                End Date
+            </label>
+            <input autocomplete="off" wire:model="end_date" type="text" id="end_date" name="end_date"
+                class="text-gray-500 border-gray-300 rounded-lg hover:border-gray-400">
+        </div>
         {{-- <button class="bg-blue-700 rounded-md text-white py-2 px-4 hover:bg-blue-800">Search</button> --}}
         {{-- </form> --}}
     </div>
@@ -31,7 +41,7 @@
                     @hasanyrole('teacher|admin')
                         <th {{-- wire:click="sort('teacher')" --}} class="flex justify-center w-full">Student</th>
                     @endhasanyrole
-                    <th class="flex justify-center w-full">Class Date</th>
+                    <th class="flex justify-center w-full">Class Datetime (Local)</th>
                     @hasanyrole('teacher|admin')
                         <th {{-- wire:click="sort('start_date')" --}} class="flex justify-center w-full">Comments</th>
                     @endhasanyrole
@@ -56,7 +66,7 @@
                         @hasanyrole('student|admin')
                             <td class="flex w-full justify-center">
                                 <a href="{{ route('profile.show', $value->teacher()->id) }}"
-                                    class="hover:underline hover:text-blue-500">{{ $value->teacher()->first_name }}
+                                    class="hover:underline hover:text-blue-500 teacher-tour">{{ $value->teacher()->first_name }}
                                     {{ $value->teacher()->last_name }}</a>
                             </td>
                         @endhasanyrole
@@ -68,15 +78,15 @@
                             </td>
                         @endhasanyrole
                         @php
-                            $lesson_date = new Carbon\Carbon($value->start_date);
+                            $lesson_date = (new Carbon\Carbon($value->start_date))->setTimezone(session('session_info')['timezone']['id']);
                         @endphp
-                        @if ($lesson_date->lt(Carbon\Carbon::now()))
-                            <td class="flex w-full justify-center text-red-500 cursor-pointer hover:underline"
+                        @if ($lesson_date->lt(Carbon\Carbon::now(session('session_info')['timezone']['id'])))
+                            <td class="flex w-full justify-center text-red-500 cursor-pointer hover:underline class-tour"
                                 wire:click="showClass({{ $value->id }})">
                                 {{ $lesson_date->format('d/m/Y - h:00 a') }}
                             </td>
                         @else
-                            <td class="flex w-full justify-center text-green-500 cursor-pointer hover:underline"
+                            <td class="flex w-full justify-center text-green-500 cursor-pointer hover:underline class-tour"
                                 wire:click="showClass({{ $value->id }})">
                                 {{ $lesson_date->format('d/m/Y - h:00 a') }}
                             </td>
@@ -166,7 +176,7 @@
                                 (new Carbon\Carbon(App\Http\Controllers\ApportionmentController::currentPeriod()[0]))->format('F Y'))
                         @if ($current_class->start_date > Carbon\Carbon::now()->addHours(1))
                             <a href="{{ route('classes.edit', $current_class->id) }}"
-                                class="bg-green-600 font-semibold text-white p-4 mr-1 rounded-full hover:bg-green-700 focus:outline-none focus:ring shadow-lg hover:shadow-none transition-all duration-300"
+                                class="bg-green-600 font-semibold text-white p-4 mr-1 rounded-full hover:bg-green-700 focus:outline-none focus:ring shadow-lg hover:shadow-none transition-all duration-300 rescheduling-button"
                                 @click=" classDetails = false">
                                 Request rescheduling
                             </a>
@@ -176,7 +186,7 @@
                 @role('admin')
                     @if (!empty($current_class))
                         <a href="{{ route('classes.edit', $current_class->id) }}"
-                            class="bg-green-600 font-semibold text-white p-4 mr-1 rounded-full hover:bg-green-700 focus:outline-none focus:ring shadow-lg hover:shadow-none transition-all duration-300"
+                            class="bg-green-600 font-semibold text-white p-4 mr-1 rounded-full hover:bg-green-700 focus:outline-none focus:ring shadow-lg hover:shadow-none transition-all duration-300 rescheduling-button"
                             @click=" classDetails = false">
                             Request rescheduling
                         </a>
@@ -230,7 +240,9 @@
     @role('student')
         <livewire:rating-form />
     @endrole
-
+    @role('student')
+        <x-shepherd-tour tourName="students/classes-tour" role="student" />
+    @endrole
     {{-- <script>
         function selectAllTeacherCheckboxes(source) {
             checkboxes = document.getElementsByClassName('teacher_checkbox');
@@ -257,5 +269,18 @@
     </script>
 
     {{-- <script src="{{ asset('js/jquery.datetimepicker.full.min.js') }}"></script> --}}
+
+    @php
+        $tourReschedulingButton = DB::table('shepherd_users')
+            ->where('user_id', auth()->id())
+            ->where('tour_name', 'students/rescheduling-button')
+            ->first();
+        // dd($tourRescheduling);
+    @endphp
+    @if ($tourReschedulingButton == null)
+        @role('student')
+            <x-shepherd-tour tourName="students/rescheduling-button" role="student" />
+        @endrole
+    @endif
 
 </div>

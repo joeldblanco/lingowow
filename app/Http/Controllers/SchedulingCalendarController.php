@@ -44,7 +44,6 @@ class SchedulingCalendarController extends Controller
     public function create(Request $request)
     {
         $plan = session('plan');
-        // dd($request);
         return view('calendar-selection', compact('plan'));
     }
 
@@ -408,29 +407,56 @@ class SchedulingCalendarController extends Controller
             if (count($teachers_available) > 0 && !$error) {
 
                 $T_selected = rand(0, count($teachers_available) - 1);
-                $teacher = User::find(7); //IMPORTANTE!!!!!! AQUI SUSTITUIR EL 7 POR "$T_selected"
+                // || (count($cells) == 1 && in_array($cell, $schedules_reserves[1]))
+                $teacher = User::find($teachers_available[$T_selected]); //IMPORTANTE!!!!!! AQUI SUSTITUIR EL 7 POR "$T_selected"
                 $schedules_reserves = ScheduleReserve::schedulesReserves($teacher->id); // Posicion 0 para los horarios normales, Posicion 1 para los horarios de un solo dia.
                 // dd($schedules_reserves, count($cells), $cells);
                 // dd($teacher->studentsSchedules(), $teacher->schedules->first()->selected_schedule, $cells, $cell);
                 foreach ($cells as $cell) {
-                    // dd(in_array($cell, $teacher->studentsSchedules()), !in_array($cell, $teacher->schedules->first()->selected_schedule));
                     if (in_array($cell, $teacher->studentsSchedules()) || !in_array($cell, $teacher->schedules->first()->selected_schedule) || in_array($cell, $schedules_reserves[0]) || (count($cells) == 1 && in_array($cell, $schedules_reserves[1]))) {
                         Cart::destroy();
                         session(['message' => "Dear Linguado. That block is not available"]);
-                        return redirect()->route("schedule.create");
+                        return redirect()->route("schedule.create")->with('error', "Sorry, you selected one or more unavailable blocks. Please try again.");
                     }
                 }
                 Cart::destroy();
 
-                $product = Course::find($course_id)->products->first();
+
+                $old_customers = json_decode(
+                    DB::table('metadata')
+                        ->where('key', 'old_customers')
+                        ->first()->value,
+                );
+
+                $course_products = Course::find($course_id)
+                    ->products()
+                    ->whereHas('categories', function ($query) {
+                        $query->where('name', 'course');
+                    })
+                    ->get();
+
+                $student = auth()->user();
+
+                $product = $course_products->first();
+                foreach ($course_products as $course_product) {
+                    if (in_array($student->id, $old_customers) && str_contains($course_product->slug, 'old')) {
+                        $product = $course_product;
+                        break;
+                    }
+                    if (!in_array($student->id, $old_customers) && !str_contains($course_product->slug, 'old')) {
+                        $product = $course_product;
+                        break;
+                    }
+                }
+
                 $apportionment = ApportionmentController::calculateApportionment(session('plan'));
                 $product_qty = $apportionment[0];
 
                 if ($modality == "exam") {
                     $product_qty = 1;
-                    session(['teacher_id' => 7]); //IMPORTANTE!!!!!! AQUI SUSTITUIR EL 7 POR "$T_selected"
+                    session(['teacher_id' => $teachers_available[$T_selected]]); //IMPORTANTE!!!!!! AQUI SUSTITUIR EL 7 POR "$T_selected"
                 }
-                // dd($apportionment);
+
                 self::saveScheduleReserve($cells);
 
                 Cart::add($product->id, $product->name, $product_qty, ($product->sale_price == null ? $product->regular_price : $product->sale_price), ['editable' => false])->associate('App\Models\Product');
@@ -439,10 +465,7 @@ class SchedulingCalendarController extends Controller
                     'classes_dates' => $apportionment[1]
                 ]);
 
-                // dd("hola que tal", $teachers, $teachers_available, count($teachers_available), rand(0, count($teachers_available) - 1), session()->all(), $cells);
-
                 if (session()->exists('enrolment_type') && session('enrolment_type') == "manual_enrolment") {
-                    // dd(session()->all());
                     $student = User::find(session('student_id'));
                     dispatch(new StoreSelfEnrolment($student));
                     session()->forget('enrolment_type');

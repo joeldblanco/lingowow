@@ -1,5 +1,5 @@
 <div>
-    <div>
+    <div class="">
         <link rel="stylesheet" type="text/css" href="{{ asset('css/jquery.datetimepicker.min.css') }}">
 
         <a id="link-schedule" href="#link-s"></a>
@@ -12,14 +12,14 @@
 
 
         {{-- @if ($role != 'admin') --}}
-        <div class="container mx-auto mt-10 text-gray-600" x-data="{ editBtn: true, edit: false, showModal1: false, showModal2: false, showModal3: false, showModalAbsence: @entangle('showModalAbsence'), event: {{ $event }}, loadingState: false }" x-cloak>
+        <div class="container mx-auto mt-10 text-gray-600 table-tour-seccion" x-data="{ editBtn: true, edit: false, showModal1: false, showModal2: false, showModal3: false, showModalAbsence: @entangle('showModalAbsence'), event: {{ $event }}, loadingState: false }" x-cloak>
             <div class="wrapper bg-white rounded w-full">
                 {{-- <p x-show="event">Event</p> --}}
 
-            <!-- INICIO DEL HORARIO DE JUAN -->
-            @if (!isset($user_schedules) || $user_schedules == null || count($user_schedules) <= 0)
-                @if ($role == 'guest')
-                    @if ($mode == 'edit')
+                <!-- INICIO DEL HORARIO DE JUAN -->
+                @if (!isset($user_schedules) || $user_schedules == null || count($user_schedules) <= 0)
+                    @if ($role == 'guest')
+                        @if ($mode == 'edit')
 
                             <h3 class="text-4xl font-bold text-gray-800">Select your schedule</h3>
                             <div class=" flex justify-between">
@@ -36,13 +36,13 @@
                             </div>
 
                             {{-- <div wire:loading>
-                            @include('components.loading-state')
-                        </div> --}}
+                                @include('components.loading-state')
+                            </div> --}}
 
                             <!-- INICIO DEL HORARIO -->
                             <div>
 
-                                <table  class="border" style="width: 100%">
+                                <table  class="border table-tour" style="width: 100%">
                                     <!--fila de los titulos-->
                                     <tr>
                                         <th class="width border">UTC</th>
@@ -187,8 +187,8 @@
                                                     </td>
                                                     @foreach ($days as $day)
                                                         @if (in_array([$i, $e], $teacher_schedule) &&
-                                                            (new Carbon\carbon($day_format_range[$d]))->addHour($i)->greaterThan($now) &&
-                                                            (new Carbon\carbon($day_format_range[$d]))->addHour($i)->lessThan($period_end_aux->copy()->addDay()))
+                                                                (new Carbon\carbon($day_format_range[$d]))->addHour($i)->greaterThan($now) &&
+                                                                (new Carbon\carbon($day_format_range[$d]))->addHour($i)->lessThan($period_end_aux->copy()->addDay()))
                                                             {{-- @php dd(($i+6)."-".$day_range[$d]); @endphp --}}
                                                             {{-- {{dd($abcense_classes, $day_range)}} --}}
                                                             {{-- {{dump($i . '-' . $day_range[$d].' -- '.$abcense_classes[0])}} --}}
@@ -289,26 +289,134 @@
                                 <h2 class="text-2xl font-bold text-gray-800">You can select a schedule after you buy
                                     a plan of classes.</h2>
                                 <a href="{{ route('shop') }}"
-                                    class="inline-block bg-blue-800 text-white px-6 py-4 mt-8 rounded-lg hover:bg-blue-900 hover:text-white hover:no-underline">Shop</a>
+                                    class="shop-button inline-block bg-blue-800 text-white px-6 py-4 mt-8 rounded-lg hover:bg-blue-900 hover:text-white hover:no-underline">Shop</a>
                             </div>
                         @endif
                     @endif
 
                     @if ($role == 'student')
+                        @if ($mode == 'edit')
+                            <h3 class="text-4xl font-bold text-gray-800">Select your schedule</h3>
+                            <div class=" flex justify-between">
+                                <h4 class="text-2xl font-bold text-gray-400 mb-8">Please, select {{ $plan }}
+                                    blocks
+                                    to
+                                    continue
+                                </h4>
+                                <h4 class="text-2xl font-bold text-gray-400 mb-8">
+                                    @if ($name != null)
+                                        Teacher: {{ $name }}
+                                    @endif
+                                </h4>
+                            </div>
 
-                        @if ($course->modality == 'synchronous')
-                            <div class="w-full text-center" style="background-color: rgba(255, 255, 255, 0.5)">
-                                <h2 class="text-4xl font-bold text-red-800" style="margin-top: 15%">You haven't
-                                    selected a schedule yet.</h2>
-                                <h2 class="text-2xl font-bold text-gray-800">You can select a schedule after you buy
-                                    a plan of classes.</h2>
-                                <a href="{{ route('shop') }}"
-                                    class="inline-block bg-blue-800 text-white px-6 py-4 mt-8 rounded-lg hover:bg-blue-900 hover:text-white hover:no-underline">Shop</a>
+                            {{-- <div wire:loading>
+                            @include('components.loading-state')
+                        </div> --}}
+
+                            <!-- INICIO DEL HORARIO -->
+                            <div>
+
+                                <table class="border" style="width: 100%">
+                                    <!--fila de los titulos-->
+                                    <tr>
+                                        <th class="width border">UTC</th>
+                                        <th>LOCAL</th>
+                                        @foreach ($days as $day)
+                                            <th class="border width">
+                                                {{ $day }}
+                                            </th>
+                                        @endforeach
+                                    </tr>
+                                    <!--filas seleccionables-->
+                                    @php
+                                        // dd($data_selected);
+                                        $e = 0;
+                                        $i = $university_schedule_start;
+                                    @endphp
+                                    {{-- @for ($i = 0; $i < 16; $i++) --}}
+                                    @for ($hour = 0; $hour < $university_schedule_hours; $hour++)
+                                        <tr class="border">
+                                            <td class="width border UTC">
+                                                @if ($i < 10)
+                                                    0{{ $i }}:00
+                                                @else
+                                                    {{ $i }}:00
+                                                @endif
+                                            </td>
+                                            <td class="width border Local">
+                                                {{-- AQUI LA HORA SE LLENA MEDIANTE JAVASCRIPT --}}
+                                            </td>
+                                            @foreach ($days as $day)
+                                                @if (in_array([$i, $e], $schedule))
+                                                    @if (in_array([$i, $e], $students_schedules))
+                                                        <td id="{{ $i }}-{{ $e }}"
+                                                            class="border width occupied"></td>
+                                                    @else
+                                                        {{-- @php dd(isFree($abcense_classes,"20-4",$days_rest)); @endphp --}}
+
+                                                        {{-- {{dd($days_rest, $abcense_classes, $this->notFree($abcense_classes, '16-2', $days_rest))}} --}}
+                                                        @if ($this->notFree($abcense_classes, $i . '-' . $e, $days_rest))
+                                                            <td id="{{ $i }}-{{ $e }}"
+                                                                class="border width occupied">
+                                                            </td>
+                                                        @else
+                                                            @if (in_array([$i, $e], $data_selected))
+                                                                <td id="{{ $i }}-{{ $e }}"
+                                                                    class="border width cursor-pointer available selectable selected">
+                                                                </td>
+                                                            @else
+                                                                <td id="{{ $i }}-{{ $e }}"
+                                                                    class="border width cursor-pointer available selectable">
+                                                                </td>
+                                                            @endif
+                                                        @endif
+                                                    @endif
+                                                @else
+                                                    <td id="{{ $i }}-{{ $e }}"
+                                                        class="border width occupied"></td>
+                                                @endif
+                                                @php
+                                                    $e++;
+                                                @endphp
+                                            @endforeach
+                                            @php
+                                                $e = 0;
+                                            @endphp
+                                        </tr>
+                                        @php
+                                            // echo $i . ' ' . $university_schedule_end . ' ';
+                                            if ($i == 23) {
+                                                $i = 0;
+                                            } else {
+                                                $i++;
+                                            }
+                                        @endphp
+                                    @endfor
+                                </table>
                             </div>
+                            <!-- FIN DEL HORARIO DE JUAN -->
+
+                            <button @click="showModalAbsence = true"
+                                onclick="checkClass({{ isset($plan) ? $plan : 0 }},{{ Auth::user()->roles->pluck('id')[0] }});"
+                                class="bg-green-500 rounded-lg text-white font-bold px-6 py-1 my-3 shadow-md"
+                                {{-- onclick="saveSchedule({{ $plan }},'schedule.check')" --}} wire:click="edit()">Save</button>
                         @else
-                            <div class="w-full text-center" style="background-color: rgba(255, 255, 255, 0.5)">
-                                <h2 class="text-4xl font-bold text-red-800" style="margin-top: 15%">Stand By</h2>
-                            </div>
+                            @if ($course->modality == 'synchronous')
+                                <div class="w-full text-center" style="background-color: rgba(255, 255, 255, 0.5)">
+                                    <h2 class="text-4xl font-bold text-red-800" style="margin-top: 15%">You haven't
+                                        selected a schedule yet.</h2>
+                                    <h2 class="text-2xl font-bold text-gray-800">You can select a schedule after you
+                                        buy
+                                        a plan of classes.</h2>
+                                    <a href="{{ route('shop') }}"
+                                        class="inline-block bg-blue-800 text-white px-6 py-4 mt-8 rounded-lg hover:bg-blue-900 hover:text-white hover:no-underline">Shop</a>
+                                </div>
+                            @else
+                                <div class="w-full text-center" style="background-color: rgba(255, 255, 255, 0.5)">
+                                    <h2 class="text-4xl font-bold text-red-800" style="margin-top: 15%">Stand By</h2>
+                                </div>
+                            @endif
                         @endif
 
                     @endif
@@ -589,13 +697,15 @@
                                     wire:click="edit()">Save</button>
                             </div>
                             <!-- FIN DEL HORARIO DE JUAN -->
-                            <div class="flex items-center flex-col">
-                                <button onclick="toggleCellBlock()" @click=" edit = true, editBtn = false "
-                                    wire:click="edit()"
-                                    class="inline-block bg-green-800 text-white px-4 py-2 my-5 rounded hover:bg-green-900 hover:text-white hover:no-underline"
-                                    x-show="editBtn" x-transition>Edit Schedule
-                                </button>
-                            </div>
+                            @hasanyrole('teacher')
+                                <div class="flex items-center flex-col">
+                                    <button onclick="toggleCellBlock()" @click=" edit = true, editBtn = false "
+                                        wire:click="edit()"
+                                        class="inline-block bg-green-800 text-white px-4 py-2 my-5 rounded hover:bg-green-900 hover:text-white hover:no-underline"
+                                        x-show="editBtn" x-transition>Edit Schedule
+                                    </button>
+                                </div>
+                            @endhasanyrole
                         @endforeach
                     @elseif($mode == 'absence')
                         {{-- {{dd($table_date)}} --}}
@@ -650,8 +760,7 @@
                                             </td>
 
                                             @foreach ($days as $day)
-                                                @if (in_array([$i, $e], $teacher_schedule) &&
-                                                    (new Carbon\carbon($day_format_range[$d]))->addHour($i)->greaterThan($now))
+                                                @if (in_array([$i, $e], $teacher_schedule) && (new Carbon\carbon($day_format_range[$d]))->addHour($i)->greaterThan($now))
                                                     {{-- {{dd($abcense_classes, in_array('13-5', $abcense_classes), $day_range)}} --}}
                                                     @if (in_array([$i, $e], $students_schedules) || in_array($i . '-' . $day_range[$d], $abcense_classes_days))
                                                         <td id="{{ $i }}-{{ $e }}-{{ $week }}-{{ $period_range[$d] }}"
@@ -696,7 +805,7 @@
 
             </div>
 
-            <div class="mt-10 grid grid-rows-2 grid-flow-col gap-4 justify-center ...">
+            {{-- <div class="mt-10 grid grid-rows-2 grid-flow-col gap-4 justify-center ...">
                 <div class="flex space-x-3 items-center">
                     <input class="@error('message') border-red-500 @enderror" type="checkbox" name="consent_checkbox"
                         id="consent_checkbox" required>
@@ -710,7 +819,7 @@
                     <button class="bg-blue-500 rounded-lg text-white font-bold px-6 py-1 my-3 shadow-md"
                         onclick="saveAbsence({{ $id_class }},'classes.update')">Submit</button>
                 </div>
-            </div>
+            </div> --}}
 
             @endif
 
@@ -886,30 +995,316 @@
 
         </div>
 
-        </div>
-
     </div>
-    {{-- @endif --}}
 
-    <script type="text/javascript" src="{{ asset('js/scheduleSelection.js') }}" defer></script>
-    <script type="text/javascript" src="{{ asset('js/viselect.cjs.js') }}"></script>
-    <script src="{{ asset('js/jquery.dataTables.min.js') }}"></script>
-    <script src="{{ asset('js/jquery.datetimepicker.full.min.js') }}"></script>
+</div>
+{{-- @endif --}}
 
+<script type="text/javascript" src="{{ asset('js/scheduleSelection.js') }}" defer></script>
+<script type="text/javascript" src="{{ asset('js/viselect.cjs.js') }}"></script>
+<script src="{{ asset('js/jquery.dataTables.min.js') }}"></script>
+<script src="{{ asset('js/jquery.datetimepicker.full.min.js') }}"></script>
 
-    @if ($role == 'teacher' || ($role == 'student' && $mode != 'absence'))
-        <script>
-            console.log("holaholahola");
-            var BT = $(".button-teacher");
-            for (var i = 0; i < BT.length; i++) {
-                BT[i].addEventListener('click', function() {
-                    document.getElementById("link-schedule").click();
+@if ($role == 'teacher' || ($role == 'student' && $mode != 'absence' && ($role == 'student' && $mode != 'edit')))
+    <script>
+        // console.log("holaholahola");
+        var BT = $(".button-teacher");
+        for (var i = 0; i < BT.length; i++) {
+            BT[i].addEventListener('click', function() {
+                document.getElementById("link-schedule").click();
+            });
+        }
+
+        // console.log("INICIO");
+        var hoyLocal = new Date(@json($hoy));
+
+        var horaLocal = hoyLocal.getHours();
+        // var horaUTC = hoyLocal.getUTCHours();
+        var difHora = hoyLocal.getTimezoneOffset() / 60;
+        var OpenUTC =
+            @json($university_schedule_start); // Hora UTC a la que abre la academia en PERU! (06:00 am Hora local en peru) (07:00 am hora local)
+        var OpenLocal = OpenUTC - difHora;
+
+        //Asignar hora UTC y Local al Horario
+
+        // cellsUTC = $('.UTC');
+        var cellsLocal = $('.Local');
+        for (var i = 0; i < cellsLocal.length; i++) {
+            // if (OpenUTC < 10) {
+            //     cellsUTC[i].innerHTML = "0" + OpenUTC + ":00";
+            // } else {
+            //     cellsUTC[i].innerHTML = OpenUTC + ":00";
+            // }
+
+            // if (OpenUTC >= 23) {
+            //     OpenUTC = 0;
+            // } else {
+            //     OpenUTC++;
+            // }
+
+            if (OpenLocal < 10) {
+                if (OpenLocal < 0) {
+                    OpenLocal += 24;
+                    cellsLocal[i].innerHTML = OpenLocal + ":00";
+                } else {
+                    cellsLocal[i].innerHTML = "0" + OpenLocal + ":00";
+                }
+            } else {
+                cellsLocal[i].innerHTML = OpenLocal + ":00";
+            }
+
+            if (OpenLocal >= 23) {
+                OpenLocal = 0;
+            } else {
+                OpenLocal++;
+            }
+        }
+
+        var role = "{{ Auth::user()->roles->pluck('name')[0] }}";
+
+        $(".selectable").selectable({
+            //disabled: true
+        });
+
+        $('body').on("contentChanged", event => {
+            //  console.log("hola")
+            var cells = $(".selected");
+            // console.log(cells);
+            var role = "{{ Auth::user()->roles->pluck('name')[0] }}";
+
+            if (role == "student") {
+
+                $(".cell").click(function() {
+                    var selectedCells = 0;
+                    var nOfClasses = {{ isset($user_schedules) ? count($user_schedules) : 0 }};
+
+                    selectedCells = $(".ui-selected").length;
+
+                    if ($(this).hasClass("ui-selected") && $(this).hasClass("cell_block")) {
+                        $(this).removeClass("ui-selected");
+                    } else if ($(this).hasClass("cell_block") && (selectedCells < nOfClasses)) {
+                        $(this).addClass("ui-selected");
+                    }
+                });
+
+            } else if (role == "teacher") {
+                var disabled = $(".selectable").selectable("option", "disabled");
+                $(".selectable").selectable("option", "disabled", !disabled);
+                $(".selectable").on("selectableselected", function(event, ui) {
+                    // $.inArray("taken",ui.selected.classList);
+                    if ($.inArray("taken", ui.selected.classList) > 0) {
+                        console.log(true);
+                    } else {
+                        console.log(false);
+                    }
                 });
             }
 
-            // console.log("inicio");
-            var hoyLocal = new Date(@json($hoy));
+        });
 
+
+        //Seleccion de horario
+
+        // console.log("hola1");
+        var next_schedule = @json($next_schedule);
+
+        if (next_schedule != null && next_schedule != []) {
+            for (var i = 0; i < next_schedule.length; i++) {
+                next_schedule[i] = next_schedule[i][0] + "-" + next_schedule[i][1];
+            }
+        }
+
+        var next = [];
+        // console.log(next_schedule);
+
+        function toggleCellBlock() {
+
+            if (role == "teacher") {
+                $(".preoccupied").toggleClass("occupied");
+                $(".preoccupied").toggleClass("selectable");
+                $(".preoccupied").removeClass("selected");
+                $(".name-student").toggleClass("not-active")
+            }
+
+            $(".schedule_cell").toggleClass("cell_block");
+            $(".preavailable").toggleClass("selectable");
+            $(".preavailable").removeClass("selected");
+            $(".preavailable").toggleClass("available");
+            $(".preselected").addClass("selected");
+            $(".tool-tip").toggleClass("invisible");
+            $(".preoccupied").toggleClass("occupied");
+
+
+            //$(".preoccupied").addClass("occupied");
+            numClass = classSelected.length;
+            init = false;
+            classSelected = preClass;
+
+            // console.log(classSelected)
+        }
+
+
+        var numClass = 0;
+        var classSelected = [];
+        var preClass = @json($schedule_user);
+        // console.log(preClass);
+        classSelected = preClass;
+        // console.log(classSelected);
+        numClass = classSelected.length;
+        //$('.notAvailable').length + $('.preavailable').length
+        var qtyClass = classSelected.length;
+        if (role == "teacher") {
+            qtyClass = ($('.notAvailable').length + $('.preavailable').length);
+        }
+        var preClassTd = [];
+        preClass.forEach(element => {
+            preClassTd.push(document.getElementById(element));
+        });
+
+        $(".preavailable").toggleClass("selectable");
+        $(".notAvailable").toggleClass("selectable");
+        $(".preselected").addClass("selected");
+        // $(".preoccupied").addClass("occupied");
+        $(".name-student").toggleClass("not-active");
+        $(".tool-tip").toggleClass("invisible");
+
+        if (next_schedule != null && next_schedule != []) {
+            for (var i = 0; i < next_schedule.length; i++) {
+                $("#" + next_schedule[i]).toggleClass("next_schedule");
+            }
+        }
+
+        var init = false;
+        // console.log(preClassTd)
+        var selection = new SelectionArea({
+                selectables: ["td.selectable"],
+                boundaries: [".container"],
+            })
+            .on("start", ({
+                store,
+                event
+            }) => {
+                if (!init) {
+                    // console.log("hola?")
+                    store.stored = preClassTd;
+                    init = true;
+                }
+                // console.log(init)
+                // console.log(store)
+                if (!event.ctrlKey && !event.metaKey) {
+                    // console.log(store)
+                    for (var el of store.stored) {
+                        //console.log("si")
+                        if (el.classList.contains("selected") && el.classList.contains("selectable")) {
+                            el.classList.remove("selected");
+                            classSelected = classSelected.filter(function(cf) {
+                                return cf !== el.id;
+                            });
+                            if (numClass > 0)
+                                numClass--;
+                            //console.log("uno"+numClass);
+                        }
+                    }
+
+                    selection.clearSelection();
+                }
+                //console.log(store.stored)
+            })
+            .on(
+                "move",
+                ({
+                    store: {
+                        changed: {
+                            added,
+                            removed
+                        }
+                    }
+                }) => {
+                    // console.log(added)
+                    for (var el of added) {
+                        if (!(el.classList.contains("selected"))) {
+                            if (numClass < qtyClass) {
+                                el.classList.add("selected");
+                                classSelected.push(el.id);
+                                numClass++;
+                                //console.log("dos"+numClass);
+                            }
+                        }
+                    }
+
+                    for (var el of removed) {
+                        if (el.classList.contains("selected")) {
+                            el.classList.remove("selected");
+                            classSelected = classSelected.filter(function(cf) {
+                                return cf !== el.id;
+                            });
+                            numClass--;
+                        }
+                        //console.log("tres"+numClass);
+
+                    }
+
+                }
+
+            );
+
+        //DATETIMEPICKER SCHEDULE
+
+        // $('#datetimepicker').datetimepicker({
+        //     format: 'd.m.Y H:i',
+        //     inline: true,
+        //     lang: 'ru',
+        //     value: '22-07-2022 04:00',
+        //     format: 'd-m-Y H:i'
+        // });
+
+
+        //PARTE DE EL HORARIO CON UNA SOLA CLASE
+        let hourForDays = @json($university_schedule_hours) + 1;
+        // console.log("holaholahola");
+        $("#absence_table").DataTable({
+            searching: false,
+            ordering: false,
+            pageLength: hourForDays,
+            info: false,
+            bLengthChange: false,
+            pagingType: "simple",
+            // stateSave: true,
+        });
+    </script>
+@endif
+
+@if ($role == 'guest' || $mode == 'absence')
+    <script>
+        // console.log("Inicio Guest")
+
+        function toggleCellBlock() {}
+        $(function() {
+
+            var selectedCells = 0;
+            var nOfClasses = {{ $plan }};
+
+            $(".cell_block").click(function() {
+                if ($(this).hasClass("selected")) {
+                    $(this).removeClass("selected");
+                } else {
+                    if (selectedCells < nOfClasses) {
+                        $(this).addClass("selected");
+                    }
+                }
+
+                selectedCells = $(".selected").length;
+            });
+
+        });
+
+
+        var numClass = 0;
+
+        Livewire.hook('element.updated', (el, component) => {
+            numClass = 0;
+
+            var hoyLocal = new Date(@json($hoy));
             var horaLocal = hoyLocal.getHours();
             // var horaUTC = hoyLocal.getUTCHours();
             var difHora = hoyLocal.getTimezoneOffset() / 60;
@@ -918,7 +1313,6 @@
             var OpenLocal = OpenUTC - difHora;
 
             //Asignar hora UTC y Local al Horario
-
             // cellsUTC = $('.UTC');
             var cellsLocal = $('.Local');
             for (var i = 0; i < cellsLocal.length; i++) {
@@ -934,6 +1328,7 @@
                 //     OpenUTC++;
                 // }
 
+
                 if (OpenLocal < 10) {
                     if (OpenLocal < 0) {
                         OpenLocal += 24;
@@ -951,378 +1346,185 @@
                     OpenLocal++;
                 }
             }
+        });
 
-            var role = "{{ Auth::user()->roles->pluck('name')[0] }}";
+        // Funcion de seleccion en el horario
+        //window.addEventListener('initSchedule', event => {
+        // console.log("hola");
+        var qtyClass = {{ $plan }};
+        var classSelected = [];
+        var preClass = @json($data_selected_format);
+        classSelected = preClass;
+        var preClassTd = [];
+        preClass.forEach(element => {
+            preClassTd.push(document.getElementById(element));
+        });
+        var init = true;
 
-            $(".selectable").selectable({
-                //disabled: true
-            });
-
-            $('body').on("contentChanged", event => {
-                //  console.log("hola")
-                var cells = $(".selected");
-                // console.log(cells);
-                var role = "{{ Auth::user()->roles->pluck('name')[0] }}";
-
-                if (role == "student") {
-
-                    $(".cell").click(function() {
-                        var selectedCells = 0;
-                        var nOfClasses = {{ isset($user_schedules) ? count($user_schedules) : 0 }};
-
-                        selectedCells = $(".ui-selected").length;
-
-                        if ($(this).hasClass("ui-selected") && $(this).hasClass("cell_block")) {
-                            $(this).removeClass("ui-selected");
-                        } else if ($(this).hasClass("cell_block") && (selectedCells < nOfClasses)) {
-                            $(this).addClass("ui-selected");
-                        }
-                    });
-
-                } else if (role == "teacher") {
-                    var disabled = $(".selectable").selectable("option", "disabled");
-                    $(".selectable").selectable("option", "disabled", !disabled);
-                    $(".selectable").on("selectableselected", function(event, ui) {
-                        // $.inArray("taken",ui.selected.classList);
-                        if ($.inArray("taken", ui.selected.classList) > 0) {
-                            console.log(true);
-                        } else {
-                            console.log(false);
-                        }
-                    });
+        var selection = new SelectionArea({
+                selectables: ["td.selectable"],
+                boundaries: [".container"],
+            })
+            .on("start", ({
+                store,
+                event
+            }) => {
+                if (!init) {
+                    store.stored = preClassTd;
+                    init = true;
                 }
 
-            });
-
-
-            //Seleccion de horario
-
-            // console.log("hola1");
-            var next_schedule = @json($next_schedule);
-
-            if (next_schedule != null && next_schedule != []) {
-                for (var i = 0; i < next_schedule.length; i++) {
-                    next_schedule[i] = next_schedule[i][0] + "-" + next_schedule[i][1];
-                }
-            }
-
-            var next = [];
-            // console.log(next_schedule);
-
-            function toggleCellBlock() {
-
-                if (role == "teacher") {
-                    $(".preoccupied").toggleClass("occupied");
-                    $(".preoccupied").toggleClass("selectable");
-                    $(".preoccupied").removeClass("selected");
-                    $(".name-student").toggleClass("not-active")
-                }
-
-                $(".schedule_cell").toggleClass("cell_block");
-                $(".preavailable").toggleClass("selectable");
-                $(".preavailable").removeClass("selected");
-                $(".preavailable").toggleClass("available");
-                $(".preselected").addClass("selected");
-                $(".tool-tip").toggleClass("invisible");
-                $(".preoccupied").toggleClass("occupied");
-
-
-                //$(".preoccupied").addClass("occupied");
-                numClass = classSelected.length;
-                init = false;
-                classSelected = preClass;
-
-                // console.log(classSelected)
-            }
-
-
-            var numClass = 0;
-            var classSelected = [];
-            var preClass = @json($schedule_user);
-            // console.log(preClass);
-            classSelected = preClass;
-            // console.log(classSelected);
-            numClass = classSelected.length;
-            //$('.notAvailable').length + $('.preavailable').length
-            var qtyClass = classSelected.length;
-            if (role == "teacher") {
-                qtyClass = ($('.notAvailable').length + $('.preavailable').length);
-            }
-            var preClassTd = [];
-            preClass.forEach(element => {
-                preClassTd.push(document.getElementById(element));
-            });
-
-            $(".preavailable").toggleClass("selectable");
-            $(".notAvailable").toggleClass("selectable");
-            $(".preselected").addClass("selected");
-            // $(".preoccupied").addClass("occupied");
-            $(".name-student").toggleClass("not-active");
-            $(".tool-tip").toggleClass("invisible");
-
-            if (next_schedule != null && next_schedule != []) {
-                for (var i = 0; i < next_schedule.length; i++) {
-                    $("#" + next_schedule[i]).toggleClass("next_schedule");
-                }
-            }
-
-            var init = false;
-            // console.log(preClassTd)
-            var selection = new SelectionArea({
-                    selectables: ["td.selectable"],
-                    boundaries: [".container"],
-                })
-                .on("start", ({
-                    store,
-                    event
-                }) => {
-                    if (!init) {
-                        // console.log("hola?")
-                        store.stored = preClassTd;
-                        init = true;
-                    }
-                    // console.log(init)
-                    // console.log(store)
-                    if (!event.ctrlKey && !event.metaKey) {
-                        // console.log(store)
-                        for (var el of store.stored) {
-                            //console.log("si")
-                            if (el.classList.contains("selected") && el.classList.contains("selectable")) {
-                                el.classList.remove("selected");
-                                classSelected = classSelected.filter(function(cf) {
-                                    return cf !== el.id;
-                                });
-                                if (numClass > 0)
-                                    numClass--;
-                                //console.log("uno"+numClass);
-                            }
-                        }
-
-                        selection.clearSelection();
-                    }
-                    //console.log(store.stored)
-                })
-                .on(
-                    "move",
-                    ({
-                        store: {
-                            changed: {
-                                added,
-                                removed
-                            }
-                        }
-                    }) => {
-                        // console.log(added)
-                        for (var el of added) {
-                            if (!(el.classList.contains("selected"))) {
-                                if (numClass < qtyClass) {
-                                    el.classList.add("selected");
-                                    classSelected.push(el.id);
-                                    numClass++;
-                                    //console.log("dos"+numClass);
-                                }
-                            }
-                        }
-
-                        for (var el of removed) {
-                            if (el.classList.contains("selected")) {
-                                el.classList.remove("selected");
-                                classSelected = classSelected.filter(function(cf) {
-                                    return cf !== el.id;
-                                });
+                if (!event.ctrlKey && !event.metaKey) {
+                    //console.log(store)
+                    for (var el of store.stored) {
+                        if (el.classList.contains("selected")) {
+                            el.classList.remove("selected");
+                            classSelected = classSelected.filter(function(cf) {
+                                return cf !== el.id;
+                            });
+                            if (numClass > 0)
                                 numClass--;
+                            //console.log("uno"+numClass);
+                        }
+                    }
+
+                    selection.clearSelection();
+                }
+                //console.log(store.stored)
+            })
+            .on(
+                "move",
+                ({
+                    store: {
+                        changed: {
+                            added,
+                            removed
+                        }
+                    }
+                }) => {
+                    //console.log(added)
+                    for (var el of added) {
+                        if (!(el.classList.contains("selected"))) {
+                            if (numClass < qtyClass) {
+                                el.classList.add("selected");
+                                classSelected.push(el.id);
+                                numClass++;
+                                //console.log("dos"+numClass);
                             }
-                            //console.log("tres"+numClass);
-
                         }
+                    }
+
+                    for (var el of removed) {
+                        if (el.classList.contains("selected")) {
+                            el.classList.remove("selected");
+                            classSelected = classSelected.filter(function(cf) {
+                                return cf !== el.id;
+                            });
+                            numClass--;
+                        }
+                        //console.log("tres"+numClass);
 
                     }
 
-                );
+                }
 
-            //DATETIMEPICKER SCHEDULE
+            );
 
-            // $('#datetimepicker').datetimepicker({
-            //     format: 'd.m.Y H:i',
-            //     inline: true,
-            //     lang: 'ru',
-            //     value: '22-07-2022 04:00',
-            //     format: 'd-m-Y H:i'
-            // });
+        //});
+        var hoyLocal = new Date(@json($hoy));
+        var horaLocal = hoyLocal.getHours();
+        // var horaUTC = hoyLocal.getUTCHours();
+        var difHora = hoyLocal.getTimezoneOffset() / 60;
+        var OpenUTC =
+            @json($university_schedule_start); // Hora UTC a la que abre la academia en PERU! (06:00 am Hora local en peru) (07:00 am hora local)
+        var OpenLocal = OpenUTC - difHora;
+
+        //Asignar hora UTC y Local al Horario
+        // cellsUTC = $('.UTC');
+        cellsLocal = $('.Local');
+        for (var i = 0; i < cellsLocal.length; i++) {
+            // if (OpenUTC < 10) {
+            //     cellsUTC[i].innerHTML = "0" + OpenUTC + ":00";
+            // } else {
+            //     cellsUTC[i].innerHTML = OpenUTC + ":00";
+            // }
+
+            // if (OpenUTC >= 23) {
+            //     OpenUTC = 0;
+            // } else {
+            //     OpenUTC++;
+            // }
 
 
-            //PARTE DE EL HORARIO CON UNA SOLA CLASE
-            let hourForDays = @json($university_schedule_hours) + 1;
-            console.log("holaholahola");
-            $("#absence_table").DataTable({
-                searching: false,
-                ordering: false,
-                pageLength: hourForDays,
-                info: false,
-                bLengthChange: false,
-                pagingType: "simple",
-                // stateSave: true,
+            if (OpenLocal < 10) {
+                if (OpenLocal < 0) {
+                    OpenLocal += 24;
+                    cellsLocal[i].innerHTML = OpenLocal + ":00";
+                } else {
+                    cellsLocal[i].innerHTML = "0" + OpenLocal + ":00";
+                }
+            } else {
+                cellsLocal[i].innerHTML = OpenLocal + ":00";
+            }
+
+            if (OpenLocal >= 23) {
+                OpenLocal = 0;
+            } else {
+                OpenLocal++;
+            }
+        }
+
+        var BT = $(".button-teacher");
+        for (var i = 0; i < BT.length; i++) {
+            BT[i].addEventListener('click', function() {
+                document.getElementById("link-schedule").click();
             });
-        </script>
-    @endif
-
-    @if ($role == 'guest' || $mode == 'absence')
-        <script>
-            console.log("Inicio Guest")
-
-            function toggleCellBlock() {}
-            $(function() {
-
-                var selectedCells = 0;
-                var nOfClasses = {{ $plan }};
-
-                $(".cell_block").click(function() {
-                    if ($(this).hasClass("selected")) {
-                        $(this).removeClass("selected");
-                    } else {
-                        if (selectedCells < nOfClasses) {
-                            $(this).addClass("selected");
-                        }
-                    }
-
-                    selectedCells = $(".selected").length;
-                });
-
-            });
+        }
 
 
-            var numClass = 0;
+        let hourForDays = @json($university_schedule_hours) + 1;
+        var DT = $("#absence_table").DataTable({
+            searching: false,
+            ordering: false,
+            pageLength: hourForDays,
+            info: false,
+            bLengthChange: false,
+            pagingType: "simple",
+            // stateSave: true,
+        });
+    </script>
+@endif
 
-            Livewire.hook('element.updated', (el, component) => {
-                numClass = 0;
+@if ($role == 'student' && $mode == 'edit')
+    <script>
+        // console.log("Inicio Guest")
 
-                var hoyLocal = new Date(@json($hoy));
-                var horaLocal = hoyLocal.getHours();
-                // var horaUTC = hoyLocal.getUTCHours();
-                var difHora = hoyLocal.getTimezoneOffset() / 60;
-                var OpenUTC =
-                    @json($university_schedule_start); // Hora UTC a la que abre la academia en PERU! (06:00 am Hora local en peru) (07:00 am hora local)
-                var OpenLocal = OpenUTC - difHora;
+        function toggleCellBlock() {}
+        $(function() {
 
-                //Asignar hora UTC y Local al Horario
-                // cellsUTC = $('.UTC');
-                var cellsLocal = $('.Local');
-                for (var i = 0; i < cellsLocal.length; i++) {
-                    // if (OpenUTC < 10) {
-                    //     cellsUTC[i].innerHTML = "0" + OpenUTC + ":00";
-                    // } else {
-                    //     cellsUTC[i].innerHTML = OpenUTC + ":00";
-                    // }
+            var selectedCells = 0;
+            var nOfClasses = {{ $plan }};
 
-                    // if (OpenUTC >= 23) {
-                    //     OpenUTC = 0;
-                    // } else {
-                    //     OpenUTC++;
-                    // }
-
-
-                    if (OpenLocal < 10) {
-                        if (OpenLocal < 0) {
-                            OpenLocal += 24;
-                            cellsLocal[i].innerHTML = OpenLocal + ":00";
-                        } else {
-                            cellsLocal[i].innerHTML = "0" + OpenLocal + ":00";
-                        }
-                    } else {
-                        cellsLocal[i].innerHTML = OpenLocal + ":00";
-                    }
-
-                    if (OpenLocal >= 23) {
-                        OpenLocal = 0;
-                    } else {
-                        OpenLocal++;
+            $(".cell_block").click(function() {
+                if ($(this).hasClass("selected")) {
+                    $(this).removeClass("selected");
+                } else {
+                    if (selectedCells < nOfClasses) {
+                        $(this).addClass("selected");
                     }
                 }
+
+                selectedCells = $(".selected").length;
             });
 
-            // Funcion de seleccion en el horario
-            //window.addEventListener('initSchedule', event => {
-            // console.log("hola");
-            var qtyClass = {{ $plan }};
-            var classSelected = [];
-            var preClass = @json($data_selected_format);
-            classSelected = preClass;
-            var preClassTd = [];
-            preClass.forEach(element => {
-                preClassTd.push(document.getElementById(element));
-            });
-            var init = true;
+        });
 
-            var selection = new SelectionArea({
-                    selectables: ["td.selectable"],
-                    boundaries: [".container"],
-                })
-                .on("start", ({
-                    store,
-                    event
-                }) => {
-                    if (!init) {
-                        store.stored = preClassTd;
-                        init = true;
-                    }
 
-                    if (!event.ctrlKey && !event.metaKey) {
-                        //console.log(store)
-                        for (var el of store.stored) {
-                            if (el.classList.contains("selected")) {
-                                el.classList.remove("selected");
-                                classSelected = classSelected.filter(function(cf) {
-                                    return cf !== el.id;
-                                });
-                                if (numClass > 0)
-                                    numClass--;
-                                //console.log("uno"+numClass);
-                            }
-                        }
+        var numClass = 0;
 
-                        selection.clearSelection();
-                    }
-                    //console.log(store.stored)
-                })
-                .on(
-                    "move",
-                    ({
-                        store: {
-                            changed: {
-                                added,
-                                removed
-                            }
-                        }
-                    }) => {
-                        //console.log(added)
-                        for (var el of added) {
-                            if (!(el.classList.contains("selected"))) {
-                                if (numClass < qtyClass) {
-                                    el.classList.add("selected");
-                                    classSelected.push(el.id);
-                                    numClass++;
-                                    //console.log("dos"+numClass);
-                                }
-                            }
-                        }
+        Livewire.hook('element.updated', (el, component) => {
+            numClass = 0;
 
-                        for (var el of removed) {
-                            if (el.classList.contains("selected")) {
-                                el.classList.remove("selected");
-                                classSelected = classSelected.filter(function(cf) {
-                                    return cf !== el.id;
-                                });
-                                numClass--;
-                            }
-                            //console.log("tres"+numClass);
-
-                        }
-
-                    }
-
-                );
-
-            //});
             var hoyLocal = new Date(@json($hoy));
             var horaLocal = hoyLocal.getHours();
             // var horaUTC = hoyLocal.getUTCHours();
@@ -1333,7 +1535,7 @@
 
             //Asignar hora UTC y Local al Horario
             // cellsUTC = $('.UTC');
-            cellsLocal = $('.Local');
+            var cellsLocal = $('.Local');
             for (var i = 0; i < cellsLocal.length; i++) {
                 // if (OpenUTC < 10) {
                 //     cellsUTC[i].innerHTML = "0" + OpenUTC + ":00";
@@ -1365,27 +1567,154 @@
                     OpenLocal++;
                 }
             }
+        });
 
-            var BT = $(".button-teacher");
-            for (var i = 0; i < BT.length; i++) {
-                BT[i].addEventListener('click', function() {
-                    document.getElementById("link-schedule").click();
-                });
+        // Funcion de seleccion en el horario
+        //window.addEventListener('initSchedule', event => {
+        // console.log("hola");
+        var qtyClass = {{ $plan }};
+        var classSelected = [];
+        var preClass = @json($data_selected_format);
+        classSelected = preClass;
+        var preClassTd = [];
+        preClass.forEach(element => {
+            preClassTd.push(document.getElementById(element));
+        });
+        var init = true;
+
+        var selection = new SelectionArea({
+                selectables: ["td.selectable"],
+                boundaries: [".container"],
+            })
+            .on("start", ({
+                store,
+                event
+            }) => {
+                if (!init) {
+                    store.stored = preClassTd;
+                    init = true;
+                }
+
+                if (!event.ctrlKey && !event.metaKey) {
+                    //console.log(store)
+                    for (var el of store.stored) {
+                        if (el.classList.contains("selected")) {
+                            el.classList.remove("selected");
+                            classSelected = classSelected.filter(function(cf) {
+                                return cf !== el.id;
+                            });
+                            if (numClass > 0)
+                                numClass--;
+                            //console.log("uno"+numClass);
+                        }
+                    }
+
+                    selection.clearSelection();
+                }
+                //console.log(store.stored)
+            })
+            .on(
+                "move",
+                ({
+                    store: {
+                        changed: {
+                            added,
+                            removed
+                        }
+                    }
+                }) => {
+                    //console.log(added)
+                    for (var el of added) {
+                        if (!(el.classList.contains("selected"))) {
+                            if (numClass < qtyClass) {
+                                el.classList.add("selected");
+                                classSelected.push(el.id);
+                                numClass++;
+                                //console.log("dos"+numClass);
+                            }
+                        }
+                    }
+
+                    for (var el of removed) {
+                        if (el.classList.contains("selected")) {
+                            el.classList.remove("selected");
+                            classSelected = classSelected.filter(function(cf) {
+                                return cf !== el.id;
+                            });
+                            numClass--;
+                        }
+                        //console.log("tres"+numClass);
+
+                    }
+
+                }
+
+            );
+
+        //});
+        var hoyLocal = new Date(@json($hoy));
+        var horaLocal = hoyLocal.getHours();
+        // var horaUTC = hoyLocal.getUTCHours();
+        var difHora = hoyLocal.getTimezoneOffset() / 60;
+        var OpenUTC =
+            @json($university_schedule_start); // Hora UTC a la que abre la academia en PERU! (06:00 am Hora local en peru) (07:00 am hora local)
+        var OpenLocal = OpenUTC - difHora;
+
+        //Asignar hora UTC y Local al Horario
+        // cellsUTC = $('.UTC');
+        cellsLocal = $('.Local');
+        for (var i = 0; i < cellsLocal.length; i++) {
+            // if (OpenUTC < 10) {
+            //     cellsUTC[i].innerHTML = "0" + OpenUTC + ":00";
+            // } else {
+            //     cellsUTC[i].innerHTML = OpenUTC + ":00";
+            // }
+
+            // if (OpenUTC >= 23) {
+            //     OpenUTC = 0;
+            // } else {
+            //     OpenUTC++;
+            // }
+
+
+            if (OpenLocal < 10) {
+                if (OpenLocal < 0) {
+                    OpenLocal += 24;
+                    cellsLocal[i].innerHTML = OpenLocal + ":00";
+                } else {
+                    cellsLocal[i].innerHTML = "0" + OpenLocal + ":00";
+                }
+            } else {
+                cellsLocal[i].innerHTML = OpenLocal + ":00";
             }
 
+            if (OpenLocal >= 23) {
+                OpenLocal = 0;
+            } else {
+                OpenLocal++;
+            }
+        }
 
-            let hourForDays = @json($university_schedule_hours) + 1;
-            var DT = $("#absence_table").DataTable({
-                searching: false,
-                ordering: false,
-                pageLength: hourForDays,
-                info: false,
-                bLengthChange: false,
-                pagingType: "simple",
-                // stateSave: true,
+        var BT = $(".button-teacher");
+        for (var i = 0; i < BT.length; i++) {
+            BT[i].addEventListener('click', function() {
+                document.getElementById("link-schedule").click();
             });
-        </script>
-    @endif
+        }
+
+
+        let hourForDays = @json($university_schedule_hours) + 1;
+        var DT = $("#absence_table").DataTable({
+            searching: false,
+            ordering: false,
+            pageLength: hourForDays,
+            info: false,
+            bLengthChange: false,
+            pagingType: "simple",
+            // stateSave: true,
+        });
+    </script>
+@endif
 
 
 </div>

@@ -10,11 +10,11 @@
                             <div class="relative">
                                 @if (count($module_units))
                                     <a href="{{ route('modules.details', $module_units->first()->module->id) }}"
-                                        class="leading-10 text-xl font-bold text-white capitalize rounded-full p-2 bg-green-600 w-10 mr-5 hover:bg-green-800"><i
+                                        class="leading-10 text-xl font-bold text-white capitalize rounded-full p-2 bg-green-600 w-10 mr-5 hover:bg-green-800 orden-unit"><i
                                             class="fas fa-sort"></i></a>
                                 @endif
                                 <button @click="unitOrExam = true"
-                                    class="text-center leading-10 text-3xl font-bold text-white capitalize rounded-full bg-lw-blue w-10 mr-10 hover:bg-blue-800">+</button>
+                                    class="text-center leading-10 text-3xl font-bold text-white capitalize rounded-full bg-lw-blue w-10 mr-10 hover:bg-blue-800 add-unit">+</button>
                                 <div x-show="unitOrExam" @click.outside="unitOrExam = false"
                                     class="right-4 top-8 absolute flex flex-col border border-gray-400 rounded-xl divide-y divide-opacity-100 divide-gray-300 bg-white">
                                     <a href="{{ route('units.create', ['module_id' => $module->id]) }}"
@@ -22,6 +22,7 @@
                                     <a href="{{ route('exam.create', ['module_id' => $module->id]) }}"
                                         class="hover:bg-gray-200 p-2 rounded-xl" @click="unitOrExam = false">Exam</a>
                                 </div>
+                                <x-shepherd-tour tourName="teachers/course_conversational" role="teacher" />
                             </div>
                         @endhasanyrole
                     @else
@@ -80,7 +81,7 @@
                             @if ($module->course->categories->pluck('name')->contains('Conversational'))
                                 @hasanyrole('admin|teacher')
                                     <div onclick="location.href='{{ route('units.edit', $unit->id) }}';"
-                                        class="flex justify-center text-3xl text-gray-400 hover:text-gray-600 cursor-pointer mx-6">
+                                        class="flex justify-center text-3xl text-gray-400 hover:text-gray-600 cursor-pointer mx-6 @if ($loop->first) first-unit-edit @endif">
                                         <i class="fas fa-info-circle mx-auto"></i>
                                     </div>
                                 @endhasanyrole
@@ -237,6 +238,18 @@
                 {{-- @endif --}}
                 {{-- @endforeach --}}
 
+                @php
+                    $tourReschedulingButton = DB::table('shepherd_users')
+                        ->where('user_id', auth()->id())
+                        ->where('tour_name', 'teachers/unit_created')
+                        ->first();
+                    // dd($tourRescheduling);
+                @endphp
+                @if ($tourReschedulingButton == null)
+                    @role('teacher')
+                        <x-shepherd-tour tourName="teachers/unit_created" role="teacher" />
+                    @endrole
+                @endif
 
             </div>
         </div>

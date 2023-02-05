@@ -12,7 +12,7 @@ const tour = new Shepherd.Tour({
 tour.addSteps([
     {
         id: 'units-list',
-        text: 'The available units for this module will be listed here.',
+        text: 'The available units for this module will be listed here. ⬇️',
         attachTo: {
             element: '.units-list',
             on: 'top'
@@ -27,14 +27,14 @@ tour.addSteps([
     },
     {
         id: 'first-unit',
-        text: 'Click on the name of free unit to preview it.',
+        text: 'Click on the name of this unit to preview it.👀',
         attachTo: {
             element: '.first-unit',
             on: 'top'
         },
         buttons: [
             {
-                text: 'Thanks!',
+                text: 'Thanks! 🎉',
                 action: tour.complete
             }
         ]

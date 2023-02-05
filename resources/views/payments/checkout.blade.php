@@ -8,19 +8,21 @@
     @endphp
 
     <script type="text/javascript">
+        action_url = @json(route('payments.checkout', ['purchaseNumber' => $purchaseNumber, '_token' => Session::token()]));
+
         function openForm() {
             VisanetCheckout.configure({
-                sessiontoken: '{{ $sessionKey }}',
+                sessiontoken: @json($sessionKey),
                 channel: 'web',
-                merchantid: '{{ env('NIUBIZ_MERCHANT_ID') }}',
-                purchasenumber: '{{ $purchaseNumber }}',
-                amount: {{ $ammount }},
+                merchantid: @json(env('NIUBIZ_MERCHANT_ID')),
+                purchasenumber: @json($purchaseNumber),
+                amount: @json($ammount),
                 expirationminutes: 20,
                 // expirationminutes: {{ $expirationTimeInMinutes }},
                 timeouturl: 'about:blank',
-                merchantlogo: '{{ asset("storage/images/logo_lw_for_niubiz.png") }}',
+                merchantlogo: '{{ asset('storage/images/logo_lw_for_niubiz.png') }}',
                 formbuttoncolor: '#3246BA',
-                action: '{{ route('payments.checkout', ['purchaseNumber' => $purchaseNumber]) }}',
+                action: action_url,
                 complete: function(params) {
                     alert(JSON.stringify(params));
                 }
@@ -31,7 +33,8 @@
     </script>
 
     <div class="w-full flex h-96 justify-center items-center">
-        <button onclick="openForm();" class="bg-lw-blue text-white px-4 py-2 rounded-md text-3xl hover:bg-blue-800">Pay here</button>
+        <button onclick="openForm();" class="bg-lw-blue text-white px-4 py-2 rounded-md text-3xl hover:bg-blue-800">Pay
+            here</button>
     </div>
 
     {{-- <form action="{{ route('payments.checkout', ['purchaseNumber' => $purchaseNumber]) }}" method="post">

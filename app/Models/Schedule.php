@@ -14,7 +14,7 @@ class Schedule extends Model
 
     protected $casts = [
         'selected_schedule' => 'array',
-        'next_schedule' => 'array',
+        // 'next_schedule' => 'array',
     ];
 
     /**
@@ -22,7 +22,7 @@ class Schedule extends Model
      *
      * @var array
      */
-    protected $fillable = ['user_id', 'selected_schedule', 'next_schedule', 'deleted_at', 'enrolment_id'];
+    protected $fillable = ['user_id', 'selected_schedule', /*'next_schedule',*/ 'deleted_at', 'enrolment_id'];
 
     // FUNCION PARA RETORNAR EL HORARIO DE LA UNIVERSIDAD
     public static function university_schedule()

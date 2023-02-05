@@ -52,7 +52,7 @@ class ApportionmentController extends Controller
         // $next_period_end->addDays(1);
         // $next_period_end->addWeeks(3);
         // dd($next_period_end);
-        
+
 
         foreach ($schedule as $key => $value) {
             $schedule[$key][0] = (int)$value[0];
@@ -103,7 +103,7 @@ class ApportionmentController extends Controller
 
         //CONSULTA DE CLASES REAGENDADAS EN EL PERIODO ACTUAL PARA RESTAR AL COBRO
 
-        
+
         $period_start_c = new Carbon($current_period[0]);
         $period_end_c = new Carbon($current_period[1]);
 
@@ -125,8 +125,6 @@ class ApportionmentController extends Controller
         $days_diff = array_values($days_diff);
 
         $qty_diff = sizeof($days_diff);
-
-        // dd($days, $qty);
 
         return [$qty_diff, $days_diff, $days, $abcense];
     }
@@ -151,33 +149,33 @@ class ApportionmentController extends Controller
         // return [$current_period_start->toDateTimeString(), $current_period_end->toDateTimeString()];
 
         $current_period = DB::table("metadata")->where("key", "current_period")->first()->value;
-        $current_period = array_values(json_decode($current_period,1));
+        $current_period = array_values(json_decode($current_period, 1));
         // dd($current_period);
         return $current_period;
     }
 
-    public static function nextPeriod($onlyDate = false){
+    public static function nextPeriod($onlyDate = false)
+    {
         $current_period = DB::table("metadata")->where("key", "current_period")->first()->value;
-        $current_period = array_values(json_decode($current_period,1));
+        $current_period = array_values(json_decode($current_period, 1));
 
         $start_period = new Carbon($current_period[0]);
         $end_period = new Carbon($current_period[1]);
 
-        if($start_period->month == $end_period->month){
-            $next_period_start = new Carbon('first monday of next month');
-            $next_period_end = (new Carbon('first monday of next month'))->addDays(5);
+        if ($start_period->month == $end_period->month) {
+            $next_period_start = $start_period->copy()->addMonth()->startOfMonth()->next(Carbon::MONDAY);
+            $next_period_end = $next_period_start->copy()->addDays(5);
             $next_period_end->addWeeks(3);
             $next_period_end->addDays(1);
-        }else{
+        } else {
             $next_period_start = $end_period->copy()->firstOfMonth(Carbon::MONDAY);
-            $next_period_end = $end_period->copy()->firstOfMonth(Carbon::MONDAY)->addDays(5);
+            $next_period_end = $next_period_start->copy()->addDays(5);
             $next_period_end->addWeeks(3);
             $next_period_end->addDays(1);
         }
         // dd($next_period_start,$next_period_end, $start_period, $end_period);
         if ($onlyDate) return [$next_period_start->toDateString(), $next_period_end->toDateString()];
         return [$next_period_start->toDateTimeString(), $next_period_end->toDateTimeString()];
-
     }
 
     public static function getPeriod($class, $extended = false)

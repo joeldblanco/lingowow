@@ -225,8 +225,8 @@ class Schedule extends Component
             $this->students_schedules = [];
             foreach ($students as $student) {
                 $this->students_schedules[] = $student->schedules->first()->selected_schedule;
-                if ($student->schedules->first()->next_schedule != null) {
-                    array_push($next_students_schedule, $student->schedules->first()->next_schedule);
+                if (!empty($student->enrolments->first()->preselection)) {
+                    array_push($next_students_schedule, $student->enrolments->first()->preselection->schedule);
                 }
             }
             $this->students_schedules = array_filter($this->students_schedules);
@@ -380,12 +380,10 @@ class Schedule extends Component
                 $this->schedule_user[$key] = implode('-', $value);
             }
 
-            $this->next_schedule = ModelsSchedule::select('next_schedule')
-                ->where('enrolment_id', $enrolment->id)
-                ->first();
+            $this->next_schedule = $enrolment->preselection;
 
-            if ($this->next_schedule != null) {
-                $this->next_schedule = $this->next_schedule->next_schedule;
+            if (!empty($this->next_schedule)) {
+                $this->next_schedule = $this->next_schedule->schedule;
             } else {
                 $this->next_schedule = [];
             }
@@ -425,8 +423,8 @@ class Schedule extends Component
             foreach ($this->students as $student) {
                 // dd($student->schedules->first());
                 $this->students_schedules[] = $student->schedules->first()->selected_schedule;
-                if ($student->schedules->first()->next_schedule != null) {
-                    array_push($next_students_schedule, $student->schedules->first()->next_schedule);
+                if (!empty($student->enrolments->first()->preselection)) {
+                    array_push($next_students_schedule, $student->enrolments->first()->preselection->schedule);
                 }
             }
 

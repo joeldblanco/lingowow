@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Enrolment;
 use App\Models\Module;
 use App\Models\Unit;
 use App\Models\User;
@@ -128,12 +129,11 @@ class UnitController extends Controller
                     }
                 } else {
                     //REVISAR QUE EL CURSO DE LA UNIDAD SOLICITADA SE ENCUENTRE ENTRE LOS CURSOS A LOS QUE EL ESTUDIANTE ESTÁ INSCRITO
-                    $student_courses = $user->enrolments->pluck('course');
+                    $student_courses = Enrolment::withTrashed()->where('student_id', $user->id)->get()->pluck('course');
                     $unit = Unit::findOrFail($id);
                     $unit_course = $unit->course();
                     if ($student_courses->contains($unit_course)) {
                         //REVISAR QUE EL ORDEN DE LA UNIDAD SOLICITADA SEA IGUAL O MENOR AL ORDEN DE LA UNIDAD DEL ESTUDIANTE
-
                         foreach ($user->units as $user_unit) {
                             if ($user_unit->course()->id == $unit_course->id) {
                                 if ($unit->order > $user_unit->order) {

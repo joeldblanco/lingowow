@@ -52,7 +52,6 @@ class TeachersCarousel extends Component
 
         $apportionment = ApportionmentController::calculateApportionment(session('plan'));
         $product_qty = $apportionment[0];
-
         Cart::add($product->id, $product->name, $product_qty, ($product->sale_price == null ? $product->regular_price : $product->sale_price))->associate('App\Models\Product');
         session([
             'selected_teacher' => $teacher_id,
@@ -82,12 +81,16 @@ class TeachersCarousel extends Component
 
     public function render()
     {
-        // dd($this->teachers_ids);
         if (!is_iterable($this->teachers_ids)) {
             $this->teachers_ids = [$this->teachers_ids];
         }
         $this->available_teachers = new Collection([]);
-        $this->available_teachers = User::role('teacher')->whereIn('id', $this->teachers_ids)->get()->pluck('schedules')->flatten()->whereNotNull('selected_schedule')->pluck('user');
+        if ((auth()->user()->hasRole('guest') || auth()->user()->hasRole('student')) && auth()->id() != 5) {
+            $this->available_teachers = User::role('teacher')->whereIn('id', $this->teachers_ids)->where('id', '!=', 7)->get()->pluck('schedules')->flatten()->whereNotNull('selected_schedule')->pluck('user');
+        } else {
+            $this->available_teachers = User::role('teacher')->whereIn('id', $this->teachers_ids)->get()->pluck('schedules')->flatten()->whereNotNull('selected_schedule')->pluck('user');
+        }
+
 
         $this->available_teachers = $this->available_teachers->shuffle();
         if (count($this->available_teachers) > 0) {

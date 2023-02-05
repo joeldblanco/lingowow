@@ -2624,11 +2624,11 @@ insert  into `plan_product`(`plan_id`,`product_id`) values
 
 /*Data for the table `plans` */
 
-insert  into `plans`(`id`,`name`,`product_id`,`n_classes`,`slug`,`created_at`,`updated_at`,`deleted_at`) values 
-(1,'Simple Plan',0,8,'simple-plan',NULL,NULL,NULL),
-(2,'Regular Plan',0,12,'regular-plan',NULL,NULL,NULL),
-(3,'Intensive Plan',0,16,'intensive-plan',NULL,NULL,NULL),
-(4,'Single Payment',0,1,'single-payment',NULL,NULL,NULL);
+insert  into `plans`(`id`,`name`,`monthly_classes`,`slug`,`created_at`,`updated_at`,`deleted_at`) values 
+(1,'Simple Plan',8,'simple-plan',NULL,NULL,NULL),
+(2,'Regular Plan',12,'regular-plan',NULL,NULL,NULL),
+(3,'Intensive Plan',16,'intensive-plan',NULL,NULL,NULL),
+(4,'Single Payment',1,'single-payment',NULL,NULL,NULL);
 
 /*Data for the table `post_like` */
 
