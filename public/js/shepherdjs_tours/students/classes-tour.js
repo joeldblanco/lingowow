@@ -13,10 +13,10 @@ tour.addSteps([
     {
         id: 'classes_welcome',
         text: "Welcome to your classes page! 🎉 This is where you'll find all the information related to your classes in one place. From class dates to class recordings, it's all here. Let's take a look! 🔍",
-        attachTo: {
-            element: '.teacher-tour',
-            on: 'top'
-        },
+        // attachTo: {
+        //     element: '.teacher-tour',
+        //     on: 'top'
+        // },
         buttons: [
             {
                 text: 'Next!',
@@ -47,16 +47,16 @@ tour.addSteps([
         },
         buttons: [
             {
-                text: 'Got it!',
-                action: tour.complete
+                text: 'Okay!',
+                action: tour.next
             }
         ],
     },
     {
         id: 'class_recordings',
-        text: "👀 To view the details of a class, simply click on the class date. 💡 That's all it takes to access important information about your class. 🔍",
+        text: "📹 By clicking here you'll have access to all the available recordings along with the password to view each recording, right there on the same page. 💡 <br><br>Keep in mind, the recordings will only be available for 7 days. 📅",
         attachTo: {
-            element: '.class-tour',
+            element: '.class-recordings',
             on: 'top'
         },
         buttons: [

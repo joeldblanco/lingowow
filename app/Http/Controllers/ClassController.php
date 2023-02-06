@@ -204,7 +204,7 @@ class ClassController extends Controller
                 session(['message' => "Dear Linguado. That block is not available"]);
                 return redirect()->back();
             }
-            dd($request->data, $data);
+            // dd($request->data, $data);
             
 
             $newDateStart = Carbon::create((new Carbon())->year, $data[3], $data[4], $data[0]);

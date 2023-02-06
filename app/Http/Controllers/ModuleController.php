@@ -90,7 +90,11 @@ class ModuleController extends Controller
             if ($user->units->count() > 0) {
                 $user_units = $module_units->where('order', '<=', $user->units->first()->order);
             } else {
-                $user_units = new Collection([]);
+                if ($module->course->categories->pluck('name')->contains('Conversational')) {
+                    $user_units = $module_units;
+                } else {
+                    $user_units = new Collection([$module_units->first()]);
+                }
             }
         } else if ($role == "guest") {
 
