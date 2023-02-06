@@ -440,10 +440,10 @@ Route::middleware(['web', 'auth', 'verified', 'impersonate'])->group(function ()
     Route::get('/users/stop-impersonation', [UsersController::class, 'stopImpersonation'])->name('stopImpersonation');
 
     //ROUTES FOR CLASSES//
-    Route::get('/classes', ClassesComponent::class)->name('classes.index');
-    Route::get('/classes/{id}', [ClassController::class, 'edit'])->name('classes.edit');
-    Route::post('/classes/update', [ClassController::class, 'update'])->name('classes.update');
-    // Route::post('/classes/check', [ClassController::class, 'checkClasses'])->name('classes.check');
+    Route::middleware(['role:teacher|student'])->get('/classes', ClassesComponent::class)->name('classes.index');
+    Route::middleware(['role:teacher|student'])->get('/classes/{id}', [ClassController::class, 'edit'])->name('classes.edit');
+    Route::middleware(['role:teacher|student'])->post('/classes/update', [ClassController::class, 'update'])->name('classes.update');
+    // Route::middleware(['role:teacher|student'])->post('/classes/check', [ClassController::class, 'checkClasses'])->name('classes.check');
 
     //ROUTES FOR POSTS//
     Route::post('/post/store', [PostController::class, 'store'])->name('post.store');

@@ -3,13 +3,14 @@
 
 <head>
     @php
-        // dd(session('selected_course'));
         $session_info = json_decode((new Illuminate\Http\Client\PendingRequest())->get('http://ipwho.is/' . $_SERVER['REMOTE_ADDR'])->getBody(), true);
         if ($session_info['success'] == false) {
             session()->forget('session_info');
         } else {
             session(['session_info' => $session_info]);
-            session(['tz' => session('session_info')['timezone']['id']]);
+            auth()
+                ->user()
+                ->update(['timezone' => session('session_info')['timezone']['id']]);
         }
         // dd(session()->all());
         
