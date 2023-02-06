@@ -484,6 +484,7 @@ class Schedule extends Component
                 }
             }
             foreach ($days as $v) {
+                if(is_array($buscado)) dd($buscado);
                 if (explode("-", $buscado)[1] === $v) {
                     $j++;
                 }
@@ -584,7 +585,7 @@ class Schedule extends Component
 
 
         foreach ($schedules_exam_reserve as $day) {
-            if ($this->notFree($schedules_exam_reserve, $day, $this->days_rest) && !in_array($day, $schedules_exam_not_free)) {
+            if ($this->notFree($schedules_exam_reserve, $day[0] . '-' . $day[1], $this->days_rest) && !in_array($day, $schedules_exam_not_free)) {
                 $schedules_exam_not_free[] = $day;
             }
         }

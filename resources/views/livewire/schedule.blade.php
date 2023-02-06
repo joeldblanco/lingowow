@@ -42,11 +42,13 @@
                             <!-- INICIO DEL HORARIO -->
                             <div>
 
-                                <table  class="border table-tour" style="width: 100%">
+                                <table class="border table-tour" style="width: 100%">
                                     <!--fila de los titulos-->
                                     <tr>
                                         <th class="width border">UTC</th>
-                                        <th>LOCAL</th>
+                                        <th>
+                                            LOCAL TIME
+                                        </th>
                                         @foreach ($days as $day)
                                             <th class="border width">
                                                 {{ $day }}
@@ -63,10 +65,22 @@
                                     @for ($hour = 0; $hour < $university_schedule_hours; $hour++)
                                         <tr class="border">
                                             <td class="width border UTC">
-                                                @if ($i < 10)
-                                                    0{{ $i }}:00
+                                                @if ($i == 0)
+                                                    12:00 AM
+                                                @elseif ($i < 12)
+                                                    @if ($i < 10)
+                                                        0{{ $i }}:00 AM
+                                                    @else
+                                                        {{ $i }}:00 AM
+                                                    @endif
+                                                @elseif ($i == 12)
+                                                    12:00 PM
                                                 @else
-                                                    {{ $i }}:00
+                                                    @if ($i - 12 < 10)
+                                                        0{{ $i - 12 }}:00 PM
+                                                    @else
+                                                        {{ $i - 12 }}:00 PM
+                                                    @endif
                                                 @endif
                                             </td>
                                             <td class="width border Local">
@@ -145,7 +159,8 @@
                                     <thead>
                                         <tr>
                                             <th class="width border">UTC</th>
-                                            <th class="" style="">LOCAL</th>
+                                            <th class="" style="">
+                                                LOCAL TIME</th>
                                             @foreach ($days as $day)
                                                 <th class="border width" style="">
                                                     {{ $day }}
@@ -321,7 +336,7 @@
                                     <!--fila de los titulos-->
                                     <tr>
                                         <th class="width border">UTC</th>
-                                        <th>LOCAL</th>
+                                        <th>LOCAL TIME</th>
                                         @foreach ($days as $day)
                                             <th class="border width">
                                                 {{ $day }}
@@ -338,10 +353,22 @@
                                     @for ($hour = 0; $hour < $university_schedule_hours; $hour++)
                                         <tr class="border">
                                             <td class="width border UTC">
-                                                @if ($i < 10)
-                                                    0{{ $i }}:00
+                                                @if ($i == 0)
+                                                    12:00 AM
+                                                @elseif ($i < 12)
+                                                    @if ($i < 10)
+                                                        0{{ $i }}:00 AM
+                                                    @else
+                                                        {{ $i }}:00 AM
+                                                    @endif
+                                                @elseif ($i == 12)
+                                                    12:00 PM
                                                 @else
-                                                    {{ $i }}:00
+                                                    @if ($i - 12 < 10)
+                                                        0{{ $i - 12 }}:00 PM
+                                                    @else
+                                                        {{ $i - 12 }}:00 PM
+                                                    @endif
                                                 @endif
                                             </td>
                                             <td class="width border Local">
@@ -427,7 +454,7 @@
                                 <!--fila de los titulos-->
                                 <tr>
                                     <th class="width border">UTC</th>
-                                    <th class="width border">LOCAL</th>
+                                    <th class="width border">LOCAL TIME</th>
                                     @foreach ($days as $day)
                                         <th class="border width">
                                             {{ $day }}
@@ -567,7 +594,7 @@
                                     <!--fila de los titulos-->
                                     <tr>
                                         <th class="width border">UTC</th>
-                                        <th class="width border">LOCAL</th>
+                                        <th class="width border">LOCAL TIME</th>
                                         @foreach ($days as $day)
                                             <th class="border width">
                                                 {{ $day }}
@@ -583,10 +610,22 @@
                                     @for ($hour = 0; $hour < $university_schedule_hours; $hour++)
                                         <tr class="border">
                                             <td class="width border UTC">
-                                                @if ($i < 10)
-                                                    0{{ $i }}:00
+                                                @if ($i == 0)
+                                                    12:00 AM
+                                                @elseif ($i < 12)
+                                                    @if ($i < 10)
+                                                        0{{ $i }}:00 AM
+                                                    @else
+                                                        {{ $i }}:00 AM
+                                                    @endif
+                                                @elseif ($i == 12)
+                                                    12:00 PM
                                                 @else
-                                                    {{ $i }}:00
+                                                    @if ($i - 12 < 10)
+                                                        0{{ $i - 12 }}:00 PM
+                                                    @else
+                                                        {{ $i - 12 }}:00 PM
+                                                    @endif
                                                 @endif
                                             </td>
                                             <td class="width border Local">
@@ -596,8 +635,10 @@
                                                 @if (in_array([$i, $e], $user_schedules))
                                                     @if (in_array([$i, $e], $students_schedules) && $role != 'student')
                                                         @foreach ($students as $student)
+                                                            @if (empty($student->schedules->first()->selected_schedule))
+                                                                {{ dd("Estudiante sin horario: ", $student) }}
+                                                            @endif
                                                             @if (in_array([$i, $e], $student->schedules->first()->selected_schedule))
-                                                                {{-- {{dd($student->first_name)}} --}}
                                                                 <td id="{{ $i }}-{{ $e }}"
                                                                     class="border width selectable preavailable preselected">
                                                                     <div onclick="location.href='{{ route('profile.show', $student->id) }}';"
@@ -718,7 +759,7 @@
                             <thead>
                                 <tr>
                                     <th class="width border">UTC</th>
-                                    <th class="" style="">LOCAL</th>
+                                    <th class="" style="">LOCAL TIME</th>
                                     @foreach ($days as $day)
                                         <th class="border width" style="">
                                             {{ $day }}
@@ -749,10 +790,22 @@
                                     @for ($hour = 0; $hour < $university_schedule_hours; $hour++)
                                         <tr class="border">
                                             <td class="width border UTC">
-                                                @if ($i < 10)
-                                                    0{{ $i }}:00
+                                                @if ($i == 0)
+                                                    12:00 AM
+                                                @elseif ($i < 12)
+                                                    @if ($i < 10)
+                                                        0{{ $i }}:00 AM
+                                                    @else
+                                                        {{ $i }}:00 AM
+                                                    @endif
+                                                @elseif ($i == 12)
+                                                    12:00 PM
                                                 @else
-                                                    {{ $i }}:00
+                                                    @if ($i - 12 < 10)
+                                                        0{{ $i - 12 }}:00 PM
+                                                    @else
+                                                        {{ $i - 12 }}:00 PM
+                                                    @endif
                                                 @endif
                                             </td>
                                             <td class="width border Local">
@@ -1015,42 +1068,36 @@
             });
         }
 
-        // console.log("INICIO");
         var hoyLocal = new Date(@json($hoy));
-
         var horaLocal = hoyLocal.getHours();
-        // var horaUTC = hoyLocal.getUTCHours();
         var difHora = hoyLocal.getTimezoneOffset() / 60;
-        var OpenUTC =
-            @json($university_schedule_start); // Hora UTC a la que abre la academia en PERU! (06:00 am Hora local en peru) (07:00 am hora local)
+        var OpenUTC = @json($university_schedule_start);
         var OpenLocal = OpenUTC - difHora;
 
-        //Asignar hora UTC y Local al Horario
-
-        // cellsUTC = $('.UTC');
         var cellsLocal = $('.Local');
         for (var i = 0; i < cellsLocal.length; i++) {
-            // if (OpenUTC < 10) {
-            //     cellsUTC[i].innerHTML = "0" + OpenUTC + ":00";
-            // } else {
-            //     cellsUTC[i].innerHTML = OpenUTC + ":00";
-            // }
+            if (OpenLocal < 0) {
+                OpenLocal += 24;
+            }
 
-            // if (OpenUTC >= 23) {
-            //     OpenUTC = 0;
-            // } else {
-            //     OpenUTC++;
-            // }
-
+            var horaFormateada = OpenLocal;
             if (OpenLocal < 10) {
-                if (OpenLocal < 0) {
-                    OpenLocal += 24;
-                    cellsLocal[i].innerHTML = OpenLocal + ":00";
-                } else {
-                    cellsLocal[i].innerHTML = "0" + OpenLocal + ":00";
-                }
+                horaFormateada = "0" + OpenLocal;
+            } else if (OpenLocal >= 10 && OpenLocal < 12) {
+                horaFormateada = OpenLocal;
+            } else if (OpenLocal >= 12 && OpenLocal < 22) {
+                horaFormateada = OpenLocal - 12;
+                horaFormateada = "0" + horaFormateada;
+            } else if (OpenLocal >= 22) {
+                horaFormateada = OpenLocal - 12;
+            }
+
+            if (OpenLocal < 12) {
+                cellsLocal[i].innerHTML = horaFormateada + ":00 AM";
+            } else if (OpenLocal === 12) {
+                cellsLocal[i].innerHTML = "12:00 PM";
             } else {
-                cellsLocal[i].innerHTML = OpenLocal + ":00";
+                cellsLocal[i].innerHTML = horaFormateada + ":00 PM";
             }
 
             if (OpenLocal >= 23) {
@@ -1306,38 +1353,34 @@
 
             var hoyLocal = new Date(@json($hoy));
             var horaLocal = hoyLocal.getHours();
-            // var horaUTC = hoyLocal.getUTCHours();
             var difHora = hoyLocal.getTimezoneOffset() / 60;
-            var OpenUTC =
-                @json($university_schedule_start); // Hora UTC a la que abre la academia en PERU! (06:00 am Hora local en peru) (07:00 am hora local)
+            var OpenUTC = @json($university_schedule_start);
             var OpenLocal = OpenUTC - difHora;
 
-            //Asignar hora UTC y Local al Horario
-            // cellsUTC = $('.UTC');
             var cellsLocal = $('.Local');
             for (var i = 0; i < cellsLocal.length; i++) {
-                // if (OpenUTC < 10) {
-                //     cellsUTC[i].innerHTML = "0" + OpenUTC + ":00";
-                // } else {
-                //     cellsUTC[i].innerHTML = OpenUTC + ":00";
-                // }
+                if (OpenLocal < 0) {
+                    OpenLocal += 24;
+                }
 
-                // if (OpenUTC >= 23) {
-                //     OpenUTC = 0;
-                // } else {
-                //     OpenUTC++;
-                // }
-
-
+                var horaFormateada = OpenLocal;
                 if (OpenLocal < 10) {
-                    if (OpenLocal < 0) {
-                        OpenLocal += 24;
-                        cellsLocal[i].innerHTML = OpenLocal + ":00";
-                    } else {
-                        cellsLocal[i].innerHTML = "0" + OpenLocal + ":00";
-                    }
+                    horaFormateada = "0" + OpenLocal;
+                } else if (OpenLocal >= 10 && OpenLocal < 12) {
+                    horaFormateada = OpenLocal;
+                } else if (OpenLocal >= 12 && OpenLocal < 22) {
+                    horaFormateada = OpenLocal - 12;
+                    horaFormateada = "0" + horaFormateada;
+                } else if (OpenLocal >= 22) {
+                    horaFormateada = OpenLocal - 12;
+                }
+
+                if (OpenLocal < 12) {
+                    cellsLocal[i].innerHTML = horaFormateada + ":00 AM";
+                } else if (OpenLocal === 12) {
+                    cellsLocal[i].innerHTML = "12:00 PM";
                 } else {
-                    cellsLocal[i].innerHTML = OpenLocal + ":00";
+                    cellsLocal[i].innerHTML = horaFormateada + ":00 PM";
                 }
 
                 if (OpenLocal >= 23) {
@@ -1497,8 +1540,6 @@
 
 @if ($role == 'student' && $mode == 'edit')
     <script>
-        // console.log("Inicio Guest")
-
         function toggleCellBlock() {}
         $(function() {
 
@@ -1527,38 +1568,34 @@
 
             var hoyLocal = new Date(@json($hoy));
             var horaLocal = hoyLocal.getHours();
-            // var horaUTC = hoyLocal.getUTCHours();
             var difHora = hoyLocal.getTimezoneOffset() / 60;
-            var OpenUTC =
-                @json($university_schedule_start); // Hora UTC a la que abre la academia en PERU! (06:00 am Hora local en peru) (07:00 am hora local)
+            var OpenUTC = @json($university_schedule_start);
             var OpenLocal = OpenUTC - difHora;
 
-            //Asignar hora UTC y Local al Horario
-            // cellsUTC = $('.UTC');
             var cellsLocal = $('.Local');
             for (var i = 0; i < cellsLocal.length; i++) {
-                // if (OpenUTC < 10) {
-                //     cellsUTC[i].innerHTML = "0" + OpenUTC + ":00";
-                // } else {
-                //     cellsUTC[i].innerHTML = OpenUTC + ":00";
-                // }
+                if (OpenLocal < 0) {
+                    OpenLocal += 24;
+                }
 
-                // if (OpenUTC >= 23) {
-                //     OpenUTC = 0;
-                // } else {
-                //     OpenUTC++;
-                // }
-
-
+                var horaFormateada = OpenLocal;
                 if (OpenLocal < 10) {
-                    if (OpenLocal < 0) {
-                        OpenLocal += 24;
-                        cellsLocal[i].innerHTML = OpenLocal + ":00";
-                    } else {
-                        cellsLocal[i].innerHTML = "0" + OpenLocal + ":00";
-                    }
+                    horaFormateada = "0" + OpenLocal;
+                } else if (OpenLocal >= 10 && OpenLocal < 12) {
+                    horaFormateada = OpenLocal;
+                } else if (OpenLocal >= 12 && OpenLocal < 22) {
+                    horaFormateada = OpenLocal - 12;
+                    horaFormateada = "0" + horaFormateada;
+                } else if (OpenLocal >= 22) {
+                    horaFormateada = OpenLocal - 12;
+                }
+
+                if (OpenLocal < 12) {
+                    cellsLocal[i].innerHTML = horaFormateada + ":00 AM";
+                } else if (OpenLocal === 12) {
+                    cellsLocal[i].innerHTML = "12:00 PM";
                 } else {
-                    cellsLocal[i].innerHTML = OpenLocal + ":00";
+                    cellsLocal[i].innerHTML = horaFormateada + ":00 PM";
                 }
 
                 if (OpenLocal >= 23) {

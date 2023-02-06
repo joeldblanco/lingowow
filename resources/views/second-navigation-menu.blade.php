@@ -156,9 +156,16 @@
                     <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
                         @foreach ($nav_links as $nav_link)
                             @if ($nav_link['parent_link'] || $nav_link['status'])
-                                <x-jet-nav-link href="{{ $nav_link['route'] }}" :active="$nav_link['status']">
-                                    {{ $nav_link['name'] }}
-                                </x-jet-nav-link>
+                                @if ($nav_link['name'] == 'Recordings')
+                                    <x-jet-nav-link href="{{ $nav_link['route'] }}" :active="$nav_link['status']"
+                                        class="class-recordings">
+                                        {{ $nav_link['name'] }}
+                                    </x-jet-nav-link>
+                                @else
+                                    <x-jet-nav-link href="{{ $nav_link['route'] }}" :active="$nav_link['status']">
+                                        {{ $nav_link['name'] }}
+                                    </x-jet-nav-link>
+                                @endif
                             @endif
                         @endforeach
                     </div>

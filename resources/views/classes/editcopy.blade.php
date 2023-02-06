@@ -11,7 +11,7 @@
         // PERIODO
         
         $hoy = (new Carbon\Carbon())->toCookieString();
-        $tz = session('tz');
+        $tz = auth()->user()->timezone;
         
         $hoyLoc = Carbon\Carbon::now()->toCookieString();
         $ip_add = $_SERVER['REMOTE_ADDR'];

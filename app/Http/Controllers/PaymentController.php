@@ -99,6 +99,8 @@ class PaymentController extends Controller
 
     public function requestTransactionAuthorization($transactionToken)
     {
+        return redirect()->route('cart')->with('error', 'No se pudo procesar el pago');
+        
         $purchaseNumber = session('purchaseNumber');
 
         $path = "https://apiprod.vnforapps.com/api.authorization/v3/authorization/ecommerce/" . env('NIUBIZ_MERCHANT_ID', '');
@@ -121,62 +123,15 @@ class PaymentController extends Controller
 
         $response = Http::withHeaders($headers)->post($path, $body);
 
-        // return $response->getStatusCode() === 200 ? $response->body() : null;
-
-        // $invoice = $this->createInvoice($response->getStatusCode());
-
         if ($response->getStatusCode() === 200) {
-            // // session()->put(['code' => 'success', 'message' => "Order $invoice->id has been paid successfully!"]);
-            // // $users = User::all();
-            // // $items = Item::all();
 
-            // foreach (Cart::content() as $item) {
-            //     if ($item->name === "Enrolment") {
-            //         $current_user = User::find(auth()->id());
-            //         $current_user->removeRole('guest');
-            //         $current_user->assignRole('student');
-            //     }
-            // }
-
-            $student = auth()->user(); //EDITAR: EN LUGAR DEL USUARIO LOGUEADO, DEBERÍA SER EL USUARIO QUE SE ENVÍE POR PARAMETRO//
-            // $course_id = session('selected_course');
-
-            // //CHANGING STUDENT'S ROLE FROM 'GUEST' TO 'STUDENT'//
-            // $student->removeRole('guest');
-            // $student->assignRole('student');
-
-            // $product = Course::find($course_id)->products->first();
-            // if ($product->courses->first()->modality == "synchronous") {
-            //     $teacher = User::find(session('teacher_id'));
-
-            //     //CREATING STUDENT'S ENROLMENT (OR UPDATING IT, IN CASE IT ALREADY EXISTS BUT IS SOFTDELETED)//
-            //     $enrolment = Enrolment::withTrashed()->updateOrCreate(
-            //         ['student_id' => $student->id, 'course_id' => $course_id],
-            //         ['teacher_id' => $teacher->id, 'deleted_at' => NULL]
-            //     );
-
-            //     SchedulingCalendarController::store(auth()->user()->id, $enrolment);
-            // } else {
-
-            //     //CREATING STUDENT'S ENROLMENT (OR UPDATING IT, IN CASE IT ALREADY EXISTS BUT IS SOFTDELETED)//
-            //     $enrolment = Enrolment::withTrashed()->updateOrCreate(
-            //         ['student_id' => $student->id, 'course_id' => $course_id],
-            //         ['teacher_id' => NULL, 'deleted_at' => NULL]
-            //     );
-            // }
-
-
-
-            // Cart::destroy();
-            // // Mail::to($student)->send(new InvoicePaid($invoice));
+            $student = auth()->user();
 
             dispatch(new StoreSelfEnrolment($student));
             return redirect()->route('invoice.show', ['id' => session('invoice_id')]);
-        } else {
-            session()->put(['code' => 'danger', 'message' => "Error processing payment"]);
         }
 
-        return redirect()->route('shop');
+        return redirect()->route('cart')->with('error', 'No se pudo procesar el pago');
     }
 
     /**

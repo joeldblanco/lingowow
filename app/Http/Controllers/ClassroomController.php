@@ -50,7 +50,7 @@ class ClassroomController extends Controller
         if (isset($enrolment)) {
             $classes = Classes::where('enrolment_id', $enrolment->id)->whereDate('start_date', '>=', $current_period[0])->orderBy('start_date', 'asc')->get();
 
-            // $current_tz = session('tz');
+            // $current_tz = auth()->user()->timezone;
             $student = User::find($id);
             $enter_classroom = false;
             $message = "Student doesn't have any class left.";
@@ -60,8 +60,7 @@ class ClassroomController extends Controller
 
             foreach ($classes as $key => $value) {
                 $classes[$key] = Carbon::createFromTimeString($value->start_date);
-                $now = Carbon::now(session('session_info')['timezone']['id']);
-                // dd($now);
+                $now = Carbon::now(auth()->user()->timezone);
                 $enter_classroom = false;
                 $message = "";
 
@@ -70,12 +69,12 @@ class ClassroomController extends Controller
 
                     if (($diffInSeconds < 600 && $user == 'teacher') || ($diffInSeconds < 20 && $user == 'student') || $user == 'admin') {
 
-                        return redirect(auth()->user()->studentClasses->sortBy('start_date')->first()->meeting->join_url);
+                        return redirect($student->studentClasses->sortBy('start_date')->first()->meeting->join_url);
 
                         break;
                     } else {
 
-                        $message2 = "On " . $classes[$key]->format('l') . ' at ' . $classes[$key]->format('g:00 a') . " UTC " . "(" . $classes[$key]->setTimezone(session('session_info')['timezone']['id'])->format('l') . " at " . $classes[$key]->setTimezone(session('session_info')['timezone']['id'])->format('g:00 a') . " " . session('session_info')['timezone']['id'] . ").";
+                        $message2 = "On " . $classes[$key]->format('l') . ' at ' . $classes[$key]->format('g:00 a') . " UTC " . "(" . $classes[$key]->setTimezone(auth()->user()->timezone)->format('l') . " at " . $classes[$key]->setTimezone(auth()->user()->timezone)->format('g:00 a') . " " . auth()->user()->timezone . ").";
 
                         if ($user == 'student') {
                             $message1 = "Your next class is in " . $classes[$key]->diffForHumans(['parts' => 2]) . ".";
@@ -86,6 +85,13 @@ class ClassroomController extends Controller
                             $message1 = "This student's next class is in " . $classes[$key]->diffForHumans(['parts' => 2]) . ".";
                             break;
                         }
+                    }
+                } else {
+                    $diffInSeconds = $classes[$key]->diffInSeconds();
+                    if ($user == 'admin' || (($classes[$key]->copy()->addMinutes(40) > now() && $diffInSeconds < 2400) && ($user == 'student' || $user == 'teacher'))) {
+                        return redirect($student->studentClasses->sortBy('start_date')->first()->meeting->join_url);
+
+                        break;
                     }
                 }
             }

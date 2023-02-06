@@ -23,10 +23,19 @@ class PricingTableComponent extends Component
 
     public function showSelectedProduct($product_id)
     {
-        $course = Product::find($product_id)->courses()->first();
-        session(['selected_course' => $course->id]);
-        $this->selectedProduct = $product_id;
-        $this->pricingTableModal = true;
+
+        $product = Product::find($product_id);
+        if ($product->categories->pluck('name')->contains('Course')) {
+            $course = $product->courses()->first();
+            session(['selected_course' => $course->id]);
+            $this->selectedProduct = $product_id;
+            $this->pricingTableModal = true;
+        } else {
+            session(['selected_product' => $product->id]);
+            Cart::destroy();
+            Cart::add($product->id, $product->name, 1, ($product->sale_price == null ? $product->regular_price : $product->sale_price), ['editable' => false])->associate('App\Models\Product');
+            return redirect()->route('cart');
+        }
     }
 
     public function store($nOfClasses = null, $synchronous = false)

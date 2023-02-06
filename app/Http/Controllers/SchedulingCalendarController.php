@@ -469,6 +469,7 @@ class SchedulingCalendarController extends Controller
                     $student = User::find(session('student_id'));
                     dispatch(new StoreSelfEnrolment($student));
                     session()->forget('enrolment_type');
+                    session()->forget('student_id');
                     return redirect()->route('enrolments.index');
                 } else {
                     return redirect()->route('cart');

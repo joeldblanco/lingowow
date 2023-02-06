@@ -108,6 +108,40 @@
 
             </div>
         @endforeach
+        @if (auth()->id() == 5)
+            @foreach ($other_products as $product)
+                <div class="w-1/3 h-5/6 max-h-" @if ($loop->first) id="course-card" @endif>
+
+                    <div class="relative bg-white rounded-3xl my-4 shadow-xl mt-7 mb-2 mx-5 flex flex-col">
+                        <div class="container shadow-lg group rounded-md bg-white max-w-sm flex justify-center items-center mx-auto content-div"
+                            style="background-image: url('{{ Storage::url($product->image) }}');"
+                            onMouseOver="this.style.backgroundImage='linear-gradient(90deg, rgba(50,70,186,0.6) 0%, rgba(28,117,187,0.6) 80%), url({{ Storage::url($product->image) }})'"
+                            onMouseOut="this.style.backgroundImage='url({{ Storage::url($product->image) }})'">
+                            <div class="flex flex-col items-center">
+                                <div class="w-full image-cover rounded-t-md blur-xl">
+                                </div>
+                                <div class="py-8 px-4 bg-white rounded-b-md fd-cl group-hover:opacity-25 w-10/12">
+                                    <span
+                                        class="block text-lg text-gray-800 font-bold tracking-wide">{{ $product->name }}</span>
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="absolute opacity-0 fd-sh group-hover:opacity-100 text-center px-4">
+                                <span
+                                    class="text-3xl font-bold text-white tracking-wider leading-relaxed font-sans">{{ $product->name }}</span>
+                                <div class="pt-8 text-center">
+                                    <button wire:click="selectProduct({{ $product->id }})"
+                                        class="text-center rounded-lg p-4 bg-white  text-gray-700 font-bold text-lg"
+                                        @if ($loop->first) id="select-button" @endif>Select</button>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+            @endforeach
+        @endif
     </div>
     <div wire:loading>
         @include('components.loading-state')
