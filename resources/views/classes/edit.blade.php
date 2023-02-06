@@ -254,21 +254,22 @@
 
                     </div>
                     --}}
-                    <div class="mt-10 grid grid-rows-2 grid-flow-col gap-4 justify-center ...">
-                        <div class="flex space-x-3 items-center terms-tour">
-                            <input class="@error('message') border-red-500 @enderror" type="checkbox"
-                                name="consent_checkbox" id="consent_checkbox" required>
-                            <label for="consent_checkbox">I accept the <a href="#"
-                                    class="text-blue-600 hover:underline">terms for class recovery</a></label>
+                        <div class="mt-10 grid grid-rows-2 grid-flow-col gap-4 justify-center ...">
+                            <div class="flex space-x-3 items-center terms-tour">
+                                <input class="@error('message') border-red-500 @enderror" type="checkbox"
+                                    name="consent_checkbox" id="consent_checkbox" required>
+                                <label for="consent_checkbox">I accept the <a href="{{route('guidelines')}}" target="_blank"
+                                        class="text-blue-600 hover:underline">guidelines for class rescheduling
+                                        (Guidelines - Section 8)</a></label>
+                            </div>
                         </div>
-                    </div>
 
-                    <div class="grid justify-center">
-                        <div>
-                            <button class="bg-blue-500 rounded-lg text-white font-bold px-6 py-1 my-3 shadow-md"
-                                onclick="saveAbsence({{ $id }},'classes.update')">Submit</button>
+                        <div class="grid justify-center">
+                            <div>
+                                <button class="bg-blue-500 rounded-lg text-white font-bold px-6 py-1 my-3 shadow-md"
+                                    onclick="saveAbsence({{ $id }},'classes.update')">Submit</button>
+                            </div>
                         </div>
-                    </div>
 
 
 

@@ -270,7 +270,7 @@
 
     {{-- <script src="{{ asset('js/jquery.datetimepicker.full.min.js') }}"></script> --}}
 
-    @php
+    {{-- @php
         $tourReschedulingButton = DB::table('shepherd_users')
             ->where('user_id', auth()->id())
             ->where('tour_name', 'students/rescheduling-button')
@@ -281,6 +281,6 @@
         @role('student')
             <x-shepherd-tour tourName="students/rescheduling-button" role="student" />
         @endrole
-    @endif
+    @endif --}}
 
 </div>

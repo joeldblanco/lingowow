@@ -46,6 +46,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'city',
         'zip_code',
         'country',
+        'timezone',
     ];
 
     /**

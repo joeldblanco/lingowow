@@ -35,7 +35,7 @@ class RatingForm extends Component
             ->studentClasses->where('start_date', '<', now());
 
         foreach ($classes as $class) {
-            if (empty($class->rating)) {
+            if (empty($class->rating) && $class->end_date < now()) {
                 $this->ratingForm = true;
                 $this->pendingClass = $class;
             }

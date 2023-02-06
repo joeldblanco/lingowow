@@ -81,6 +81,9 @@ class CreateSchedule implements ShouldQueue
             ['user_id' => $student_id, 'enrolment_id' => $enrolment_id],
             ['selected_schedule' => $student_schedule, 'deleted_at' => NULL]
         );
+
+        //SENDING NOTIFICATION TO TEACHER//
+        Notification::sendNow($this->teacher, new BookedClass($this->student_id));
     }
 
     /**
@@ -90,7 +93,6 @@ class CreateSchedule implements ShouldQueue
      */
     public function handle()
     {
-        //SENDING NOTIFICATION TO TEACHER//
-        Notification::sendNow($this->teacher, new BookedClass($this->student_id));
+        //
     }
 }
