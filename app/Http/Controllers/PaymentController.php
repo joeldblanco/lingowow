@@ -91,16 +91,25 @@ class PaymentController extends Controller
         $transactionToken = $request->transactionToken;
 
         if ($transactionToken) {
-            $this->requestTransactionAuthorization($transactionToken);
+            $approved = self::requestTransactionAuthorization($transactionToken);
+            // return $approved;
         } else {
             return redirect()->route('cart.index')->with('error', 'No se pudo procesar el pago');
+        }
+
+        if ($approved) {
+
+            $student = auth()->user();
+            dispatch(new StoreSelfEnrolment($student));
+
+            return redirect()->route('invoice.show', ['id' => session('invoice_id')]);
+        } else {
+            return redirect()->route('cart')->with('error', 'No se pudo procesar el pago');
         }
     }
 
     public function requestTransactionAuthorization($transactionToken)
     {
-        return redirect()->route('cart')->with('error', 'No se pudo procesar el pago');
-        
         $purchaseNumber = session('purchaseNumber');
 
         $path = "https://apiprod.vnforapps.com/api.authorization/v3/authorization/ecommerce/" . env('NIUBIZ_MERCHANT_ID', '');
@@ -117,21 +126,25 @@ class PaymentController extends Controller
                 'tokenId' => $transactionToken,
                 'purchaseNumber' => $purchaseNumber,
                 'amount' => Cart::total(),
-                'currency' => 'USD'
+                'currency' => 'USD',
+                'traceNumber' => $transactionToken,
             ],
         ];
 
         $response = Http::withHeaders($headers)->post($path, $body);
+        return $response;
+        // if ($response->getStatusCode() === 200) {
+        //     return true;
+        //     // $student = auth()->user();
 
-        if ($response->getStatusCode() === 200) {
+        //     // dd(dispatch(new StoreSelfEnrolment($student)));
 
-            $student = auth()->user();
+        //     // return redirect()->route('invoice.show', ['id' => session('invoice_id')]);
+        // } else {
+        //     return false;
+        // }
 
-            dispatch(new StoreSelfEnrolment($student));
-            return redirect()->route('invoice.show', ['id' => session('invoice_id')]);
-        }
-
-        return redirect()->route('cart')->with('error', 'No se pudo procesar el pago');
+        // return redirect()->route('dashboard');
     }
 
     /**

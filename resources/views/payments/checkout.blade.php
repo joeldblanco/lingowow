@@ -24,7 +24,7 @@
                 formbuttoncolor: '#3246BA',
                 action: action_url,
                 complete: function(params) {
-                    Livewire.emit('paypalCheckout');
+                    // Livewire.emit('paypalCheckout');
                 }
             });
             VisanetCheckout.open();
