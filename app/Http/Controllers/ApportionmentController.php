@@ -18,6 +18,13 @@ class ApportionmentController extends Controller
     {
         // $plan = json_decode($plan);
 
+        if(empty(session('student_id')))
+        {
+            $user = auth()->user();
+        }else{
+            $user = User::find(session('student_id'));
+        }
+
         // $schedule == null ? session('user_schedule') : $schedule;
         if ($schedule == null) {
             $schedule = session("user_schedule");
@@ -43,21 +50,15 @@ class ApportionmentController extends Controller
         $next_period_end = new Carbon($next_period[1]);
 
 
-        // $current_period_start = new Carbon('second monday of this month');
-        // $current_period_end = (new Carbon('second monday of this month'))->addDays(6);
-        // $current_period_end->addWeeks(3);
-
-        // $next_period_start = new Carbon('second monday of next month');
-        // $next_period_end = (new Carbon('second monday of next month'))->addDays(6);
-        // $next_period_end->addDays(1);
-        // $next_period_end->addWeeks(3);
-        // dd($next_period_end);
-
-
-        foreach ($schedule as $key => $value) {
-            $schedule[$key][0] = (int)$value[0];
-            $schedule[$key][1] = (int)$value[1];
-        }
+        // $timezone = Carbon::now()->setTimezone($user->timezone);
+        // $schedule_utc = [];
+        // foreach ($schedule as $key => $value) {
+        //     $date = Carbon::now();
+        //     $date_local = Carbon::parse('Next ' . Carbon::now()->setISODate($date->year, $date->weekOfYear, $value[1])->format('l') . ' at ' . $value[0] . ':00');
+        //     $schedule_utc[$key][0] = (int)$date_local->copy()->subHours($timezone->offsetHours)->hour;
+        //     $schedule_utc[$key][1] = (int)$date_local->copy()->subHours($timezone->offsetHours)->dayOfWeek;
+        // }
+        
 
         $qty = 0;
         $days = [];
@@ -65,17 +66,18 @@ class ApportionmentController extends Controller
             $day = $value[1];
             $time = $value[0];
             $qty += $today->diffInDaysFiltered(function (Carbon $date) use (&$day, &$time, &$days) {
-                // dd(get_class_methods($date));
                 if ($date->isDayOfWeek($day)) {
                     $date->hour = $time;
                     $date->minute = 0;
                     $date->second = 0;
                     array_push($days, $date->toDateTimeString());
                 }
-                // if($date->isDayOfWeek($day)) array_push($days,get_class_methods($date));
+
                 return $date->isDayOfWeek($day);
             }, $current_period_end);
         }
+
+        // dd($schedule, $schedule_utc);
 
         if ($qty <= 0) {
             $qty = 0;
@@ -107,10 +109,12 @@ class ApportionmentController extends Controller
         $period_start_c = new Carbon($current_period[0]);
         $period_end_c = new Carbon($current_period[1]);
 
-        $abcense = Classes::select("start_date")
-            ->where("status", "1")
-            ->whereBetween("start_date", [$period_start_c->subDay()->toDateTimeString(), $period_end_c->toDateTimeString()])
-            ->get();
+        $abcense = User::find(session('teacher_id'))->teacherClasses()->where('status', 1)->whereBetween('start_date', [$today->toDateTimeString(), ApportionmentController::currentPeriod()[1]])->orderBy('start_date', 'asc')->get()->pluck('start_date');
+
+        // $abcense = Classes::select("start_date")
+        //     ->where("status", "1")
+        //     ->whereBetween("start_date", [$period_start_c->subDay()->toDateTimeString(), $period_end_c->toDateTimeString()])
+        //     ->get();
 
         if ($abcense != null) {
             foreach ($abcense as $key => $value) {
@@ -125,6 +129,8 @@ class ApportionmentController extends Controller
         $days_diff = array_values($days_diff);
 
         $qty_diff = sizeof($days_diff);
+
+        // dd($days);
 
         return [$qty_diff, $days_diff, $days, $abcense];
     }

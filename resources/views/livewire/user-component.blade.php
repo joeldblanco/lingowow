@@ -1,5 +1,5 @@
 <div class="flex flex-col border space-y-5 border-gray-100 hover:border-blue-500 rounded-xl p-6 bg-gray-50 justify-between @if ($user->trashed()) opacity-50 filter saturate-0 @endif"
-    style="width: 32%" x-data="{ showUserInfo: false, editUser: false, newMessage: false }">
+    style="width: 32%" x-data="{ showUserInfo: false, editUser: false, newMessage: false, deleteConfirmation: false }">
     <div class="flex justify-between">
         <div class="w-2/12">
             <a href="{{ route('profile.show', $user->id) }}">

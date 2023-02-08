@@ -359,6 +359,10 @@
         src="https://www.paypal.com/sdk/js?client-id=Aau1Mwj0MPuEe3SsdsAsVZ0DvSSt8yrvLCqA-cT72bu6wbKXLHAXK_d9p4RuNRQpxk7nYpLl13GB69qX&currency=USD"
         defer></script>
 
+        {{-- <script
+        src="https://www.paypal.com/sdk/js?client-id=AUa2ToyOsBrbfUh0FwDR4wg8A2A7bvgVFaW3XuAN4-zttVI-XImVMP6Bllg-_UziMRfP5wOSrZqPNAMD&currency=USD"
+        defer></script> --}}
+
     <script defer>
         function runPaypalButtonFunction() {
             return new Promise(resolve => {

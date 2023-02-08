@@ -188,6 +188,8 @@ Route::middleware(['web', 'auth', 'verified', 'impersonate'])->group(function ()
 
     Route::post('units/sort', [UnitController::class, 'sort'])->name('units.sort');
     Route::get('/units/{unit}/details', [UnitController::class, "details"])->name('units.details');
+    Route::middleware(['role:admin'])->get('admin/units/association', [UnitController::class, 'userAssociation'])->name('units.association');
+    Route::middleware(['role:admin'])->post('admin/units/associate', [UnitController::class, 'userAssociate'])->name('units.associate');
 
 
 
@@ -441,8 +443,8 @@ Route::middleware(['web', 'auth', 'verified', 'impersonate'])->group(function ()
 
     //ROUTES FOR CLASSES//
     Route::middleware(['role:teacher|student'])->get('/classes', ClassesComponent::class)->name('classes.index');
-    Route::middleware(['role:teacher|student'])->get('/classes/{id}', [ClassController::class, 'edit'])->name('classes.edit');
-    Route::middleware(['role:teacher|student'])->post('/classes/update', [ClassController::class, 'update'])->name('classes.update');
+    Route::middleware(['role:admin|student'])->get('/classes/{id}', [ClassController::class, 'edit'])->name('classes.edit');
+    Route::middleware(['role:admin|student'])->post('/classes/update', [ClassController::class, 'update'])->name('classes.update');
     // Route::middleware(['role:teacher|student'])->post('/classes/check', [ClassController::class, 'checkClasses'])->name('classes.check');
 
     //ROUTES FOR POSTS//
