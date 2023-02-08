@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Course;
 use App\Models\Enrolment;
 use App\Models\Module;
 use App\Models\Unit;
@@ -260,5 +261,44 @@ class UnitController extends Controller
             }
         }
         return redirect()->route('modules.details', $request->module_id);
+    }
+
+
+    /**
+     * Show the form to associate users with units
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function userAssociation()
+    {
+        $users = User::whereHas('roles', function ($query) {
+            $query->where('name', 'student');
+        })->orderBy('first_name')->get();
+        $courses = Course::all();
+
+        return view('course.module.unit.userAssociation', compact('users', 'courses'));
+    }
+
+    /**
+     * Associate users with units
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function userAssociate(Request $request)
+    {
+        $request->validate([
+            'user' => 'required|numeric|exists:App\Models\User,id',
+            'unit' => 'required|numeric|exists:App\Models\Unit,id',
+        ]);
+
+        $user = User::find($request->user);
+        $user->units()->detach();
+        $user->units()->attach($request->unit);
+
+        session(['success' => 'User associated with unit successfully']);
+
+        return redirect()->route('units.association');
     }
 }

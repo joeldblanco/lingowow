@@ -130,16 +130,16 @@ class Schedule extends Component
                 }
             }
         } else if ($this->role == "teacher") {
-
             $this->schedules = User::withTrashed()->find($this->user->id)->schedules;
 
             if (count($this->schedules) > 0) {
                 $this->loadTeacherSchedule($this->user->id);
             }
-        } else if ($this->role == "admin") {
-
-            // $this->loadAdminSchedule($this->user->id);
         }
+        // else if ($this->role == "admin") {
+
+        //     // $this->loadAdminSchedule($this->user->id);
+        // }
 
         $university_schedule = ModelsSchedule::university_schedule();
         $this->university_schedule_start = $university_schedule[0];
@@ -162,6 +162,7 @@ class Schedule extends Component
         }
 
         if ($mode == "one" || $mode == "absence") {
+            // dd(session()->all());
             // dd((new Carbon())->hour(0)->minute(0)->second(0));
             // variables para el periodo, fechas y similares
             // $this->emit('findReserves');
@@ -192,12 +193,13 @@ class Schedule extends Component
             // dd($this->day_format_range, $this->period_end_aux, (new carbon($this->day_format_range[28]))->addHour(2)->lessThan($this->period_end_aux->copy()->addDay()));
             // dd($this->day_format_range, $period_start_c->weekOfYear, $period_end_c->weekOfYear, $period_start_c->diffInWeeks($period_end_c) + 1, $this->period_end_aux);
             // variables para horarios ocupados
-
             $course_id = session('selected_course');
             if ($course_id != null) {
                 $modality_course = Course::find($course_id)->modality;
                 if ($modality_course == "exam") {
                     $this->loadSelectingSchedule();
+                } else {
+                    $this->loadSelectingSchedule(session('teacher_id'));
                 }
             }
         }
@@ -205,11 +207,28 @@ class Schedule extends Component
 
     public function loadSelectingSchedule($teacher_id = 0)
     {
-        // dd("HOla");
         if ($teacher_id != 0) {
             $this->teacher_id = $teacher_id;
             $this->name = User::find($this->teacher_id)->first_name . " " . User::find($this->teacher_id)->last_name;
+
+
+
             $this->schedule = User::find($this->teacher_id)->schedules[0]->selected_schedule;
+            $timezone = Carbon::now()->setTimezone($this->user->timezone);
+            $schedule_utc = [];
+            foreach ($this->schedule as $key => $value) {
+                $date = Carbon::now();
+                $date_local = Carbon::parse('Next ' . Carbon::now()->setISODate($date->year, $date->weekOfYear, $value[1])->format('l') . ' at ' . $value[0] . ':00');
+                $schedule_utc[$key][0] = (int)$date_local->copy()->addHours($timezone->offsetHours)->hour;
+                $schedule_utc[$key][1] = (int)$date_local->copy()->addHours($timezone->offsetHours)->dayOfWeek;
+            }
+            $this->schedule = $schedule_utc;
+
+
+
+
+
+
 
             $scheduled_classes = Enrolment::select('student_id')
                 ->where('teacher_id', $teacher_id)
@@ -224,20 +243,43 @@ class Schedule extends Component
             $next_students_schedule = [];
             $this->students_schedules = [];
             foreach ($students as $student) {
-                $this->students_schedules[] = $student->schedules->first()->selected_schedule;
+
+                $student_schedule = $student->schedules->first()->selected_schedule;
+                // $timezone = Carbon::now()->setTimezone($this->user->timezone);
+                // $schedule_utc = [];
+                // foreach ($student_schedule as $key => $value) {
+                //     $date = Carbon::now();
+                //     $date_local = Carbon::parse('Next ' . Carbon::now()->setISODate($date->year, $date->weekOfYear, $value[1])->format('l') . ' at ' . $value[0] . ':00');
+                //     $schedule_utc[$key][0] = (int)$date_local->copy()->addHours($timezone->offsetHours)->hour;
+                //     $schedule_utc[$key][1] = (int)$date_local->copy()->addHours($timezone->offsetHours)->dayOfWeek;
+                // }
+                // $student_schedule = $schedule_utc;
+
+
+                $this->students_schedules[] = $student_schedule;
                 if (!empty($student->enrolments->first()->preselection)) {
                     array_push($next_students_schedule, $student->enrolments->first()->preselection->schedule);
                 }
             }
+
+            $timezone = Carbon::now()->setTimezone($this->user->timezone);
+            $schedule_utc = [];
+            foreach ($this->students_schedules as $schedules) {
+                foreach ($schedules as $key => $value) {
+                    $date = Carbon::now();
+                    $date_local = Carbon::parse('Next ' . Carbon::now()->setISODate($date->year, $date->weekOfYear, $value[1])->format('l') . ' at ' . $value[0] . ':00');
+                    $schedules[$key][0] = (int)$date_local->copy()->addHours($timezone->offsetHours)->hour;
+                    $schedules[$key][1] = (int)$date_local->copy()->addHours($timezone->offsetHours)->dayOfWeek;
+                }
+                $schedule_utc[] = $schedules;
+            }
+            $this->students_schedules = $schedule_utc;
             $this->students_schedules = array_filter($this->students_schedules);
             $this->students_schedules = array_merge(...$this->students_schedules);
             $next_students_schedule = array_merge(...$next_students_schedule);
 
             $this->students_schedules = array_merge($this->students_schedules, $next_students_schedule);
-            // dd($this->students_schedules);
 
-            // dd($this->students_schedules);
-            // dd("gola");
             if ($this->schedule == null) $this->schedule = [];
         } else {
 
@@ -286,14 +328,12 @@ class Schedule extends Component
             if ($this->schedule == null) $this->schedule = [];
             if ($this->teacher_schedule == null) $this->teacher_schedule = [];
         }
-        // $this->emit('loadingState', false);
+
         $this->edit();
     }
 
     public function edit()
     {
-        // dd("render"); 
-
         $this->dispatchBrowserEvent('contentChanged');
     }
 
@@ -306,13 +346,27 @@ class Schedule extends Component
     {
 
         $this->user_schedules = ModelsSchedule::where('user_id', $this->user->id)->get();
-        // if(count($this->user_schedules) > 0){
-        foreach ($this->user_schedules as $key => $value) {
-            $this->user_schedules[$key] = $value->selected_schedule;
+
+        foreach ($this->user_schedules as $key1 => $schedule) {
+
+            $timezone = Carbon::now()->setTimezone($this->user->timezone);
+            $schedule_utc = [];
+            foreach ($schedule->selected_schedule as $key => $value) {
+                $date = Carbon::now();
+                $date_local = Carbon::parse('Next ' . Carbon::now()->setISODate($date->year, $date->weekOfYear, $value[1])->format('l') . ' at ' . $value[0] . ':00');
+                $schedule_utc[$key][0] = (int)$date_local->copy()->addHours($timezone->offsetHours)->hour;
+                $schedule_utc[$key][1] = (int)$date_local->copy()->addHours($timezone->offsetHours)->dayOfWeek;
+            }
+
+
+            $this->user_schedules[$key1] = $schedule_utc;
+
+
             if (User::find($this->user->id)->roles[0]->name == "student")
-                $this->user_courses[$key] = Enrolment::find($value->enrolment_id)->course->name;
+                $this->user_courses[$key1] = Enrolment::find($schedule->enrolment_id)->course->name;
         }
-        // }
+        $this->user_schedules = $this->user_schedules->toArray()[0];
+
 
         $this->teacher_id = Enrolment::select("teacher_id")
             ->where("student_id", $this->user->id)->first();
@@ -326,15 +380,24 @@ class Schedule extends Component
         if (!is_null($this->teacher_id)) {
             $this->teacher_schedule = User::find($this->teacher_id)->schedules;
 
-            foreach ($this->teacher_schedule as $key => $value) {
-                $this->teacher_schedule[$key] = $value->selected_schedule;
+            foreach ($this->teacher_schedule as $key1 => $schedule) {
+
+                $timezone = Carbon::now()->setTimezone($this->user->timezone);
+                $schedule_utc = [];
+                foreach ($schedule->selected_schedule as $key => $value) {
+                    $date = Carbon::now();
+                    $date_local = Carbon::parse('Next ' . Carbon::now()->setISODate($date->year, $date->weekOfYear, $value[1])->format('l') . ' at ' . $value[0] . ':00');
+                    $schedule_utc[$key][0] = (int)$date_local->copy()->addHours($timezone->offsetHours)->hour;
+                    $schedule_utc[$key][1] = (int)$date_local->copy()->addHours($timezone->offsetHours)->dayOfWeek;
+                }
+                $schedule = $schedule_utc;
+
+
+                $this->teacher_schedule[$key1] = $schedule;
             }
 
             if (count($this->teacher_schedule) > 0) $this->teacher_schedule = json_decode(json_encode($this->teacher_schedule[0]), 1);
         }
-        $this->user_schedules = $this->user_schedules->first();
-
-
 
         $this->edit();
     }
@@ -342,12 +405,20 @@ class Schedule extends Component
     public function loadGuestSchedule()
     {
         $today = new Carbon();
-        $abcense = Classes::select('start_date')
-            ->where('status', '1')
-            ->whereBetween('start_date', [$today->toDateTimeString(), ApportionmentController::currentPeriod()[1]])
-            ->get();
-
-        // dd($abcense);
+        $class = Classes::find($this->id_class);
+        if (!empty($class)) {
+            $enrolment_id = Classes::find($this->id_class)->enrolment_id;
+            $abcense = Classes::select('start_date')
+                ->where('enrolment_id', $enrolment_id)
+                ->where('status', '1')
+                ->whereBetween('start_date', [$today->toDateTimeString(), ApportionmentController::currentPeriod()[1]])
+                ->get();
+        } else {
+            $abcense = Classes::select('start_date')
+                ->where('status', '1')
+                ->whereBetween('start_date', [$today->toDateTimeString(), ApportionmentController::currentPeriod()[1]])
+                ->get();
+        }
 
         foreach ($abcense as $key => $value) {
             $abcense[$key] = $value->start_date;
@@ -355,14 +426,14 @@ class Schedule extends Component
         $abcense = json_decode($abcense);
 
         foreach ($abcense as $key => $value) {
-            $abcense[$key] = new Carbon($abcense[$key]);
+            $abcense[$key] = Carbon::parse($abcense[$key])->setTimezone($this->user->timezone);
         }
 
         foreach ($abcense as $key => $value) {
             $this->abcense_classes[$key] = $abcense[$key]->isoFormat('H') . '-' . $abcense[$key]->isoFormat('d');
             $this->abcense_classes_days[$key] = $abcense[$key]->isoFormat('H') . '-' . $abcense[$key]->format('d');
         }
-        // dd($this->abcense_classes);
+        // dump($this->abcense_classes);
     }
 
     public function loadStudentSchedule($user_id)
@@ -374,6 +445,17 @@ class Schedule extends Component
 
             $this->user_schedules = $user->schedules->where('enrolment_id', $enrolment->id)->first()->selected_schedule;
             $this->user_schedules = null ? [] : array_filter($this->user_schedules);
+            $timezone = Carbon::now()->setTimezone($this->user->timezone);
+            $schedule_utc = [];
+            foreach ($this->user_schedules as $key => $value) {
+                $date = Carbon::now();
+                $date_local = Carbon::parse('Next ' . Carbon::now()->setISODate($date->year, $date->weekOfYear, $value[1])->format('l') . ' at ' . $value[0] . ':00');
+                $schedule_utc[$key][0] = (int)$date_local->copy()->addHours($timezone->offsetHours)->hour;
+                $schedule_utc[$key][1] = (int)$date_local->copy()->addHours($timezone->offsetHours)->dayOfWeek;
+            }
+            $this->user_schedules = $schedule_utc;
+
+
 
             $this->schedule_user = $this->user_schedules;
             foreach ($this->schedule_user as $key => $value) {
@@ -402,8 +484,9 @@ class Schedule extends Component
             if ($this->classes->count() > 0) $this->classes = $this->classes->toArray();
 
             foreach ($this->classes as $key => $value) {
-                $this->classes[$key] = new Carbon($value["start_date"]);
+                $this->classes[$key] = Carbon::parse($value["start_date"])->setTimezone($user->timezone);
             }
+
             foreach ($this->classes as $key => $value) {
                 $this->date_classes[$key] = $this->classes[$key]->isoFormat('H') . '-' . $this->classes[$key]->isoFormat('d');
                 $this->date_format_class[$key] = $this->classes[$key]->isoFormat('ddd, D MMM HH:mm a');
@@ -439,14 +522,43 @@ class Schedule extends Component
 
     public function loadTeacherSchedule($user_id)
     {
-        $this->teacher_schedule = $this->schedules->first()->selected_schedule;
+        $this->teacher_schedule = $this->schedules->first()->selected_schedule == null ? [] : $this->schedules->first()->selected_schedule;
+        $timezone = Carbon::now()->setTimezone($this->user->timezone);
+        $schedule_utc = [];
+        foreach ($this->teacher_schedule as $key => $value) {
+            $date = Carbon::now();
+            $date_local = Carbon::parse('Next ' . Carbon::now()->setISODate($date->year, $date->weekOfYear, $value[1])->format('l') . ' at ' . $value[0] . ':00');
+            $schedule_utc[$key][0] = (int)$date_local->copy()->addHours($timezone->offsetHours)->hour;
+            $schedule_utc[$key][1] = (int)$date_local->copy()->addHours($timezone->offsetHours)->dayOfWeek;
+        }
+        $this->teacher_schedule = $schedule_utc;
+
+
         $this->user_schedules = $this->user->schedules->first()->selected_schedule;
         $this->user_schedules == null ? $this->user_schedules = [] : array_filter($this->user_schedules);
+        $timezone = Carbon::now()->setTimezone($this->user->timezone);
+        $schedule_utc = [];
+        foreach ($this->user_schedules as $key => $value) {
+            $date = Carbon::now();
+            $date_local = Carbon::parse('Next ' . Carbon::now()->setISODate($date->year, $date->weekOfYear, $value[1])->format('l') . ' at ' . $value[0] . ':00');
+            $schedule_utc[$key][0] = (int)$date_local->copy()->addHours($timezone->offsetHours)->hour;
+            $schedule_utc[$key][1] = (int)$date_local->copy()->addHours($timezone->offsetHours)->dayOfWeek;
+        }
+        $this->user_schedules = $schedule_utc;
+
+
+
 
         $this->schedule_user = $this->user_schedules;
         foreach ($this->schedule_user as $key => $value) {
             $this->schedule_user[$key] = implode('-', $value);
         }
+
+
+
+
+
+
 
         $this->scheduled_classes = Enrolment::select('student_id')
             ->where('teacher_id', $user_id)
@@ -457,10 +569,21 @@ class Schedule extends Component
         }
 
         $this->students = User::select('id', 'first_name', 'last_name')->find($this->students);
-
+        $this->students_schedules = [];
         foreach ($this->students as $student) {
             if ($student->schedules->first() != null) {
-                $this->students_schedules[] = $student->schedules->first()->selected_schedule;
+
+                $student_schedule = $student->schedules->first()->selected_schedule;
+                $timezone = Carbon::now()->setTimezone($this->user->timezone);
+                $schedule_utc = [];
+                foreach ($student_schedule as $key => $value) {
+                    $date = Carbon::now();
+                    $date_local = Carbon::parse('Next ' . Carbon::now()->setISODate($date->year, $date->weekOfYear, $value[1])->format('l') . ' at ' . $value[0] . ':00');
+                    $schedule_utc[$key][0] = (int)$date_local->copy()->addHours($timezone->offsetHours)->hour;
+                    $schedule_utc[$key][1] = (int)$date_local->copy()->addHours($timezone->offsetHours)->dayOfWeek;
+                }
+                $student_schedule = $schedule_utc;
+                $this->students_schedules[] = $student_schedule;
             }
         }
         $this->students_schedules = array_filter($this->students_schedules);
@@ -484,7 +607,7 @@ class Schedule extends Component
                 }
             }
             foreach ($days as $v) {
-                if(is_array($buscado)) dd($buscado);
+                if (is_array($buscado)) dd($buscado);
                 if (explode("-", $buscado)[1] === $v) {
                     $j++;
                 }
@@ -639,6 +762,7 @@ class Schedule extends Component
             foreach ($this->data_selected_format as $key => $value) {
                 $this->data_selected_format[$key] = implode('-', $value);
             }
+            // dd($data_select);
             // foreach ($this->data_selected as $key => $value) {
             //     $this->data_selected[$key] = new Carbon($this->data_selected[$key]);
             //     $this->data_selected[$key] = $this->data_selected[$key]->isoFormat('H')."-".$this->data_selected[$key]->isoFormat('d');

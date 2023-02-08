@@ -90,6 +90,7 @@ class StoreSelfEnrolment implements ShouldQueue
             $product = Product::find(session('selected_product'));
             if(!empty($product) && !$product->categories->pluck('name')->contains('Course'))
             {
+                session()->forget('selected_product');
                 return redirect()->route('invoice.show', ['id' => session('invoice_id')]);
             }
         }
