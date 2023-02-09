@@ -42,7 +42,7 @@
                             <!-- INICIO DEL HORARIO -->
                             <div>
 
-                                <table  class="border table-tour" style="width: 100%">
+                                <table class="border table-tour" style="width: 100%">
                                     <!--fila de los titulos-->
                                     <tr>
                                         <th class="width border">UTC</th>
@@ -289,7 +289,7 @@
                                 <h2 class="text-2xl font-bold text-gray-800">You can select a schedule after you buy
                                     a plan of classes.</h2>
                                 <a href="{{ route('shop') }}"
-                                    class="inline-block bg-blue-800 text-white px-6 py-4 mt-8 rounded-lg hover:bg-blue-900 hover:text-white hover:no-underline">Shop</a>
+                                    class="inline-block bg-blue-800 text-white px-6 py-4 mt-8 rounded-lg hover:bg-blue-900 hover:text-white hover:no-underline shop-button">Shop</a>
                             </div>
                         @endif
                     @endif
@@ -312,7 +312,7 @@
 
                             {{-- <div wire:loading>
                             @include('components.loading-state')
-                        </div> --}}
+                            </div> --}}
 
                             <!-- INICIO DEL HORARIO -->
                             <div>
@@ -410,7 +410,7 @@
                                         buy
                                         a plan of classes.</h2>
                                     <a href="{{ route('shop') }}"
-                                        class="inline-block bg-blue-800 text-white px-6 py-4 mt-8 rounded-lg hover:bg-blue-900 hover:text-white hover:no-underline">Shop</a>
+                                        class="inline-block bg-blue-800 text-white px-6 py-4 mt-8 rounded-lg hover:bg-blue-900 hover:text-white hover:no-underline shop-button">Shop</a>
                                 </div>
                             @else
                                 <div class="w-full text-center" style="background-color: rgba(255, 255, 255, 0.5)">
@@ -1016,17 +1016,18 @@
         }
 
         // console.log("INICIO");
-        var hoyLocal = new Date(@json($hoy));
+        var hoyLocal = new Date();
 
         var horaLocal = hoyLocal.getHours();
         // var horaUTC = hoyLocal.getUTCHours();
         var difHora = hoyLocal.getTimezoneOffset() / 60;
+        let difHora2 = hoyLocal.getTimezoneOffset();
         var OpenUTC =
-            @json($university_schedule_start); // Hora UTC a la que abre la academia en PERU! (06:00 am Hora local en peru) (07:00 am hora local)
+        @json($university_schedule_start); // Hora UTC a la que abre la academia en PERU! (06:00 am Hora local en peru) (07:00 am hora local)
         var OpenLocal = OpenUTC - difHora;
 
         //Asignar hora UTC y Local al Horario
-
+        
         // cellsUTC = $('.UTC');
         var cellsLocal = $('.Local');
         for (var i = 0; i < cellsLocal.length; i++) {
@@ -1041,7 +1042,7 @@
             // } else {
             //     OpenUTC++;
             // }
-
+            console.log(OpenLocal);
             if (OpenLocal < 10) {
                 if (OpenLocal < 0) {
                     OpenLocal += 24;

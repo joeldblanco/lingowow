@@ -11,6 +11,14 @@
             session(['session_info' => $session_info]);
             session(['tz' => session('session_info')['timezone']['id']]);
         }
+        // $ip_add = $_SERVER['REMOTE_ADDR'];
+        
+        // $ch = curl_init('http://ipwho.is/' . $ip_add);
+        // curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        // curl_setopt($ch, CURLOPT_HEADER, false);
+        // $ipwhois = json_decode(curl_exec($ch), true);
+        // curl_close($ch);
+        // dd($ip_add, $ipwhois);
         // dd(session()->all());
         
         // if (isset($_GET['tz']) && session('tz') == null) {
