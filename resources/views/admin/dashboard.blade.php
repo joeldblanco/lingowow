@@ -45,7 +45,7 @@
                     </div>
                 </div>
                 <div class="flex space-x-5 h-44">
-                    <div onclick="location.href='{{ route('exam.index') }}';"
+                    <div onclick="location.href='{{ route('exams.index') }}';"
                         class="w-1/2 bg-yellow-600 rounded-xl p-4 relative overflow-hidden cursor-pointer">
                         <div class="w-52 h-52 bg-yellow-900 rounded-full absolute opacity-50 -right-4 -top-32"></div>
                         <div class="flex flex-col">
@@ -224,7 +224,7 @@
                         <p class="text-sm">Guests</p>
                     </div>
                 </a>
-                {{-- <a href="{{ route('exam.index') }}"
+                {{-- <a href="{{ route('exams.index') }}"
                     class="flex w-full border-2 border-yellow-700 bg-white text-gray-700 hover:bg-yellow-700 hover:text-white rounded-xl p-4 space-x-3 items-center transition-all duration-300 ease-in-out relative overflow-hidden"> --}}
                 {{-- <button class="border-2 border-yellow-800 p-2 rounded-lg w-10 h-10 items-center justify-center text-blue-300 z-10">
                             <i class="fas fa-ellipsis-h m-1"></i>

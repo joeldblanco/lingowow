@@ -68,7 +68,7 @@ class ClassRescheduledToTeacher extends Notification implements ShouldQueue
             ->line('Greetings, dear ' . $notifiable->first_name . ' ' . $notifiable->last_name . '.')
             ->line('We are writing to notify you that a class has been rescheduled by student ' . $this->student->first_name . ' ' . $this->student->last_name . ' ' . $this->schedule_string)
             ->line('Click the button below to check your current schedule.')
-            ->action('Check Schedule', url('/dashboard'))
+            ->action('Check Schedule', route('dashboard'))
             ->line('If you have any questions, please contact us through the regular channels.');
     }
 

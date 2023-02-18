@@ -8,7 +8,7 @@ use App\Models\Product;
 use App\Models\Schedule;
 use App\Models\User;
 use Livewire\Component;
-use Cart;
+use Gloudemans\Shoppingcart\Facades\Cart;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
 

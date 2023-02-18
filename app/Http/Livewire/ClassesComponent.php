@@ -29,6 +29,7 @@ class ClassesComponent extends Component
     public $start_date;
     public $end_date;
     public $classDetails = false;
+    public $enrolment_id;
     // public $sortBy = 'class_date';
     // public $sortDirection = 'asc';
 
@@ -41,6 +42,7 @@ class ClassesComponent extends Component
     {
         $this->start_date = ApportionmentController::currentPeriod(true)[0];
         $this->end_date = ApportionmentController::currentPeriod(true)[1];
+        $this->enrolment_id = 0;
     }
 
     public function loadComment($id)
@@ -91,11 +93,11 @@ class ClassesComponent extends Component
     {
         $this->to_review_classes = [];
         if (auth()->user()->roles[0]->name == "teacher") {
-            $classes = User::find(auth()->id())->teacherClasses()->where('start_date', '>=', $this->start_date)->where('end_date', '<=', $this->end_date)->orderBy('start_date')->paginate(15);
+            $classes = User::find(auth()->id())->teacherClasses()->whereDate('start_date', '>=', $this->start_date)->whereDate('end_date', '<=', $this->end_date)->orderBy('start_date')->paginate(15);
         } else if (auth()->user()->roles[0]->name == "student") {
-            $classes = User::find(auth()->id())->studentClasses()->where('start_date', '>=', $this->start_date)->where('end_date', '<=', $this->end_date)->orderBy('start_date')->paginate(15);
+            $classes = User::find(auth()->id())->studentClasses()->whereDate('start_date', '>=', $this->start_date)->whereDate('end_date', '<=', $this->end_date)->orderBy('start_date')->paginate(15);
         } else if (auth()->user()->roles[0]->name == "admin") {
-            $classes = Classes::where('start_date', '>=', $this->start_date)->where('end_date', '<=', $this->end_date)->orderBy('start_date')->paginate(15);
+            $classes = Classes::where('enrolment_id', 'like', '%'.$this->enrolment_id)->whereDate('start_date', '>=', $this->start_date)->whereDate('end_date', '<=', $this->end_date)->orderBy('start_date')->paginate(15);
             foreach ($classes as $key => $value) {
                 // $this->students[$key] = $value->student();
                 // $this->teachers[$key] = $value->teacher();

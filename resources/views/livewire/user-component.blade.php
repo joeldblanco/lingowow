@@ -133,7 +133,9 @@
                         $course_id = $course_id->course->id;
                     }
                 @endphp
+                
                 @livewire('schedule', ['user_id' => $user->id, 'mode' => 'show', 'course_id' => $course_id])
+                {{-- <livewire:new-schedule :users="$user->id" :action="'adminShow'" :wire:key="$user->id" /> --}}
             </div>
             @if (count($students) > 0)
                 <table class="flex flex-col w-1/2 space-y-5 border border-gray-200 p-5">

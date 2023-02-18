@@ -45,6 +45,7 @@ use App\Models\Attempt;
 use App\Http\Controllers\UploadImages;
 use App\Http\Controllers\WhatsAppController;
 use App\Http\Livewire\ClassesComponent;
+use App\Http\Livewire\NewSchedule;
 use App\Mail\InvoicePaid;
 use App\Models\Enrolment;
 use App\Models\Meeting;
@@ -232,26 +233,61 @@ Route::middleware(['web', 'auth', 'verified', 'impersonate'])->group(function ()
 
     //ROUTES FOR SCHEDULE//
     Route::post('/schedule/check', [SchedulingCalendarController::class, 'checkForTeachers'])->name("schedule.check");
-    Route::middleware('checkPreviousUrlName:shop|schedule.check|schedule.create,shop')->get('/schedule/selection', [SchedulingCalendarController::class, 'create'])->name("schedule.create");
+    Route::middleware('checkPreviousUrlName:shop|schedule.check|schedule.create|enrolments.checkSchedule,shop')->get('/schedule/selection', [SchedulingCalendarController::class, 'create'])->name("schedule.create");
     Route::post('/schedule/update', [SchedulingCalendarController::class, 'update'])->name("schedule.update");
     Route::get('/schedule/destroy/{student_id}/{course_id}', [SchedulingCalendarController::class, 'destroy'])->name("schedule.destroy");
 
 
 
 
+
     //ROUTES FOR EXAMS//
-    Route::get('/exam/{id}', [ExamController::class, 'display'])->name('exam.display');
+    Route::middleware(['role:admin'])->get('/exams', [ExamController::class, 'index'])->name('exams.index');
+    Route::middleware(['role:admin|teacher'])->get('/exams/create', [ExamController::class, 'create'])->name('exams.create');
+    Route::middleware(['role:admin|teacher'])->post('/exams', [ExamController::class, 'store'])->name('exams.store');
+    Route::middleware(['role:admin|teacher|student'])->get('/exams/{exam}', [ExamController::class, 'show'])->name('exams.show');
+    Route::middleware(['role:admin|teacher'])->get('/exams/{exam}/edit', [ExamController::class, 'edit'])->name('exams.edit');
+    Route::middleware(['role:admin|teacher'])->patch('/exams/{exam}', [ExamController::class, 'update'])->name('exams.update');
+    Route::middleware(['role:admin|teacher'])->delete('/exams/{exam}', [ExamController::class, 'destroy'])->name('exams.destroy');
+    // Route::middleware(['role:admin|teacher'])->post('/exams/manual_correction', [ExamController::class, 'manualCorrection'])->name('exams.manualCorrection');
+
+
+
+
+
     //ROUTES FOR ATTEMPTS//
     Route::get('/attempts/{user}', [AttemptController::class, 'index'])->name('attempt.index');
     Route::get('/attempt/{id}', [AttemptController::class, 'show'])->name('attempt.show');
-    Route::get('/attempt/{attempt_id}/question/{question_id}', [AttemptController::class, 'show_question'])->name('attempt.show_question');
+    Route::get('/attempt/{attempt_id}/question/{question_id}', [AttemptController::class, 'showQuestion'])->name('attempt.show_question');
+    Route::post('/attempt/correct', [AttemptController::class, 'correct'])->name('attempt.correct');
+    Route::middleware(['role:admin|teacher'])->post('/attempt/manual_correction', [AttemptController::class, 'manualCorrection'])->name('attempt.manualCorrection');
 
+
+
+
+
+    //ROUTES FOR QUESTIONS//
+    Route::resource('/questions', QuestionController::class);
+    Route::post('/questions/import', [QuestionController::class, 'import'])->name('questions.import');
+    Route::post('/questions/sort', [QuestionController::class, 'sort'])->name('questions.sort');
+
+
+
+
+    Route::resource('/answers', AnswerController::class);
 
 
 
     //ROUTES FOR RECORDINGS//
-    Route::get('/recordings', [MeetingController::class, 'getRecordings'])->name('recordings.index');
+    Route::middleware(['role:student'])->get('/recordings', [MeetingController::class, 'getRecordings'])->name('recordings.index');
 
+
+
+
+    //ROUTES FOR NEW SCHEDULE//
+    Route::get('/schedule', function () {
+        return view('newSchedule');
+    })->name('newSchedule');
 
 
 
@@ -340,22 +376,13 @@ Route::middleware(['web', 'auth', 'verified', 'impersonate'])->group(function ()
 
 
 
-        //ROUTES FOR EXAMS//
-        Route::resource('/admin/exam', ExamController::class);
-        Route::get('/exam/{id}/details', [ExamController::class, "details"])->name('exam.details');
-
-
-
-
-        //ROUTES FOR QUESTIONS//
-        Route::resource('/questions', QuestionController::class);
-        Route::post('/questions/import', [QuestionController::class, 'import'])->name('questions.import');
-
 
 
 
         //ROUTES FOR CLASSES//
         Route::get('/admin/classes', ClassesComponent::class)->name('admin.classes.index');
+        Route::get('/classes/create', [ClassController::class, 'create'])->name('classes.create');
+        Route::post('/classes', [ClassController::class, 'store'])->name('classes.store');
 
 
 
@@ -430,7 +457,7 @@ Route::middleware(['web', 'auth', 'verified', 'impersonate'])->group(function ()
 
         // Route::resource('api/paypal', PayPalController::class);
 
-        Route::get('/admin/exam/result/{id}', [ExamController::class, 'correct'])->name('exam.result');
+        // Route::get('/admin/exam/result/{id}', [ExamController::class, 'correct'])->name('exam.result');
     });
 
     //ROUTES FOR NEW PAYPAL API//

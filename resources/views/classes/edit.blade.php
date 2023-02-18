@@ -85,38 +85,33 @@
         @showdate.window="weekSchedule=true, monthlySchedule=false">
         <div class="flex space-x-4 p-4 bg-gray-100 mx-3 rounded-xl">
             <div class="wrapper bg-white rounded w-full p-24 form-tour">
-                <div class="dateReason-tour">
-                    <h1 class="font-medium leading-tight text-xl mt-0 mb-2 text-center text-gray-500">Class to
-                        reschedule:
-                        {{ $class_date }}</h1>
-
-                    <div class="mt-10 mb-5 grid grid-rows-1">
-                        <input class="w-full" type="text" name="absence_reason" id="absence_reason"
-                            placeholder="Reason for rescheduling" required>
-                    </div>
-                </div>
+                <h1 class="font-medium leading-tight text-xl mt-0 mb-2 text-center text-gray-500">Class to
+                    reschedule:
+                    {{ $class_date }}</h1>
                 <div class="container mx-auto" x-data="{ editBtn: true, edit: false, showModal1: false, showModal2: false, showModal3: false, showModalAbsence: false, loadingState: false }" x-cloak>
 
                     <div class="wrapper bg-white rounded  w-full schedule-tour">
 
-                        @livewire('schedule', ['plan' => '1', 'user_id' => auth()->id(), 'mode' => 'absence', 'course_id' => $course_id, 'id_class' => $id])
+                        {{-- @livewire('schedule', ['plan' => '1', 'user_id' => auth()->id(), 'mode' => 'absence', 'course_id' => $course_id, 'id_class' => $id]) --}}
+                        @livewire('new-schedule', ['limit' => 1, 'users' => session('teacher_id'), 'action' => 'classRescheduling', 'week' => 1])
 
-                        <div class="mt-10 grid grid-rows-2 grid-flow-col gap-4 justify-center ...">
+                        {{-- <div class="mt-10 grid grid-rows-2 grid-flow-col gap-4 justify-center ...">
                             <div class="flex space-x-3 items-center terms-tour">
                                 <input class="@error('message') border-red-500 @enderror" type="checkbox"
                                     name="consent_checkbox" id="consent_checkbox" required>
-                                <label for="consent_checkbox">I accept the <a href="{{route('guidelines')}}" target="_blank"
-                                        class="text-blue-600 hover:underline">guidelines for class rescheduling
+                                <label for="consent_checkbox">I accept the <a href="{{ route('guidelines') }}"
+                                        target="_blank" class="text-blue-600 hover:underline">guidelines for class
+                                        rescheduling
                                         (Guidelines - Section 8)</a></label>
                             </div>
-                        </div>
+                        </div> --}}
 
-                        <div class="grid justify-center">
+                        {{-- <div class="grid justify-center">
                             <div>
                                 <button class="bg-blue-500 rounded-lg text-white font-bold px-6 py-1 my-3 shadow-md"
                                     onclick="saveAbsence({{ $id }},'classes.update')">Submit</button>
                             </div>
-                        </div>
+                        </div> --}}
 
 
 

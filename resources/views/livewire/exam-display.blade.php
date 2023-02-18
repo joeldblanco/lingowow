@@ -31,7 +31,7 @@
 
     <div class="bg-white font-sans" style="min-height: 80vh" x-data="{ startAttempt: @entangle('startAttempt'), loadingState: true, examContent: @entangle('examContent'), }" x-cloak>
         <!-- Display the countdown timer in an element -->
-        <div class="text-center p-3 w-full flex justify-end fixed z-0 pr-10" id="timer_container">
+        <div class="text-center p-3 w-full flex justify-end fixed z-0 pr-10 pointer-events-none" id="timer_container">
             <p id="timer" class="text-2xl w-1/6 bg-gray-200 border border-gray-600"></p>
         </div>
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 h-screen flex flex-col justify-center items-center"
@@ -112,7 +112,7 @@
                                     @endif
                                 @elseif($question->type == 'essay')
                                     <div wire:ignore>
-                                        <textarea wire:model="essay_content" id="essay" class="w-full px-2 py-2 text-gray-700 bg-gray-200 rounded"
+                                        <textarea wire:model.lazy="essay_content" id="essay" class="w-full px-2 py-2 text-gray-700 bg-gray-200 rounded"
                                             placeholder="Write your text here" style="resize: none" rows="4"
                                             name="essay" required></textarea>
                                     </div>
@@ -121,12 +121,12 @@
                         </div>
                     @endforeach
                 </div>
-                <div wire:loading>
+                {{-- <div wire:loading>
                     @include('components.loading-state')
-                </div>
+                </div> --}}
                 <div class="flex justify-end mt-40 mb-16">
                     <button wire:click="submitExam"
-                        class="bg-blue-500 rounded-md p-3 text-white text-lg w-1/6">Submit</button>
+                        class="bg-blue-500 rounded-md p-3 text-white text-lg w-1/6" wire:loading.attr="disabled">Submit</button>
                 </div>
             </div>
         </div>

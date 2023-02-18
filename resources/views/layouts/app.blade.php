@@ -2,39 +2,6 @@
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 
 <head>
-    @php
-        $session_info = json_decode((new Illuminate\Http\Client\PendingRequest())->get('http://ipwho.is/' . $_SERVER['REMOTE_ADDR'])->getBody(), true);
-        if ($session_info['success'] == false) {
-            session()->forget('session_info');
-        } else {
-            session(['session_info' => $session_info]);
-            auth()
-                ->user()
-                ->update(['timezone' => session('session_info')['timezone']['id']]);
-        }
-        // dd(session()->all());
-        
-        // if (isset($_GET['tz']) && session('tz') == null) {
-        //     // This is just an example. In application this will come from Javascript (via an AJAX or something)
-        //     $timezone_offset_minutes = $_GET['tz']; // $_GET['timezone_offset_minutes']
-        
-        //     // Convert minutes to seconds
-        //     $timezone_name = timezone_name_from_abbr('', $timezone_offset_minutes * 60, false);
-        //     session(['tz' => $timezone_name]);
-        // }
-        
-        // function tz()
-        // {
-        //     if (session('tz') == null) {
-        //         return true;
-        //     } else {
-        //         return false;
-        //     }
-        
-        //     // return !isset($_GET['tz']);
-        // }
-    @endphp
-
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
@@ -84,6 +51,44 @@
 
 <body class="font-sans antialiased">
     <x-jet-banner />
+
+    @if (session('success'))
+        <div class="flex justify-center fixed bottom-5 left-5 z-20">
+            <div
+                class="w-full px-6 py-3 shadow-2xl flex flex-col items-center border-t sm:w-auto sm:m-4 sm:rounded-lg sm:flex-row sm:border bg-green-600 border-green-600 text-white">
+                <div>
+                    {{ session('success') }}
+                </div>
+                <div class="flex mt-2 sm:mt-0 sm:ml-4">
+                    <a @click="open = false"
+                        class="px-3 py-2 hover:bg-green-700 transition ease-in-out duration-300 cursor-pointer">
+                        Dismiss </a>
+                </div>
+            </div>
+        </div>
+        @php
+            session()->forget('success');
+        @endphp
+    @endif
+
+    @if (session('error'))
+        <div class="flex justify-center fixed bottom-5 left-5 z-20">
+            <div
+                class="w-full px-6 py-3 shadow-2xl flex flex-col items-center border-t sm:w-auto sm:m-4 sm:rounded-lg sm:flex-row sm:border bg-red-600 border-red-600 text-white">
+                <div>
+                    {{ session('error') }}
+                </div>
+                <div class="flex mt-2 sm:mt-0 sm:ml-4">
+                    <a @click="open = false"
+                        class="px-3 py-2 hover:bg-red-700 transition ease-in-out duration-300 cursor-pointer">
+                        Dismiss </a>
+                </div>
+            </div>
+        </div>
+        @php
+            session()->forget('error');
+        @endphp
+    @endif
 
     <div class="min-h-screen bg-white flex flex-col">
 
@@ -147,7 +152,7 @@
             window.fcWidget.user.setEmail("{{ auth()->user()->email }}");
         });
     </script>
-
+    @stack('scripts')
 </body>
 
 </html>

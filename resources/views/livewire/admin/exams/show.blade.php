@@ -16,7 +16,7 @@
     @endif
     <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
         <div class="p-6 sm:px-20 bg-white border-b border-gray-200">
-            {{-- <a href="{{route('exam.store')}}" class="p-2 m-2 block border w-20 text-center rounded-md bg-gray-200 font-semibold hover:bg-gray-500 hover:text-white">
+            {{-- <a href="{{route('exams.store')}}" class="p-2 m-2 block border w-20 text-center rounded-md bg-gray-200 font-semibold hover:bg-gray-500 hover:text-white">
                     New
                 </a> --}}
             <div class="fixed inset-0 w-full h-full z-20 bg-black bg-opacity-50 duration-300 overflow-y-auto"
@@ -47,6 +47,7 @@
                                     <option value="info">Info</option>
                                     <option value="multiple-choice">Multiple choice</option>
                                     <option value="essay">Essay</option>
+                                    <option value="speaking">Speaking</option>
                                 </select>
                                 <textarea class="w-full px-2 py-2 text-gray-700 bg-gray-200 rounded" placeholder="Description" style="resize: none"
                                     rows="4" name="question-description" required></textarea>
@@ -163,7 +164,7 @@
                                     <a href="{{route('questions.show',[$exam_id,$question->id])}}" class="text-gray-600 font-bold py-1 px-3 rounded text-xs bg-blue-100 hover:bg-blue-500 hover:text-white">View</a>
                                 </td> --}}
                                 <td class="py-4 px-6 border-b border-gray-400 text-center">
-                                    <a href="{{ route('questions.edit', ['exam_id' => $exam_id, 'question' => $question->id, 'question_id' => $question->id]) }}"
+                                    <a href="{{ route('questions.edit', $question->id) }}"
                                         class="text-gray-600 font-bold py-1 px-3 rounded text-xs bg-blue-100 hover:bg-blue-500 hover:text-white">Edit</a>
                                 </td>
                                 <td class="py-4 px-6 border-b border-gray-400 text-center">

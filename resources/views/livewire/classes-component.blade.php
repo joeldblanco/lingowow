@@ -1,22 +1,38 @@
 <div x-data="{ showCommentsModal: false, classDetails: @entangle('classDetails') }" id="classes_main" class="px-20 pt-10">
-    <div class="flex justify-start w-1/2 my-4 space-x-4 range-date-tour">
+    <div class="flex justify-between w-full my-4">
         {{-- <form action="{{ route('classes.index') }}"> --}}
-        <div>
-            <label class="block text-gray-700 text-sm font-bold mb-2" for="start_date">
-                Start Date
-            </label>
-            <input autocomplete="off" wire:model="start_date" type="text" id="start_date" name="start_date"
-                class="text-gray-500 border-gray-300 rounded-lg hover:border-gray-400">
+        <div class="flex space-x-4 range-date-tour">
+            <div>
+                <label class="block text-gray-700 text-sm font-bold mb-2" for="start_date">
+                    Start Date
+                </label>
+                <input autocomplete="off" wire:model.lazy="start_date" type="text" id="start_date" name="start_date"
+                    class="text-gray-500 border-gray-300 rounded-lg hover:border-gray-400">
+            </div>
+            <div>
+                <label class="block text-gray-700 text-sm font-bold mb-2" for="end_date">
+                    End Date
+                </label>
+                <input autocomplete="off" wire:model.lazy="end_date" type="text" id="end_date" name="end_date"
+                    class="text-gray-500 border-gray-300 rounded-lg hover:border-gray-400">
+            </div>
+            <div>
+                <label class="block text-gray-700 text-sm font-bold mb-2" for="end_date">
+                    Enrolment ID
+                </label>
+                <input autocomplete="off" wire:model.lazy="enrolment_id" type="number"
+                    class="text-gray-500 border-gray-300 rounded-lg hover:border-gray-400">
+            </div>
         </div>
-        <div>
-            <label class="block text-gray-700 text-sm font-bold mb-2" for="end_date">
-                End Date
-            </label>
-            <input autocomplete="off" wire:model="end_date" type="text" id="end_date" name="end_date"
-                class="text-gray-500 border-gray-300 rounded-lg hover:border-gray-400">
-        </div>
-        {{-- <button class="bg-blue-700 rounded-md text-white py-2 px-4 hover:bg-blue-800">Search</button> --}}
+        @role('admin')
+            <div class="flex items-end">
+                <a class="bg-blue-700 rounded-md text-white py-2 px-4 hover:bg-blue-800 cursor-pointer"
+                    href="{{ route('classes.create') }}">Create</a>
+            </div>
+        @endrole
+
         {{-- </form> --}}
+
     </div>
     @if (count($classes) > 0)
         <div class="flex justify-center w-full items-center my-8">
@@ -78,9 +94,9 @@
                             </td>
                         @endhasanyrole
                         @php
-                            $lesson_date = (new Carbon\Carbon($value->start_date))->setTimezone(session('session_info')['timezone']['id']);
+                            $lesson_date = (new Carbon\Carbon($value->start_date))->setTimezone(auth()->user()->timezone);
                         @endphp
-                        @if ($lesson_date->lt(Carbon\Carbon::now(session('session_info')['timezone']['id'])))
+                        @if ($lesson_date->lt(Carbon\Carbon::now(auth()->user()->timezone)))
                             <td class="flex w-full justify-center text-red-500 cursor-pointer hover:underline class-tour"
                                 wire:click="showClass({{ $value->id }})">
                                 {{ $lesson_date->format('d/m/Y - h:00 a') }}
@@ -155,13 +171,13 @@
                         Yes
                     @endif
                 </p> --}}
-                <p><span class="font-bold">Did the student receive the class?</span>
+                {{-- <p><span class="font-bold">Did the student receive the class?</span>
                     @if (empty($current_class->rating))
                         No
                     @else
                         Yes
                     @endif
-                </p>
+                </p> --}}
                 {{-- <p><span class="font-bold">Recording:</span> {{App\Http\Controllers\ClassController::getRecordingUrl($current_class)}}</p> --}}
             @endif
         </x-slot>
@@ -237,9 +253,11 @@
         </x-slot>
     </x-modal>
 
-    @role('student')
-        <livewire:rating-form />
-    @endrole
+    @if (!Auth::user()->isImpersonated())
+        @role('student')
+            <livewire:rating-form />
+        @endrole
+    @endif
     @role('student')
         <x-shepherd-tour tourName="students/classes-tour" role="student" />
     @endrole

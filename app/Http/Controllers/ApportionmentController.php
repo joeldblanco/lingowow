@@ -37,7 +37,7 @@ class ApportionmentController extends Controller
         // $product = Course::find($course_id)->products->first();
 
         $today = Carbon::now()->setTimezone('UTC');
-        $today->addDays(1);
+        // $today->addDays(1);
 
         $current_period = ApportionmentController::currentPeriod();
         $next_period = ApportionmentController::nextPeriod();
@@ -50,6 +50,7 @@ class ApportionmentController extends Controller
         $next_period_end = new Carbon($next_period[1]);
 
 
+
         // $timezone = Carbon::now()->setTimezone($user->timezone);
         // $schedule_utc = [];
         // foreach ($schedule as $key => $value) {
@@ -57,8 +58,7 @@ class ApportionmentController extends Controller
         //     $date_local = Carbon::parse('Next ' . Carbon::now()->setISODate($date->year, $date->weekOfYear, $value[1])->format('l') . ' at ' . $value[0] . ':00');
         //     $schedule_utc[$key][0] = (int)$date_local->copy()->subHours($timezone->offsetHours)->hour;
         //     $schedule_utc[$key][1] = (int)$date_local->copy()->subHours($timezone->offsetHours)->dayOfWeek;
-        // }
-        
+        // }        
 
         $qty = 0;
         $days = [];
@@ -74,10 +74,8 @@ class ApportionmentController extends Controller
                 }
 
                 return $date->isDayOfWeek($day);
-            }, $current_period_end);
+            }, $current_period_end->copy()->addDay()); //It's necessary to add a day '->addDay()' to the end date to include the last day of the period
         }
-
-        // dd($schedule, $schedule_utc);
 
         if ($qty <= 0) {
             $qty = 0;
@@ -96,7 +94,7 @@ class ApportionmentController extends Controller
                     }
                     // if($date->isDayOfWeek($day)) array_push($days,get_class_methods($date));
                     return $date->isDayOfWeek($day);
-                }, $next_period_end);
+                }, $next_period_end->copy()->addDay());//It's necessary to add a day '->addDay()' to the end date to include the last day of the period
             }
         }
 
@@ -129,8 +127,6 @@ class ApportionmentController extends Controller
         $days_diff = array_values($days_diff);
 
         $qty_diff = sizeof($days_diff);
-
-        // dd($days);
 
         return [$qty_diff, $days_diff, $days, $abcense];
     }
