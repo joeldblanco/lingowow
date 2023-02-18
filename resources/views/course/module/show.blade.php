@@ -19,7 +19,7 @@
                                     class="right-4 top-8 absolute flex flex-col border border-gray-400 rounded-xl divide-y divide-opacity-100 divide-gray-300 bg-white">
                                     <a href="{{ route('units.create', ['module_id' => $module->id]) }}"
                                         class="hover:bg-gray-200 p-2 rounded-xl" @click="unitOrExam = false">Unit</a>
-                                    <a href="{{ route('exam.create', ['module_id' => $module->id]) }}"
+                                    <a href="{{ route('exams.create', ['module_id' => $module->id]) }}"
                                         class="hover:bg-gray-200 p-2 rounded-xl" @click="unitOrExam = false">Exam</a>
                                 </div>
                                 <x-shepherd-tour tourName="teachers/course_conversational" role="teacher" />
@@ -39,7 +39,7 @@
                                     class="right-4 top-8 absolute flex flex-col border border-gray-400 rounded-xl divide-y divide-opacity-100 divide-gray-300 bg-white">
                                     <a href="{{ route('units.create', ['module_id' => $module->id]) }}"
                                         class="hover:bg-gray-200 p-2 rounded-xl" @click="unitOrExam = false">Unit</a>
-                                    <a href="{{ route('exam.create', ['module_id' => $module->id]) }}"
+                                    <a href="{{ route('exams.create', ['module_id' => $module->id]) }}"
                                         class="hover:bg-gray-200 p-2 rounded-xl" @click="unitOrExam = false">Exam</a>
                                 </div>
                             </div>
@@ -94,12 +94,12 @@
                                 @endrole
                             @endif
                         </div>
-                        @if ($unit->exams->count() > 0 && $role != 'guest')
+                        @if ($unit->exams->where('status', 1)->count() > 0 && $role != 'guest')
                             @php
-                                $exam = $unit->exams->random();
+                                $exam = $unit->exams->where('status', 1)->random();
                             @endphp
                             <div class="flex justify-between items-center mb-10">
-                                <div onclick="location.href='{{ route('exam.display', $exam->id) }}';"
+                                <div onclick="location.href='{{ route('exams.show', $exam->id) }}';"
                                     class="group flex flex-row bg-red-100 rounded-lg w-full justify-between shadow-md hover:shadow-xl cursor-pointer items-center">
 
                                     <div class="w-3/12 m-5">
@@ -120,7 +120,7 @@
                                     </div>
                                 </div>
                                 @role('admin')
-                                    <div onclick="location.href='{{ route('exam.details', $exam->id) }}';"
+                                    <div onclick="location.href='{{ route('exams.edit', $exam->id) }}';"
                                         class="flex justify-center text-3xl text-gray-400 hover:text-gray-600 cursor-pointer mx-6">
                                         <i class="fas fa-info-circle mx-auto"></i>
                                     </div>
@@ -174,7 +174,7 @@
                                     </div>
                                 </div>
                                 @role('admin')
-                                    <div onclick="location.href='{{ route('exam.details', $exam->id) }}';"
+                                    <div {{-- onclick="location.href='{{ route('exams.details', $exam->id) }}';" --}}
                                         class="flex justify-center text-3xl text-gray-400 hover:text-gray-600 cursor-pointer mx-6">
                                         <i class="fas fa-info-circle mx-auto"></i>
                                     </div>

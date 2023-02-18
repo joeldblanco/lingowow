@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Invoice;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Cart;
+use Gloudemans\Shoppingcart\Facades\Cart;
 use App\Item;
 use App\Jobs\StoreSelfEnrolment;
 use App\Mail\InvoicePaid;

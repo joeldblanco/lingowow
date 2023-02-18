@@ -8,7 +8,7 @@ use App\Item;
 use App\Jobs\StoreSelfEnrolment;
 use App\Models\Course;
 use App\Models\Enrolment;
-use Cart;
+use Gloudemans\Shoppingcart\Facades\Cart;
 use Illuminate\Http\Request;
 use Srmklive\PayPal\Services\AdaptivePayments;
 use Srmklive\PayPal\Services\ExpressCheckout;

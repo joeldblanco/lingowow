@@ -31,41 +31,71 @@ class UnitController extends Controller
      */
     public function create(Request $request)
     {
-        if (auth()->user()->getRoleNames()->first() == "admin") {
+        // Check if the authenticated user is an admin
+        if (auth()->user()->hasRole("admin")) {
+            // If the user is an admin, get the module using the given module_id in the request
             $modules = new Collection([Module::find($request->module_id)]);
         } else {
+            // If the user is not an admin, get all modules the user is assigned to, sorted by order
             $modules = auth()->user()->modules->sortBy('order');
         }
+        // Return the view, passing in the modules
         return view('course.module.unit.create', compact('modules'));
     }
 
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param \Illuminate\Http\Request $request
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
     {
-
-        $request->validate([
+        // Validate the request data
+        $validatedData = $request->validate([
             'name' => 'required',
             'status' => 'required',
             'module_id' => 'required',
             'image' => 'image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
+        // Create a new unit object
         $unit = new Unit();
-        $unit->name = $request->name;
-        $unit->status = $request->status;
-        $unit->module_id = $request->module_id;
-        $unit->order = Unit::where('module_id', $request->module_id)->max('order') + 1;
+
+        // Assign validated data to the unit object
+        $unit->name = $validatedData['name'];
+        $unit->status = $validatedData['status'];
+        $unit->module_id = $validatedData['module_id'];
+        $unit->order = Unit::where('module_id', $validatedData['module_id'])->max('order') + 1;
+
+        // Get the image path
         $image = $request->file('image');
-        $path_to_file = $image == null ? DB::table('metadata')->where('key', 'sample_image_url')->first()->value : $image->storeAs('public/images/units/covers', str_replace(" ", "_", $request->name) . '.' . $image->getClientOriginalExtension());
+        $path_to_file = $this->getImagePath($image, $validatedData['name']);
         $unit->image = $path_to_file;
+
+        // Save the unit object
         $unit->save();
 
-        return redirect()->route('modules.show', $request->module_id)->with('success', 'Unit created successfully.');
+        // Redirect to the show view for the module with a success message
+        return redirect()->route('modules.show', $validatedData['module_id'])->with('success', 'Unit created successfully.');
+    }
+
+    /**
+     * Get the path for the unit image.
+     *
+     * @param $image
+     * @param $name
+     * @return string
+     */
+    private function getImagePath($image, $name)
+    {
+        // If the image is null, return the sample image URL
+        if ($image === null) {
+            return DB::table('metadata')->where('key', 'sample_image_url')->first()->value;
+        }
+
+        // Store the image and return its path
+        return $image->storeAs('public/images/units/covers', str_replace(" ", "_", $name) . '.' . $image->getClientOriginalExtension());
     }
 
     /**
@@ -195,12 +225,14 @@ class UnitController extends Controller
      */
     public function update(Request $request, Unit $unit)
     {
+        // Store the image in the public/images/units/covers directory
         $image = $request->file('image');
         $path_to_file = $unit->image;
         if ($image != null) {
             $path_to_file = $image->storeAs('public/images/units/covers', $unit->id . '.' . $image->getClientOriginalExtension());
         }
 
+        // Update the unit's information in the database
         $unit->update([
             "module_id" => $request->module_id,
             "name" => $request->name,
@@ -208,6 +240,7 @@ class UnitController extends Controller
             'image' => $path_to_file,
         ]);
 
+        // Redirect to the module's show page
         return redirect()->route('modules.show', $unit->module_id);
     }
 
@@ -223,19 +256,23 @@ class UnitController extends Controller
         $user = User::find(auth()->id());
         $role = $user->roles->first()->name;
 
+        // Check if the user is an admin
         if ($role == "admin") {
             $unit->delete();
         }
 
+        // Check if the user is a teacher
         if ($role == "teacher") {
-
             $course = $unit->course();
 
+            // Check if the course is conversational
             if ($course->categories->pluck('name')->contains('Conversational')) {
                 $teacher_units = $user->modules->pluck('units')->flatten();
 
-                if (!$teacher_units->contains($unit, false))
+                // Check if the teacher owns the unit
+                if (!$teacher_units->contains($unit, false)) {
                     abort(404);
+                }
 
                 $unit->delete();
             }
@@ -245,23 +282,30 @@ class UnitController extends Controller
     }
 
     /**
-     * Sort units in module
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
+     * This function sorts the units in a given module.
+     * 
+     * @param \Illuminate\Http\Request $request The request object
+     * @return \Illuminate\Http\Response The response
      */
     public function sort(Request $request)
     {
+        // Decode the data from the request
         $newUnitsOrder = json_decode($request->data);
+
+        // Loop through the decoded data
         foreach ($newUnitsOrder as $key => $value) {
+            // Check if the value is not null
             if ($value != null) {
+                // Find the unit and assign the value to its order
                 $unit = Unit::find($key);
                 $unit->order = (int)$value;
                 $unit->save();
             }
         }
+        // Redirect to the module details page
         return redirect()->route('modules.details', $request->module_id);
     }
+
 
 
     /**
@@ -272,11 +316,15 @@ class UnitController extends Controller
      */
     public function userAssociation()
     {
+        // Retrieve all users with the role 'student'
         $users = User::whereHas('roles', function ($query) {
             $query->where('name', 'student');
         })->orderBy('first_name')->get();
+
+        // Retrieve all courses
         $courses = Course::all();
 
+        // Return the view with the users and courses data
         return view('course.module.unit.userAssociation', compact('users', 'courses'));
     }
 
@@ -288,17 +336,25 @@ class UnitController extends Controller
      */
     public function userAssociate(Request $request)
     {
+        // Validate the request data
         $request->validate([
             'user' => 'required|numeric|exists:App\Models\User,id',
             'unit' => 'required|numeric|exists:App\Models\Unit,id',
         ]);
 
+        // Get the user object
         $user = User::find($request->user);
+
+        // Detach user from all units
         $user->units()->detach();
+
+        // Attach the user to the unit
         $user->units()->attach($request->unit);
 
-        session(['success' => 'User associated with unit successfully']);
+        // Set a success message
+        // session(['success' => 'User associated with unit successfully']);
 
-        return redirect()->route('units.association');
+        // Redirect to the unit association page
+        return redirect()->route('units.association')->with('success', 'User associated with unit successfully');
     }
 }

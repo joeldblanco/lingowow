@@ -1,9 +1,24 @@
 <x-app-layout>
 
+    @php
+        $session_info = json_decode((new Illuminate\Http\Client\PendingRequest())->get('http://ipwho.is/' . $_SERVER['REMOTE_ADDR'])->getBody(), true);
+        // dd($session_info['success']);
+        if ($session_info['success'] == false) {
+            session()->forget('session_info');
+        } else {
+            if (!Auth::user()->isImpersonated()) {
+                session(['session_info' => $session_info]);
+                auth()
+                    ->user()
+                    ->update(['timezone' => session('session_info')['timezone']['id']]);
+            }
+        }
+    @endphp
+
     <div style="width: 100%" class="bg-white font-sans">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden">
-                
+
                 @php
                     $users = \App\User::select('first_name', 'last_name', 'id')->get();
                     $affected_students = session('affected_students');
@@ -169,12 +184,24 @@
                 <div class="mt-5">
                     @role('student')
                         @if ($course_modality == 'synchronous')
-                            @livewire('schedule', ['user_id' => auth()->id(), 'mode' => 'show', 'course_id' => $course_id])
-                            {{-- @livewire('schedule-controller', ['user_id' => auth()->id(), 'mode' => 'show', 'course_id' => $course_id]) --}}
+
+                            @if (auth()->id() == 9 || auth()->id() == 5)
+                                {{-- @php
+                                    dd(now()->dayOfWeek);
+                                @endphp --}}
+                                @livewire('new-schedule', ['users' => auth()->id(), 'action' => 'studentShow'])
+                                {{-- @livewire('schedule', ['user_id' => auth()->id(), 'mode' => 'show', 'course_id' => $course_id]) --}}
+                            @else
+                                @livewire('schedule', ['user_id' => auth()->id(), 'mode' => 'show', 'course_id' => $course_id])
+                            @endif
+
                         @endif
                     @endrole
                     @hasanyrole('teacher')
-                        @livewire('schedule', ['user_id' => auth()->id(), 'mode' => 'show', 'course_id' => $course_id])
+                        {{-- @if (auth()->id() == 7) --}}
+                            @livewire('new-schedule', ['users' => auth()->id(), 'action' => 'teacherShow'])
+                            {{-- @livewire('schedule', ['user_id' => auth()->id(), 'mode' => 'show', 'course_id' => $course_id]) --}}
+                        {{-- @endif --}}
                     @endrole
                     @role('guest')
                         <div class="flex flex-col items-center h-screen pt-20">
@@ -242,9 +269,11 @@
                     @endif
                 @endrole
 
-                @role('student')
-                    <livewire:rating-form />
-                @endrole
+                @if (!Auth::user()->isImpersonated())
+                    @role('student')
+                        <livewire:rating-form />
+                    @endrole
+                @endif
 
             </div>
         </div>

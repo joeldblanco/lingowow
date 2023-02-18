@@ -96,15 +96,15 @@
                                                             $average = 0;
                                                             $exams_count = 0;
                                                         @endphp
-                                                        @foreach ($module->exams() as $exam)
-                                                            @foreach ($attempts as $key => $attempt)
-                                                                @if ($exam->count() > 0)
-                                                                    @if ($key == $exam->first()->id)
+                                                        @foreach ($units as $unit)
+                                                            @if ($module->units->pluck('id')->contains($unit->id))
+                                                                @foreach ($attempts as $key => $attempt)
+                                                                    @if ($unit->id == $key)
                                                                         <a href="{{ route('attempt.show', $attempt->id) }}"
                                                                             class="flex flex-col items-center hover:underline mr-24">
                                                                             <div
                                                                                 class="text-lg font-bold text-gray-700">
-                                                                                {{ $exam->first()->unit->name }}
+                                                                                {{ $unit->exams->first()->unit->name }}
                                                                             </div>
                                                                             <div class="text-2xl font-bold">
                                                                                 {{ $attempt->score }}
@@ -121,15 +121,15 @@
                                                                         <div class="flex flex-col items-center">
                                                                             <div
                                                                                 class="text-lg font-bold text-gray-700">
-                                                                                {{ $exam->first()->unit->name }}
+                                                                                {{ $unit->name }}
                                                                             </div>
                                                                             <div class="text-2xl font-bold">
                                                                                 -
                                                                             </div>
                                                                         </div>
                                                                     @endif
-                                                                @endif
-                                                            @endforeach
+                                                                @endforeach
+                                                            @endif
                                                         @endforeach
                                                         <div class="flex flex-col items-center ml-auto">
                                                             <div class="text-lg font-bold text-gray-700">

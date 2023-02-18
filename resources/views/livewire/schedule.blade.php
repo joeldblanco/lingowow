@@ -85,6 +85,7 @@
                                             {{-- <td class="width border Local"></td> --}}
                                             @foreach ($days as $day)
                                                 @if (in_array([$i, $e], $schedule))
+                                                    {{-- {{ dd(get_defined_vars()) }} --}}
                                                     @if (in_array([$i, $e], $students_schedules))
                                                         <td id="{{ $i }}-{{ $e }}"
                                                             class="border width occupied"></td>
@@ -597,7 +598,7 @@
                                                                         @if ($value === $i . '-' . $e)
                                                                             <button class="tooltip button_tooltip">
                                                                                 <span
-                                                                                    class="tooltiptext mb-3">{{ $date_format_class[$key] . ' UTC' }}</span>
+                                                                                    class="tooltiptext mb-3">{{ $date_format_class[$key] }}</span>
                                                                             </button>
                                                                         @endif
                                                                     @endforeach
@@ -617,7 +618,7 @@
                                                                             <button
                                                                                 class="tooltip button_tooltip_green">
                                                                                 <span
-                                                                                    class="tooltiptext mb-3">{{ $date_format_class[$key] . ' UTC' }}</span>
+                                                                                    class="tooltiptext mb-3">{{ $date_format_class[$key] }}</span>
                                                                             </button>
                                                                         @endif
                                                                     @endforeach

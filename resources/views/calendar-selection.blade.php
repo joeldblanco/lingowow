@@ -71,7 +71,11 @@
                 @if ($modality_course == 'exam')
                     @livewire('schedule', ['plan' => $plan, 'user_id' => auth()->id(), 'mode' => 'one'])
                 @else
-                    @livewire('schedule', ['plan' => $plan, 'user_id' => auth()->id(), 'mode' => 'edit'])
+                    @if (auth()->id() == 5)
+                        @livewire('new-schedule', ['users' => auth()->id(), 'action' => 'scheduleSelection', 'limit' => $plan])
+                    @else
+                        @livewire('schedule', ['plan' => $plan, 'user_id' => auth()->id(), 'mode' => 'edit'])
+                    @endif
                 @endif
                 {{-- <livewire:scheduling-calendar plan="{{$plan}}" /> --}}
 

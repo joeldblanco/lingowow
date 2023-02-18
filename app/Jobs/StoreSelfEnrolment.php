@@ -4,7 +4,7 @@ namespace App\Jobs;
 
 use App\Http\Controllers\GatherController;
 use App\Invoice;
-use Cart;
+use Gloudemans\Shoppingcart\Facades\Cart;
 use App\Item;
 use App\Mail\InvoicePaid;
 use App\Models\Course;

@@ -62,6 +62,7 @@ class Schedule extends Component
     public $period_end_aux;
     public $id_class;
     // public $day_rest = 0;
+    public $timezone = null;
 
 
     protected $listeners = ['showTeacherInfo', 'loadSelectingSchedule', 'checkForClass', 'findReserves' => 'findReservesAndRetun'];
@@ -90,6 +91,12 @@ class Schedule extends Component
         $this->user = User::withTrashed()->find($user_id);
         $this->role = $this->user->roles->first()->name;
         $this->plan = $plan;
+        if(auth()->user()->hasRole('admin'))
+        {
+            $this->timezone = auth()->user()->timezone;
+        }else{
+            $this->timezone = $this->user->timezone;
+        }
 
         if ($this->role == "guest") {
 
@@ -214,7 +221,7 @@ class Schedule extends Component
 
 
             $this->schedule = User::find($this->teacher_id)->schedules[0]->selected_schedule;
-            $timezone = Carbon::now()->setTimezone($this->user->timezone);
+            $timezone = Carbon::now()->setTimezone($this->timezone);
             $schedule_utc = [];
             foreach ($this->schedule as $key => $value) {
                 $date = Carbon::now();
@@ -262,7 +269,7 @@ class Schedule extends Component
                 }
             }
 
-            $timezone = Carbon::now()->setTimezone($this->user->timezone);
+            $timezone = Carbon::now()->setTimezone($this->timezone);
             $schedule_utc = [];
             foreach ($this->students_schedules as $schedules) {
                 foreach ($schedules as $key => $value) {

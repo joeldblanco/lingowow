@@ -7,7 +7,7 @@ use App\Models\Enrolment;
 use App\Models\Product;
 use Carbon\Carbon;
 use Livewire\Component;
-use Cart;
+use Gloudemans\Shoppingcart\Facades\Cart;
 use Illuminate\Support\Facades\DB;
 
 class PricingTableComponent extends Component

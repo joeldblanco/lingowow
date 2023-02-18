@@ -67,6 +67,11 @@
   cursor: pointer;
 }
 
+.new-selectable:hover {
+  border: 2px solid rgba(1, 167, 86, 0.785);
+  cursor: pointer;
+}
+
 .paging_simple {
   display: flex;
   justify-content: center;
@@ -758,6 +763,12 @@ html {
 }
 
 .selectable {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
+
+.new-selectable {
   list-style-type: none;
   margin: 0;
   padding: 0;

@@ -148,7 +148,7 @@ class CourseController extends Controller
             } else {
                 foreach ($modules as $module) {
                     if (!empty($user->units->first())) {
-                        if ($module->id <= $user->units->first()->module->order) {
+                        if ($module->order <= $user->units->first()->module->order) {
                             $user_modules->push($module);
                         }
                     }else{

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Livewire\NewSchedule;
 use App\Jobs\StoreSelfEnrolment;
 use App\Models\Classes;
 use App\Models\Course;
@@ -19,7 +20,7 @@ use Illuminate\Support\Facades\Notification;
 use App\Notifications\ClassRescheduledToTeacher;
 use App\Notifications\ClassRescheduledToStudent;
 use Carbon\Carbon;
-use Cart;
+use Gloudemans\Shoppingcart\Facades\Cart;
 use Illuminate\Support\Facades\DB;
 
 use function PHPSTORM_META\type;
@@ -364,29 +365,14 @@ class SchedulingCalendarController extends Controller
 
 
             $cells = json_decode($request->data);
+            $cells = (new NewSchedule)->localToUtc($cells);
 
-            $timezone = Carbon::now()->setTimezone(auth()->user()->timezone);
-            $schedule_utc = [];
-            foreach ($cells as $key => $value) {
-                $date = Carbon::now();
-                $date_local = Carbon::parse('Next ' . Carbon::now()->setISODate($date->year, $date->weekOfYear, $value[1])->format('l') . ' at ' . $value[0] . ':00');
-                $schedule_utc[$key][0] = (int)$date_local->copy()->subHours($timezone->offsetHours)->hour;
-                $schedule_utc[$key][1] = (int)$date_local->copy()->subHours($timezone->offsetHours)->dayOfWeek;
-            }
-            $cells = $schedule_utc;
-
-            // $cells = array_chunk($request->data, 2);
-            // dd($cells);
             session(['user_schedule' => json_encode($cells)]);
             session(['schedule_reserve' => json_encode($cells)]);
 
-
-            // dd(session()->all(), json_decode(session('user_schedule')), $cells);
             $teachers = [];
             $teachers_available = [];
             $day_of_exam = [$cells[0][0], $cells[0][1]];
-
-
 
             $course_id = session('selected_course');
             $modality = Course::find($course_id)->modality;
@@ -406,15 +392,16 @@ class SchedulingCalendarController extends Controller
             }
             $teachers = User::find($teachers);
 
+            // dd($teachers);
+
             foreach ($teachers as $teacher) {
                 $T_schedule = $teacher->schedules->first()->selected_schedule;
-
                 if ($T_schedule != null && in_array($day_of_exam, $T_schedule)) {
                     $classes = [];
                     foreach ($teacher->teacherClasses as $class) {
                         $classes[] = [(new Carbon($class->start_date))->isoFormat('H'), (new Carbon($class->start_date))->isoFormat('d')];
                     }
-                    // dd($day_of_exam,$classes, !in_array($day_of_exam, $classes));
+                    
                     if (!in_array($day_of_exam, $classes)) {
                         // dd($modality, new Carbon(),(Carbon::create((new Carbon())->year, $cells[0][3], $cells[0][4], $cells[0][0], 0)), !(Carbon::create((new Carbon())->year, $cells[0][3], $cells[0][4], $cells[0][0], 0))->lessThan(new Carbon()));
                         if (($modality == "exam" && (Carbon::create((new Carbon())->year, $cells[0][3], $cells[0][4], $cells[0][0], 0))->lessThan(new Carbon()) == false) || $modality == "synchronous") {
@@ -435,8 +422,6 @@ class SchedulingCalendarController extends Controller
                     }
                 }
             }
-
-
 
             if (count($teachers_available) > 0 && !$error) {
 
@@ -470,7 +455,7 @@ class SchedulingCalendarController extends Controller
                         $query->where('name', 'course');
                     })
                     ->get();
-                    
+
                 if (session()->exists('enrolment_type') && session('enrolment_type') == "manual_enrolment") {
                     $student = User::find(session('student_id'));
                 } else {

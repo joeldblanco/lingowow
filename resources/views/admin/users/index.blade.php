@@ -42,7 +42,7 @@
                 <div class="flex flex-col space-y-8">
                     <div class="flex flex-row w-full gap-x-4 gap-y-4 flex-wrap justify-evenly items-stretch">
                         @foreach ($users as $user)
-                            @livewire('user-component', ['user' => $user, 'role' => $role, 'key' => $user->id])
+                            <livewire:user-component :user="$user" :role="$role">
                         @endforeach
                     </div>
                 </div>

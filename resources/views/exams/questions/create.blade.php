@@ -3,8 +3,11 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="p-6 sm:px-20 bg-white border-b border-gray-200">
                 @if ($method == 'create')
-                    <form action="{{ route('exam.store') }}" enctype="multipart/form-data" method="POST" id="exam-form">
+                    <form action="{{ route('questions.store') }}" enctype="multipart/form-data" method="POST"
+                        id="exam-form">
                         @csrf
+                        
+                        <input type="hidden" name="exam_id" value="{{ $exam->id }}"required>
                         <div class="w-full h-full flex items-center justify-center">
                             <div class="leading-loose">
                                 <div id="create-questions-form"
@@ -14,21 +17,22 @@
                                         <i class="fas fa-times cursor-pointer text-xl"></i>
                                     </div>
                                     <div class="flex flex-col">
-                                        <label for="question-value" class="text-sm">Question Value</label>
-                                        <input type="number" name="question-value" id="question-value"
-                                            value="question-value"
+                                        <label for="marks" class="text-sm">Question Value</label>
+                                        <input type="number" name="marks" id="marks"
+                                            value="marks"
                                             class="w-3/12 px-2 py-2 text-gray-700 bg-gray-200 rounded" placeholder="0"
                                             min="0" max="100" required>
                                     </div>
-                                    <select id="question-type"
-                                        class="w-full px-2 py-2 text-gray-700 bg-gray-200 rounded" name="question-type">
+                                    <select id="type"
+                                        class="w-full px-2 py-2 text-gray-700 bg-gray-200 rounded" name="type">
                                         <option selected disabled hidden required>Type</option>
                                         <option value="info">Info</option>
                                         <option value="multiple-choice">Multiple choice</option>
                                         <option value="essay">Essay</option>
+                                        <option value="speaking">Speaking</option>
                                     </select>
                                     <textarea class="w-full px-2 py-2 text-gray-700 bg-gray-200 rounded" placeholder="Description" style="resize: none"
-                                        rows="4" name="question-description" required></textarea>
+                                        rows="4" name="description" required></textarea>
                                     <div id="options">
 
                                     </div>
@@ -42,7 +46,8 @@
                         </div>
                     </form>
                 @else
-                    <form action="{{ route('exam.store') }}" enctype="multipart/form-data" method="POST" id="exam-form">
+                    <form action="{{ route('exams.store') }}" enctype="multipart/form-data" method="POST"
+                        id="exam-form">
                         @csrf
                         <div class="w-full h-full flex items-center justify-center">
                             <div class="leading-loose">
@@ -53,7 +58,7 @@
                                         <i class="fas fa-times cursor-pointer text-xl"></i>
                                     </div>
                                     <div class="flex flex-col">
-                                        <label for="question-value" class="text-sm">Upload File</label>
+                                        <label for="marks" class="text-sm">Upload File</label>
                                         <input type="file" name="import_file" id="import_file" accept=".txt"
                                             class="px-2 py-2 text-gray-700 bg-gray-200 rounded" required>
                                     </div>
@@ -72,8 +77,8 @@
         </div>
         @if ($method == 'create')
             <script>
-                $("#question-type").change(function() {
-                    var option = $("#question-type").find(":selected").text();
+                $("#type").change(function() {
+                    var option = $("#type").find(":selected").text();
                     $('#options').empty();
 
                     if (option == "Multiple choice") {
@@ -103,7 +108,7 @@
                         $('<input>').attr({
                             type: 'file',
                             class: 'w-full px-2 py-2 text-gray-700 bg-gray-200 rounded',
-                            name: 'question-file'
+                            name: 'file'
                         }).appendTo('#options');
                     }
 

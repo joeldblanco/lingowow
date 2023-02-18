@@ -35,7 +35,10 @@ class ClassController extends Controller
      */
     public function create()
     {
-        //
+        $teachers = User::role('teacher')->get();
+        $students = User::role('student')->get();
+
+        return view('classes.create', compact('teachers', 'students'));
     }
 
     /**
@@ -46,7 +49,22 @@ class ClassController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'teacher_id' => 'required|numeric|exists:App\Models\User,id',
+            'student_id' => 'required|numeric|exists:App\Models\User,id',
+            'date_time' => 'required|date_format:Y-m-d\TH:i',
+        ]);
+        $date_time = Carbon::parse($request->date_time)->format('Y-m-d H:i:s');
+        $enrolment_id = Enrolment::where('teacher_id', $request->teacher_id)->where('student_id', $request->student_id)->first()->id;
+        $meeting_id = Meeting::where('host_id', $request->teacher_id)->where('atendee_id', $request->student_id)->first()->id;
+        Classes::create([
+            'enrolment_id' => $enrolment_id,
+            'start_date' => $date_time,
+            'end_date' => Carbon::parse($date_time)->addMinutes(40)->format('Y-m-d H:i:s'),
+            'meeting_id' => $meeting_id,
+        ]);
+
+        return redirect()->route('admin.classes.index');
     }
 
     /**
@@ -73,11 +91,14 @@ class ClassController extends Controller
         $enrolment = Enrolment::find($class->enrolment_id);
         $teacher_id = $enrolment->teacher_id;
         $student_id = $enrolment->student_id;
-        session(['teacher_id' => $teacher_id]);
+        session([
+            'teacher_id' => $teacher_id,
+            'toRescheduleClass' => $id,
+        ]);
 
         $class_date = $class->start_date;
         $class_date = new Carbon($class_date);
-        $class_date = $class_date->toCookieString();
+        $class_date = $class_date->timezone(auth()->user()->timezone)->format('Y/m/d H:00');
         // dd($class_date);
 
         $teacher_schedule = Schedule::where('user_id', $teacher_id)->select('selected_schedule')->get()->toArray();
@@ -198,7 +219,7 @@ class ClassController extends Controller
 
 
             $teacher = User::find(session('teacher_id'));
-            $timezone = Carbon::now()->setTimezone($teacher->timezone);
+            $timezone = Carbon::now()->setTimezone(auth()->user()->timezone);
             $schedule = [$data[0], $data[1]];
             $date = Carbon::now();
             $date_local = Carbon::parse('Next ' . Carbon::now()->setISODate($date->year, $date->weekOfYear, $schedule[1])->format('l') . ' at ' . $schedule[0] . ':00');
