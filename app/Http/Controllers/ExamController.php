@@ -54,7 +54,7 @@ class ExamController extends Controller
             'unit_id' => 'required|numeric|exists:App\Models\Unit,id',
             'passing_marks' => 'required|numeric|min:0|max:100',
             'total_marks' => 'required|numeric|min:0|max:100',
-            'title' => 'string|nullable',
+            'title' => 'required|string|nullable',
             'description' => 'string|nullable',
             'type' => 'numeric',
             'duration' => 'required|numeric',
