@@ -26,7 +26,7 @@
                                         min="0" max="100" required>
                                 </div>
                                 <input type="text" class="w-full px-2 py-2 text-gray-700 bg-gray-200 rounded"
-                                    name="title" placeholder="Title">
+                                    name="title" placeholder="Title" required>
                                 <textarea name="description" class="w-full px-2 py-2 text-gray-700 bg-gray-200 rounded" id="" cols="30"
                                     rows="10" placeholder="Description"></textarea>
                                 <select id="unit_id" class="w-3/4 px-2 py-2 text-gray-700 bg-gray-200 rounded"
