@@ -119,6 +119,13 @@
         <main class="pb-10 w-full min-h-screen">
             {{ $slot }}
         </main>
+
+
+        @if (auth()->user()->hasRole('admin') || Auth::user()->isImpersonated())
+            @livewire('admin-tools')
+        @endif
+
+
         @include('footer')
     </div>
 
