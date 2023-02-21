@@ -25,6 +25,14 @@ class Attempt extends Model
     }
 
     /**
+     * Get the duration of the attempt.
+     */
+    public function duration()
+    {
+        return $this->exam->duration;
+    }
+
+    /**
      * Get the user that owns the attempt.
      */
     public function user()

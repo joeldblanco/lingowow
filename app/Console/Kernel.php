@@ -5,6 +5,7 @@ namespace App\Console;
 use App\Http\Controllers\ApportionmentController;
 use App\Http\Controllers\GatherController;
 use App\Jobs\CreateClasses;
+use App\Models\Attempt;
 use App\Models\Classes;
 use App\Models\Enrolment;
 use App\Models\Schedule as ModelsSchedule;
@@ -132,6 +133,17 @@ class Kernel extends ConsoleKernel
 
                 if (!$notified_students->contains($class->student())) {
                     Notification::sendNow($class->student(), new UpcomingClassForStudent($class));
+                }
+            }
+        })->everyMinute();
+
+        $schedule->call(function () {
+            $attempts = Attempt::whereNull('completed_at')->get();
+            
+            foreach ($attempts as $attempt) {
+                if (now() >= $attempt->created_at->copy()->addMinutes($attempt->duration())) {
+                    $attempt->completed_at = now()->toDateTimeString();
+                    $attempt->save();
                 }
             }
         })->everyMinute();

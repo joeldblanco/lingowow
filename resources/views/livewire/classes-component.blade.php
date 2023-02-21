@@ -16,13 +16,15 @@
                 <input autocomplete="off" wire:model.lazy="end_date" type="text" id="end_date" name="end_date"
                     class="text-gray-500 border-gray-300 rounded-lg hover:border-gray-400">
             </div>
-            <div>
-                <label class="block text-gray-700 text-sm font-bold mb-2" for="end_date">
-                    Enrolment ID
-                </label>
-                <input autocomplete="off" wire:model.lazy="enrolment_id" type="number"
-                    class="text-gray-500 border-gray-300 rounded-lg hover:border-gray-400">
-            </div>
+            @role('admin')
+                <div>
+                    <label class="block text-gray-700 text-sm font-bold mb-2" for="end_date">
+                        Enrolment ID
+                    </label>
+                    <input autocomplete="off" wire:model.lazy="enrolment_id" type="number"
+                        class="text-gray-500 border-gray-300 rounded-lg hover:border-gray-400">
+                </div>
+            @endrole
         </div>
         @role('admin')
             <div class="flex items-end">
@@ -40,7 +42,7 @@
                 <p class="text-2xl font-bold w-full text-center">Classes</p>
                 @role('admin')
                     <p class="text-xl w-full text-center text-gray-600">Classes pending review:
-                        {{ count($to_review_classes) }}</p>
+                        {{ count($to_review_classes) }}/{{ count($total_to_review_classes) }}</p>
                 @endrole
             </div>
         </div>

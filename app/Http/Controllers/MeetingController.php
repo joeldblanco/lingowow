@@ -114,26 +114,16 @@ class MeetingController extends Controller
             }
 
             $meetings = Meeting::all();
-            $success = "Meeting created successfully";
-            session(['success' => $success]);
+
+            if ($return) {
+                return $meeting->id;
+            } else {
+                return view('meetings.index', compact('meetings'))->with('success', 'Meeting created successfully');
+            }
         } else {
             $meetings = Meeting::all();
             $error = json_decode($response->getBody(), true);
-            session(['error' => $error]);
-        }
-
-        // } else {
-        //     $meetings = Meeting::all();
-        //     $error = [
-        //         'message' => "Meeting already exists",
-        //     ];
-        //     session(['error' => $error]);
-        // }
-
-        if ($return) {
-            return $meeting->id;
-        } else {
-            return view('meetings.index', compact('meetings'));
+            return view('meetings.index', compact('meetings'))->with('error', $error);
         }
     }
 
@@ -319,7 +309,7 @@ class MeetingController extends Controller
                 }
 
                 // Add the recordings to the array of all recordings using the recording start date as the key
-                if(!empty($value)) $allRecordings[$value["recording_start"]] = $recordings;
+                if (!empty($value)) $allRecordings[$value["recording_start"]] = $recordings;
             }
         }
 
@@ -328,7 +318,7 @@ class MeetingController extends Controller
 
         // Sort the array of all recordings by the recording start date
         ksort($allRecordings);
-        
+
 
         // If the link is set, return the recordings
         if ($link) {

@@ -121,36 +121,73 @@
                                 </div>
 
 
+                                @if (auth()->id() == 5)
+                                    <x-modal type="info" name="examModal_{{ $exam->id }}"
+                                        class="w-6/12 mx-auto">
+                                        <x-slot name="title">
+                                            @php
+                                                $attempt = $exam->attempts
+                                                    ->where('user_id', auth()->id())
+                                                    ->where('completed_at', null)
+                                                    ->first();
+                                            @endphp
+                                            <p class="text-2xl font-semibold mt-5 ml-5 text-gray-500">
+                                                @if (!empty($attempt))
+                                                    Continue attempt
+                                                @else
+                                                    Start attempt
+                                                @endif
+                                            </p>
+                                        </x-slot>
+                                        <x-slot name="content" class="px-16">
+                                            <p class="text-2xl font-bold text-left mb-3">Time limit</p>
+                                            <p class="text-justify">
 
-                                <x-modal type="info" name="examModal_{{ $exam->id }}" class="w-6/12 mx-auto">
-                                    <x-slot name="title">
-                                        <p class="text-2xl font-semibold mt-5 ml-5 text-gray-500">Start attempt</p>
-                                    </x-slot>
-                                    <x-slot name="content" class="px-16">
-                                        <p class="text-2xl font-bold text-left mb-3">Time limit</p>
-                                        <p class="text-justify">
-                                            Your attempt will have a time limit of 1 hour. When you start, the timer
-                                            will begin to count
-                                            down and cannot be paused. You must finish your attempt before it expires.
-                                            Are you sure you
-                                            wish to start now?
-                                        </p>
+                                                @if (!empty($attempt))
+                                                    You have already started this attempt. You have
+                                                    {{ (new Carbon\Carbon($attempt->created_at))->addSecond()->addMinutes($exam->duration)->diffForHumans(Carbon\Carbon::now(), [
+                                                            'syntax' => Carbon\CarbonInterface::DIFF_ABSOLUTE,
+                                                            'parts' => 2,
+                                                            'join' => ' and ',
+                                                        ]) }}
+                                                    remaining.
+                                                    Are you sure you wish to continue?
+                                                @else
+                                                    Your attempt will have a time limit of
+                                                    {{ Carbon\Carbon::now()->addSecond()->addMinutes($exam->duration)->diffForHumans(Carbon\Carbon::now(), [
+                                                            'syntax' => Carbon\CarbonInterface::DIFF_ABSOLUTE,
+                                                            'parts' => 2,
+                                                            'join' => ' and ',
+                                                        ]) }}.
+                                                    When you
+                                                    start, the timer
+                                                    will begin to count
+                                                    down and cannot be paused. You must finish your attempt before it
+                                                    expires.
+                                                    Are you sure you
+                                                    wish to start now?
+                                                @endif
+                                            </p>
 
-                                        <div class="flex mt-10 space-x-2 justify-start">
-                                            <a href="{{ route('exams.show', $exam->id) }}"
-                                                class="bg-lw-blue hover:bg-blue-800 py-2 px-4 rounded-md font-bold text-white">
-                                                Start Attempt
-                                            </a>
-                                            <button
-                                                class="bg-gray-200 hover:bg-gray-300 py-2 px-4 rounded-md font-bold text-gray-600">
-                                                Cancel
-                                            </button>
-                                        </div>
-                                    </x-slot>
-                                    <x-slot name="footer">
-                                    </x-slot>
-                                </x-modal>
-
+                                            <div class="flex mt-10 space-x-2 justify-start">
+                                                <a href="{{ route('exams.show', $exam->id) }}"
+                                                    class="bg-lw-blue hover:bg-blue-800 py-2 px-4 rounded-md font-bold text-white">
+                                                    @if (!empty($attempt))
+                                                        Continue attempt
+                                                    @else
+                                                        Start attempt
+                                                    @endif
+                                                </a>
+                                                <button
+                                                    class="bg-gray-200 hover:bg-gray-300 py-2 px-4 rounded-md font-bold text-gray-600">
+                                                    Cancel
+                                                </button>
+                                            </div>
+                                        </x-slot>
+                                        <x-slot name="footer">
+                                        </x-slot>
+                                    </x-modal>
+                                @endif
 
                                 @role('admin')
                                     <div onclick="location.href='{{ route('exams.edit', $exam->id) }}';"

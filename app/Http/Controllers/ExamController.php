@@ -76,11 +76,9 @@ class ExamController extends Controller
     {
         $attempt = null;
         if (auth()->user()->hasRole('student')) {
-            $attempt = new Attempt();
-            $attempt->user_id = auth()->id();
-            $attempt->exam_id = $exam->id;
-            $attempt->save();
+            $attempt = Attempt::where('user_id', auth()->id())->where('exam_id', $exam->id)->whereNull('completed_at')->first();
         }
+        
         return view('exams.show', compact('exam', 'attempt'));
     }
 

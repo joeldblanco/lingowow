@@ -14,9 +14,9 @@ class CheckPreviousUrlName
      * @param  \Closure  $next
      * @return mixed
      */
-    public function handle(Request $request, Closure $next, $routeToCheck,$routeToRedirect)
+    public function handle(Request $request, Closure $next, $routeToCheck, $routeToRedirect)
     {
-        //dd($request);
+        // dd($request);
         $routesToCheck = is_array($routeToCheck)
             ? $routeToCheck
             : explode('|', $routeToCheck);
@@ -24,12 +24,12 @@ class CheckPreviousUrlName
         try {
             $routeName = app('router')->getRoutes()->match(app('request')->create(url()->previous()))->getName();
         } catch (\Throwable $th) {
-            if($th->getMessage() == "The GET method is not supported for this route. Supported methods: POST."){
-                $routeName = app('router')->getRoutes()->match(app('request')->create(url()->previous(),'POST'))->getName();
+            if ($th->getMessage() == "The GET method is not supported for this route. Supported methods: POST.") {
+                $routeName = app('router')->getRoutes()->match(app('request')->create(url()->previous(), 'POST'))->getName();
             }
         }
-        
-        if(!in_array($routeName,$routesToCheck)){
+
+        if (!in_array($routeName, $routesToCheck)) {
             return redirect()->route($routeToRedirect);
         }
 
