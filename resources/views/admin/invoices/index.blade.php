@@ -24,7 +24,7 @@
                                 ID</th>
                             <th
                                 class="py-4 px-6 bg-gray-100 font-bold uppercase text-sm text-gray-600 border-b border-gray-400">
-                                Username</th>
+                                Customer</th>
                             <th
                                 class="py-4 px-6 bg-gray-100 font-bold uppercase text-sm text-gray-600 border-b border-gray-400">
                                 Total</th>
@@ -43,7 +43,8 @@
                                     <td class="py-4 px-6 border-b border-gray-400">{{ $invoice->id }}</td>
                                     <td class="py-4 px-6 border-b border-gray-400"><a
                                             href="{{ route('profile.show', $invoice->user->id) }}"
-                                            class="hover:text-blue-600 hover:underline">{{ $invoice->user->username }}</a>
+                                            class="hover:text-blue-600 hover:underline">{{ $invoice->user->first_name }}
+                                            {{ $invoice->user->last_name }}</a>
                                     </td>
                                     <td class="py-4 px-6 border-b border-gray-400">${{ $invoice->price }}</td>
                                     <td class="py-4 px-6 border-b border-gray-400">

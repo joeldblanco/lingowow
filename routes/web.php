@@ -47,6 +47,7 @@ use App\Http\Controllers\WhatsAppController;
 use App\Http\Livewire\ClassesComponent;
 use App\Http\Livewire\NewSchedule;
 use App\Mail\InvoicePaid;
+use App\Models\Classes;
 use App\Models\Enrolment;
 use App\Models\Meeting;
 use App\Models\Post;
@@ -280,6 +281,7 @@ Route::middleware(['web', 'auth', 'verified', 'impersonate'])->group(function ()
 
     //ROUTES FOR RECORDINGS//
     Route::middleware(['role:student'])->get('/recordings', [MeetingController::class, 'getRecordings'])->name('recordings.index');
+    Route::post('/getZoomUser', [MeetingController::class, 'getZoomUser'])->name('getZoomUser');
 
 
 
@@ -341,6 +343,7 @@ Route::middleware(['web', 'auth', 'verified', 'impersonate'])->group(function ()
 
         //EARNINGS//
         Route::get('/admin/earnings', [AnalyticsController::class, 'earnings'])->name('admin.earnings');
+        Route::post('/admin/earnings', [AnalyticsController::class, 'periodEarnings'])->name('admin.earnings');
 
 
 
@@ -472,6 +475,19 @@ Route::middleware(['web', 'auth', 'verified', 'impersonate'])->group(function ()
     Route::middleware(['role:teacher|student'])->get('/classes', ClassesComponent::class)->name('classes.index');
     Route::middleware(['role:admin|student'])->get('/classes/{id}', [ClassController::class, 'edit'])->name('classes.edit');
     Route::middleware(['role:admin|student'])->post('/classes/update', [ClassController::class, 'update'])->name('classes.update');
+    Route::middleware(['role:admin|student'])->post('/classes/complaint', [ClassController::class, 'registerComplain'])->name('classes.complaint');
+    Route::middleware(['role:admin|student'])->get('/classes/complaints/{id}', function ($class_id) {
+        $class = Classes::find($class_id);
+        if (empty($class)) {
+            return abort(404);
+        }
+
+        if ((auth()->user()->hasRole('student') && $class->student()->id == auth()->id()) || auth()->user()->hasRole('admin')) {
+            return view('classes.complaints-form', compact('class_id'));
+        } else {
+            return abort(403, 'Unauthorized action.');
+        }
+    })->name('classes.complaints');
     // Route::middleware(['role:teacher|student'])->post('/classes/check', [ClassController::class, 'checkClasses'])->name('classes.check');
 
     //ROUTES FOR POSTS//

@@ -3,6 +3,7 @@
 namespace App\Http\Livewire;
 
 use App\Http\Controllers\ApportionmentController;
+use App\Http\Controllers\MeetingController;
 use App\Models\Course;
 use App\Models\Product;
 use App\Models\Schedule;
@@ -10,6 +11,7 @@ use App\Models\User;
 use Livewire\Component;
 use Gloudemans\Shoppingcart\Facades\Cart;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class TeachersCarousel extends Component
@@ -89,6 +91,18 @@ class TeachersCarousel extends Component
             $this->available_teachers = User::role('teacher')->whereIn('id', $this->teachers_ids)->where('id', '!=', 7)->get()->pluck('schedules')->flatten()->whereNotNull('selected_schedule')->pluck('user');
         } else {
             $this->available_teachers = User::role('teacher')->whereIn('id', $this->teachers_ids)->get()->pluck('schedules')->flatten()->whereNotNull('selected_schedule')->pluck('user');
+        }
+
+        foreach ($this->available_teachers as $key => $teacher) {
+            $request = new Request([
+                'teacherId' => $teacher->id,
+            ]);
+
+            $inZoom = (new MeetingController)->getZoomUser($request);
+
+            if (!$inZoom) {
+                $this->available_teachers->forget($key);
+            }
         }
 
 

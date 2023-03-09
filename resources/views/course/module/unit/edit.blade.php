@@ -1,7 +1,10 @@
 <x-app-layout>
+
     <div class="bg-white font-sans">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">            
             <div class="p-6 sm:px-20 bg-white border-b border-gray-200">
+                
+                {{ Breadcrumbs::render('units.edit', $unit->id) }}
 
                 <form method="POST" action="{{ route('units.update', $unit->id) }}" enctype="multipart/form-data"
                     class="bg-white rounded-md w-1/2 p-6 my-4 mx-auto border border-gray-400">
@@ -18,9 +21,8 @@
                                 <input type="file" name="image" id="image" class="hidden"
                                     accept=".jpeg,.jpg,.png,.webp">
                                 <label for="image" class="flex items-center text-blue-800 cursor-pointer">
-                                    <img id="preview-image-before-upload"
-                                        src="{{ Storage::url($unit->image) }}" alt="preview image"
-                                        class="object-none w-full max-h-56">
+                                    <img id="preview-image-before-upload" src="{{ Storage::url($unit->image) }}"
+                                        alt="preview image" class="object-none w-full max-h-56">
                                 </label>
                                 <p class="text-gray-500 text-sm font-light">Please select an image for the unit</p>
 
@@ -38,17 +40,17 @@
                                     @endforeach
                                 </select>
                                 @if ($errors->has('module_id'))
-                                    <p class="text-xs font-light text-red-600">{{$errors->get('module_id')[0]}}</p>
+                                    <p class="text-xs font-light text-red-600">{{ $errors->get('module_id')[0] }}</p>
                                 @endif
                                 <p class="text-gray-500 text-sm font-light">Please select a module for the unit</p>
                             </div>
                             <div class="py-4 space-y-1">
                                 <p class="font-bold text-gray-600 mb-1">Name</p>
-                                <input type="text" name="name" id="name"
-                                    value="{{ $unit->name }}" placeholder="Enter unit name" required
+                                <input type="text" name="name" id="name" value="{{ $unit->name }}"
+                                    placeholder="Enter unit name" required
                                     class="w-full rounded-md p-3 text-gray-600 hover:border-gray-600 @if ($errors->has('name')) border-red-600 @else border-gray-300 @endif ">
                                 @if ($errors->has('name'))
-                                    <p class="text-xs font-light text-red-600">{{$errors->get('name')[0]}}</p>
+                                    <p class="text-xs font-light text-red-600">{{ $errors->get('name')[0] }}</p>
                                 @endif
                                 <p class="text-gray-500 text-sm font-light">Please enter unit name</p>
                             </div>
@@ -74,7 +76,7 @@
                                     </option>
                                 </select>
                                 @if ($errors->has('status'))
-                                    <p class="text-xs font-light text-red-600">{{$errors->get('status')[0]}}</p>
+                                    <p class="text-xs font-light text-red-600">{{ $errors->get('status')[0] }}</p>
                                 @endif
                                 <p class="text-gray-500 text-sm font-light">Please select a status for the unit</p>
                             </div>
@@ -91,7 +93,7 @@
         </div>
     </div>
 
-    <script   type="text/javascript">
+    <script type="text/javascript">
         $(document).ready(function(e) {
 
             $('#image').change(function() {

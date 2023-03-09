@@ -6,7 +6,7 @@ use App\Models\Product;
 use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 
-class CoursesCarousel extends Component
+class ProductsCarousel extends Component
 {
 
     public $loadingState = false;
@@ -21,17 +21,17 @@ class CoursesCarousel extends Component
     {
         if (auth()->user()->hasRole('admin')) {
             $this->course_products = Product::whereHas('categories', function ($query) {
-                $query->where('name', 'course');
+                $query->where('name', 'course')->orWhere('name', 'test');
             })->get();
         } else {
             $old_customers = json_decode(DB::table('metadata')->where('key', 'old_customers')->first()->value);
             if (in_array(auth()->id(), $old_customers)) {
                 $this->course_products = Product::whereHas('categories', function ($query) {
-                    $query->where('name', 'course');
+                    $query->where('name', 'course')->orWhere('name', 'test');
                 })->get();
 
                 $this->old_courses_products = Product::whereHas('categories', function ($query) {
-                    $query->where('slug', 'like', '%old%')->where('name', 'course');
+                    $query->where('slug', 'like', '%old%')->where('name', 'course')->orWhere('name', 'test');
                 })->get();
 
                 foreach ($this->old_courses_products as $old_product) {
@@ -39,7 +39,7 @@ class CoursesCarousel extends Component
                 }
             } else {
                 $this->course_products = Product::whereHas('categories', function ($query) {
-                    $query->where('name', 'course');
+                    $query->where('name', 'course')->orWhere('name', 'test');
                 })->get();
 
                 $this->course_products = $this->course_products->reject(function ($model) {
@@ -55,6 +55,6 @@ class CoursesCarousel extends Component
         $this->course_products = $this->course_products->sortBy('id');
         $this->other_products = $this->other_products->sortBy('id');
 
-        return view('livewire.courses-carousel');
+        return view('livewire.products-carousel');
     }
 }

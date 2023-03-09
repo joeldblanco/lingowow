@@ -1,4 +1,4 @@
-<div x-data="{ openToolsPanel: false, enrolmentsModal: false, usersModal: false }" x-cloak>
+<div x-data="{ openToolsPanel: false, enrolmentsModal: false, usersModal: false, unitsUsersModal: @entangle('unitUsersModal') }" x-cloak>
     <div @click="openToolsPanel = !openToolsPanel"
         class="fixed flex justify-center items-center bottom-5 left-5 bg-purple-600 hover:bg-purple-700 p-5 w-16 rounded-full font-bold text-white cursor-pointer">
 
@@ -102,6 +102,57 @@
         <x-slot name="footer"></x-slot>
     </x-modal>
 
+    <x-modal type="info" name="unitsUsersModal" class="p-5 w-1/2 mx-auto">
+        <x-slot name="title"></x-slot>
+        <x-slot name="content" class="p-5">
+            <div class="flex">
+                <p class="text-2xl font-bold w-full text-center my-4">Assign unit to student</p>
+            </div>
+            <div class="space-y-5">
+                <div class="flex flex-col">
+                    <select name="studentToAssociate" id="studentToAssociate" wire:model="studentToAssociate"
+                        class="w-1/2 mx-auto bg-white border border-gray-300 focus:border-indigo-500 focus:bg-white focus:ring-2 focus:ring-indigo-200 text-base outline-none text-gray-700 py-1 px-3 leading-8 transition-colors duration-200 ease-in-out">
+                        {{-- <option value="" class="text-gray-500 font-bold uppercase" disabled selected>
+                            Select a Student</option> --}}
+                        @foreach ($students as $student)
+                            <option value="{{ $student->id }}" selected>{{ $student->first_name }} {{ $student->last_name }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="flex flex-col">
+                    <select name="unitToAssociate" id="unitToAssociate" wire:model="unitToAssociate"
+                        class="w-1/2 mx-auto bg-white border border-gray-300 focus:border-indigo-500 focus:bg-white focus:ring-2 focus:ring-indigo-200 text-base outline-none text-gray-700 py-1 px-3 leading-8 transition-colors duration-200 ease-in-out">
+                        {{-- <option value="" class="text-gray-500 font-bold uppercase" disabled selected>
+                            Select a Unit</option> --}}
+                        @forelse ($courses as $course)
+                            <option value="" class="text-gray-500 font-bold uppercase" disabled>
+                                {{ $course->name }}</option>
+                            @forelse($course->modules->sortBy('order') as $module)
+                                <option value="" class="text-gray-400 uppercase" disabled>-
+                                    {{ $module->name }}</option>
+                                @forelse($module->units->sortBy('order') as $unit)
+                                    @if ($loop->even)
+                                        <option value="{{ $unit->id }}" selected>--- {{ $unit->name }}</option>
+                                    @endif
+                                @empty
+                                    <option value="" disabled>- No Units</option>
+                                @endforelse
+                            @empty
+                                <option value="" disabled>- No Modules</option>
+                            @endforelse
+                        @empty
+                            <option value="" disabled>No Courses</option>
+                        @endforelse
+                    </select>
+                </div>
+                <button wire:click="assignUnitToStudent()"
+                    class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded cursor-pointer">Associate</button>
+            </div>
+        </x-slot>
+        <x-slot name="footer"></x-slot>
+    </x-modal>
+
     <x-modal type="info" name="enrolmentsModal" class="p-5 w-full">
         <x-slot name="title"></x-slot>
         <x-slot name="content" class="p-5">
@@ -185,4 +236,48 @@
         </x-slot>
         <x-slot name="footer"></x-slot>
     </x-modal>
+
+    @if ($success == true)
+        <div class="flex justify-center fixed bottom-5 left-5 z-20" x-data="{ openSuccess: true }" x-show="openSuccess"
+            x-cloak>
+            <div
+                class="w-full px-6 py-3 shadow-2xl flex flex-col items-center border-t sm:w-auto sm:m-4 sm:rounded-lg sm:flex-row sm:border bg-green-600 border-green-600 text-white">
+                <div>
+                    {{ $message }}
+                </div>
+                <div class="flex mt-2 sm:mt-0 sm:ml-4">
+                    <button @click="openSuccess = false"
+                        class="px-3 py-2 hover:bg-green-700 transition ease-in-out duration-300 cursor-pointer">
+                        Dismiss </button>
+                </div>
+            </div>
+        </div>
+        @php
+            $success = false;
+        @endphp
+    @endif
+
+    @if ($error == true)
+        <div class="flex justify-center fixed bottom-5 left-5 z-20" x-data="{ openError: true }" x-show="openError"
+            x-cloak>
+            <div
+                class="w-full px-6 py-3 shadow-2xl flex flex-col items-center border-t sm:w-auto sm:m-4 sm:rounded-lg sm:flex-row sm:border bg-red-600 border-red-600 text-white">
+                <div>
+                    {{ $message }}
+                </div>
+                <div class="flex mt-2 sm:mt-0 sm:ml-4">
+                    <button @click="openError = false"
+                        class="px-3 py-2 hover:bg-red-700 transition ease-in-out duration-300 cursor-pointer">
+                        Dismiss </button>
+                </div>
+            </div>
+        </div>
+        @php
+            $error = false;
+        @endphp
+    @endif
+
+    <div wire:loading>
+        @include('components.loading-state')
+    </div>
 </div>

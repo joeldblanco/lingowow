@@ -131,7 +131,16 @@
                                     } else {
                                         $user_units = auth()
                                             ->user()
-                                            ->units->first()->order;
+                                            ->units->last();
+                                    
+                                        $user_units = $user_units
+                                            ->course()
+                                            ->modules->sortBy('order')
+                                            ->where('order', '<=', $user_units->module->order)
+                                            ->pluck('units')
+                                            ->flatten();
+                                    
+                                        $user_units = $user_units->count() - $user_units->where('module_id',auth()->user()->units->last()->module->id)->where('order','>',auth()->user()->units->last()->order)->count();
                                     }
                                 @endphp
                                 <script>
@@ -199,8 +208,8 @@
                     @endrole
                     @hasanyrole('teacher')
                         {{-- @if (auth()->id() == 7) --}}
-                            @livewire('new-schedule', ['users' => auth()->id(), 'action' => 'teacherShow'])
-                            {{-- @livewire('schedule', ['user_id' => auth()->id(), 'mode' => 'show', 'course_id' => $course_id]) --}}
+                        @livewire('new-schedule', ['users' => auth()->id(), 'action' => 'teacherShow'])
+                        {{-- @livewire('schedule', ['user_id' => auth()->id(), 'mode' => 'show', 'course_id' => $course_id]) --}}
                         {{-- @endif --}}
                     @endrole
                     @role('guest')
@@ -269,11 +278,11 @@
                     @endif
                 @endrole
 
-                @if (!Auth::user()->isImpersonated())
-                    @role('student')
+                {{-- @if (!Auth::user()->isImpersonated()) --}}
+                {{-- @role('student')
                         <livewire:rating-form />
-                    @endrole
-                @endif
+                    @endrole --}}
+                {{-- @endif --}}
 
             </div>
         </div>

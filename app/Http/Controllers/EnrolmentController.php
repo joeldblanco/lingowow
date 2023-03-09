@@ -35,11 +35,11 @@ class EnrolmentController extends Controller
             $query->where('name', 'teacher');
         })->orderBy('first_name')->orderBy('last_name')->get();
 
-        $guests = User::role('guest')->orderBy('first_name')->orderBy('last_name')->get();
+        $users = User::role(['guest','student'])->orderBy('first_name')->orderBy('last_name')->get();
 
         $courses = Course::orderBy('name')->get();
 
-        return view('enrolments.create', compact('teachers', 'courses', 'guests'));
+        return view('enrolments.create', compact('teachers', 'courses', 'users'));
     }
 
     /**
@@ -131,6 +131,8 @@ class EnrolmentController extends Controller
         if (($request->get('student_id') != null) && ($request->get('teacher_id') != null)) {
             User::find($request->get('student_id'))->givePermissionTo('view units');
         }
+
+        GatherController::setGuestsList();
 
         return redirect()->route('enrolments.index');
     }

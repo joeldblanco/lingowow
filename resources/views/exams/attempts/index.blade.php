@@ -35,7 +35,7 @@
                                 <tr class="hover:bg-gray-200">
                                     <td class="py-4 px-6 border-b border-gray-400">{{ $attempt->user->username }}</td>
                                     <td class="py-4 px-6 border-b border-gray-400 text-center">
-                                        {{ $attempt->exam->id }}
+                                        {{ $attempt->exam->title }}
                                     </td>
                                     <td class="py-4 px-6 border-b border-gray-400 text-center">
                                         {{ $attempt->score }}

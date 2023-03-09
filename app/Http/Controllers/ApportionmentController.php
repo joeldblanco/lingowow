@@ -14,14 +14,13 @@ use Illuminate\Support\Facades\DB;
 class ApportionmentController extends Controller
 {
 
-    public static function calculateApportionment($plan, $schedule = null, $course_id = null)
+    public static function calculateApportionment($plan = null, $schedule = null, $course_id = null, $preselection = null)
     {
         // $plan = json_decode($plan);
 
-        if(empty(session('student_id')))
-        {
+        if (empty(session('student_id'))) {
             $user = auth()->user();
-        }else{
+        } else {
             $user = User::find(session('student_id'));
         }
 
@@ -37,7 +36,7 @@ class ApportionmentController extends Controller
         // $product = Course::find($course_id)->products->first();
 
         $today = Carbon::now()->setTimezone('UTC');
-        // $today->addDays(1);
+        $today->addDays(1);
 
         $current_period = ApportionmentController::currentPeriod();
         $next_period = ApportionmentController::nextPeriod();
@@ -60,26 +59,81 @@ class ApportionmentController extends Controller
         //     $schedule_utc[$key][1] = (int)$date_local->copy()->subHours($timezone->offsetHours)->dayOfWeek;
         // }        
 
-        $qty = 0;
-        $days = [];
-        foreach ($schedule as $key => $value) {
-            $day = $value[1];
-            $time = $value[0];
-            $qty += $today->diffInDaysFiltered(function (Carbon $date) use (&$day, &$time, &$days) {
-                if ($date->isDayOfWeek($day)) {
-                    $date->hour = $time;
-                    $date->minute = 0;
-                    $date->second = 0;
-                    array_push($days, $date->toDateTimeString());
-                }
 
-                return $date->isDayOfWeek($day);
-            }, $current_period_end->copy()->addDay()); //It's necessary to add a day '->addDay()' to the end date to include the last day of the period
-        }
 
-        if ($qty <= 0) {
+        if (empty($preselection)) {
             $qty = 0;
             $days = [];
+            foreach ($schedule as $key => $value) {
+                $day = $value[1];
+                $time = $value[0];
+                $qty += $today->diffInDaysFiltered(function (Carbon $date) use (&$day, &$time, &$days) {
+                    if ($date->isDayOfWeek($day)) {
+                        $date->hour = $time;
+                        $date->minute = 0;
+                        $date->second = 0;
+                        array_push($days, $date->toDateTimeString());
+                    }
+
+                    return $date->isDayOfWeek($day);
+                }, $current_period_end->copy()->addDay()); //It's necessary to add a day '->addDay()' to the end date to include the last day of the period
+            }
+
+            if ($qty <= 0) {
+                $qty = 0;
+                $days = [];
+                foreach ($schedule as $key => $value) {
+                    $day = $value[1];
+                    $time = $value[0];
+
+                    $qty += $next_period_start->diffInDaysFiltered(function (Carbon $date) use (&$day, &$time, &$days) {
+
+                        if ($date->isDayOfWeek($day)) {
+                            $date->hour = $time;
+                            $date->minute = 0;
+                            $date->second = 0;
+                            array_push($days, $date->toDateTimeString());
+                        }
+                        // if($date->isDayOfWeek($day)) array_push($days,get_class_methods($date));
+                        return $date->isDayOfWeek($day);
+                    }, $next_period_end->copy()->addDay()); //It's necessary to add a day '->addDay()' to the end date to include the last day of the period
+                }
+            }
+
+            // $teacher_id == null ? session("teacher_id") : $teacher_id;
+            // $teacher_classes = User::find($teacher_id)->teacherClasses;
+
+            //CONSULTA DE CLASES REAGENDADAS EN EL PERIODO ACTUAL PARA RESTAR AL COBRO
+
+
+            $period_start_c = new Carbon($current_period[0]);
+            $period_end_c = new Carbon($current_period[1]);
+
+            $absence = User::find(session('teacher_id'))->teacherClasses()->where('status', 1)->whereBetween('start_date', [$today->toDateTimeString(), ApportionmentController::currentPeriod()[1]])->orderBy('start_date', 'asc')->get()->pluck('start_date');
+
+            // $absence = Classes::select("start_date")
+            //     ->where("status", "1")
+            //     ->whereBetween("start_date", [$period_start_c->subDay()->toDateTimeString(), $period_end_c->toDateTimeString()])
+            //     ->get();
+
+            if ($absence != null) {
+                foreach ($absence as $key => $start_date) {
+                    $absence[$key] = $start_date;
+                }
+                $absence = json_decode($absence);
+            } else {
+                $absence = [];
+            }
+
+            $days_diff = array_diff($days, $absence);
+            $days_diff = array_values($days_diff);
+
+            $qty_diff = sizeof($days_diff);
+        } else {
+
+            $qty = 0;
+            $days = [];
+            $absence = [];
             foreach ($schedule as $key => $value) {
                 $day = $value[1];
                 $time = $value[0];
@@ -94,41 +148,16 @@ class ApportionmentController extends Controller
                     }
                     // if($date->isDayOfWeek($day)) array_push($days,get_class_methods($date));
                     return $date->isDayOfWeek($day);
-                }, $next_period_end->copy()->addDay());//It's necessary to add a day '->addDay()' to the end date to include the last day of the period
+                }, $next_period_end->copy()->addDay()); //It's necessary to add a day '->addDay()' to the end date to include the last day of the period
             }
+
+            $days_diff = array_diff($days, $absence);
+            $days_diff = array_values($days_diff);
+
+            $qty_diff = sizeof($days_diff);
         }
 
-        // $teacher_id == null ? session("teacher_id") : $teacher_id;
-        // $teacher_classes = User::find($teacher_id)->teacherClasses;
-
-        //CONSULTA DE CLASES REAGENDADAS EN EL PERIODO ACTUAL PARA RESTAR AL COBRO
-
-
-        $period_start_c = new Carbon($current_period[0]);
-        $period_end_c = new Carbon($current_period[1]);
-
-        $abcense = User::find(session('teacher_id'))->teacherClasses()->where('status', 1)->whereBetween('start_date', [$today->toDateTimeString(), ApportionmentController::currentPeriod()[1]])->orderBy('start_date', 'asc')->get()->pluck('start_date');
-
-        // $abcense = Classes::select("start_date")
-        //     ->where("status", "1")
-        //     ->whereBetween("start_date", [$period_start_c->subDay()->toDateTimeString(), $period_end_c->toDateTimeString()])
-        //     ->get();
-
-        if ($abcense != null) {
-            foreach ($abcense as $key => $value) {
-                $abcense[$key] = $value->start_date;
-            }
-            $abcense = json_decode($abcense);
-        } else {
-            $abcense = [];
-        }
-
-        $days_diff = array_diff($days, $abcense);
-        $days_diff = array_values($days_diff);
-
-        $qty_diff = sizeof($days_diff);
-
-        return [$qty_diff, $days_diff, $days, $abcense];
+        return [$qty_diff, $days_diff, $days, $absence];
     }
 
     public static function currentPeriod($onlyDate = false)

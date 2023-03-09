@@ -53,16 +53,16 @@
     <x-jet-banner />
 
     @if (session('success'))
-        <div class="flex justify-center fixed bottom-5 left-5 z-20">
+        <div class="flex justify-center fixed bottom-5 left-5 z-20" x-data="{open: true}" x-show="open" x-cloak>
             <div
                 class="w-full px-6 py-3 shadow-2xl flex flex-col items-center border-t sm:w-auto sm:m-4 sm:rounded-lg sm:flex-row sm:border bg-green-600 border-green-600 text-white">
                 <div>
                     {{ session('success') }}
                 </div>
                 <div class="flex mt-2 sm:mt-0 sm:ml-4">
-                    <a @click="open = false"
+                    <button @click="open = false"
                         class="px-3 py-2 hover:bg-green-700 transition ease-in-out duration-300 cursor-pointer">
-                        Dismiss </a>
+                        Dismiss </button>
                 </div>
             </div>
         </div>
@@ -72,16 +72,16 @@
     @endif
 
     @if (session('error'))
-        <div class="flex justify-center fixed bottom-5 left-5 z-20">
+        <div class="flex justify-center fixed bottom-5 left-5 z-20" x-data="{open: true}" x-show="open" x-cloak>
             <div
                 class="w-full px-6 py-3 shadow-2xl flex flex-col items-center border-t sm:w-auto sm:m-4 sm:rounded-lg sm:flex-row sm:border bg-red-600 border-red-600 text-white">
                 <div>
                     {{ session('error') }}
                 </div>
                 <div class="flex mt-2 sm:mt-0 sm:ml-4">
-                    <a @click="open = false"
+                    <button @click="open = false"
                         class="px-3 py-2 hover:bg-red-700 transition ease-in-out duration-300 cursor-pointer">
-                        Dismiss </a>
+                        Dismiss </button>
                 </div>
             </div>
         </div>

@@ -215,7 +215,7 @@ class AttemptController extends Controller
 
                     //Associate the unit to the user.
                     $request = new Request([
-                        'user' => auth()->id(),
+                        'user' => $attempt->user->id,
                         'unit' => $unit->id,
                     ]);
                     (new UnitController)->userAssociate($request);
@@ -242,7 +242,7 @@ class AttemptController extends Controller
 
                     //Associate the unit to the user.
                     $request = new Request([
-                        'user' => auth()->id(),
+                        'user' => $attempt->user->id,
                         'unit' => $unit->id,
                     ]);
                     (new UnitController)->userAssociate($request);
@@ -283,6 +283,66 @@ class AttemptController extends Controller
 
         $attempt->score = Answer::where('attempt_id', $attempt->id)->pluck('score')->sum();
         $attempt->save();
+
+        $exam = $attempt->exam;
+
+        //Check if user passed the exam
+        if ($attempt->score >= $exam->passing_marks) {
+
+            //Get this module's units that are greater than this exam's unit
+            $nextUnits = $exam->unit->course()->units()->where('order', '>', $exam->unit->order)->where('module_id', $exam->unit->module_id)->sortBy('order');
+
+            //Check if there are other units in the same module
+            if (!empty($nextUnits) && $nextUnits->count() > 0) {
+
+                //Check if those units have exams
+                $nextExams = $nextUnits->pluck('exams')->flatten();
+                if ($nextExams->count() > 0) {
+
+                    //Get the first exam's unit
+                    $unit = $nextExams->first()->unit;
+                } else {
+
+                    //Get the last unit of the module
+                    $unit = $nextUnits->last();
+                }
+
+                //Associate the unit to the user.
+                $request = new Request([
+                    'user' => $attempt->user->id,
+                    'unit' => $unit->id,
+                ]);
+                (new UnitController)->userAssociate($request);
+            } else {
+
+                //Get all course's modules that are greater than this exam's unit's module
+                $nextModules = $exam->unit->course()->modules->where('order', '>', $exam->unit->module->order)->sortBy('order');
+                
+                if (!empty($nextModules) && $nextModules->count() > 0) {
+
+                    //Get all exams in the next modules
+                    $nextExams = $nextModules->pluck('units')->flatten()->pluck('exams')->flatten();
+                }
+
+                //Check if there are exams in the next modules
+                if ($nextExams->count() > 0) {
+
+                    //Get the first exam's unit
+                    $unit = $nextExams->first()->unit;
+                } else {
+
+                    //If there are no exams in the next modules, get the last unit of the course
+                    $unit = $exam->unit->course()->units()->last();
+                }
+
+                //Associate the unit to the user.
+                $request = new Request([
+                    'user' => $attempt->user->id,
+                    'unit' => $unit->id,
+                ]);
+                (new UnitController)->userAssociate($request);
+            }
+        }
 
         return redirect()->route('attempt.show', $attempt->id);
     }

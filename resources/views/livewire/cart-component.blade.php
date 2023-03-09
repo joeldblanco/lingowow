@@ -325,14 +325,6 @@
                                         <span class="ml-2 mt-5px">Credit/Debit Card</span>
                                     </button>
                                 </a>
-                                {{-- <a href="{{ route('paypal-checkout') }}">
-                                    <button
-                                        class="flex justify-center w-full px-10 py-3 mt-6 font-bold text-white uppercase rounded-full shadow items-center focus:shadow-outline focus:outline-none"
-                                        style="background-color: #FFCC00; color: #2C2E2F;">
-                                        <i class="fab fa-paypal h-full text-xl"></i>
-                                        <span class="ml-2 mt-5px">PayPal</span>
-                                    </button>
-                                </a> --}}
                                 <!-- Set up a container element for the button -->
                                 <div id="paypal-button-container" class="mt-3"></div>
                             @endif

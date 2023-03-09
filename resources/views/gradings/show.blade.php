@@ -117,7 +117,7 @@
                                                                             $average += $attempt->score;
                                                                             $exams_count++;
                                                                         @endphp
-                                                                    @else
+                                                                    {{-- @else
                                                                         <div class="flex flex-col items-center">
                                                                             <div
                                                                                 class="text-lg font-bold text-gray-700">
@@ -126,7 +126,7 @@
                                                                             <div class="text-2xl font-bold">
                                                                                 -
                                                                             </div>
-                                                                        </div>
+                                                                        </div> --}}
                                                                     @endif
                                                                 @endforeach
                                                             @endif

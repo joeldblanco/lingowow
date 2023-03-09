@@ -104,9 +104,18 @@
                                     <progress id="seekbar" value="0" max="1" class="w-full"></progress>
                                 </div>
                             @endif
-                            <div wire:ignore>
-                                <textarea wire:model.lazy="essay_content" id="essay" class="w-full px-2 py-2 text-gray-700 bg-gray-200 rounded"
+                            <div>
+                                <textarea wire:model="essay.{{ $question->id }}" id="essay" class="w-full px-2 py-2 text-gray-700 bg-white rounded"
                                     placeholder="Write your text here" style="resize: none" rows="4" name="{{ $question->id }}"></textarea>
+
+                                <p class="text-sm w-full text-right">
+                                    @if (isset($essay[$question->id]))
+                                        {{ str_word_count($essay[$question->id]) }}
+                                    @else
+                                        0
+                                    @endif
+                                    WORDS
+                                </p>
                             </div>
                         @endif
                     </div>
@@ -175,10 +184,10 @@
 
                 startTimer();
 
-                tinymce.init({
-                    selector: 'textarea#essay',
-                    plugins: 'wordcount',
-                });
+                // tinymce.init({
+                //     selector: 'textarea#essay',
+                //     plugins: 'wordcount',
+                // });
 
 
 

@@ -25,7 +25,7 @@ class PricingTableComponent extends Component
     {
 
         $product = Product::find($product_id);
-        if ($product->categories->pluck('name')->contains('Course')) {
+        if ($product->categories->pluck('name')->contains('Course') || $product->categories->pluck('name')->contains('Test')) {
             $course = $product->courses()->first();
             session(['selected_course' => $course->id]);
             $this->selectedProduct = $product_id;
@@ -51,20 +51,20 @@ class PricingTableComponent extends Component
 
         if ($enroled && !$deleted) {
 
-            // $current_period = json_decode(DB::table('metadata')->where('key', '=', 'current_period')->first()->value);
-            // $now = Carbon::now();
-            // $current_period_end = new Carbon($current_period->end_date);
+            $current_period = json_decode(DB::table('metadata')->where('key', '=', 'current_period')->first()->value);
+            $now = Carbon::now();
+            $current_period_end = new Carbon($current_period->end_date);
 
-            // if ($enroled->course_id == session('selected_course') && $synchronous && ($now->greaterThan($current_period_end->copy()->subDays(7))) && empty($enroled->preselection)) {
-            //     $course_id = session('selected_course');
-            //     $product = Course::find($course_id)->products->first();
-            //     session(['plan' => $nOfClasses]);
-            //     redirect()->route("schedule.create");
-            // } else {
-            $this->popup_message = "User already enroled in a course.";
-            $this->popup_color = "red";
-            $this->popup = true;
-            // }
+            if ($enroled->course_id == session('selected_course') && $synchronous && ($now->greaterThan($current_period_end->copy()->subDays(7))) && empty($enroled->preselection)) {
+                $course_id = session('selected_course');
+                $product = Course::find($course_id)->products->first();
+                session(['plan' => $nOfClasses, 'preselection' => true]);
+                redirect()->route("schedule.create");
+            } else {
+                $this->popup_message = "User already enroled in a course.";
+                $this->popup_color = "red";
+                $this->popup = true;
+            }
         } else {
             $course_id = session('selected_course');
             $product = Course::find($course_id)->products->first();

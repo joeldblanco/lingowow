@@ -149,7 +149,7 @@
     </div>
 
 
-    <x-modal type="info" name="classDetails">
+    <x-modal type="info" name="classDetails" class="w-1/4 mx-auto">
         <x-slot name="title">
             Details
         </x-slot>
@@ -189,15 +189,20 @@
                 @role('student')
                     @if (
                         !empty($current_class) &&
-                            empty($current_class->rating) &&
                             App\Http\Controllers\ApportionmentController::getPeriod($current_class->start_date) ==
                                 (new Carbon\Carbon(App\Http\Controllers\ApportionmentController::currentPeriod()[0]))->format('F Y'))
-                        @if ($current_class->start_date > Carbon\Carbon::now()->addHours(1))
+                        @if ($current_class->start_date > Carbon\Carbon::now()->addHours(1) && $current_class->status != 1)
                             <a href="{{ route('classes.edit', $current_class->id) }}"
                                 class="bg-green-600 font-semibold text-white p-4 mr-1 rounded-full hover:bg-green-700 focus:outline-none focus:ring shadow-lg hover:shadow-none transition-all duration-300 rescheduling-button"
                                 @click=" classDetails = false">
                                 Request rescheduling
                             </a>
+                        @endif
+                        @if ($current_class->end_date < now())
+                            <p class="text-sm text-center mx-auto inline-block text-gray-600">Any complaints about this
+                                class?<br> Fill out the form <a
+                                    href="{{ route('classes.complaints', $current_class->id) }}"
+                                    class="hover:text-blue-600 underline" @click="classDetails = false">here.</a></p>
                         @endif
                     @endif
                 @endrole
@@ -255,11 +260,11 @@
         </x-slot>
     </x-modal>
 
-    @if (!Auth::user()->isImpersonated())
-        @role('student')
+    {{-- @if (!Auth::user()->isImpersonated()) --}}
+    {{-- @role('student')
             <livewire:rating-form />
-        @endrole
-    @endif
+        @endrole --}}
+    {{-- @endif --}}
     @role('student')
         <x-shepherd-tour tourName="students/classes-tour" role="student" />
     @endrole

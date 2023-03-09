@@ -75,13 +75,11 @@ class ClassroomController extends Controller
 
                         $message2 = "On " . $classes[$key]->format('l') . ' at ' . $classes[$key]->format('g:00 a') . " UTC " . "(" . $classes[$key]->setTimezone(auth()->user()->timezone)->format('l') . " at " . $classes[$key]->setTimezone(auth()->user()->timezone)->format('g:00 a') . " " . auth()->user()->timezone . ").";
 
-                        if ($user == 'student') {
-                            $message1 = "Your next class is in " . $classes[$key]->diffForHumans(['parts' => 2]) . ".";
-                            break;
-                        }
-
                         if ($user == 'teacher') {
                             $message1 = "This student's next class is in " . $classes[$key]->diffForHumans(['parts' => 2]) . ".";
+                            break;
+                        } else {
+                            $message1 = "Your next class is in " . $classes[$key]->diffForHumans(['parts' => 2]) . ".";
                             break;
                         }
                     }
