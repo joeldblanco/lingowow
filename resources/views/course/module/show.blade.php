@@ -1,7 +1,10 @@
 <x-app-layout>
+
     <div class="bg-white font-sans" x-data="{ unitOrExam: false }">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="p-6 sm:px-20 bg-white border-b border-gray-200 units-list">
+
+                {{ Breadcrumbs::render('modules.show', $module->id) }}
 
                 <div class="w-full flex justify-between my-10">
                     <h2 class="text-4xl font-bold text-gray-800 capitalize">My Units</h2>
@@ -121,7 +124,7 @@
                                 </div>
 
 
-                                @if (auth()->id() == 5)
+                                @if (auth()->user()->hasRole('student'))
                                     <x-modal type="info" name="examModal_{{ $exam->id }}"
                                         class="w-6/12 mx-auto">
                                         <x-slot name="title">
@@ -233,7 +236,7 @@
                                     <div class="w-full flex flex-col justify-start">
                                         <div class="my-5 px-5 space-y-4">
                                             <h1 class="text-2xl leading-6 text-blue-800 font-semibold">
-                                                Quiz
+                                                {{ $exam->title }}
                                             </h1>
                                             <p class="text-justify pr-10">{{ $unit->unit_description }}</p>
                                         </div>

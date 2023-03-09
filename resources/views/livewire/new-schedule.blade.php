@@ -32,6 +32,22 @@
         </div>
     @endif
 
+    @if ($errors->has('absenceReason'))
+        <div class="flex justify-center fixed bottom-5 left-5 z-20" x-data="{ open: true }" x-show="open">
+            <div
+                class="w-full px-6 py-3 shadow-2xl flex flex-col items-center border-t sm:w-auto sm:m-4 sm:rounded-lg sm:flex-row sm:border bg-red-600 border-red-600 text-white">
+                <div>
+                    {{ $errors->first('absenceReason') }}
+                </div>
+                <div class="flex mt-2 sm:mt-0 sm:ml-4">
+                    <button @click="open = false"
+                        class="px-3 py-2 hover:bg-red-700 transition ease-in-out duration-300 cursor-pointer">
+                        Dismiss </button>
+                </div>
+            </div>
+        </div>
+    @endif
+
 
     @if (!empty($week))
         <div class="flex w-full justify-end space-x-4">
@@ -63,7 +79,7 @@
                     @endforeach
                 </tr>
             </thead>
-            <tbody class="container">
+            <tbody class="container" id="{{ $users }}">
                 @for ($hour = 0; $hour < 24; $hour++)
                     <tr>
                         <td class="border">{{ Carbon\Carbon::now()->setHour($hour)->format('h:00 A') }}</td>
@@ -79,7 +95,8 @@
         </table>
     </div>
     @if (
-        $action == 'classRescheduling' ||
+        $action == 'schedulePreselection' ||
+            $action == 'classRescheduling' ||
             $action == 'manualEnrolment' ||
             $action == 'scheduleSelection' ||
             $action == 'examScheduling')
@@ -93,7 +110,7 @@
         @endhasanyrole
     @endif
 
-    <div wire:loading>
+    <div wire:loading wire:target="saveSchedule">
         @include('components.loading-state')
     </div>
 
@@ -130,15 +147,16 @@
             studentsInfo = @json($studentsInfo);
             studentsInfo.forEach(student => {
                 student.schedule.forEach(element => {
-                    $('#' + element[0] + '-' + element[1]).html(student.student.first_name + ' ' + student
+                    $('#' + @json($users) + ' #' + element[0] + '-' + element[1]).html(student
+                        .student.first_name + ' ' + student
                         .student.last_name);
                 });
             });
 
 
             var limit;
-            let classForSelected = @json($classForSelected);
-            let classForSelectees = @json($classForSelectees);
+            var classForSelected = @json($classForSelected);
+            var classForSelectees = @json($classForSelectees);
 
             if (@json($limit) == null) {
                 limit = $('.selectee').length;
@@ -282,9 +300,16 @@
                 });
             });
 
-            if (@json($action == 'scheduleSelection') || @json($action == 'classRescheduling') || @json($action == 'manualEnrolment')) {
+            if (@json($action == 'schedulePreselection') || @json($action == 'scheduleSelection') || @json($action == 'classRescheduling') ||
+                @json($action == 'manualEnrolment')) {
                 selection.enable();
             }
+
+            document.addEventListener("DOMContentLoaded", () => {
+                Livewire.hook('element.updated', (el, component) => {
+                    selection.enable();
+                });
+            });
         </script>
     @else
         <script>

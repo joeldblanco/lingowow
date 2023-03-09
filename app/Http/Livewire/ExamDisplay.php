@@ -12,7 +12,7 @@ use Livewire\Component;
 
 class ExamDisplay extends Component
 {
-    public $exam, $question, $total_questions, $index, $answer, $attempt, $startAttempt, $examContent, $essay_content = "";
+    public $exam, $question, $total_questions, $index, $answer, $attempt, $startAttempt, $examContent, $essay = [];
     public $answers = [];
     protected $listeners = ['timerExpired' => 'submitExam'];
 
@@ -55,6 +55,22 @@ class ExamDisplay extends Component
 
 
         $this->dispatchBrowserEvent('startAttempt');
+    }
+
+    public function updatedEssay()
+    {
+        foreach ($this->essay as $question_id => $essay) {
+
+            $question = $this->exam->questions->where('id', $question_id)->first();
+
+            Answer::updateOrCreate([
+                'attempt_id' => $this->attempt->id,
+                'question_id' => $question->id,
+                'score' => $question->marks,
+            ], [
+                'answer' => $essay,
+            ]);
+        }
     }
 
     // public function nextQuestion()
@@ -105,7 +121,7 @@ class ExamDisplay extends Component
         // }
 
         // if (!empty($essay_index))
-        //     $this->answers[$essay_index] = $this->essay_content;
+        //     $this->answers[$essay_index] = $this->essay;
 
         // ksort($this->answers);
 
@@ -127,6 +143,10 @@ class ExamDisplay extends Component
         // $this->answers = array_values($this->answers);
 
         if (!auth()->user()->hasRole('student')) {
+            $answersIds = Answer::where('attempt_id', $this->attempt->id)->get()->pluck('id')->toArray();
+            $this->attempt->answers->whereIn('id', $answersIds)->each(function ($answer) {
+                $answer->delete();
+            });
             $this->attempt->delete();
             return redirect()->route('exams.show', $this->exam->id);
         }
@@ -197,7 +217,7 @@ class ExamDisplay extends Component
 
                     //Associate the unit to the user.
                     $request = new Request([
-                        'user' => auth()->id(),
+                        'user' => $attempt->user->id,
                         'unit' => $unit->id,
                     ]);
                     (new UnitController)->userAssociate($request);
@@ -224,7 +244,7 @@ class ExamDisplay extends Component
 
                     //Associate the unit to the user.
                     $request = new Request([
-                        'user' => auth()->id(),
+                        'user' => $attempt->user->id,
                         'unit' => $unit->id,
                     ]);
                     (new UnitController)->userAssociate($request);

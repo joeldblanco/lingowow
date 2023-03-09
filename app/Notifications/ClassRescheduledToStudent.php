@@ -44,9 +44,9 @@ class ClassRescheduledToStudent extends Notification implements ShouldQueue
         return (new MailMessage)
             ->subject('Class Rescheduled!')
             ->line('Greetings, dear ' . $notifiable->first_name . ' ' . $notifiable->last_name . '.')
-            ->line('We are writing to notify you that your schedule has been successfully updated.')
-            ->line('Click the button below to check your current schedule.')
-            ->action('Check Schedule', route('dashboard'))
+            ->line('We are writing to notify you that your class has been successfully rescheduled.')
+            ->line('Click the button below to check your classes.')
+            ->action('Classes', route('classes.index'))
             ->line('If you have any questions, please contact us through the regular channels.');
     }
 

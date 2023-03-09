@@ -6,12 +6,16 @@ use App\Http\Controllers\SchedulingCalendarController;
 use App\Jobs\StoreSelfEnrolment;
 use App\Models\Classes;
 use App\Models\Enrolment;
+use App\Models\ScheduleReserve;
 use App\Models\User;
+use App\Notifications\ClassRescheduledToStudent;
+use App\Notifications\ClassRescheduledToTeacher;
 use Carbon\Carbon;
+use DateTimeZone;
 use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 use Illuminate\Http\Request;
-
+use Illuminate\Support\Facades\Notification;
 
 class NewSchedule extends Component
 {
@@ -87,7 +91,6 @@ class NewSchedule extends Component
 
 
             case 'scheduleSelection':
-
                 $this->classForSelectees = "available";
                 $this->classForSelected = "available";
 
@@ -99,6 +102,23 @@ class NewSchedule extends Component
 
                 break;
 
+            case 'schedulePreselection':
+
+                $scheduleReservation = ScheduleReserve::where('user_id', auth()->id())->first();
+                if (!empty($scheduleReservation)) {
+                    $scheduleReservation->delete();
+                }
+
+                $this->classForSelectees = "available";
+                $this->classForSelected = "available";
+
+                // Get teacher schedule
+                $this->users = session('first_teacher');
+
+                // Get teacher schedule
+                $this->schedules = $this->utcToLocal($this->getTeachersPreselectionAvailability($this->users));
+
+                break;
             case 'manualEnrolment':
 
                 $this->classForSelectees = "available";
@@ -129,6 +149,7 @@ class NewSchedule extends Component
                 $this->classForSelected = "selected";
 
                 if (!User::withTrashed()->find($users)->trashed()) {
+
                     if (User::find($users)->hasRole('teacher')) {
 
                         // Get teacher schedule
@@ -155,7 +176,13 @@ class NewSchedule extends Component
     public function loadSelectingSchedule($teacherId = null)
     {
         if (!empty($teacherId)) {
-            $this->schedules = $this->utcToLocal($this->getTeachersAvailability($teacherId));
+            if ($this->action == 'scheduleSelection') {
+                $this->schedules = $this->utcToLocal($this->getTeachersAvailability($teacherId));
+            }
+
+            if ($this->action == 'schedulePreselection') {
+                $this->schedules = $this->utcToLocal($this->getTeachersPreselectionAvailability($teacherId));
+            }
         }
 
         // Emit event of schedule updated and send schedule to parent component
@@ -180,6 +207,13 @@ class NewSchedule extends Component
         $academicPeriod = json_decode(DB::table('metadata')->where('key', 'current_period')->first()->value);
         $periodStart = new Carbon($academicPeriod->start_date);
 
+        // $now = Carbon::now('UTC');
+        // $timezone = new DateTimeZone(auth()->user()->timezone);
+        // $now->setTimezone($timezone);
+
+        // $weekStart = $periodStart->copy()->subDay()->addWeeks($week - 1)->subSeconds($timezone->getOffset($now));
+        // $weekEnd = $periodStart->copy()->subDay()->addWeeks($week)->subSeconds($timezone->getOffset($now));
+
         $weekStart = $periodStart->copy()->subDay()->addWeeks($week - 1);
         $weekEnd = $periodStart->copy()->subDay()->addWeeks($week);
 
@@ -196,12 +230,17 @@ class NewSchedule extends Component
 
         // Get teacher's ocassional classes
         $ocassionalClasses = [];
+
         foreach ($teacherEnrolments as $enrolment) {
             if (Classes::where('enrolment_id', $enrolment->id)->where('status', 1)->whereDate('start_date', '>=', $weekStart)->whereDate('start_date', '<', $weekEnd)->count()) {
                 $ocassionalClasses[] = Classes::where('enrolment_id', $enrolment->id)->where('status', 1)->whereDate('start_date', '>=', $weekStart)->whereDate('start_date', '<', $weekEnd)->get()->pluck('start_date')->toArray();
             }
         }
         $ocassionalClasses = array_merge(...$ocassionalClasses);
+
+        $weekStart->diffInHoursFiltered(function (Carbon $date) use (&$ocassionalClasses) {
+            if ($date < now()) array_push($ocassionalClasses, $date->toDateTimeString());
+        }, $weekEnd);
 
         return $ocassionalClasses;
     }
@@ -239,6 +278,41 @@ class NewSchedule extends Component
         }
 
         return $teachersAvailability;
+    }
+
+    public function getTeachersPreselectionAvailability($teachers, $week = null)
+    {
+        // Verify if $teachers is an array and transform it into a collection if it's not
+        is_array($teachers) == true ? $teachers = User::find($teachers) : $teachers = User::find([$teachers]);
+
+        foreach ($teachers as $key => $teacher) {
+
+            // Get students' schedules
+            $nextStudentsSchedules[$key] = $this->getNextStudentsSchedules($teacher->id, false);
+
+            // Get teacher schedule
+            $teacherNextSchedule[$key] = $this->getUserSchedule($teacher->id);
+
+            // Get difference between teacher schedule and students' schedules
+            $teachersPreselectionAvailability[$key] = $this->schedulesDiff($teacherNextSchedule[$key], $nextStudentsSchedules[$key]);
+
+            if (!empty($week)) {
+                // Get teacher's ocassional classes
+                $ocassionalClasses[$teacher->id] = $this->getOcassionalClasses($teacher->id, $week);
+            }
+        }
+        $teachersPreselectionAvailability = array_merge(...$teachersPreselectionAvailability);
+
+        // Remove duplicate schedules
+        $teachersPreselectionAvailability = array_values(array_map("unserialize", array_unique(array_map("serialize", $teachersPreselectionAvailability))));
+
+        if (!empty($week)) {
+            $ocassionalClasses = array_merge(...$ocassionalClasses);
+            $ocassionalClasses = $this->datesToScheduleFormat($ocassionalClasses);
+            $teachersPreselectionAvailability = $this->schedulesDiff($teachersPreselectionAvailability, $ocassionalClasses);
+        }
+
+        return $teachersPreselectionAvailability;
     }
 
     public function getStudentsInfo($teachers)
@@ -301,6 +375,35 @@ class NewSchedule extends Component
         return $getStudentsInfo == true ? $studentsInfo : $studentsSchedules;
     }
 
+    public function getNextStudentsSchedules($teacherId, $getStudentsInfo = false)
+    {
+        // Get teacher enrolments
+        // $preselections = Enrolment::where('teacher_id', 7)->whereNotNull('student_id')->get()->pluck('preselection');
+        $preselections = Enrolment::where('teacher_id', $teacherId)->whereNotNull('student_id')->get()->pluck('preselection')->filter();
+
+        // Get students' schedules and data
+        $studentsSchedules = [];
+        $studentsInfo = [];
+
+        foreach ($preselections as $preselection) {
+            if ($getStudentsInfo == true) {
+                $studentsInfo[] = [
+                    'student' => $preselection->enrolment->student,
+                    'schedule' => $preselection->schedule,
+                ];
+            }
+            $studentsSchedules[] = $preselection->schedule;
+        }
+
+        // Merge students' schedules
+        $studentsSchedules = array_merge(...$studentsSchedules);
+
+        // Remove duplicate schedules
+        $studentsSchedules = array_values(array_map("unserialize", array_unique(array_map("serialize", $studentsSchedules))));
+
+        return $getStudentsInfo == true ? $studentsInfo : $studentsSchedules;
+    }
+
     public function schedulesDiff($scheduleA, $scheduleB)
     {
         $scheduleA = array_map(function ($arr) {
@@ -333,7 +436,7 @@ class NewSchedule extends Component
         // Get first schedule of each user
         $schedules = [];
         foreach ($users as $user) {
-            if (!empty($user->schedules)) {
+            if (!empty($user->schedules->count())) {
                 $schedules[] = $user->schedules->first()->selected_schedule;
             }
         }
@@ -347,30 +450,34 @@ class NewSchedule extends Component
         return $schedules;
     }
 
-    public function utcToLocal($schedule)
+    public function utcToLocal($schedule, $timezone = null)
     {
+        $timezone == null ? $timezone = auth()->user()->timezone : $timezone = $timezone;
+
         // Convert UTC to local time
         $localSchedule = [];
 
         // Get local date and time of the UTC schedule and convert it to array of hour and day of week (0-6)
         $tempDate = Carbon::now();
         foreach ($schedule as $key => $value) {
-            $localDate = Carbon::parse('Next ' . Carbon::now()->copy()->setISODate($tempDate->year, $tempDate->weekOfYear, $value[1])->format('l') . ' at ' . $value[0] . ':00')->timezone(auth()->user()->timezone);
+            $localDate = Carbon::parse('This ' . Carbon::now()->copy()->setISODate($tempDate->year, $tempDate->weekOfYear, $value[1])->format('l') . ' at ' . $value[0] . ':00')->timezone(auth()->user()->timezone);
             $localSchedule[$key] = [$localDate->hour, $localDate->dayOfWeek];
         }
 
         return $localSchedule;
     }
 
-    public function localToUtc($schedule)
+    public function localToUtc($schedule, $timezone = null)
     {
+        $timezone == null ? $timezone = auth()->user()->timezone : $timezone = $timezone;
+
         // Convert local time to UTC
         $utcSchedule = [];
 
         // Get UTC date and time of the local schedule and convert it to array of hour and day of week (0-6)
         $tempDate = Carbon::now();
         foreach ($schedule as $key => $value) {
-            $utcDate = Carbon::parse('Next ' . Carbon::now()->setISODate($tempDate->year, $tempDate->weekOfYear, $value[1])->format('l') . ' at ' . $value[0] . ':00', auth()->user()->timezone)->timezone('UTC');
+            $utcDate = Carbon::parse('This ' . Carbon::now()->setISODate($tempDate->year, $tempDate->weekOfYear, $value[1])->format('l') . ' at ' . $value[0] . ':00', auth()->user()->timezone)->timezone('UTC');
             $utcSchedule[$key] = [$utcDate->hour, $utcDate->dayOfWeek];
         }
         return $utcSchedule;
@@ -392,8 +499,14 @@ class NewSchedule extends Component
 
         // Update schedule
         $user = User::find($this->users);
-        $user->schedules->first()->selected_schedule = $this->localToUtc($schedule);
-        $user->schedules->first()->save();
+        if (!empty($user->schedules->first())) {
+            $user->schedules->first()->selected_schedule = $this->localToUtc($schedule);
+            $user->schedules->first()->save();
+        } else {
+            $user->schedules()->create([
+                'selected_schedule' => $this->localToUtc($schedule),
+            ]);
+        }
 
         // Convert schedule to local time
         $schedule = $this->utcToLocal($this->getUserSchedule($user->id));
@@ -442,6 +555,8 @@ class NewSchedule extends Component
                     // Get class to reschedule
                     $toRescheduleClass = Classes::find($toRescheduleClass);
 
+                    $classOldDate = (new Carbon($toRescheduleClass->start_date))->timezone($toRescheduleClass->teacher()->timezone)->isoFormat('MMMM Do - Oh:00 a');
+
                     // Get new class date
                     $newClassDate = array_merge(...$data);
 
@@ -460,12 +575,17 @@ class NewSchedule extends Component
                     $toRescheduleClass->status = 1;
                     $s = $toRescheduleClass->save();
 
+                    $classNewDate = $toRescheduleClass->start_date->copy()->timezone($toRescheduleClass->teacher()->timezone)->isoFormat('MMMM Do - Oh:00 a');
+                    Notification::sendNow($toRescheduleClass->student(), new ClassRescheduledToStudent());
+                    Notification::sendNow($toRescheduleClass->teacher(), new ClassRescheduledToTeacher($toRescheduleClass->student(), $classOldDate, $classNewDate));
+
+
                     session()->forget('toRescheduleClass');
 
                     if (auth()->user()->hasRole('admin')) {
-                        redirect()->to('admin/classes');
+                        redirect()->to('admin/classes')->with('success', 'Class rescheduled successfully.');
                     } else {
-                        redirect()->to('/classes');
+                        redirect()->to('/classes')->with('success', 'Class rescheduled successfully.');
                     }
                 } else {
                     // Class not found
@@ -496,6 +616,24 @@ class NewSchedule extends Component
                 break;
 
             case 'scheduleSelection':
+
+                if ($this->limit == count($data)) {
+
+                    $schedule = $this->localToUtc($data);
+                    $schedule = $this->utcToLocal($schedule);
+
+                    $request = new Request([
+                        "data" => json_encode($schedule),
+                        "error" => "false",
+                        "action" => $this->action,
+                        "_token" => csrf_token(),
+                    ]);
+
+                    (new SchedulingCalendarController)->checkForTeachers($request);
+                }
+
+                break;
+            case 'schedulePreselection':
 
                 if ($this->limit == count($data)) {
 

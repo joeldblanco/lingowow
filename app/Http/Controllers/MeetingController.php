@@ -208,15 +208,12 @@ class MeetingController extends Controller
         if ($success) {
             Meeting::find($meeting->id)->delete();
             $meetings = Meeting::all();
-            $success = "Meeting deleted successfully";
-            session(['success' => $success]);
-            return view('meetings.index', compact('meetings'));
+            return view('meetings.index', compact('meetings'))->with('success', 'Meeting deleted successfully');
         } else {
 
             $meetings = Meeting::all();
             $error = json_decode($response->getBody(), true);
-            session(['error' => $error]);
-            return view('meetings.index', compact('meetings'));
+            return view('meetings.index', compact('meetings'))->with('error', $error);
         }
     }
 
@@ -327,5 +324,23 @@ class MeetingController extends Controller
 
         // Return the view with the recordings
         return view('meetings.recordings', compact('allRecordings'));
+    }
+
+    public function getZoomUser(Request $request)
+    {
+        $teacher = User::find($request->teacherId);
+        $path = 'users/' . $teacher->email;
+        $url = $this->retrieveZoomUrl();
+
+        $response = Http::withHeaders([
+            'Authorization' => 'Bearer ' . $this->jwt,
+            'Content-Type'  => 'application/json',
+        ])->get($url . $path);
+
+        if ($response->getStatusCode() === 200) {
+            return true;
+        } else {
+            return false;
+        }
     }
 }

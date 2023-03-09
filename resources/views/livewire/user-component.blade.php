@@ -7,7 +7,7 @@
             </a>
         </div>
         <div class="w-full flex justify-end items-center">
-            @if (!$user->trashed())
+            {{-- @if (!$user->trashed())
                 <button wire:click="hide({{ $user->id }})"
                     class="rounded-full my-auto w-10 h-10 bg-white active:bg-gray-200 transition duration-100 ease-in-out flex justify-center items-center">
                     <i class="fas fa-eye m-1 mr-0 text-gray-500"></i>
@@ -17,7 +17,7 @@
                     class="rounded-full w-10 h-10 bg-white active:bg-gray-200 transition duration-100 ease-in-out flex justify-center items-center">
                     <i class="fas fa-eye-slash m-1 mr-0 text-gray-500"></i>
                 </button>
-            @endif
+            @endif --}}
             <button class="rounded-full w-10 h-10 bg-white active:bg-gray-200 transition duration-100 ease-in-out"
                 wire:click="show" @click="showUserInfo = true">
                 <i class="fas fa-info-circle m-1 text-gray-500"></i>
@@ -116,7 +116,7 @@
         </x-slot>
     </x-modal>
 
-    <x-modal type="info" name="showUserInfo">
+    <x-modal type="info" name="showUserInfo" class="w-10/12 mx-auto">
         <x-slot name="title">
         </x-slot>
 
@@ -134,8 +134,8 @@
                     }
                 @endphp
                 
-                @livewire('schedule', ['user_id' => $user->id, 'mode' => 'show', 'course_id' => $course_id])
-                {{-- <livewire:new-schedule :users="$user->id" :action="'adminShow'" :wire:key="$user->id" /> --}}
+                {{-- @livewire('schedule', ['user_id' => $user->id, 'mode' => 'show', 'course_id' => $course_id]) --}}
+                <livewire:new-schedule :users="$user->id" :action="'adminShow'" :wire:key="$user->id" />
             </div>
             @if (count($students) > 0)
                 <table class="flex flex-col w-1/2 space-y-5 border border-gray-200 p-5">

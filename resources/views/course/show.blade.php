@@ -3,6 +3,8 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="p-6 sm:px-20 bg-white border-b border-gray-200 modules-list">
 
+                {{ Breadcrumbs::render('courses.show', $course->id) }}
+
                 <div class="w-full flex justify-between my-10">
                     @if ($course->categories->pluck('name')->contains('Conversational'))
                         <h2 class="text-4xl font-bold text-gray-800 capitalize">My Classrooms</h2>

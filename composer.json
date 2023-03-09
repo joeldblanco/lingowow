@@ -9,6 +9,7 @@
         "aberkanidev/laravel-coupons": "^1.1",
         "barryvdh/laravel-dompdf": "^2.0",
         "beyondcode/laravel-websockets": "^1.13",
+        "davejamesmiller/laravel-breadcrumbs": "^5.3",
         "doctrine/dbal": "^3.4",
         "fideloper/proxy": "^4.4",
         "firebase/php-jwt": "^6.3",

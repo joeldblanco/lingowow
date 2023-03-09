@@ -35,7 +35,7 @@
         }
     </style>
     <h3 class="text-4xl font-bold my-10 text-gray-800">Courses</h3>
-    <div class="courses-carousel flex flex-wrap w-full justify-evenly items-end" {{-- gallery js-flickity  data-flickity-options='{ "wrapAround": true }' wire:ignore --}}>
+    <div class="products-carousel flex flex-wrap w-full justify-evenly items-end" {{-- gallery js-flickity  data-flickity-options='{ "wrapAround": true }' wire:ignore --}}>
         @foreach ($course_products as $product)
             <div class="w-1/3 h-5/6 max-h-" @if ($loop->first) id="course-card" @endif>
                 {{-- <div class="relative bg-white rounded-3xl w-64 my-4 shadow-xl mt-7 mb-2 mx-10 flex flex-col">
@@ -156,6 +156,6 @@
     </script> --}}
 
     {{-- @role('guest')
-        <x-shepherd-tour tourName="guests/courses-carousel" role="guest" />
+        <x-shepherd-tour tourName="guests/products-carousel" role="guest" />
     @endrole --}}
 </div>

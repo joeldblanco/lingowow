@@ -136,8 +136,14 @@ class UnitController extends Controller
 
                 foreach ($user->units as $user_unit) {
                     if ($user_unit->course()->id == $unit_course->id) {
-                        if ($unit->order > $user_unit->order) {
+                        if ($unit->module->order > $user_unit->module->order) {
                             abort(403, 'USER DOES NOT HAVE THE RIGHT PERMISSIONS.');
+                        }
+
+                        if ($unit->module->order == $user_unit->module->order) {
+                            if ($unit->order > $user_unit->order) {
+                                abort(403, 'USER DOES NOT HAVE THE RIGHT PERMISSIONS.');
+                            }
                         }
                     }
                 }

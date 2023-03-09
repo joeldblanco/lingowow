@@ -12,7 +12,11 @@
             @if (!empty($response['code']))
                 <div x-show="open" x-transition.duration.200ms x-data="open" x-init="setTimeout(() => open = false, 3000)"
                     class="py-4 px-4 text-white font-semibold rounded-lg text-center
-                    @if ($response['code'] == 'success') bg-green-500 @else bg-red-500 @endif">
+                    @if ($response['code'] == 'success')
+bg-green-500
+@else
+bg-red-500
+@endif">
                     <span class="font-bold">{{ $response['message'] }}</span>
                 </div>
             @endif
@@ -21,7 +25,7 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 mb-20">
             <div class="p-6 sm:px-20 bg-white border-b border-gray-200">
 
-                <livewire:courses-carousel />
+                <livewire:products-carousel />
 
             </div>
 
@@ -32,7 +36,7 @@
             </div>
         </div>
         @role('guest')
-            <x-shepherd-tour tourName="guests/courses-carousel" role="guest" />
+            <x-shepherd-tour tourName="guests/products-carousel" role="guest" />
         @endrole
     </div>
 

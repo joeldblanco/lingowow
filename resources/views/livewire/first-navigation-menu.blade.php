@@ -33,7 +33,7 @@
         ],
         [
             'name' => 'Gather',
-            'route' => 'https://app.gather.town/invite?token=odIfjNGGT7G4ZWGJXV24',
+            'route' => 'https://app.gather.town/app/NMqppR61QkKUarTd/beach_bar',
             'status' => false,
             'roles' => ['student', 'teacher', 'admin'],
         ],

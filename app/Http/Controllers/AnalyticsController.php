@@ -22,52 +22,26 @@ class AnalyticsController extends Controller
     public function index()
     {
         $current_period = ApportionmentController::currentPeriod();
-        $invoices = Invoice::all();
-        // $invoices = Invoice::whereDate('created_at', '>=', $current_period[0])->whereDate('created_at', '<=', $current_period[1])->get();
-        $total_earnings = 0;
-        $total_invoices = count($invoices);
-        $guests = [];
-        $students = [];
-        $teachers = [];
-        $admins = [];
+        // $current_period = ApportionmentController::getPeriod('2023-02-06', true);
+        $invoices = Invoice::where('created_at', '>=', $current_period[0])->where('created_at', '<=', $current_period[1])->get();
         $payment = [];
         $classes = [];
         $profit = [];
         $paypal_commissions = [];
 
-        $model_roles = DB::table('model_has_roles')->select('role_id', 'model_id')->get();
-        foreach ($model_roles as $model_role) {
-
-            if ($model_role->role_id == 1) {
-                $guests[] = $model_role->model_id;
-            } else if ($model_role->role_id == 2) {
-                $students[] = $model_role->model_id;
-            } else if ($model_role->role_id == 3) {
-                $teachers[] = $model_role->model_id;
-            } else if ($model_role->role_id == 4) {
-                $admins[] = $model_role->model_id;
-            }
-        }
-
-        $total_guests = count($guests);
-        $total_students = count($students);
-        $total_teachers = count($teachers);
-        $total_admins = count($admins);
-
-        // $guests = User::find($guests);
-        // $students = User::find($students);
-        $teachers = User::find($teachers);
-        // $admins = User::find($admins);
-
-        // $current_period = ApportionmentController::currentPeriod();
-        // dd('2022-01-06 12:00:00' >= $current_period[0],'2022-01-06 12:00:00' <= $current_period[1]);
+        $guests = User::role('guest')->get();
+        $students = User::role('student')->get();
+        $teachers = User::role('teacher')->get();
+        $admins = User::role('admin')->get();
 
         foreach ($teachers as $key => $value) {
             $enrolments = Enrolment::where('teacher_id', $value->id)->get();
+            // $enrolments = Enrolment::withTrashed()->where('teacher_id', $value->id)->get();
 
             foreach ($enrolments as $enrolment) {
-                // $monthly_classes = Classes::where('enrolment_id', $enrolment->id)->whereDate('start_date', '>=', $current_period[0])->where('teacher_check', 1)->where('student_check', 1)->count();
-                $monthly_classes = Classes::where('enrolment_id', $enrolment->id)->whereDate('start_date', '>=', $current_period[0])->get()->pluck('rating')->whereNotNull()->count();
+                $monthly_classes = Classes::where('enrolment_id', $enrolment->id)->whereDate('start_date', '>=', $current_period[0])->whereDate('end_date', '<', now())->count();
+                // $monthly_classes = Classes::where('enrolment_id', $enrolment->id)->whereDate('start_date', '>=', $current_period[0])->whereDate('end_date', '<', $current_period[1])->count();
+
                 $product = Course::find($enrolment->course_id)->products->first();
                 if ($product->sale_price == NULL) {
                     $product_price = $product->regular_price;
@@ -87,9 +61,6 @@ class AnalyticsController extends Controller
 
                 $classes[$value->id][] = ($monthly_classes * $teacher_payment);
                 $profit[$value->id][] = ($monthly_classes * $product_price);
-
-                // dd($monthly_classes,$teacher_payment);
-
             }
         }
 
@@ -128,54 +99,32 @@ class AnalyticsController extends Controller
             $total_profit += round($aux_profit[$key], 2);
         }
 
+        $earningsByMonth = Invoice::all()->groupBy(function ($invoice) {
+            return $invoice->created_at->format('M');
+        });
 
-        // $total_classes = 0;
-        // if (isset($data['classes'][$key]))
-        //     foreach ($data['classes'][$key] as $classes) {
-        //         $total_classes += count($classes);
-        //     };
+        $earningsByMonth = $earningsByMonth->map(function ($month) {
+            return $month->sum('price');
+        });
 
-        $total_users = User::count();
-
-        foreach ($invoices as $invoice) {
-            $total_earnings += $invoice->price;
-        }
-
-        if (count($invoices)) $month = $invoices[0]->created_at->month;
-        $month_total = 0;
-        $months_total = [];
-        $months = [];
-
-        foreach ($invoices as $invoice) {
-            if ($month != $invoice->created_at->month) {
-                $month = $invoice->created_at->month;
-                $month_total = 0;
-            }
-
-            array_push($months, (new Carbon($invoice->created_at))->isoFormat("MMM"));
-            $month_total += $invoice->price;
-            $months_total[$month] = $month_total;
-        }
-
-        $months = array_unique($months);
+        $months = Invoice::all()->pluck('created_at')->map(function ($invoice) {
+            return $invoice->format('M');
+        })->unique()->toArray();
 
         $total_exams = Exam::all()->count();
 
         $data = [
-            'total_earnings' => $total_earnings,
-            'total_invoices' => $total_invoices,
-            'total_users' => $total_users,
-            'total_guests' => $total_guests,
-            'total_students' => $total_students,
-            'total_teachers' => $total_teachers,
-            'total_admins' => $total_admins,
+            'total_earnings' => $earningsByMonth->sum(),
+            'total_invoices' => $invoices->count(),
+            'total_users' => User::count(),
+            'total_guests' => $guests->count(),
+            'total_students' => $students->count(),
+            'total_teachers' => $teachers->count(),
+            'total_admins' => $admins->count(),
             'invoices' => $invoices,
             'months' => $months,
-            'months_total' => $months_total,
-            // 'guests' => $guests,
-            // 'students' => $students,
+            'months_total' => $earningsByMonth->toArray(),
             'teachers' => $teachers,
-            // 'admins' => $admins,
             'payment' => $payment,
             'total_payment' => $total_payment,
             'total_profit' => $total_profit,
@@ -259,8 +208,44 @@ class AnalyticsController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function earnings()
+    public function earnings($period = null)
     {
-        //
+        $teachers = User::role('teacher')->get();
+        $synchronousCourses = Course::whereHas('categories', function ($query) {
+            $query->where('name', 'synchronous');
+        })->get();
+        $courses = Course::all();
+        $enrolments = Enrolment::all();
+
+        if($period == null) {
+            $period = ApportionmentController::getPeriod(Carbon::now(), true);
+        }
+        
+        $periodClasses = Classes::whereBetween('start_date', [$period[0], $period[1]])->get();
+
+        $classes = Classes::all();
+        $allPeriods = [];
+        foreach (Classes::all() as $class) {
+            $allPeriods[] = ApportionmentController::getPeriod($class->start_date, true)[0];
+        }
+
+        $allPeriods = array_values(array_unique($allPeriods));
+        foreach ($allPeriods as $key => $period) {
+            $allPeriods[$key] = (new Carbon($period))->isoFormat('MMMM Y');
+        }
+
+        return view('admin.analytics.earnings', compact('teachers', 'synchronousCourses', 'courses', 'enrolments', 'allPeriods', 'periodClasses'));
+    }
+
+    /**
+     * Show the earnings.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function periodEarnings(Request $request)
+    {
+        $period = ClassController::getClassesByPeriod($request->month);
+        
+        return $this->earnings($period);
     }
 }

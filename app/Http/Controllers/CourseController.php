@@ -142,7 +142,8 @@ class CourseController extends Controller
                 $user_module = DB::table('module_user')->select('module_id')->where('user_id', auth()->user()->id)->first();
                 if (!empty($user_module)) {
                     $user_module = Module::findOrFail($user_module->module_id);
-                    $user_modules->push($user_module);
+                    if ($user_module->course_id == $course->id)
+                        $user_modules->push($user_module);
                 }
                 $modules = $user_modules;
             } else {
@@ -151,7 +152,7 @@ class CourseController extends Controller
                         if ($module->order <= $user->units->first()->module->order) {
                             $user_modules->push($module);
                         }
-                    }else{
+                    } else {
                         $user_modules->push($modules->first());
                     }
                 }
@@ -159,7 +160,7 @@ class CourseController extends Controller
             }
         } else if ($role == "teacher") {
             if ($course->categories->pluck('name')->contains('Conversational')) {
-                $user_modules = $user->modules->sortBy('order');
+                $user_modules = $user->modules->where('course_id', $course->id)->sortBy('order');
                 $modules = $user_modules;
             } else {
                 $user_modules = $modules;

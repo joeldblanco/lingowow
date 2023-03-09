@@ -230,7 +230,7 @@ class ClassController extends Controller
             $teacher = User::find($class->teacher()->id);
             // dd(in_array($data, $schedules_reserves[1]),in_array($data, $schedules_reserves[0]), $schedules_reserves[1], $data);
             if (in_array([$data[0], $data[1]], $teacher->studentsSchedules()) || !in_array([$data[0], $data[1]], $teacher->schedules->first()->selected_schedule) || in_array([$data[0], $data[1]], $schedules_reserves[0]) || in_array($data, $schedules_reserves[1])) {
-                session(['message' => "Dear Linguado. That block is not available"]);
+                session(['message' => "Dear Student. That block is not available"]);
                 return redirect()->back();
             }
 
@@ -312,22 +312,24 @@ class ClassController extends Controller
         return $recordings;
     }
 
-    // public function checkClasses(Request $request)
-    // {
-    //     $request = $request->except(['_token', '_method']);
-    //     $role = Auth::user()->roles()->first()->name;
-    //     foreach ($request as $key => $value) {
-    //         $name = explode('_', $key)[0];
-    //         $id = explode('_', $key)[1];
+    public function registerComplain(Request $request)
+    {
+        $request->validate([
+            'subject' => 'required|string',
+            'complaint' => 'required|string',
+            'class_id' => 'required|numeric|exists:App\Models\Classes,id',
+        ]);
+        $request = $request->except(['_token', '_method']);
 
-    //         if ($name == 'teacher' && ($role == "teacher" || $role == "admin")) {
-    //             dispatch(new TeacherClassCheck($id, $value));
-    //         }
+        dd($request);
 
-    //         if ($name == 'student' && ($role == "student" || $role == "admin")) {
-    //             dispatch(new StudentClassCheck($id, $value));
-    //         }
-    //     }
-    //     return redirect()->back();
-    // }
+        return redirect()->route('classes.index');
+    }
+
+    public static function getClassesByPeriod($period)
+    {
+        $period = Carbon::parse('Second monday of ' . $period);
+        
+        return ApportionmentController::getPeriod($period, true);
+    }
 }

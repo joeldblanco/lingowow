@@ -42,7 +42,7 @@ class QuestionController extends Controller
             $request->validate([
                 'exam_id' => 'required|numeric|exists:App\Models\Exam,id',
                 'title' => 'string|max:255',
-                'description' => 'string|max:255',
+                'description' => 'string',
                 // 'type' => 'required',
                 'marks' => 'required|min:0|max:100',
                 'options' => 'array',

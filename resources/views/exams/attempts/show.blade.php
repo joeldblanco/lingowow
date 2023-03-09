@@ -71,7 +71,9 @@
                                 <td
                                     class="py-4 px-6 uppercase text-sm text-gray-600 border-b border-gray-400 text-center">
                                     @if ($question->type == 'multiple-choice')
-                                        {{ json_decode($question->options, true)['option-text-' . strval($question->answer)] }}
+                                        @if (!empty($question->answer))
+                                            {{ json_decode($question->options, true)['option-text-' . strval($question->answer)] }}
+                                        @endif
                                     @endif
                                     @if ($question->type == 'essay' || $question->type == 'speaking')
                                         {{ $answers->where('question_id', $question->id)->first()->score }}
