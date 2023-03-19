@@ -46,9 +46,15 @@ class ClassroomController extends Controller
     {
         // $current_period = ApportionmentController::getPeriod('2022-05-17'); //TO_DELETE
         $current_period = ApportionmentController::currentPeriod();
-        $enrolment = Enrolment::where('student_id', $id)->first();
-        if (isset($enrolment)) {
-            $classes = Classes::where('enrolment_id', $enrolment->id)->whereDate('start_date', '>=', $current_period[0])->orderBy('start_date', 'asc')->get();
+        $enrolments = Enrolment::where('student_id', $id)->get();
+        if (count($enrolments) > 0) {
+            // $classes = Classes::where('enrolment_id', $enrolment->id)->whereDate('start_date', '>=', $current_period[0])->orderBy('start_date', 'asc')->get();
+            // dump($classes);
+            $classes = collect([]);
+            foreach($enrolments as $enrolment){
+                $classes = $classes->merge(Classes::where('enrolment_id', $enrolment->id)->whereDate('start_date', '>=', $current_period[0])->orderBy('start_date', 'asc')->get());
+            }
+
 
             $student = User::find($id);
             $enter_classroom = false;

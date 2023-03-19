@@ -12,8 +12,16 @@
         <div class="bg-white shadow-md rounded my-6">
             {{ $invoices->links() }}
             @foreach ($date as $month_year)
-                <div class="text-3xl font-bold w-full p-2 text-center bg-gray-100">
-                    <p class="bg-white p-4">{{ $month_year }}</p>
+                <div
+                    class="bg-white text-3xl font-bold w-full p-2 text-center flex justify-around border border-gray-200">
+                    <div class="w-3/4">
+                        <p class="p-4">{{ $month_year }}</p>
+
+                    </div>
+                    <div class="w-1/4 flex justify-center items-center">
+                        <a href="#"
+                            class="bg-lw-blue text-white text-sm text-center py-2 px-4 my-auto rounded-lg hover:bg-blue-800">Export</a>
+                    </div>
                 </div>
                 <table class="text-left w-full border-collapse mb-16">
                     <!--Border collapse doesn't work on this site yet but it's available in newer tailwind versions -->

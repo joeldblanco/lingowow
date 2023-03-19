@@ -113,8 +113,17 @@ class AnalyticsController extends Controller
 
         $total_exams = Exam::all()->count();
 
+        $thisMonthEarnings = $invoices->groupBy(function ($invoice) {
+            return $invoice->created_at->format('M');
+        });
+
+        $thisMonthEarnings = $thisMonthEarnings->map(function ($month) {
+            return $month->sum('price');
+        });
+
         $data = [
             'total_earnings' => $earningsByMonth->sum(),
+            'this_month_earnings' => $thisMonthEarnings->sum(),
             'total_invoices' => $invoices->count(),
             'total_users' => User::count(),
             'total_guests' => $guests->count(),
@@ -217,10 +226,10 @@ class AnalyticsController extends Controller
         $courses = Course::all();
         $enrolments = Enrolment::all();
 
-        if($period == null) {
+        if ($period == null) {
             $period = ApportionmentController::getPeriod(Carbon::now(), true);
         }
-        
+
         $periodClasses = Classes::whereBetween('start_date', [$period[0], $period[1]])->get();
 
         $classes = Classes::all();
@@ -245,7 +254,7 @@ class AnalyticsController extends Controller
     public function periodEarnings(Request $request)
     {
         $period = ClassController::getClassesByPeriod($request->month);
-        
+
         return $this->earnings($period);
     }
 }

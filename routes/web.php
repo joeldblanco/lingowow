@@ -428,12 +428,13 @@ Route::middleware(['web', 'auth', 'verified', 'impersonate'])->group(function ()
                     });
 
                     if ($user->enrolments->count()) {
-                        // $user->schedules->where('enrolment_id', $user->enrolments->first()->id)->first()->delete();
-                        $user->enrolments->first()->delete();
-                        if ($user->schedules->first() != null) {
-                            // $user->schedules->first()->next_schedule = null;
-                            $user->schedules->first()->save();
-                            $user->schedules->first()->delete();
+                        foreach ($user->enrolments as $enrolment) {
+                            $enrolment->delete();
+                            if ($user->schedules->count()) {
+                                foreach ($user->schedules as $schedule) {
+                                    $schedule->delete();
+                                }
+                            }
                         }
                     }
 

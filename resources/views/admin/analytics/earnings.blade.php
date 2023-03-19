@@ -152,27 +152,10 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @php
-                        $students = collect();
-                        foreach ($periodClasses as $key => $class) {
-                            $students->push($class->student());
-                        }
-                        $students = $students->unique();
-                    @endphp
-                    @foreach ($students as $student)
+                    @foreach ($periodClasses as $key => $class)
                         <tr class="border">
                             <td class="px-6 py-4 text-sm">{{ $student->first_name }} {{ $student->last_name }}</td>
                             @foreach ($teachers as $teacher)
-                                @php
-                                    $classes = collect([]);
-                                    foreach ($periodClasses as $key => $class) {
-                                        if ($class->teacher()->id == $teacher->id && $class->student()->id == $student->id) {
-                                            $classes->push($class);
-                                        }
-                                    }
-                                    // $classes = $classes->count();
-                                @endphp
-
                                 <td class="px-6 relative @if ($loop->last) pr-8 @endif"
                                     x-data="{ modalDetails: false }" x-cloak>
                                     {{-- @if ($students->count())

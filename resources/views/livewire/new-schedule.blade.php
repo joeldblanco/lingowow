@@ -87,6 +87,20 @@
                             <td id="{{ $hour }}-{{ $key }}"
                                 @if (!empty($date)) data-date="{{ $date[$key] }}" @endif
                                 class="border h-8 bg-gray-100 selectee @if (in_array([$hour, $key], $schedules)) {{ $classForSelected }} @endif">
+
+                                @php
+                                    $count = 0;
+                                    for ($i = 0; $i < count($studentClasses); $i++) {
+                                        if ($studentClasses[$i] === [$hour, $key]) {
+                                            $count++;
+                                        }
+                                    }
+                                @endphp
+
+                                @for ($i = 0; $i < $count; $i++)
+                                    <button class="tooltip button_tooltip"></button>
+                                @endfor
+
                             </td>
                         @endforeach
                     </tr>

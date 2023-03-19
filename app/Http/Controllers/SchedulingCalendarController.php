@@ -466,6 +466,8 @@ class SchedulingCalendarController extends Controller
                         ->first()->value,
                 );
 
+                $old_customers = [];
+
                 $course_products = Course::find($course_id)
                     ->products()
                     ->whereHas('categories', function ($query) {
@@ -553,9 +555,14 @@ class SchedulingCalendarController extends Controller
         $teacher_id = session('teacher_id');
         $schedule_encode = json_encode($schedule);
 
+        if (session()->exists('enrolment_type') && session('enrolment_type') == "manual_enrolment") {
+            $student_id = session('student_id');
+        } else {
+            $student_id = auth()->id();
+        }
 
         $reserve = ScheduleReserve::withTrashed()->updateOrCreate(
-            ['user_id' => auth()->id()],
+            ['user_id' => $student_id],
             ['teacher_id' => $teacher_id, 'selected_schedule' => $schedule_encode, 'type' => $type, 'deleted_at' => null]
             // ['type' => 'exam']
         );
