@@ -37,8 +37,9 @@ class ClassController extends Controller
     {
         $teachers = User::role('teacher')->get();
         $students = User::role('student')->get();
+        $enrolments = Enrolment::all();
 
-        return view('classes.create', compact('teachers', 'students'));
+        return view('classes.create', compact('teachers', 'students', 'enrolments'));
     }
 
     /**
@@ -50,15 +51,16 @@ class ClassController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'teacher_id' => 'required|numeric|exists:App\Models\User,id',
-            'student_id' => 'required|numeric|exists:App\Models\User,id',
+            // 'teacher_id' => 'required|numeric|exists:App\Models\User,id',
+            // 'student_id' => 'required|numeric|exists:App\Models\User,id',
+            'enrolment_id' => 'required|numeric|exists:App\Models\Enrolment,id',
             'date_time' => 'required|date_format:Y-m-d\TH:i',
         ]);
         $date_time = Carbon::parse($request->date_time)->format('Y-m-d H:i:s');
-        $enrolment_id = Enrolment::where('teacher_id', $request->teacher_id)->where('student_id', $request->student_id)->first()->id;
-        $meeting_id = Meeting::where('host_id', $request->teacher_id)->where('atendee_id', $request->student_id)->first()->id;
+        $enrolment = Enrolment::find($request->enrolment_id);
+        $meeting_id = Meeting::where('host_id', $enrolment->teacher->id)->where('atendee_id', $enrolment->student->id)->first()->id;
         Classes::create([
-            'enrolment_id' => $enrolment_id,
+            'enrolment_id' => $enrolment->id,
             'start_date' => $date_time,
             'end_date' => Carbon::parse($date_time)->addMinutes(40)->format('Y-m-d H:i:s'),
             'meeting_id' => $meeting_id,
@@ -329,7 +331,7 @@ class ClassController extends Controller
     public static function getClassesByPeriod($period)
     {
         $period = Carbon::parse('Second monday of ' . $period);
-        
+
         return ApportionmentController::getPeriod($period, true);
     }
 }

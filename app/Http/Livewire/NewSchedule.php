@@ -41,6 +41,7 @@ class NewSchedule extends Component
     public $absenceReason = "";
     public $classForSelected = "";
     public $classForSelectees = "";
+    public $studentClasses = [];
 
     protected $listeners = [
         'updateSchedule',
@@ -83,6 +84,10 @@ class NewSchedule extends Component
             case 'studentShow':
 
                 $this->classForSelected = "selected";
+
+                $this->studentClasses = User::find($users)->studentClasses;
+
+                $this->studentClasses = $this->utcToLocal($this->datesToScheduleFormat($this->studentClasses->where('start_date', '>', now())->pluck('start_date')));
 
                 // Get student schedule
                 $this->schedules = $this->utcToLocal($this->getUserSchedule($users));
@@ -132,6 +137,8 @@ class NewSchedule extends Component
                     $this->schedules = $this->utcToLocal($this->getTeachersAvailability($users));
                 }
 
+                // dd($this->getTeachersAvailability($users));
+
                 break;
 
             case 'classRescheduling':
@@ -141,6 +148,12 @@ class NewSchedule extends Component
 
                 // Get teacher's free blocks
                 $this->schedules = $this->utcToLocal($this->getTeachersAvailability($users, $week));
+
+                // dd($this->schedules);
+                // // Get students' schedules and data
+                // $this->studentsInfo = array_map(function ($arr) {
+                //     return ['student' => $arr['student'], 'schedule' => $this->utcToLocal($arr['schedule'])];
+                // }, $this->getStudentsInfo($users));
 
                 break;
 
@@ -437,7 +450,7 @@ class NewSchedule extends Component
         $schedules = [];
         foreach ($users as $user) {
             if (!empty($user->schedules->count())) {
-                $schedules[] = $user->schedules->first()->selected_schedule;
+                $schedules = $user->schedules->pluck('selected_schedule')->toArray();
             }
         }
 
@@ -589,7 +602,7 @@ class NewSchedule extends Component
                     }
                 } else {
                     // Class not found
-                    // session()->flash('error', 'There was an error rescheduling the class. Please try again.');
+                    session()->flash('error', 'There was an error rescheduling the class. Please try again.');
                 }
 
                 break;

@@ -194,15 +194,15 @@
                     @role('student')
                         @if ($course_modality == 'synchronous')
 
-                            @if (auth()->id() == 9 || auth()->id() == 5)
+                            {{-- @if (auth()->id() == 9 || auth()->id() == 5) --}}
                                 {{-- @php
                                     dd(now()->dayOfWeek);
                                 @endphp --}}
                                 @livewire('new-schedule', ['users' => auth()->id(), 'action' => 'studentShow'])
                                 {{-- @livewire('schedule', ['user_id' => auth()->id(), 'mode' => 'show', 'course_id' => $course_id]) --}}
-                            @else
-                                @livewire('schedule', ['user_id' => auth()->id(), 'mode' => 'show', 'course_id' => $course_id])
-                            @endif
+                            {{-- @else --}}
+                                {{-- @livewire('schedule', ['user_id' => auth()->id(), 'mode' => 'show', 'course_id' => $course_id]) --}}
+                            {{-- @endif --}}
 
                         @endif
                     @endrole

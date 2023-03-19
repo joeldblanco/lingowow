@@ -106,6 +106,7 @@ class StoreSelfEnrolment implements ShouldQueue
             $teacher = User::find(session('teacher_id'));
 
             $enrolment = Enrolment::where('student_id', $student->id)
+                ->where('course_id', $course_id)
                 ->withTrashed()
                 ->first();
 
@@ -131,6 +132,8 @@ class StoreSelfEnrolment implements ShouldQueue
                     }
 
                     return redirect()->route('invoice.show', $invoice->id);
+                } else {
+                    dd("User has an active enrolment in this course.");
                 }
             } else {
                 //CREATING STUDENT'S ENROLMENT (OR UPDATING IT, IN CASE IT ALREADY EXISTS BUT IS SOFTDELETED)//
@@ -138,6 +141,8 @@ class StoreSelfEnrolment implements ShouldQueue
                     ['student_id' => $student->id, 'course_id' => $course_id],
                     ['teacher_id' => $teacher->id, 'deleted_at' => NULL]
                 );
+
+                // dd($enrolment);
             }
 
             // SchedulingCalendarController::store($student->id, $enrolment);
@@ -159,11 +164,11 @@ class StoreSelfEnrolment implements ShouldQueue
             $course = Course::find($course_id);
 
             if ($course->categories->pluck('name')->contains('Conversational')) {
-                dd("Maintenance");
+                // dd("Maintenance");
                 $modules_ids = DB::table('module_user')->select('module_id')->where('user_id', $student->id)->get();
-                $modules = Module::find($modules_ids);
-                $module_id = $modules->where('course_id', $course->id)->first()->id;
-                if (empty($module_id)) {
+                $modules = Module::find($modules_ids->pluck('module_id')->toArray());
+                $module = $modules->where('course_id', $course->id)->first();
+                if (empty($module)) {
                     $order = $course->modules->sortBy('order')->last() == null ? 1 : $course->modules->sortBy('order')->last()->order + 1;
                     $module = Module::create([
                         'name' => $student->first_name . ' ' . $student->last_name . ' - Lesson Room',
@@ -184,7 +189,7 @@ class StoreSelfEnrolment implements ShouldQueue
                         ['module_id' => $module->id, 'user_id' => session('teacher_id')]
                     ]);
                 } else {
-                    $module = Module::find($module_id);
+                    $module = Module::find($module->id);
                     if ($module->course_id)
                         DB::table('module_user')->insertOrIgnore([
                             ['module_id' => $module->id, 'user_id' => $student->id],

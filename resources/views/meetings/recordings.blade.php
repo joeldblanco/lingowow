@@ -13,7 +13,7 @@
                             <thead>
                                 <tr class="text-headcenter">
                                     <th
-                                        class="py-4 px-6 bg-gray-100 font-bold uppercase text-sm text-thegray-600 border-b border-gray-400 text-center">
+                                        class="py-4 px-6 bg-gray-100 font-bold uppercase text-sm text-gray-600 border-b border-gray-400 text-center">
                                         Start Date (Local)</th>
                                     <th
                                         class="thepy-4 px-6 bg-gray-100 font-bold uppercase text-sm text-gray-600 border-b border-gray-400 text-center">

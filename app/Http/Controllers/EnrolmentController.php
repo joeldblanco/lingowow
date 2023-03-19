@@ -35,7 +35,7 @@ class EnrolmentController extends Controller
             $query->where('name', 'teacher');
         })->orderBy('first_name')->orderBy('last_name')->get();
 
-        $users = User::role(['guest','student'])->orderBy('first_name')->orderBy('last_name')->get();
+        $users = User::role(['guest', 'student'])->orderBy('first_name')->orderBy('last_name')->get();
 
         $courses = Course::orderBy('name')->get();
 
@@ -62,6 +62,13 @@ class EnrolmentController extends Controller
                 'teacher_id' => 'required|numeric|exists:App\Models\User,id',
                 'student_id' => 'numeric|exists:App\Models\User,id',
                 'plan' => 'numeric',
+            ]);
+
+            session()->forget([
+                'enrolment_type',
+                'selected_course',
+                'selected_teacher',
+                'student_id',
             ]);
 
             if ($request->student_id == null) {

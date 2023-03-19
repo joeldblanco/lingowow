@@ -17,7 +17,7 @@
                                 </button>
                             </div>
                             <div class="flex space-x-1 text-white text-3xl font-bold mb-3">
-                                <p><span class="mr-1 text-purple-300">$</span>{{ $data['total_earnings'] }}</p>
+                                <p><span class="mr-1 text-purple-300">$</span>{{ $data['this_month_earnings'] }}</p>
                                 <i class="fas fa-arrow-circle-up transform rotate-45 text-2xl text-purple-400"></i>
                             </div>
                             <p class="text-purple-400 text-lg font-bold mb-4">Total Earnings ({{now()->format('M')}})</p>

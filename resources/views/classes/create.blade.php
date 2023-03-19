@@ -11,17 +11,33 @@
                             New Class
                         </p>
                         <div>
-                            {{-- <div class="py-6 space-y-1">
-                                <p class="font-bold text-gray-600 mb-1">Topic</p>
-                                <input type="text" name="topic" id="topic" placeholder="Enter meeting topic"
-                                    required
-                                    class="w-full rounded-md p-3 text-gray-600 hover:border-gray-600 @if ($errors->has('topic')) border-red-600 @else border-gray-300 @endif ">
-                                @if ($errors->has('topic'))
-                                    <p class="text-xs font-light text-red-600">{{ $errors->get('topic')[0] }}</p>
-                                @endif
-                                <p class="text-gray-500 text-sm font-light">Please enter meeting topic</p>
-                            </div> --}}
                             <div class="py-6 space-y-1">
+                                <p class="font-bold text-gray-600 mb-1">Enrolment</p>
+                                <select name="enrolment_id" id="enrolment_id" required
+                                    class="w-full rounded-md hover:border-gray-600 p-3 text-gray-600 @if ($errors->has('enrolment_id')) border-red-600 @else border-gray-300 @endif">
+                                    <option value="none" selected disabled hidden>Select an enrolment</option>
+                                    @foreach ($enrolments as $enrolment)
+                                        <option value="{{ $enrolment->id }}">
+                                            {{-- {{ $enrolment->id }} --}}
+                                            @if (!empty($enrolment->teacher))
+                                                {{ $enrolment->teacher->first_name . ' ' . $enrolment->teacher->last_name }}
+                                            @endif
+                                            @if (!empty($enrolment->teacher) && !empty($enrolment->student))
+                                                -
+                                            @endif
+                                            @if (!empty($enrolment->student))
+                                                {{ $enrolment->student->first_name . ' ' . $enrolment->student->last_name }}
+                                            @endif
+                                            ({{ $enrolment->course->name }})
+                                        </option>
+                                    @endforeach
+                                </select>
+                                @if ($errors->has('teacher_id'))
+                                    <p class="text-xs font-light text-red-600">{{ $errors->get('teacher_id')[0] }}</p>
+                                @endif
+                                <p class="text-gray-500 text-sm font-light">Please select a teacher for the class</p>
+                            </div>
+                            {{-- <div class="py-6 space-y-1">
                                 <p class="font-bold text-gray-600 mb-1">Teacher</p>
                                 <select name="teacher_id" id="teacher_id" required
                                     class="w-full rounded-md hover:border-gray-600 p-3 text-gray-600 @if ($errors->has('teacher_id')) border-red-600 @else border-gray-300 @endif">
@@ -52,14 +68,12 @@
                                     <p class="text-xs font-light text-red-600">{{ $errors->get('student_id')[0] }}</p>
                                 @endif
                                 <p class="text-gray-500 text-sm font-light">Please select an student for the meeting</p>
-                            </div>
+                            </div> --}}
                             <div class="pt-6 pb-2 space-y-1">
                                 <p class="font-bold text-gray-600 mb-1">Date & Time (UTC)</p>
                                 <input type="datetime-local" name="date_time" id="date_time"
-                                    placeholder="Enter meeting date" step="3600"
-                                    {{-- min="{{ now() }}" --}}
-                                    {{-- value="0000-00-00T00:00" --}}
-                                    required
+                                    placeholder="Enter meeting date" step="3600" {{-- min="{{ now() }}" --}}
+                                    {{-- value="0000-00-00T00:00" --}} required
                                     class="w-full rounded-md p-3 text-gray-600 hover:border-gray-600 @if ($errors->has('date_time')) border-red-600 @else border-gray-300 @endif ">
                                 @if ($errors->has('student_id'))
                                     <p class="text-xs font-light text-red-600">{{ $errors->get('student_id')[0] }}</p>

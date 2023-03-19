@@ -59,6 +59,7 @@
                     @hasanyrole('teacher|admin')
                         <th {{-- wire:click="sort('teacher')" --}} class="flex justify-center w-full">Student</th>
                     @endhasanyrole
+                    <th class="flex justify-center w-full">Course</th>
                     <th class="flex justify-center w-full">Class Datetime (Local)</th>
                     @hasanyrole('teacher|admin')
                         <th {{-- wire:click="sort('start_date')" --}} class="flex justify-center w-full">Comments</th>
@@ -95,6 +96,11 @@
                                     {{ $value->student()->last_name }}</a>
                             </td>
                         @endhasanyrole
+                        <td class="flex w-full justify-center">
+                            <a href="{{ route('courses.show', $value->enrolment->course->id) }}"
+                                class="hover:underline hover:text-blue-500">
+                                {{ $value->enrolment->course->name }}</a>
+                        </td>
                         @php
                             $lesson_date = (new Carbon\Carbon($value->start_date))->setTimezone(auth()->user()->timezone);
                         @endphp
