@@ -70,7 +70,7 @@
                                 <input type="hidden" id="selected-categories-input" name="categories">
                                 <select id="categories-select"
                                     class="w-full rounded-md hover:border-gray-600 p-3 text-gray-600 @if ($errors->has('categories')) border-red-600 @else border-gray-300 @endif">
-                                    <option value="">Selecciona una categoría</option>
+                                    <option value="">Select a category</option>
                                     @foreach ($categories as $category)
                                         @if (!$product->categories->pluck('name')->contains($category->name))
                                             <option value="{{ $category->id }}" data-value="{{ $category->id }}">
@@ -104,6 +104,33 @@
                                 @endif
                                 <p class="text-gray-500 text-sm font-light">Please select a course for the product</p>
                             </div>
+                            {{-- <div class="pb-6 space-y-1">
+                                {{ dd($product->features) }}
+                                <p class="font-bold text-gray-600 mb-1">Features</p>
+                                <div id="selected-features" name="selected-features"
+                                    class="bg-white border border-gray-300 rounded p-2"></div>
+                                <input type="hidden" id="selected-features-input" name="features">
+                                <select id="features-select"
+                                    class="w-full rounded-md hover:border-gray-600 p-3 text-gray-600 @if ($errors->has('features')) border-red-600 @else border-gray-300 @endif">
+                                    <option value="">Select a feature</option>
+                                    @foreach ($features as $feature)
+                                        @if (empty($product->features))
+                                            <option value="{{ $feature->id }}" data-value="{{ $feature->id }}">
+                                                {{ $feature->name }}</option>
+                                        @else
+                                            @if (!$product->features->pluck('name')->contains($feature->name))
+                                                <option value="{{ $feature->id }}"
+                                                    data-value="{{ $feature->id }}">
+                                                    {{ $feature->name }}</option>
+                                            @endif
+                                        @endif
+                                    @endforeach
+                                </select>
+                                @if ($errors->has('features'))
+                                    <p class="text-xs font-light text-red-600">{{ $errors->get('features')[0] }}</p>
+                                @endif
+                                <p class="text-gray-500 text-sm font-light">Please select a course for the product</p>
+                            </div> --}}
                         </div>
                     </div>
                     <div class="w-full flex justify-end">
@@ -202,6 +229,40 @@
             console.log($('#selected-courses-input').val());
         });
 
+        // // JavaScript: Escuchar el evento change del select y crear el chip
+        // var selectedFourses = [];
+        // var features = [];
+        // $('#features-select').on('change', function() {
+        //     var option = $(this).find('option:selected');
+        //     var chip = $(
+        //         '<div data-value="' + $(option).data('value') +
+        //         '" class="feature_chip bg-transparent border-2 border-green-500 text-green-500 rounded-full px-2 py-1 m-2 inline-block font-bold">' +
+        //         option.text() +
+        //         '<i class="fas fa-times text-white text-sm rounded-full bg-green-500 close ml-2 px-2 py-1 cursor-pointer"></i></div>'
+        //     );
+        //     $('#selected-features').append(chip);
+        //     features.push(parseInt(option.val()));
+        //     $('#selected-features-input').val(features.join(','));
+        //     option.remove();
+        //     console.log($('#selected-features-input').val());
+        // });
+
+        // //JavaScript: Eliminar el chip seleccionado
+        // $(document).on('click', '.feature_chip i.close', function() {
+        //     var chip = $(this).parent();
+        //     var option = $('<option value="' + chip.attr('data-value') + '" data-value="' + chip.attr(
+        //             'data-value') + '">' + chip.text().trim() +
+        //         '</option>');
+        //     $('#features-select').append(option);
+        //     var index = features.indexOf(parseInt(chip.attr('data-value')));
+        //     if (index > -1) {
+        //         features.splice(index, 1);
+        //     }
+        //     $('#selected-features-input').val(features.join(','));
+        //     chip.remove();
+        //     console.log($('#selected-features-input').val());
+        // });
+
         $(document).ready(function() {
             selectedCategories = @json($product->categories);
             selectedCategories.forEach(element => {
@@ -228,6 +289,19 @@
                 courses.push(element.id);
                 $('#selected-courses-input').val(courses.join(','));
             });
+
+            // selectedFeatures = @json($product->features);
+            // selectedFeatures.forEach(element => {
+            //     var chip = $(
+            //         '<div data-value="' + element.id +
+            //         '" class="feature_chip bg-transparent border-2 border-green-500 text-green-500 rounded-full px-2 py-1 m-2 inline-block font-bold">' +
+            //         element.name +
+            //         '<i class="fas fa-times text-white text-sm rounded-full bg-green-500 close ml-2 px-2 py-1 cursor-pointer"></i></div>'
+            //     );
+            //     $('#selected-features').append(chip);
+            //     features.push(element.id);
+            //     $('#selected-features-input').val(features.join(','));
+            // });
         });
     </script>
 

@@ -35,9 +35,9 @@
         }
     </style>
     <h3 class="text-4xl font-bold my-10 text-gray-800">Courses</h3>
-    <div class="gallery js-flickity courses-carousel" data-flickity-options='{ "wrapAround": true }' wire:ignore>
+    <div class="courses-carousel flex flex-wrap w-full justify-evenly items-end" {{-- gallery js-flickity  data-flickity-options='{ "wrapAround": true }' wire:ignore --}}>
         @foreach ($course_products as $product)
-            <div class="gallery-cell" @if ($loop->first) id="course-card" @endif>
+            <div class="w-1/3 h-5/6 max-h-" @if ($loop->first) id="course-card" @endif>
                 {{-- <div class="relative bg-white rounded-3xl w-64 my-4 shadow-xl mt-7 mb-2 mx-10 flex flex-col">
                     <div class="bg-green-600 w-full p-4 rounded-t-lg text-white">
                         <p class="text-xl font-semibold my-2">{{ $product->name }}</p>
@@ -71,12 +71,12 @@
                         class="inline-block bg-green-600 text-white px-6 py-2 rounded-b-lg hover:bg-green-700">Select</button>
                 </div> --}}
 
-                <div class="relative bg-white rounded-3xl w-96 my-4 shadow-xl mt-7 mb-2 mx-5 flex flex-col">
+                <div class="relative bg-white rounded-3xl my-4 shadow-xl mt-7 mb-2 mx-5 flex flex-col">
                     <div class="container shadow-lg group rounded-md bg-white max-w-sm flex justify-center items-center mx-auto content-div"
                         style="background-image: url('{{ Storage::url($product->image) }}');"
                         onMouseOver="this.style.backgroundImage='linear-gradient(90deg, rgba(50,70,186,0.6) 0%, rgba(28,117,187,0.6) 80%), url({{ Storage::url($product->image) }})'"
                         onMouseOut="this.style.backgroundImage='url({{ Storage::url($product->image) }})'">
-                        <div>
+                        <div class="flex flex-col items-center">
                             <div class="w-full image-cover rounded-t-md blur-xl">
                                 {{-- <div
                                     class="p-2 m-4 w-16 h-16 text-center bg-gray-700 rounded-full text-white float-right fd-cl group-hover:opacity-25">
@@ -85,10 +85,10 @@
                                     <span class="text-xs tracking-wide font-bold uppercase block font-sans">April</span>
                                 </div> --}}
                             </div>
-                            <div class="py-8 px-4 bg-white  rounded-b-md fd-cl group-hover:opacity-25">
+                            <div class="py-8 px-4 bg-white rounded-b-md fd-cl group-hover:opacity-25 w-10/12">
                                 <span
                                     class="block text-lg text-gray-800 font-bold tracking-wide">{{ $product->name }}</span>
-                                <span class="block text-gray-600 text-sm">{{ $product->description }}
+                                {{-- <span class="block text-gray-600 text-sm">{{ $product->description }} --}}
                                 </span>
                             </div>
                         </div>
@@ -96,8 +96,9 @@
                             <span
                                 class="text-3xl font-bold text-white tracking-wider leading-relaxed font-sans">{{ $product->name }}</span>
                             <div class="pt-8 text-center">
-                                <button onclick="selectProduct({{ $product->id }})"
-                                    class="text-center rounded-lg p-4 bg-white  text-gray-700 font-bold text-lg">Select</button>
+                                <button wire:click="selectProduct({{ $product->id }})"
+                                    class="text-center rounded-lg p-4 bg-white  text-gray-700 font-bold text-lg"
+                                    @if ($loop->first) id="select-button" @endif>Select</button>
                             </div>
                         </div>
                     </div>
@@ -107,18 +108,52 @@
 
             </div>
         @endforeach
+        @if (auth()->id() == 5)
+            @foreach ($other_products as $product)
+                <div class="w-1/3 h-5/6 max-h-" @if ($loop->first) id="course-card" @endif>
+
+                    <div class="relative bg-white rounded-3xl my-4 shadow-xl mt-7 mb-2 mx-5 flex flex-col">
+                        <div class="container shadow-lg group rounded-md bg-white max-w-sm flex justify-center items-center mx-auto content-div"
+                            style="background-image: url('{{ Storage::url($product->image) }}');"
+                            onMouseOver="this.style.backgroundImage='linear-gradient(90deg, rgba(50,70,186,0.6) 0%, rgba(28,117,187,0.6) 80%), url({{ Storage::url($product->image) }})'"
+                            onMouseOut="this.style.backgroundImage='url({{ Storage::url($product->image) }})'">
+                            <div class="flex flex-col items-center">
+                                <div class="w-full image-cover rounded-t-md blur-xl">
+                                </div>
+                                <div class="py-8 px-4 bg-white rounded-b-md fd-cl group-hover:opacity-25 w-10/12">
+                                    <span
+                                        class="block text-lg text-gray-800 font-bold tracking-wide">{{ $product->name }}</span>
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="absolute opacity-0 fd-sh group-hover:opacity-100 text-center px-4">
+                                <span
+                                    class="text-3xl font-bold text-white tracking-wider leading-relaxed font-sans">{{ $product->name }}</span>
+                                <div class="pt-8 text-center">
+                                    <button wire:click="selectProduct({{ $product->id }})"
+                                        class="text-center rounded-lg p-4 bg-white  text-gray-700 font-bold text-lg"
+                                        @if ($loop->first) id="select-button" @endif>Select</button>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+            @endforeach
+        @endif
     </div>
     <div wire:loading>
         @include('components.loading-state')
     </div>
-    <script>
+    {{-- <script>
         async function selectProduct(object) {
             // console.log(object);
             @this.selectProduct(object);
             // await new Promise(r => setTimeout(r, 1000));
             window.location = '#plans';
         }
-    </script>
+    </script> --}}
 
     {{-- @role('guest')
         <x-shepherd-tour tourName="guests/courses-carousel" role="guest" />

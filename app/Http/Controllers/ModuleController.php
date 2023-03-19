@@ -87,7 +87,15 @@ class ModuleController extends Controller
             }
         } else if ($role == "student") {
             $module_units  = $module->units->where('status', 1)->sortBy('order');
-            $user_units = $module_units->where('order', '<=', $user->units->first()->order);
+            if ($user->units->count() > 0) {
+                $user_units = $module_units->where('order', '<=', $user->units->first()->order);
+            } else {
+                if ($module->course->categories->pluck('name')->contains('Conversational')) {
+                    $user_units = $module_units;
+                } else {
+                    $user_units = new Collection([$module_units->first()]);
+                }
+            }
         } else if ($role == "guest") {
 
             if ($user->hasPermissionTo('view units')) {

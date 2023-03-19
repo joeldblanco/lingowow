@@ -11,12 +11,26 @@ const tour = new Shepherd.Tour({
 
 tour.addSteps([
     {
-        id: 'Teacher_tour',
-        text: "By clicking on your teacher's name, you can go directly to his or her user profile.",
-        attachTo: {
-            element: '.teacher-tour',
-            on: 'top'
-        },
+        id: 'classes_welcome',
+        text: "Welcome to your classes page! 🎉 This is where you'll find all the information related to your classes in one place. From class dates to class recordings, it's all here. Let's take a look! 🔍",
+        // attachTo: {
+        //     element: '.teacher-tour',
+        //     on: 'top'
+        // },
+        buttons: [
+            {
+                text: 'Next!',
+                action: tour.next
+            }
+        ],
+    },
+    {
+        id: 'teacher_tour',
+        text: "📝 On the left side, you'll see the teacher's name and a link to their profile. On the right side, you'll find the class date and time. 🕰️ This way, you'll have all the important details at a quick glance. 🔍",
+        // attachTo: {
+        //     element: '.teacher-tour',
+        //     on: 'top'
+        // },
         buttons: [
             {
                 text: 'Next!',
@@ -26,9 +40,23 @@ tour.addSteps([
     },
     {
         id: 'Class_tour',
-        text: 'You can view the details of your class by clicking directly on the class date.',
+        text: "👀 To view the details of a class, simply click on the class date. 💡 That's all it takes to access important information about your class. 🔍",
         attachTo: {
             element: '.class-tour',
+            on: 'top'
+        },
+        buttons: [
+            {
+                text: 'Okay!',
+                action: tour.next
+            }
+        ],
+    },
+    {
+        id: 'class_recordings',
+        text: "📹 By clicking here you'll have access to all the available recordings along with the password to view each recording, right there on the same page. 💡 <br><br>Keep in mind, the recordings will only be available for 7 days. 📅",
+        attachTo: {
+            element: '.class-recordings',
             on: 'top'
         },
         buttons: [
@@ -37,7 +65,7 @@ tour.addSteps([
                 action: tour.complete
             }
         ],
-    }
+    },
 ]);
 
 function start() {

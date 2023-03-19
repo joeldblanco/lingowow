@@ -1,12 +1,9 @@
 <div>
     <x-jet-dialog-modal wire:model="showModalMenuUsers">
-
         <x-slot name="title">
             <div class="w-full center-h">Select one student</div>
         </x-slot>
-
         <x-slot name="content">
-
             <div class="mb-2">
                 <div class="w-full center-h title-activity">STUDENTS</div>
                 <div class="w-full center-h">
@@ -28,27 +25,20 @@
                             </div>
                         @endif
                     @endforeach
-
                     {{-- <div id="mark_the_word" class="w-full center-h card-menu">Mark the words</div>
                     <div id="find_the_word" class="w-full center-h card-menu">Find the words</div> --}}
                 </div>
             </div>
-
-
         </x-slot>
-
         <x-slot name="footer">
             <button class="btn-assign-close">Close</button>
         </x-slot>
-
     </x-jet-dialog-modal>
 
     <x-jet-dialog-modal wire:model="showModalConfirm">
-
         <x-slot name="title">
             <div class="w-full center-h">Confirm?</div>
         </x-slot>
-
         <x-slot name="content">
             @if (!empty($activity))
                 <div class="mb-2">
@@ -57,10 +47,7 @@
                         {{ $student_assign->first_name }} {{ $student_assign->last_name }}?</div>
                 </div>
             @endif
-
-
         </x-slot>
-
         <x-slot name="footer">
             <div class="flex justify-center gap-x-5 mt-5">
                 <button class="btn-black-outliner btn-assign-student-confirm">Confirm</button>
@@ -68,19 +55,16 @@
             </div>
             {{-- <button class="">Cancel</button> --}}
         </x-slot>
-
     </x-jet-dialog-modal>
 
     <x-jet-dialog-modal wire:model="showModalDelete">
-
         <x-slot name="title">
             <div class="w-full center-h">Delete?</div>
         </x-slot>
 
-        @if (!empty($activity))
-            {{ dd($activity) }}
-            <x-slot name="content">
-
+        {{-- {{ dd($activity) }} --}}
+        <x-slot name="content">
+            @if (!empty($activity))
                 <div class="mb-2">
                     <div class="w-full center-h">Do you want to delete this activity ?</div>
                     <br>
@@ -89,11 +73,10 @@
                         <div>Unit: {{ $activity->unit->unit_name }}</div>
                     </div>
                 </div>
-
-
-            </x-slot>
-
-            <x-slot name="footer">
+            @endif
+        </x-slot>
+        <x-slot name="footer">
+            @if (!empty($activity))
                 <div class="flex justify-center gap-x-5 mt-5">
                     {{-- <button class="btn-black-outliner btn-assign-student-confirm">Delete</button> --}}
                     <form action="{{ route('activities.destroy', $activity->id) }}" method="POST">
@@ -103,9 +86,9 @@
                     </form>
                     <button class="btn-black-outliner btn-assign-student-close">Cancel</button>
                 </div>
-                {{-- <button class="">Cancel</button> --}}
-            </x-slot>
-        @endif
+            @endif
+            {{-- <button class="">Cancel</button> --}}
+        </x-slot>
 
     </x-jet-dialog-modal>
 </div>

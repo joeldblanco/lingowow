@@ -73,6 +73,7 @@ class ClassController extends Controller
         $enrolment = Enrolment::find($class->enrolment_id);
         $teacher_id = $enrolment->teacher_id;
         $student_id = $enrolment->student_id;
+        session(['teacher_id' => $teacher_id]);
 
         $class_date = $class->start_date;
         $class_date = new Carbon($class_date);
@@ -190,13 +191,20 @@ class ClassController extends Controller
         if ($request->error == "false") {
             // $request->data = explode(',', $request->data);
             $id = $request->id;
-            $message = "Class rescheduled for the following reason: " . $request->message;
             $request->data = json_decode($request->data);
             $data = array_filter($request->data);
             $data = array_merge(...array_values($data));
-
             $class = Classes::find($id); //Ubico la clase, para sacar el id del profesor;
-            
+
+
+            $teacher = User::find(session('teacher_id'));
+            $timezone = Carbon::now()->setTimezone($teacher->timezone);
+            $schedule = [$data[0], $data[1]];
+            $date = Carbon::now();
+            $date_local = Carbon::parse('Next ' . Carbon::now()->setISODate($date->year, $date->weekOfYear, $schedule[1])->format('l') . ' at ' . $schedule[0] . ':00');
+            $data[0] = (int)$date_local->copy()->subHours($timezone->offsetHours)->hour;
+            $data[1] = (int)$date_local->copy()->subHours($timezone->offsetHours)->dayOfWeek;
+
             $schedules_reserves = ScheduleReserve::schedulesReserves($class->teacher()->id); // Posicion 0 para los horarios normales, Posicion 1 para los horarios de un solo dia.
             $teacher = User::find($class->teacher()->id);
             // dd(in_array($data, $schedules_reserves[1]),in_array($data, $schedules_reserves[0]), $schedules_reserves[1], $data);
@@ -204,17 +212,18 @@ class ClassController extends Controller
                 session(['message' => "Dear Linguado. That block is not available"]);
                 return redirect()->back();
             }
-            dd($request->data, $data);
-            
+
 
             $newDateStart = Carbon::create((new Carbon())->year, $data[3], $data[4], $data[0]);
             $newDateStart = $newDateStart->toDateTimeString();
             $newDateEnd = Carbon::create((new Carbon())->year, $data[3], $data[4], $data[0])->addMinutes(40);
             $newDateEnd = $newDateEnd->toDateTimeString();
 
+            $message = "Class rescheduled for the following reason: " . $request->message . ". Original date: " . $class->start_date . " - " . "New date: " . $newDateStart . ".";
+
             $class->start_date = $newDateStart;
             $class->end_date = $newDateEnd;
-            //ESTATUS ONE, MEANS THAT SOMEONE ABCENSES A CLASS
+            //STATUS ONE, MEANS THAT SOMEONE ABCENSES A CLASS
             $class->status = 1;
             $class->save();
 

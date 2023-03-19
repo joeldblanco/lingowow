@@ -38,7 +38,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Notification;
 use App\Http\Controllers\MeetingController;
 use App\Http\Controllers\PaymentController;
-use App\Http\Controllers\PaypalController;
+use App\Http\Controllers\PlanController;
+// use App\Http\Controllers\PaypalController;
 use App\Http\Controllers\ProductController;
 use App\Models\Attempt;
 use App\Http\Controllers\UploadImages;
@@ -52,6 +53,11 @@ use App\Models\Unit;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Mail;
+use Laravel\Jetstream\Jetstream;
+// use Inertia\Inertia;
+use Illuminate\Support\Str;
+
+
 
 /*
 |--------------------------------------------------------------------------
@@ -101,7 +107,22 @@ Route::middleware(['web', 'auth', 'verified', 'impersonate'])->group(function ()
 
 
 
-    Route::get('chatwoot/createContact', [ChatwootController::class, 'createContact']);
+    // ROUTES FOR GENERAL GUIDELINES AND GUIDELINES FOR CLASS RECOVERY
+    Route::get('/guidelines', function () {
+        $guidelines = Jetstream::localizedMarkdownPath('guidelines.md');
+        $guidelines = Str::markdown(file_get_contents($guidelines));
+
+        return view('guidelines', compact('guidelines'));
+    })->name('guidelines');
+
+    Route::get('/guidelines-for-class-recovery', function () {
+        $classRecovery = Jetstream::localizedMarkdownPath('class_recovery.md');
+        $classRecovery = Str::markdown(file_get_contents($classRecovery));
+
+        return view('class_recovery', compact('classRecovery'));
+    })->name('guidelines-for-class-recovery');
+
+    // Route::get('chatwoot/createContact', [ChatwootController::class, 'createContact']);
 
 
 
@@ -167,6 +188,8 @@ Route::middleware(['web', 'auth', 'verified', 'impersonate'])->group(function ()
 
     Route::post('units/sort', [UnitController::class, 'sort'])->name('units.sort');
     Route::get('/units/{unit}/details', [UnitController::class, "details"])->name('units.details');
+    Route::middleware(['role:admin'])->get('admin/units/association', [UnitController::class, 'userAssociation'])->name('units.association');
+    Route::middleware(['role:admin'])->post('admin/units/associate', [UnitController::class, 'userAssociate'])->name('units.associate');
 
 
 
@@ -217,11 +240,13 @@ Route::middleware(['web', 'auth', 'verified', 'impersonate'])->group(function ()
 
 
     //ROUTES FOR EXAMS//
-    Route::get('/exam/{id}', [ExamController::class, 'display'])->name('exam.display');
+    Route::get('/exams/{id}', [ExamController::class, 'display'])->name('exam.display');
     //ROUTES FOR ATTEMPTS//
     Route::get('/attempts/{user}', [AttemptController::class, 'index'])->name('attempt.index');
     Route::get('/attempt/{id}', [AttemptController::class, 'show'])->name('attempt.show');
     Route::get('/attempt/{attempt_id}/question/{question_id}', [AttemptController::class, 'show_question'])->name('attempt.show_question');
+    Route::middleware(['role:admin|teacher'])->get('/exam/create', [ExamController::class, 'create'])->name('exams.create');
+
 
 
 
@@ -246,6 +271,13 @@ Route::middleware(['web', 'auth', 'verified', 'impersonate'])->group(function ()
 
         //ROUTES FOR PRODUCTS//
         Route::resource('admin/products', ProductController::class);
+
+
+
+
+
+        //ROUTES FOR PLANS//
+        Route::resource('admin/plans', PlanController::class);
 
 
 
@@ -312,6 +344,8 @@ Route::middleware(['web', 'auth', 'verified', 'impersonate'])->group(function ()
 
         //ROUTES FOR EXAMS//
         Route::resource('/admin/exam', ExamController::class);
+        // Route::middleware(['role:admin'])->get('/exam/index', [ExamController::class, 'index'])->name('exam.index');
+        // Route::middleware(['role:admin|teacher'])->get('/exam/create', [ExamController::class, 'create'])->name('exam.create');
         Route::get('/exam/{id}/details', [ExamController::class, "details"])->name('exam.details');
 
 
@@ -378,6 +412,7 @@ Route::middleware(['web', 'auth', 'verified', 'impersonate'])->group(function ()
                     }
 
                     $user->removeRole('student');
+                    $user->revokePermissionTo('view units');
                     $user->assignRole('guest');
                 }
             }
@@ -397,13 +432,13 @@ Route::middleware(['web', 'auth', 'verified', 'impersonate'])->group(function ()
         Route::get('gather/get_guests_list', [GatherController::class, 'getGuestsList']);
         Route::get('gather/set_guests_list', [GatherController::class, 'setGuestsList']);
 
-        Route::resource('api/paypal', PayPalController::class);
+        // Route::resource('api/paypal', PayPalController::class);
 
         Route::get('/admin/exam/result/{id}', [ExamController::class, 'correct'])->name('exam.result');
     });
 
     //ROUTES FOR NEW PAYPAL API//
-    Route::resource('api/paypal', PaypalController::class);
+    // Route::resource('api/paypal', PaypalController::class);
 
     Route::get('activities', [ActivityController::class, 'index'])->name('activities.index');
     Route::get('activities/{id}', [ActivityController::class, 'show'])->name('admin.activities.show');
@@ -411,10 +446,10 @@ Route::middleware(['web', 'auth', 'verified', 'impersonate'])->group(function ()
     Route::get('/users/stop-impersonation', [UsersController::class, 'stopImpersonation'])->name('stopImpersonation');
 
     //ROUTES FOR CLASSES//
-    Route::get('/classes', ClassesComponent::class)->name('classes.index');
-    Route::get('/classes/{id}', [ClassController::class, 'edit'])->name('classes.edit');
-    Route::post('/classes/update', [ClassController::class, 'update'])->name('classes.update');
-    // Route::post('/classes/check', [ClassController::class, 'checkClasses'])->name('classes.check');
+    Route::middleware(['role:teacher|student'])->get('/classes', ClassesComponent::class)->name('classes.index');
+    Route::middleware(['role:admin|student'])->get('/classes/{id}', [ClassController::class, 'edit'])->name('classes.edit');
+    Route::middleware(['role:admin|student'])->post('/classes/update', [ClassController::class, 'update'])->name('classes.update');
+    // Route::middleware(['role:teacher|student'])->post('/classes/check', [ClassController::class, 'checkClasses'])->name('classes.check');
 
     //ROUTES FOR POSTS//
     Route::post('/post/store', [PostController::class, 'store'])->name('post.store');

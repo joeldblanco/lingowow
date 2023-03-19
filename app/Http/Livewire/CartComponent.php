@@ -93,7 +93,7 @@ class CartComponent extends Component
 
         dispatch(new StoreSelfEnrolment($this->user));
 
-        return redirect()->route('invoices.show', session('invoice_id'));
+        return redirect()->route('invoice.show', session('invoice_id'));
     }
 
     public function updated($propertyName)

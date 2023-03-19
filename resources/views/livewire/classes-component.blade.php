@@ -41,7 +41,7 @@
                     @hasanyrole('teacher|admin')
                         <th {{-- wire:click="sort('teacher')" --}} class="flex justify-center w-full">Student</th>
                     @endhasanyrole
-                    <th class="flex justify-center w-full">Class Date</th>
+                    <th class="flex justify-center w-full">Class Datetime (Local)</th>
                     @hasanyrole('teacher|admin')
                         <th {{-- wire:click="sort('start_date')" --}} class="flex justify-center w-full">Comments</th>
                     @endhasanyrole
@@ -78,9 +78,9 @@
                             </td>
                         @endhasanyrole
                         @php
-                            $lesson_date = new Carbon\Carbon($value->start_date);
+                            $lesson_date = (new Carbon\Carbon($value->start_date))->setTimezone(session('session_info')['timezone']['id']);
                         @endphp
-                        @if ($lesson_date->lt(Carbon\Carbon::now()))
+                        @if ($lesson_date->lt(Carbon\Carbon::now(session('session_info')['timezone']['id'])))
                             <td class="flex w-full justify-center text-red-500 cursor-pointer hover:underline class-tour"
                                 wire:click="showClass({{ $value->id }})">
                                 {{ $lesson_date->format('d/m/Y - h:00 a') }}
@@ -270,7 +270,7 @@
 
     {{-- <script src="{{ asset('js/jquery.datetimepicker.full.min.js') }}"></script> --}}
 
-    @php
+    {{-- @php
         $tourReschedulingButton = DB::table('shepherd_users')
             ->where('user_id', auth()->id())
             ->where('tour_name', 'students/rescheduling-button')
@@ -281,6 +281,6 @@
         @role('student')
             <x-shepherd-tour tourName="students/rescheduling-button" role="student" />
         @endrole
-    @endif
+    @endif --}}
 
 </div>

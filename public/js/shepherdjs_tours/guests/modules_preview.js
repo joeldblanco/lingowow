@@ -12,7 +12,7 @@ const tour = new Shepherd.Tour({
 tour.addSteps([
     {
         id: 'modules-list',
-        text: 'All our courses are divided into modules and each module has a number of units. The available modules will be listed here.',
+        text: 'All our courses are divided into convenient modules with multiple units. Take a look at the available modules here. ⬇️',
         attachTo: {
             element: '.modules-list',
             on: 'top'
@@ -27,14 +27,14 @@ tour.addSteps([
     },
     {
         id: 'first-module',
-        text: 'Click on the name of free module to preview it.',
+        text: 'Click on the name of this module to preview it.👀',
         attachTo: {
             element: '.first-module',
             on: 'top'
         },
         buttons: [
             {
-                text: 'Thanks!',
+                text: 'Great! 💪',
                 action: tour.complete
             }
         ]

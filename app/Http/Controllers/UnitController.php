@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Course;
+use App\Models\Enrolment;
 use App\Models\Module;
 use App\Models\Unit;
 use App\Models\User;
@@ -128,12 +130,11 @@ class UnitController extends Controller
                     }
                 } else {
                     //REVISAR QUE EL CURSO DE LA UNIDAD SOLICITADA SE ENCUENTRE ENTRE LOS CURSOS A LOS QUE EL ESTUDIANTE ESTÁ INSCRITO
-                    $student_courses = $user->enrolments->pluck('course');
+                    $student_courses = Enrolment::withTrashed()->where('student_id', $user->id)->get()->pluck('course');
                     $unit = Unit::findOrFail($id);
                     $unit_course = $unit->course();
                     if ($student_courses->contains($unit_course)) {
                         //REVISAR QUE EL ORDEN DE LA UNIDAD SOLICITADA SEA IGUAL O MENOR AL ORDEN DE LA UNIDAD DEL ESTUDIANTE
-
                         foreach ($user->units as $user_unit) {
                             if ($user_unit->course()->id == $unit_course->id) {
                                 if ($unit->order > $user_unit->order) {
@@ -260,5 +261,44 @@ class UnitController extends Controller
             }
         }
         return redirect()->route('modules.details', $request->module_id);
+    }
+
+
+    /**
+     * Show the form to associate users with units
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function userAssociation()
+    {
+        $users = User::whereHas('roles', function ($query) {
+            $query->where('name', 'student');
+        })->orderBy('first_name')->get();
+        $courses = Course::all();
+
+        return view('course.module.unit.userAssociation', compact('users', 'courses'));
+    }
+
+    /**
+     * Associate users with units
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function userAssociate(Request $request)
+    {
+        $request->validate([
+            'user' => 'required|numeric|exists:App\Models\User,id',
+            'unit' => 'required|numeric|exists:App\Models\Unit,id',
+        ]);
+
+        $user = User::find($request->user);
+        $user->units()->detach();
+        $user->units()->attach($request->unit);
+
+        session(['success' => 'User associated with unit successfully']);
+
+        return redirect()->route('units.association');
     }
 }

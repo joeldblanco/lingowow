@@ -76,11 +76,25 @@ class CreateSchedule implements ShouldQueue
             dispatch(new CreateClasses($date, $enrolment_id, $meeting_id));
         }
 
+        $student_schedule = json_decode(session('user_schedule'));
+        // $student = User::find($student_id);
+        // $timezone = Carbon::now()->setTimezone($student->timezone);
+        // $schedule_utc = [];
+        // foreach ($student_schedule as $key => $value) {
+        //     $date = Carbon::now();
+        //     $date_local = Carbon::parse('Next ' . Carbon::now()->setISODate($date->year, $date->weekOfYear, $value[1])->format('l') . ' at ' . $value[0] . ':00');
+        //     $schedule_utc[$key][0] = (int)$date_local->copy()->subHours($timezone->offsetHours)->hour;
+        //     $schedule_utc[$key][1] = (int)$date_local->copy()->subHours($timezone->offsetHours)->dayOfWeek;
+        // }
+        // $student_schedule = $schedule_utc;
         // UPDATING OR CREATING A SCHEDULE ON THE DATABASE FOR THE GIVEN USER AND ENROLMENT
         Schedule::withTrashed()->updateOrCreate(
             ['user_id' => $student_id, 'enrolment_id' => $enrolment_id],
             ['selected_schedule' => $student_schedule, 'deleted_at' => NULL]
         );
+
+        //SENDING NOTIFICATION TO TEACHER//
+        Notification::sendNow($this->teacher, new BookedClass($this->student_id));
     }
 
     /**
@@ -90,7 +104,6 @@ class CreateSchedule implements ShouldQueue
      */
     public function handle()
     {
-        //SENDING NOTIFICATION TO TEACHER//
-        Notification::sendNow($this->teacher, new BookedClass($this->student_id));
+        //
     }
 }

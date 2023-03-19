@@ -19,12 +19,23 @@ class PricingTableComponent extends Component
     public $popup = false;
     public $popup_message = "";
     public $popup_color = "";
+    public $pricingTableModal = false;
 
-    public function showSelectedProduct($course_id)
+    public function showSelectedProduct($product_id)
     {
-        session(['selected_course' => $course_id]);
-        $this->selectedProduct = $course_id;
-        $this->emit('loadingState', false);
+
+        $product = Product::find($product_id);
+        if ($product->categories->pluck('name')->contains('Course')) {
+            $course = $product->courses()->first();
+            session(['selected_course' => $course->id]);
+            $this->selectedProduct = $product_id;
+            $this->pricingTableModal = true;
+        } else {
+            session(['selected_product' => $product->id]);
+            Cart::destroy();
+            Cart::add($product->id, $product->name, 1, ($product->sale_price == null ? $product->regular_price : $product->sale_price), ['editable' => false])->associate('App\Models\Product');
+            return redirect()->route('cart');
+        }
     }
 
     public function store($nOfClasses = null, $synchronous = false)

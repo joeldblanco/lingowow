@@ -12,7 +12,7 @@ const tour = new Shepherd.Tour({
 tour.addSteps([
     {
         id: 'home_tour',
-        text: "In this section you can read the posts issued by the institution, by your teachers and your friends! You can interact with them with likes, comments and more!<br><br>Don't forget to be respectful!",
+        text: "Welcome to the announcements section! Here, you can read posts from the institution, your teachers, and even your friends! 🤗 It's a great place to connect and engage with others through likes, comments, and more. 💬 <br><br>Just remember to be respectful and considerate in your interactions! 🤝",
         attachTo: {
             element: '.home-tour',
             // on: 'top'

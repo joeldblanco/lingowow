@@ -66,8 +66,8 @@ class AnalyticsController extends Controller
             $enrolments = Enrolment::where('teacher_id', $value->id)->get();
 
             foreach ($enrolments as $enrolment) {
-                // $n_classes = Classes::where('enrolment_id', $enrolment->id)->whereDate('start_date', '>=', $current_period[0])->where('teacher_check', 1)->where('student_check', 1)->count();
-                $n_classes = Classes::where('enrolment_id', $enrolment->id)->whereDate('start_date', '>=', $current_period[0])->get()->pluck('rating')->whereNotNull()->count();
+                // $monthly_classes = Classes::where('enrolment_id', $enrolment->id)->whereDate('start_date', '>=', $current_period[0])->where('teacher_check', 1)->where('student_check', 1)->count();
+                $monthly_classes = Classes::where('enrolment_id', $enrolment->id)->whereDate('start_date', '>=', $current_period[0])->get()->pluck('rating')->whereNotNull()->count();
                 $product = Course::find($enrolment->course_id)->products->first();
                 if ($product->sale_price == NULL) {
                     $product_price = $product->regular_price;
@@ -85,10 +85,10 @@ class AnalyticsController extends Controller
                     $teacher_payment = 7.99;
                 }
 
-                $classes[$value->id][] = ($n_classes * $teacher_payment);
-                $profit[$value->id][] = ($n_classes * $product_price);
+                $classes[$value->id][] = ($monthly_classes * $teacher_payment);
+                $profit[$value->id][] = ($monthly_classes * $product_price);
 
-                // dd($n_classes,$teacher_payment);
+                // dd($monthly_classes,$teacher_payment);
 
             }
         }
