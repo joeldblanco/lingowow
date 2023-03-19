@@ -4,6 +4,7 @@ namespace App\Notifications;
 
 use App\Models\Schedule;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
@@ -23,30 +24,35 @@ class BookedClass extends Notification implements ShouldQueue
      */
     public function __construct($student_id)
     {
-
         $this->student = User::find($student_id)->first();
-        // dd($this->student);
-        // $schedule = $this->student->schedules->first()->selected_schedule;
-        $schedule = Schedule::select('selected_schedule')->where('user_id', $student_id)->first()->selected_schedule;
-        // dd($schedule);
-        // $schedule = json_decode($schedule);
-        $schedule_string = "";
-        $days = ["Sundays", "Mondays", "Tuesdays", "Wednesdays", "Thursdays", "Fridays", "Saturdays"];
+        $schedule = Schedule::select('selected_schedule')
+            ->where('user_id', $student_id)
+            ->first();
 
-        if ($schedule != null) {
-            for ($i = 0; $i < count($schedule); $i++) {
-                $schedule[$i][0] = $schedule[$i][0] . ':00';
-                $schedule[$i][1] = $days[intval($schedule[$i][1])];
+        $result = [];
 
 
-                if ($i == (count($schedule) - 1)) {
-                    $schedule_string = substr_replace($schedule_string, "", -2);
-                    $schedule_string .= " and " . $schedule[$i][1] . " at " . $schedule[$i][0] . ", ";
-                } else {
-                    $schedule_string .= "on " . $schedule[$i][1] . " at " . $schedule[$i][0] . ", ";
-                }
+        if (!empty($schedule)) {
+            $schedule = $schedule->selected_schedule;
+
+            foreach ($schedule as $block) {
+                $day = Carbon::now()
+                    ->startOfWeek()
+                    ->addDays($block[0]);
+                $hora = Carbon::createFromTime($block[1], 0, 0);
+                $date = $day->setTime($hora->hour, $hora->minute);
+                $result[] = $date->englishDayOfWeek . 's at ' . $date->format('h:i A');
             }
-            $schedule_string = substr_replace($schedule_string, "", -2);
+
+            $qty = count($result);
+            $lasts = array_pop($result);
+            $schedule_string = 'New class booked ';
+
+            if ($qty > 1) {
+                $schedule_string .= implode(', ', $result) . " and $lasts";
+            } else {
+                $schedule_string .= $lasts;
+            }
             $schedule_string .= ".";
 
             $this->schedule_string = $schedule_string;

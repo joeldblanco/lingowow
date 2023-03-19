@@ -15,10 +15,11 @@
     </script>
 @else
     <x-app-layout>
-        <div class="text-2xl font-bold">
-            <div colspan="4" class="text-center">
-                <div class="py-20 text-red-500">{{ $message }}</div>
-            </div>
+        <div class="font-bold">
+                <div class="py-20 flex flex-col items-center">
+                    <p class="text-red-500 text-3xl">{{ $message1 }}</p>
+                    <p class="text-gray-700 text-lg">{{ $message2 }}</p>
+                </div>
         </div>
     </x-app-layout>
 @endif

@@ -144,10 +144,15 @@ class CourseController extends Controller
                     $user_module = Module::findOrFail($user_module->module_id);
                     $user_modules->push($user_module);
                 }
+                $modules = $user_modules;
             } else {
                 foreach ($modules as $module) {
-                    if ($module->id <= $user->units->first()->module->order) {
-                        $user_modules->push($module);
+                    if (!empty($user->units->first())) {
+                        if ($module->id <= $user->units->first()->module->order) {
+                            $user_modules->push($module);
+                        }
+                    }else{
+                        $user_modules->push($modules->first());
                     }
                 }
                 $user_modules = $user_modules->unique();

@@ -69,7 +69,6 @@ $("#btnSend").on("click", function (e) {
             console.log(cadena);
 
             inputImage.value = cadena;
-          
 
 
             const divForm = document.createElement("form");
@@ -694,7 +693,7 @@ $(".activity-create").on("click", function (e) {
 
 $(".btn-flotante").on("click", function (e) {
     e.preventDefault();
-    // console.log("hola")
+    // console.log("hola");
     Livewire.emitTo('modal-content-menu', 'display-modal');
 });
 

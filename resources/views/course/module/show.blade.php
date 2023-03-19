@@ -7,6 +7,7 @@
                     <h2 class="text-4xl font-bold text-gray-800 capitalize">My Units</h2>
                     @if ($module->course->categories->pluck('name')->contains('Conversational'))
                         @hasanyrole('admin|teacher')
+                            {{-- {{dd("Hola")}} --}}
                             <div class="relative">
                                 @if (count($module_units))
                                     <a href="{{ route('modules.details', $module_units->first()->module->id) }}"
@@ -19,8 +20,14 @@
                                     class="right-4 top-8 absolute flex flex-col border border-gray-400 rounded-xl divide-y divide-opacity-100 divide-gray-300 bg-white">
                                     <a href="{{ route('units.create', ['module_id' => $module->id]) }}"
                                         class="hover:bg-gray-200 p-2 rounded-xl" @click="unitOrExam = false">Unit</a>
-                                    <a href="{{ route('exam.create', ['module_id' => $module->id]) }}"
-                                        class="hover:bg-gray-200 p-2 rounded-xl" @click="unitOrExam = false">Exam</a>
+                                    @role('admin')
+                                        <a href="{{ route('exam.create', ['module_id' => $module->id]) }}"
+                                            class="hover:bg-gray-200 p-2 rounded-xl" @click="unitOrExam = false">Exam</a>
+                                    @endrole
+                                    @role('teacher')
+                                        <a href="{{ route('exams.create', ['module_id' => $module->id]) }}"
+                                            class="hover:bg-gray-200 p-2 rounded-xl" @click="unitOrExam = false">Exam</a>
+                                    @endrole
                                 </div>
                                 <x-shepherd-tour tourName="teachers/course_conversational" role="teacher" />
                             </div>

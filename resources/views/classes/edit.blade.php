@@ -7,64 +7,10 @@
         $university_schedule_hours = $university_schedule[2];
         
         $hoy = (new Carbon\Carbon())->toCookieString();
-        // $tz = session('tz');
-        
-        // $hoyLoc = Carbon\Carbon::now()->toCookieString();
-        // $ip_add = $_SERVER['REMOTE_ADDR'];
         
         $current_period = App\Http\Controllers\ApportionmentController::currentPeriod();
-        // $period_start_c = new Carbon\Carbon($current_period[0]);
         $period_end_c = new Carbon\Carbon($current_period[1]);
-        // $period_start = $period_start_c->format('Y/m/d');
         $period_end = $period_end_c->format('Y/m/d');
-        
-        // $now = new Carbon\Carbon();
-        
-        // $date_range = new Carbon\CarbonPeriod($period_start_c->copy()->subDay(), $period_end_c);
-        // $day_format_range = [];
-        // $period_range = [];
-        // $day_range = [];
-        // $table_date = [];
-        
-        // foreach ($date_range as $key => $date) {
-        
-        //     $day_format_range[$key] = $date->format('Y-m-d');
-        //     $period_range[$key] = $date->format('m-d');
-        //     $day_range[$key] = $date->format('d');
-        //     $table_date[$key] = $date->format('d/m');
-        
-        // }
-        
-        // $abcense = App\Models\Classes::select('start_date')
-        //     ->whereBetween('start_date', [$period_start_c->copy()->subDay()->toDateTimeString(), $period_end_c->toDateTimeString()])
-        //     ->get();
-        
-        // foreach ($abcense as $key => $value) {
-        //     $abcense[$key] = $value->start_date;
-        // }
-        
-        // foreach ($abcense as $key => $value) {
-        //     $abcense[$key] = new Carbon\Carbon($abcense[$key]);
-        // }
-        
-        // $abcense_classes = [];
-        // foreach ($abcense as $key => $value) {
-        //     $abcense_classes[$key] = $abcense[$key]->isoFormat('H') . '-' . $abcense[$key]->format('d');
-        
-        // }
-        
-        // function isFree($a, $buscado, $plan)
-        // {
-        //     $i = 0;
-        //     if (is_array($a)) {
-        //         foreach ($a as $v) {
-        //             if ($buscado === $v) {
-        //                 $i++;
-        //             }
-        //         }
-        //     }
-        //     return $i;
-        // }
         
         $enrolment = auth()
             ->user()
@@ -154,121 +100,23 @@
                     <div class="wrapper bg-white rounded  w-full schedule-tour">
 
                         @livewire('schedule', ['plan' => '1', 'user_id' => auth()->id(), 'mode' => 'absence', 'course_id' => $course_id, 'id_class' => $id])
-                        {{-- @php
-                            $days = ['SUNDAY', 'MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY'];
-                            $aux = [];
-                        @endphp --}}
 
-                        {{-- <h1 class="font-medium leading-tight text-base mt-0 mb-2 text-left text-gray-600">Select the new
-                            date:
-                        </h1>
-                        <table id="absence_table" class="border" style="width: 100%">
-
-                            <thead>
-                                <tr>
-                                    <th class="width border">UTC</th>
-                                    <th class="" style="">LOCAL</th>
-                                    @foreach ($days as $day)
-                                        <th class="border width" style="">
-                                            {{ $day }}
-                                        </th>
-                                    @endforeach
-                                </tr>
-                            </thead>
-
-                            <tbody>
-                                @php
-                                    $e = 0;
-                                    $d = 0;
-                                    $i = $university_schedule_start;
-                                @endphp
-                                @for ($week = 0; $week < 4; $week++)
-                                    <tr>
-                                        <td class="width border"></td>
-                                        <td class="width border"></td>
-                                        <td class="width border">{{ $table_date[$d + 0] }}</td>
-                                        <td class="width border">{{ $table_date[$d + 1] }}</td>
-                                        <td class="width border">{{ $table_date[$d + 2] }}</td>
-                                        <td class="width border">{{ $table_date[$d + 3] }}</td>
-                                        <td class="width border">{{ $table_date[$d + 4] }}</td>
-                                        <td class="width border">{{ $table_date[$d + 5] }}</td>
-                                        <td class="width border">{{ $table_date[$d + 6] }}</td>
-                                    </tr>
-
-                                    @for ($hour = 0; $hour < $university_schedule_hours; $hour++)
-                                        <tr class="border">
-                                            <td class="width border UTC">
-                                                @if ($i < 10)
-                                                    0{{ $i }}:00
-                                                @else
-                                                    {{ $i }}:00
-                                                @endif
-                                            </td>
-                                            <td class="width border Local">
-
-                                            </td>
-                                            
-                                            @foreach ($days as $day)
-                                                @if (in_array([$i, $e], $teacher_schedule) && (new Carbon\carbon($day_format_range[$d]))->addHour($i)->greaterThan($now))
-
-                                                    @if (in_array([$i, $e], $students_schedules) || in_array($i . '-' . $day_range[$d], $abcense_classes))
-                                                        <td id="{{ $i }}-{{ $e }}-{{ $week }}-{{ $period_range[$d] }}"
-                                                            class="border width occupied bg-gray-100">
-                                                        </td>
-                                                    @else
-                                                        <td id="{{ $i }}-{{ $e }}-{{ $week }}-{{ $period_range[$d] }}"
-                                                            class="border width cursor-pointer available selectable">
-                                                        </td>
-                                                    @endif
-                                                @else
-                                                    <td id="{{ $i }}-{{ $e }}-{{ $week }}-{{ $period_range[$d] }}"
-                                                        class="border width occupied bg-gray-100">
-                                                    </td>
-                                                @endif
-                                                @php
-                                                    $e++;
-                                                    $d++;
-                                                @endphp
-                                            @endforeach
-                                            @php
-                                                $e = 0;
-                                                $d -= 7;
-                                            @endphp
-                                        </tr>
-                                        @php
-
-                                            if ($i == 23) {
-                                                $i = 0;
-                                            } else {
-                                                $i++;
-                                            }
-                                        @endphp
-                                    @endfor
-                                    @php
-                                        
-                                        $d += 7;
-                                    @endphp
-                                @endfor
-                            </tbody>
-                        </table>
-
-                    </div>
-                    --}}
-                    <div class="mt-10 grid grid-rows-2 grid-flow-col gap-4 justify-center ...">
-                        <div class="flex space-x-3 items-center terms-tour">
-                            <input class="@error('message') border-red-500 @enderror" type="checkbox"
-                                name="consent_checkbox" id="consent_checkbox" required>
-                            <label for="consent_checkbox">I accept the <a href="#"
-                                    class="text-blue-600 hover:underline">terms for class recovery</a></label>
+                        <div class="mt-10 grid grid-rows-2 grid-flow-col gap-4 justify-center ...">
+                            <div class="flex space-x-3 items-center terms-tour">
+                                <input class="@error('message') border-red-500 @enderror" type="checkbox"
+                                    name="consent_checkbox" id="consent_checkbox" required>
+                                <label for="consent_checkbox">I accept the <a href="{{route('guidelines')}}" target="_blank"
+                                        class="text-blue-600 hover:underline">guidelines for class rescheduling
+                                        (Guidelines - Section 8)</a></label>
+                            </div>
                         </div>
-                    </div>
 
-                    <div class="grid justify-center">
-                        <div>
-                            <button class="bg-blue-500 rounded-lg text-white font-bold px-6 py-1 my-3 shadow-md"
-                                onclick="saveAbsence({{ $id }},'classes.update')">Submit</button>
+                        <div class="grid justify-center">
+                            <div>
+                                <button class="bg-blue-500 rounded-lg text-white font-bold px-6 py-1 my-3 shadow-md"
+                                    onclick="saveAbsence({{ $id }},'classes.update')">Submit</button>
+                            </div>
                         </div>
-                    </div>
 
 
 

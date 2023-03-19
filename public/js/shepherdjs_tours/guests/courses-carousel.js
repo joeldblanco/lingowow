@@ -12,21 +12,21 @@ const tour = new Shepherd.Tour({
 tour.addSteps([
     {
         id: 'courses-carousel',
-        text: 'Here you will find a carousel with the courses we offer. You can drag right or left to see the other courses.',
+        text: 'Welcome to our shop!🛍️ We have a variety of courses available for you to choose from 💻📖. Take a look and find the perfect one for you! ✨',
         attachTo: {
             element: '.courses-carousel',
             on: 'top'
         },
         buttons: [
             {
-                text: 'Next',
+                text: 'Got it!',
                 action: tour.next
             }
         ]
     },
     {
         id: 'course-card',
-        text: 'Once you find a course you like, you can select it to see the avaliable plans and prices.',
+        text: 'Once you find a course that catches your interest, simply select it to view all the available plans and prices. 💰📊💳',
         attachTo: {
             element: '#course-card',
             on: 'top'
@@ -39,48 +39,62 @@ tour.addSteps([
         ],
     },
     {
-        id: 'pricing-table',
-        text: 'Here you will see the plans and prices for the courses you select. If the course you selected is an asynchronous course or a test, you will only see one card with the price.',
-        attachTo: {
-            element: '.pricing-table',
-            on: 'top'
-        },
-        buttons: [
-            {
-                text: 'Next',
-                action: tour.next
-            }
-        ]
-    },
-    {
         id: 'select-button',
-        text: 'To select a plan, click on the "Select" button below.',
+        text: 'Click on the "Select" button to continue. Let\'s help you make an informed decision! 💡',
         attachTo: {
-            element: '.select-button',
+            element: '#select-button',
             on: 'top'
         },
-        buttons: [
-            {
-                text: 'Next',
-                action: tour.next
-            }
-        ],
+        canClickTarget: true,
+        advanceOn: {
+            selector: '#select-button',
+            event: 'click'
+        },
     },
-    {
-        id: 'courses-link',
-        text: 'Once you click the select button on the plan you prefer you will be able to select the teacher and schedule for your classes.',
-        // attachTo: {
-        //     element: '.courses-link',
-        //     on: 'bottom'
-        // },
-        buttons: [
-            {
-                text: 'Got it!',
-                action: tour.complete
-            }
-        ],
-        canClickTarget: false
-    }
+    // {
+    //     id: 'pricing-table',
+    //     text: 'Here you will see the plans and prices for the courses you select. If the course you selected is an asynchronous course or a test, you will only see one card with the price.',
+    //     attachTo: {
+    //         element: '.pricing-table',
+    //         on: 'top'
+    //     },
+    //     canClickTarget: false,
+    //     buttons: [
+    //         {
+    //             text: 'Next',
+    //             action: tour.next
+    //         }
+    //     ]
+    // },
+    // {
+    //     id: 'select-button',
+    //     text: 'To select a plan, click on the "Select" button below.',
+    //     attachTo: {
+    //         element: '.select-button',
+    //         on: 'top'
+    //     },
+    //     buttons: [
+    //         {
+    //             text: 'Next',
+    //             action: tour.next
+    //         }
+    //     ],
+    // },
+    // {
+    //     id: 'courses-link',
+    //     text: 'Once you click the select button on the plan you prefer you will be able to select the teacher and schedule for your classes.',
+    //     // attachTo: {
+    //     //     element: '.courses-link',
+    //     //     on: 'bottom'
+    //     // },
+    //     buttons: [
+    //         {
+    //             text: 'Got it!',
+    //             action: tour.complete
+    //         }
+    //     ],
+    //     canClickTarget: false
+    // }
 ]);
 
 function start() {

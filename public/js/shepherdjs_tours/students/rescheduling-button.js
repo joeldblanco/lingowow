@@ -15,7 +15,7 @@ tour2.addSteps([
         text: 'If you wish to reschedule a class, you can do it from this button.',
         attachTo: {
             element: '.rescheduling-button',
-            // on: 'top'
+            on: 'top'
         },
         buttons: [
             {

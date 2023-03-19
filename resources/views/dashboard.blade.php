@@ -3,14 +3,12 @@
     <div style="width: 100%" class="bg-white font-sans">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden">
-                {{-- @if (isset($_GET['tz'])) --}}
-
-                {{-- {{ dd(session('affected_students')) }} --}}
+                
                 @php
                     $users = \App\User::select('first_name', 'last_name', 'id')->get();
                     $affected_students = session('affected_students');
                 @endphp
-                
+
                 @if (session('message'))
 
                     <div x-data="{ showModal1: true }">
@@ -106,52 +104,65 @@
                             @endhasanyrole
                         </div>
                     </div>
-                    @role('student')
-                        <div class="w-9/12">
-                            <div id="chart" class="barprogress-tour"></div>
-                            <script>
-                                var options = {
-                                    series: [{
-                                            name: 'Progress (Units)',
-                                            data: [{{ auth()->user()->units->first()->order }}]
-                                        },
-                                        {
-                                            name: 'Remaining (Units)',
-                                            data: [{{ count($enrolment->course->units()) -auth()->user()->units->first()->order }}]
-                                        },
-                                    ],
-                                    chart: {
-                                        type: 'bar',
-                                        height: 150,
-                                        stacked: true,
-                                        stackType: "100%",
-                                    },
-                                    plotOptions: {
-                                        bar: {
-                                            borderRadius: 4,
-                                            horizontal: true,
-                                        }
-                                    },
-                                    dataLabels: {
-                                        enabled: false
-                                    },
-                                    legend: {
-                                        position: 'top'
-                                    },
-                                    xaxis: {
-                                        categories: ['{{ $enrolment->course->name }}'],
-                                    },
-                                    yaxis: {
-                                        labels: {
-                                            show: false
-                                        }
-                                    },
-                                };
 
-                                var chart = new ApexCharts(document.querySelector("#chart"), options);
-                                chart.render();
-                            </script>
-                        </div>
+                    @role('student')
+                        @if (!$enrolment->course->categories->pluck('name')->contains('Conversational'))
+                            <div class="w-9/12">
+                                <div id="chart" class="barprogress-tour"></div>
+                                @php
+                                    $user_units = auth()->user()->units;
+                                    if (count($user_units) <= 0) {
+                                        $user_units = 0;
+                                    } else {
+                                        $user_units = auth()
+                                            ->user()
+                                            ->units->first()->order;
+                                    }
+                                @endphp
+                                <script>
+                                    var options = {
+                                        series: [{
+                                                name: 'Progress (Units)',
+                                                data: [{{ $user_units }}]
+                                            },
+                                            {
+                                                name: 'Remaining (Units)',
+                                                data: [{{ count($enrolment->course->units()) - $user_units }}]
+                                            },
+                                        ],
+                                        chart: {
+                                            type: 'bar',
+                                            height: 150,
+                                            stacked: true,
+                                            stackType: "100%",
+                                        },
+                                        plotOptions: {
+                                            bar: {
+                                                borderRadius: 4,
+                                                horizontal: true,
+                                            }
+                                        },
+                                        dataLabels: {
+                                            enabled: false
+                                        },
+                                        legend: {
+                                            position: 'top'
+                                        },
+                                        xaxis: {
+                                            categories: ['{{ $enrolment->course->name }}'],
+                                        },
+                                        yaxis: {
+                                            labels: {
+                                                show: false
+                                            }
+                                        },
+                                    };
+
+                                    var chart = new ApexCharts(document.querySelector("#chart"), options);
+                                    chart.render();
+                                </script>
+                            </div>
+                        @endif
                     @endrole
                 </div>
 
@@ -162,8 +173,18 @@
                             {{-- @livewire('schedule-controller', ['user_id' => auth()->id(), 'mode' => 'show', 'course_id' => $course_id]) --}}
                         @endif
                     @endrole
-                    @hasanyrole('teacher|guest')
+                    @hasanyrole('teacher')
                         @livewire('schedule', ['user_id' => auth()->id(), 'mode' => 'show', 'course_id' => $course_id])
+                    @endrole
+                    @role('guest')
+                        <div class="flex flex-col items-center h-screen pt-20">
+                            <i class="fas fa-ghost text-9xl text-gray-300 mb-10"></i>
+                            <p class="text-4xl text-gray-500">Nothing to show here</p>
+                            <p class="text-2xl text-gray-400 mb-10">You are not enrolled in any course</p>
+                            <a href="{{ route('courses.index') }}"
+                                class="bg-lw-blue py-2 px-4 rounded-md text-white hover:bg-blue-800 preview-courses-button">Preview
+                                Courses 👀</a>
+                        </div>
                     @endrole
                 </div>
 
