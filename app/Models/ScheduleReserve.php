@@ -12,13 +12,13 @@ class ScheduleReserve extends Model
     use SoftDeletes;
 
     protected $table = 'schedule_reserve';
-    protected $fillable = ['user_id','teacher_id', 'selected_schedule', 'type'];
+    protected $fillable = ['user_id','teacher_id', 'selected_schedule', 'type', 'deleted_at'];
     use HasFactory;
 
     public static function schedulesReserves($teacher_id){
         $schedules = []; $schedules_exam = [];
-        $schedule = ScheduleReserve::all()->where('teacher_id', $teacher_id)->where('type', 'schedule')->whereNotNull('selected_schedule')->pluck('selected_schedule');
-        $exam = ScheduleReserve::all()->where('teacher_id', $teacher_id)->where('type', 'exam')->whereNotNull('selected_schedule')->pluck('selected_schedule');
+        $schedule = ScheduleReserve::where('teacher_id', $teacher_id)->where('type', 'schedule')->whereNotNull('selected_schedule')->pluck('selected_schedule');
+        $exam = ScheduleReserve::where('teacher_id', $teacher_id)->where('type', 'exam')->whereNotNull('selected_schedule')->pluck('selected_schedule');
 
         foreach($schedule as $value){
             foreach(json_decode($value) as $day){

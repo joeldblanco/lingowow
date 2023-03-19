@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Attempt;
+use App\Models\Course;
 use App\Models\Exam;
 use App\Models\Module;
 use App\Models\Question;
@@ -23,7 +24,7 @@ class ExamController extends Controller
     {
         $exams = Exam::all();
 
-        return view('admin.exams.index', compact('exams'));
+        return view('exams.index', compact('exams'));
     }
 
     /**
@@ -34,12 +35,11 @@ class ExamController extends Controller
     public function create(Request $request)
     {
         if (empty($request->module_id)) {
-            $units = Module::all()->pluck('units')->sortBy('order');
-        } else {
-            $units = Module::find($request->module_id)->units->sortBy('order');
+            $courses = Course::all();
+            return view('exams.create', compact('courses'));
         }
 
-        return view('admin.exams.create', compact('units'));
+        return abort(404);
     }
 
     /**
@@ -52,14 +52,18 @@ class ExamController extends Controller
     {
         $request->validate([
             'unit_id' => 'required|numeric|exists:App\Models\Unit,id',
-            'min_score' => 'required|numeric|min:0|max:100',
+            'passing_marks' => 'required|numeric|min:0|max:100',
+            'total_marks' => 'required|numeric|min:0|max:100',
+            'title' => 'required|string|nullable',
+            'description' => 'string|nullable',
+            'type' => 'numeric',
+            'duration' => 'required|numeric',
+            'status' => 'required|numeric',
         ]);
 
-        $exam = new Exam;
-        $exam->unit_id = $request->unit_id;
-        $exam->min_score = $request->min_score;
-        $exam->save();
-        return redirect()->route('exam.show', $exam->id);
+        $exam = Exam::create($request->all());
+
+        return redirect()->route('exams.index');
     }
 
     /**
@@ -68,11 +72,14 @@ class ExamController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($exam_id)
+    public function show(Exam $exam)
     {
-        $exam = Exam::find($exam_id);
-        $questions = $exam->questions;
-        return view('admin.exams.show', compact('questions', 'exam_id'));
+        $attempt = null;
+        if (auth()->user()->hasRole('student')) {
+            $attempt = Attempt::where('user_id', auth()->id())->where('exam_id', $exam->id)->whereNull('completed_at')->first();
+        }
+        
+        return view('exams.show', compact('exam', 'attempt'));
     }
 
     /**
@@ -83,58 +90,8 @@ class ExamController extends Controller
     public function display($exam_id)
     {
         $exam = Exam::find($exam_id);
-        // $questions = $exam->questions;
 
         return view('exams.display', compact('exam'));
-    }
-
-    /**
-     * Automatically corrects the exam.
-     *
-     * @param  int  $exam_id
-     */
-    public static function correct($attempt_id)
-    {
-        $attempt = Attempt::find($attempt_id);
-
-        if ($attempt == null) abort(404);
-
-        if ($attempt->user_id == auth()->id() || auth()->user()->roles[0]->name == "admin" || auth()->user()->roles[0]->name == "teacher") {
-            $exam_id = $attempt->exam_id;
-            $student_answers = json_decode($attempt->data);
-            $student_answers = json_decode(json_encode($student_answers), true);
-            $student_answers = $student_answers["answers"];
-            $exam = Exam::find($exam_id);
-            $questions = $exam->questions;
-            $answers = [];
-            $result = 0;
-
-            foreach ($student_answers as $key => $value) {
-                // dd($student_answers, $questions, $attempt->data);
-                if ($questions[$key]->answer() == $value) {
-                    $result += $questions[$key]->value;
-                }
-            }
-            $attempt->score = $result;
-            $attempt->save();
-
-            foreach ($questions as $key => $value) {
-                if (!isset($student_answers[$key])) {
-                    $student_answers[$key] = -1;
-                }
-                $answers[$key] = [$questions[$key]->answer(), $student_answers[$key]];
-            }
-
-            if ($attempt->score >= $exam->min_score) {
-                $user = new UsersController;
-                $unit = Unit::where('course_id', $exam->unit->course->id)->where('order', '>', $exam->unit->order)->orderBy('order')->first();
-                $user->addUnit(auth()->id(), $unit);
-            }
-
-            return view('exams.result', compact('result', 'answers', 'questions','attempt'));
-        } else {
-            abort(404);
-        }
     }
 
     /**
@@ -155,23 +112,16 @@ class ExamController extends Controller
     }
 
     /**
-     * Shows view for manual correction.
-     *
-     * @param  int  $exam_id
-     */
-    public static function manually_correct($attempt_id, $question_id)
-    {
-    }
-
-    /**
      * Show the form for editing the specified resource.
      *
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit($id)
+    public function edit(Exam $exam)
     {
-        //
+        $courses = Course::all();
+
+        return view('exams.edit', compact('exam', 'courses'));
     }
 
     /**
@@ -183,7 +133,21 @@ class ExamController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $request->validate([
+            'unit_id' => 'required|numeric|exists:App\Models\Unit,id',
+            'passing_marks' => 'required|numeric|min:0|max:100',
+            'total_marks' => 'required|numeric|min:0|max:100',
+            'title' => 'string|nullable',
+            'description' => 'string|nullable',
+            'type' => 'numeric',
+            'duration' => 'required|numeric',
+            'status' => 'required|numeric',
+        ]);
+
+        $exam = Exam::find($id);
+        $exam->update($request->all());
+
+        return redirect()->route('exams.edit', $exam->id)->with('success', 'Exam updated successfully');
     }
 
     /**
@@ -194,6 +158,9 @@ class ExamController extends Controller
      */
     public function destroy($id)
     {
-        //
+        $exam = Exam::find($id);
+        $exam->delete();
+
+        return redirect()->route('exams.index');
     }
 }

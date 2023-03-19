@@ -12,36 +12,37 @@ class ClassRescheduledToTeacher extends Notification implements ShouldQueue
 {
     use Queueable;
 
-    public $student, $schedule_string;
+    public $student, $classNewDate, $classOldDate;
 
     /**
      * Create a new notification instance.
      *
      * @return void
      */
-    public function __construct($student)
+    public function __construct($student, $classOldDate, $classNewDate)
     {
         $this->student = $student;
-        $schedule = $student->schedules->first()->selected_schedule;
-        $schedule_string = "";
-        $days = ["Sundays", "Mondays", "Tuesdays", "Wednesdays", "Thursdays", "Fridays", "Saturdays"];
+        // $schedule = $student->schedules->first()->selected_schedule;
+        // $schedule_string = "";
+        // $days = ["Sundays", "Mondays", "Tuesdays", "Wednesdays", "Thursdays", "Fridays", "Saturdays"];
 
-        for ($i = 0; $i < count($schedule); $i++) {
-            $schedule[$i][0] = $schedule[$i][0] . ':00';
-            $schedule[$i][1] = $days[intval($schedule[$i][1])];
+        // for ($i = 0; $i < count($schedule); $i++) {
+        //     $schedule[$i][0] = $schedule[$i][0] . ':00';
+        //     $schedule[$i][1] = $days[intval($schedule[$i][1])];
 
 
-            if ($i == (count($schedule) - 1)) {
-                $schedule_string = substr_replace($schedule_string, "", -2);
-                $schedule_string .= " and " . $schedule[$i][1] . " at " . $schedule[$i][0] . ", ";
-            } else {
-                $schedule_string .= "on " . $schedule[$i][1] . " at " . $schedule[$i][0] . ", ";
-            }
-        }
-        $schedule_string = substr_replace($schedule_string, "", -2);
-        $schedule_string .= ".";
+        //     if ($i == (count($schedule) - 1)) {
+        //         $schedule_string = substr_replace($schedule_string, "", -2);
+        //         $schedule_string .= " and " . $schedule[$i][1] . " at " . $schedule[$i][0] . ", ";
+        //     } else {
+        //         $schedule_string .= "on " . $schedule[$i][1] . " at " . $schedule[$i][0] . ", ";
+        //     }
+        // }
+        // $schedule_string = substr_replace($schedule_string, "", -2);
+        // $schedule_string .= ".";
 
-        $this->schedule_string = $schedule_string;
+        $this->classOldDate = $classOldDate;
+        $this->classNewDate = $classNewDate;
     }
 
     /**
@@ -66,9 +67,9 @@ class ClassRescheduledToTeacher extends Notification implements ShouldQueue
         return (new MailMessage)
             ->subject('Class Rescheduled: ' . $this->student->first_name . ' ' . $this->student->last_name)
             ->line('Greetings, dear ' . $notifiable->first_name . ' ' . $notifiable->last_name . '.')
-            ->line('We are writing to notify you that a class has been rescheduled by student ' . $this->student->first_name . ' ' . $this->student->last_name . ' ' . $this->schedule_string)
-            ->line('Click the button below to check your current schedule.')
-            ->action('Check Schedule', url('/dashboard'))
+            ->line('We are writing to notify you that a class has been rescheduled by student ' . $this->student->first_name . ' ' . $this->student->last_name . ' from ' . $this->classOldDate . ' to ' . $this->classNewDate)
+            ->line('Click the button below to check your classes.')
+            ->action('Classes', route('classes.index'))
             ->line('If you have any questions, please contact us through the regular channels.');
     }
 
@@ -76,7 +77,7 @@ class ClassRescheduledToTeacher extends Notification implements ShouldQueue
     {
         return [
             "user_id" => $this->student->id,
-            "schedule_string" => $this->schedule_string
+            "schedule_string" => 'from ' . $this->classOldDate . ' to ' . $this->classNewDate,
         ];
     }
 

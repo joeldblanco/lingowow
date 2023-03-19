@@ -9,7 +9,7 @@
                     </h1>
 
                     <div class="w-full flex justify-end mb-6">
-                        <a href="{{ route('products.create') }}"
+                        <a href="{{ route('courses.create') }}"
                             class="text-center leading-10 text-3xl font-bold text-white capitalize rounded-full bg-lw-blue w-10 mr-10 hover:bg-lw-light_blue">+</a>
                     </div>
 

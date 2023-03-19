@@ -50,8 +50,8 @@ class UpcomingClassForStudent extends Notification implements ShouldQueue
             ->subject('Upcoming class')
             ->line('Greetings, dear ' . $notifiable->first_name . ' ' . $notifiable->last_name . '.')
             ->line('We are writing to remind you that your next class is in ' . $this->timeUntilClass . ', with teacher ' . $this->teacher->first_name . ' ' . $this->teacher->last_name . '.')
-            ->line('Click the button below to login to your dashboard.')
-            ->action('Dashboard', url('/dashboard'))
+            ->line('Click on the button below to access to your classroom.')
+            ->action('Classroom', route('classroom', $notifiable->id))
             ->line('If you have any questions, please contact us through the regular channels.');
     }
 

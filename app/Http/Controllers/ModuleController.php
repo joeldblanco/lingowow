@@ -9,6 +9,7 @@ use App\Models\Group_unit;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 
 class ModuleController extends Controller
 {
@@ -88,7 +89,12 @@ class ModuleController extends Controller
         } else if ($role == "student") {
             $module_units  = $module->units->where('status', 1)->sortBy('order');
             if ($user->units->count() > 0) {
-                $user_units = $module_units->where('order', '<=', $user->units->first()->order);
+                // dump($module->id, $user->units->first()->module->id);
+                if($module->order < $user->units->first()->module->order){
+                    $user_units = $module_units;
+                }else{
+                    $user_units = $module_units->where('order', '<=', $user->units->first()->order);
+                }
             } else {
                 if ($module->course->categories->pluck('name')->contains('Conversational')) {
                     $user_units = $module_units;
@@ -142,7 +148,9 @@ class ModuleController extends Controller
     public function update(Request $request, Module $module)
     {
         $image = $request->file('image');
+        $old_image = $module->image;
         $path_to_file = $image == null ? DB::table('metadata')->where('key', 'sample_image_url')->first()->value : $request->file('image')->storeAs('public/images/modules/covers', $module->id . '.' . $image->getClientOriginalExtension());
+
         $module->update([
             "course_id" => $request->course_id,
             "name" => $request->name,
@@ -150,6 +158,10 @@ class ModuleController extends Controller
             "status" => $request->status,
             "image" => $path_to_file,
         ]);
+
+        if ($old_image != null && $old_image != $path_to_file) {
+            Storage::delete($old_image);
+        }
 
         return redirect()->route('courses.details', $module->course_id);
     }

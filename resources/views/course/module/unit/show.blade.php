@@ -3,6 +3,8 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="p-6 sm:px-20 bg-gray-50 border-b border-gray-200">
 
+                {{ Breadcrumbs::render('units.show', $unit->id) }}
+
                 <div class="mt-10 mb-20">
                     <h2 class="text-3xl font-bold text-center text-gray-500 mb-3">{{ $unit->name }}</h2>
                     @if ($unit->course()->categories->pluck('name')->contains('Conversational'))

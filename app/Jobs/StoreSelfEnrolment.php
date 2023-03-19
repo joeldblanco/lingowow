@@ -4,7 +4,7 @@ namespace App\Jobs;
 
 use App\Http\Controllers\GatherController;
 use App\Invoice;
-use Cart;
+use Gloudemans\Shoppingcart\Facades\Cart;
 use App\Item;
 use App\Mail\InvoicePaid;
 use App\Models\Course;
@@ -12,6 +12,7 @@ use App\Models\Enrolment;
 use App\Models\Module;
 use App\Models\Preselection;
 use App\Models\Product;
+use App\Models\ScheduleReserve;
 use App\Models\Unit;
 use App\Models\User;
 use Carbon\Carbon;
@@ -79,7 +80,7 @@ class StoreSelfEnrolment implements ShouldQueue
                 $item->item_name = $product['name'];
                 $item->item_price = $product['price'];
                 $item->item_qty = $product['qty'];
-                
+
                 $item->save();
             });
 
@@ -88,8 +89,7 @@ class StoreSelfEnrolment implements ShouldQueue
             session(['invoice_id' => $invoice->id]);
 
             $product = Product::find(session('selected_product'));
-            if(!empty($product) && !$product->categories->pluck('name')->contains('Course'))
-            {
+            if (!empty($product) && !$product->categories->pluck('name')->contains('Course')) {
                 session()->forget('selected_product');
                 return redirect()->route('invoice.show', ['id' => session('invoice_id')]);
             }
@@ -106,6 +106,7 @@ class StoreSelfEnrolment implements ShouldQueue
             $teacher = User::find(session('teacher_id'));
 
             $enrolment = Enrolment::where('student_id', $student->id)
+                ->where('course_id', $course_id)
                 ->withTrashed()
                 ->first();
 
@@ -118,13 +119,21 @@ class StoreSelfEnrolment implements ShouldQueue
                 $now = Carbon::now();
                 $current_period_end = new Carbon($current_period->end_date);
 
-                if ($enrolment->course_id == session('selected_course') && ($now->greaterThan($current_period_end->copy()->subDays(7))) && empty($enrolment->preselection)) {
+                if (session('preselection') == true) {
                     $preselection = Preselection::withTrashed()->updateOrCreate(
                         ['enrolment_id' => $enrolment->id],
                         ['teacher_id' => $teacher->id, 'schedule' => json_decode(session('user_schedule')), 'deleted_at' => NULL]
                     );
+                    session()->forget('preselection');
+
+                    $scheduleReservation = ScheduleReserve::where('user_id', $enrolment->student->id)->first();
+                    if (!empty($scheduleReservation)) {
+                        $scheduleReservation->delete();
+                    }
 
                     return redirect()->route('invoice.show', $invoice->id);
+                } else {
+                    dd("User has an active enrolment in this course.");
                 }
             } else {
                 //CREATING STUDENT'S ENROLMENT (OR UPDATING IT, IN CASE IT ALREADY EXISTS BUT IS SOFTDELETED)//
@@ -132,6 +141,8 @@ class StoreSelfEnrolment implements ShouldQueue
                     ['student_id' => $student->id, 'course_id' => $course_id],
                     ['teacher_id' => $teacher->id, 'deleted_at' => NULL]
                 );
+
+                // dd($enrolment);
             }
 
             // SchedulingCalendarController::store($student->id, $enrolment);
@@ -150,12 +161,15 @@ class StoreSelfEnrolment implements ShouldQueue
         if ($student->id != null) {
 
             User::find($student->id)->givePermissionTo('view units');
+            $course = Course::find($course_id);
 
-            if (Course::find($course_id)->categories->pluck('name')->contains('Conversational')) {
-
-                $module = DB::table('module_user')->select('module_id')->where('user_id', $student->id)->first();
+            if ($course->categories->pluck('name')->contains('Conversational')) {
+                // dd("Maintenance");
+                $modules_ids = DB::table('module_user')->select('module_id')->where('user_id', $student->id)->get();
+                $modules = Module::find($modules_ids->pluck('module_id')->toArray());
+                $module = $modules->where('course_id', $course->id)->first();
                 if (empty($module)) {
-                    $order = Course::find($course_id)->modules->sortBy('order')->last() == null ? 1 : Course::find($course_id)->modules->sortBy('order')->last()->order + 1;
+                    $order = $course->modules->sortBy('order')->last() == null ? 1 : $course->modules->sortBy('order')->last()->order + 1;
                     $module = Module::create([
                         'name' => $student->first_name . ' ' . $student->last_name . ' - Lesson Room',
                         'course_id' => $course_id,
@@ -175,18 +189,20 @@ class StoreSelfEnrolment implements ShouldQueue
                         ['module_id' => $module->id, 'user_id' => session('teacher_id')]
                     ]);
                 } else {
-                    DB::table('module_user')->insertOrIgnore([
-                        ['module_id' => $module->module_id, 'user_id' => $student->id],
-                        ['module_id' => $module->module_id, 'user_id' => session('teacher_id')]
-                    ]);
+                    $module = Module::find($module->id);
+                    if ($module->course_id)
+                        DB::table('module_user')->insertOrIgnore([
+                            ['module_id' => $module->id, 'user_id' => $student->id],
+                            ['module_id' => $module->id, 'user_id' => session('teacher_id')]
+                        ]);
                 }
             } else {
-                $unit = Course::find($course_id)->units()->sortBy('order')->pluck('exams')->reject(function ($innerCollection) {
+                $unit = $course->units()->sortBy('order')->pluck('exams')->reject(function ($innerCollection) {
                     return $innerCollection->isEmpty();
                 })->flatten()->first();
 
                 if (empty($unit)) {
-                    $unit_id = Course::find($course_id)->units()->sortBy('order')->first()->id;
+                    $unit_id = $course->units()->sortBy('order')->first()->id;
                 } else {
                     $unit_id = $unit->unit_id;
                 }

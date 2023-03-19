@@ -35,49 +35,56 @@ class QuestionController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request, $exam_id)
+    public function store(Request $request)
     {
+        $exam_id = $request->exam_id;
         try {
             $request->validate([
-                'question-file' => 'file|mimes:mp3,jpg,png|max:10000',
-                'question-type' => 'required',
-                'question-value' => 'required',
-                'question-description' => 'required',
-                'question-value' => 'min:0|max:100',
+                'exam_id' => 'required|numeric|exists:App\Models\Exam,id',
+                'title' => 'string|max:255',
+                'description' => 'string',
+                // 'type' => 'required',
+                'marks' => 'required|min:0|max:100',
+                'options' => 'array',
+                'file' => 'file|mimes:mp3,jpg,png|max:10000',
+                'description' => 'required',
             ]);
 
-            if ($request->input('question-type') == "multiple-choice") {
+            if ($request->input('type') == "multiple-choice") {
                 $request->validate([
-                    'selected-option' => 'required',
+                    'answer' => 'required',
                 ]);
+
+                $options = json_encode($request->only([
+                    'option-text-1',
+                    'option-text-2',
+                    'option-text-3',
+                ]));
             }
         } catch (\Throwable $th) {
             $request->session()->flash('error', $th->getMessage());
-            return redirect()->route('exam.show', $exam_id);
+            return redirect()->route('exams.edit', $exam_id);
         }
 
 
-        $file = $request->file('question-file');
-        $path_to_file = $file == null ? null : $request->file('question-file')->storeAs('public/questions/files', time() . '.' . $file->getClientOriginalExtension());
+        $file = $request->file('file');
+        $path_to_file = $file == null ? null : $request->file('file')->storeAs('public/questions/files', time() . '.' . $file->getClientOriginalExtension());
 
-        $question = new Question;
-        $question->value = $request->input('question-value');
-        $question->description = $request->input('question-description');
-        $question->type = $request->input('question-type');
-        $question->data = json_encode([
-            'path-to-file' => $path_to_file,
-            'options' => [
-                'option-text-1' => $request->input('option-text-1'),
-                'option-text-2' => $request->input('option-text-2'),
-                'option-text-3' => $request->input('option-text-3'),
-                'selected-option' => $request->input('selected-option')
-            ]
+        $order = Question::where('exam_id', $exam_id)->max('order') + 1;
+
+        Question::create([
+            'exam_id' => $exam_id,
+            'title' => $request->title,
+            'description' => $request->description,
+            'type' => $request->type,
+            'marks' => $request->marks,
+            'options' => $options ?? null,
+            'answer' => $request->input('answer'),
+            'file_path' => $path_to_file,
+            'order' => $order,
         ]);
 
-        $question->save();
-        $question->exams()->attach([$exam_id]);
-
-        return redirect()->route('exam.show', $exam_id);
+        return redirect()->route('exams.edit', $exam_id);
     }
 
     /**
@@ -148,21 +155,21 @@ class QuestionController extends Controller
 
                     foreach ($options as $key => $value) {
                         $options_aux['option-text-' . ($key + 1)] = $value;
-                        $options_aux['selected-option'] = $answer;
                     }
                     $options = $options_aux;
 
+                    $order = Question::where('exam_id', $exam_id)->max('order') + 1;
+
                     $question = new Question;
-                    $question->value = 1;
+                    $question->marks = 1;
+                    $question->exam_id = $exam_id;
                     $question->description = $question_description;
                     $question->type = 'multiple-choice';
-                    $question->data = json_encode([
-                        'path-to-file' => NULL,
-                        'options' => $options,
-                    ]);
+                    $question->options = json_encode($options);
+                    $question->answer = $answer;
+                    $question->order = $order;
 
                     $question->save();
-                    $question->exams()->attach([$exam_id]);
 
                     $options = [];
                     $options_aux = [];
@@ -179,7 +186,7 @@ class QuestionController extends Controller
             return redirect()->back()->with("error", "Invalid data");
         }
 
-        return redirect()->route('exam.show', $exam_id);
+        return redirect()->route('exams.edit', $exam_id);
     }
 
     /**
@@ -188,14 +195,12 @@ class QuestionController extends Controller
      * @param  \App\Models\Question  $question
      * @return \Illuminate\Http\Response
      */
-    public function edit(Request $request)
+    public function edit(Request $request, Question $question)
     {
-        $exam_id = $request->exam_id;
-        $question_id = $request->question_id;
+        $exam_id = $question->exam_id;
+        $question_id = $question->question_id;
 
-        $question = Question::find($question_id);
-
-        return view('admin.exams.questions.show', compact('question', 'exam_id'));
+        return view('exams.questions.show', compact('question', 'exam_id'));
     }
 
     /**
@@ -205,47 +210,63 @@ class QuestionController extends Controller
      * @param  \App\Models\Question  $question
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $exam_id, $question_id)
+    public function update(Request $request, Question $question)
     {
         try {
             $request->validate([
-                'question-file' => 'file|mimes:mp3,jpg,png|max:10000',
-                'question-type' => 'required',
-                'question-value' => 'required',
-                'question-description' => 'required',
-                'question-value' => 'min:0|max:100',
+                'title' => 'string|max:255',
+                'description' => 'string|max:255',
+                // 'type' => 'required',
+                'marks' => 'required|min:0|max:100',
+                'options' => 'array',
+                'file' => 'file|mimes:mp3,jpg,png|max:10000',
+                'description' => 'required',
             ]);
 
-            if ($request->input('question-type') == "multiple-choice") {
+            if ($request->input('type') == "multiple-choice") {
                 $request->validate([
-                    'selected-option' => 'required',
+                    'answer' => 'required',
                 ]);
+
+                $options = json_encode($request->only([
+                    'option-text-1',
+                    'option-text-2',
+                    'option-text-3',
+                ]));
             }
         } catch (\Throwable $th) {
-            $request->session()->flash('error', $th->getMessage());
-            return redirect()->route('exam.show', $exam_id);
+            session()->flash('error', $th->getMessage());
+            return redirect()->route('exams.edit', $question->exam_id);
         }
 
-
         $file = $request->file('question-file');
-        $path_to_file = $file == null ? null : $request->file('question-file')->storeAs('questions/files', time() . '.' . $file->getClientOriginalExtension());
+        $path_to_file = $file == null ? $question->file : $request->file('question-file')->storeAs('questions/files', time() . '.' . $file->getClientOriginalExtension());
 
-        $question = Question::find($question_id);
-        $question->value = $request->input('question-value');
-        $question->description = $request->input('question-description');
-        $question->type = $request->input('question-type');
-        $question->data = json_encode([
-            'path-to-file' => $path_to_file,
-            'options' => [
-                'option-text-1' => $request->input('option-text-1'),
-                'option-text-2' => $request->input('option-text-2'),
-                'option-text-3' => $request->input('option-text-3'),
-                'selected-option' => $request->input('selected-option')
-            ]
-        ]);
+        $question = Question::find($question->id);
+        $question->marks = $request->marks;
+        $question->title = $request->title;
+        $question->description = $request->description;
+        $question->type = $request->type;
+        $question->options = $options ?? null;
+        $question->answer = $request->answer;
+        $question->file_path = $path_to_file;
         $question->save();
 
-        return redirect()->route('exam.show', $exam_id);
+        return redirect()->route('exams.edit', $question->exam_id);
+    }
+
+    public function sort(Request $request)
+    {
+        $newQuestionsOrder = json_decode($request->data);
+        foreach ($newQuestionsOrder as $key => $value) {
+            if (!empty($value)) {
+                $question = Question::find($key);
+                $question->order = (int)$value;
+                $question->save();
+            }
+        }
+
+        return redirect()->route('exams.edit', $request->exam_id);
     }
 
     /**
@@ -256,11 +277,8 @@ class QuestionController extends Controller
      */
     public function destroy(Question $question)
     {
-        $exam_id = $question->exam->id;
-        // $question_id = $request->question_id;
-        // dd($question->exams);
-        // $question = Question::find($question_id);
+        $exam_id = $question->exam_id;
         $question->delete();
-        return redirect()->route('exam.show', $exam_id);
+        return redirect()->route('exams.edit', $exam_id);
     }
 }

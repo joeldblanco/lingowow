@@ -72,7 +72,7 @@ class StudentUnrolmentToTeacher extends Notification implements ShouldQueue
             ->line('Greetings, dear ' . $notifiable->first_name . ' ' . $notifiable->last_name . '.')
             ->line('We are writing to notify you that student ' . $this->student->first_name . ' ' . $this->student->last_name . ' have been automatically unenroled from the course ' . $this->course->name . ', which leaves your blocks ' . $this->schedule_string . ' free.')
             ->line('Click the button below to check your current schedule.')
-            ->action('Check Schedule', url('/dashboard'))
+            ->action('Check Schedule', route('dashboard'))
             ->line('If you have any questions, please contact us through the regular channels.');
     }
 

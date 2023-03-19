@@ -15,7 +15,7 @@ return new class extends Migration
     {
         Schema::create('answers', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->string('answer_data',50)->nullable();
+            $table->string('answer_data', 50)->nullable();
             $table->text('answer_content')->nullable();
             $table->bigInteger('attempt_id')->unsigned();
             $table->timestamps();

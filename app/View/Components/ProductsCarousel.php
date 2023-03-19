@@ -4,7 +4,7 @@ namespace App\View\Components;
 
 use Illuminate\View\Component;
 
-class CoursesCarousel extends Component
+class ProductsCarousel extends Component
 {
     /**
      * Create a new component instance.
@@ -23,6 +23,6 @@ class CoursesCarousel extends Component
      */
     public function render()
     {
-        return view('components.courses-carousel');
+        return view('components.products-carousel');
     }
 }

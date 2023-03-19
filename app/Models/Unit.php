@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 
 class Unit extends Model
 {
@@ -80,6 +81,14 @@ class Unit extends Model
     public function contents()
     {
         return $this->hasMany(Content::class);
+    }
+
+    /**
+     * Get all of the attempts for the unit.
+     */
+    public function attempts(): HasManyThrough
+    {
+        return $this->hasManyThrough(Attempt::class, Exam::class);
     }
 }
 //

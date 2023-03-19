@@ -24,67 +24,60 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @if (count($questions) > 0)
-                            @foreach ($questions as $question)
-                                <tr>
-                                    {{-- {{dd($answers[$loop->index][0],$answers[$loop->index][1])}} --}}
-                                    <td class="py-4 px-6 uppercase text-sm text-gray-600 border-b border-gray-400">
-                                        {{ $question->value }}</td>
-                                    <td
-                                        class="py-4 px-6 uppercase text-sm text-gray-600 border-b border-gray-400 text-center">
-                                        {{ $question->description }}</td>
-                                    <td
-                                        class="py-4 px-6 uppercase text-sm text-gray-600 border-b border-gray-400 text-center">
-                                        {{ $question->type }}</td>
-                                    @if (array_key_exists($loop->index, $answers) && $question->type == 'multiple-choice')
-                                        {{-- {{dd(json_decode($question->data,1)["options"])}} --}}
-                                        @if ($answers[$loop->index][0] == $answers[$loop->index][1])
-                                            <td
-                                                class="py-4 px-6 uppercase text-sm bg-green-100 text-gray-600 border-b border-gray-400 text-center">
-                                                @if ($answers[$loop->index][1] != -1)
-                                                    {{ json_decode($question->data, 1)['options']['option-text-' . strval($answers[$loop->index][1])] }}
-                                                @else
-                                                    n/a
-                                                @endif
-                                            </td>
-                                            <td
-                                                class="py-4 px-6 uppercase text-sm bg-green-100 text-gray-600 border-b border-gray-400 text-center">
-                                                {{ json_decode($question->data, 1)['options']['option-text-' . strval($answers[$loop->index][0])] }}
-                                            </td>
-                                        @else
-                                            <td
-                                                class="py-4 px-6 uppercase text-sm bg-red-100 text-gray-600 border-b border-gray-400 text-center">
-                                                @if ($answers[$loop->index][1] != -1)
-                                                    {{ json_decode($question->data, 1)['options']['option-text-' . strval($answers[$loop->index][1])] }}
-                                                @else
-                                                    n/a
-                                                @endif
-                                            </td>
-                                            <td
-                                                class="py-4 px-6 uppercase text-sm bg-red-100 text-gray-600 border-b border-gray-400 text-center">
-                                                {{ json_decode($question->data, 1)['options']['option-text-' . strval($answers[$loop->index][0])] }}
-                                            </td>
-                                        @endif
+                        @forelse ($questions as $question)
+                            <tr>
+                                <td class="py-4 px-6 uppercase text-sm text-gray-600 border-b border-gray-400">
+                                    {{ $question->marks }}</td>
+                                <td
+                                    class="py-4 px-6 uppercase text-sm text-gray-600 border-b border-gray-400 text-center">
+                                    {{ $question->description }}</td>
+                                <td
+                                    class="py-4 px-6 uppercase text-sm text-gray-600 border-b border-gray-400 text-center">
+                                    {{ $question->type }}</td>
+                                @if ($question->type == 'multiple-choice')
+                                    @if (!isset($answers[$question->id]))
+                                        <td
+                                            class="py-4 px-6 uppercase text-sm text-gray-600 border-b border-gray-400 text-center bg-red-100">
+                                            —
+                                        </td>
                                     @else
                                         <td
-                                            class="py-4 px-6 uppercase text-sm text-gray-600 border-b border-gray-400 text-center">
-                                            @hasanyrole('teacher|admin')
-                                                @if ($question->type == 'essay')
-                                                    <a href="{{route('attempt.show_question',[$attempt->id,$question->id])}}" class="font-bold text-xl"><i class="fas fa-edit"></i></a>
-                                                @endif
-                                            @endhasanyrole
-                                        </td>
-                                        <td
-                                            class="py-4 px-6 uppercase text-sm text-gray-600 border-b border-gray-400 text-center">
+                                            class="py-4 px-6 uppercase text-sm text-gray-600 border-b border-gray-400 text-center @if ($answers[$question->id] == $question->answer) bg-green-100 @else bg-red-100 @endif">
+                                            {{ $answers[$question->id] }}
                                         </td>
                                     @endif
-                                </tr>
-                            @endforeach
-                        @else
+                                @endif
+                                @if ($question->type == 'essay')
+                                    <td class="py-4 px-6 uppercase text-gray-600 border-b border-gray-400 text-center">
+                                        @php
+                                            if (empty($answers[$question->id])) {
+                                                $answers[$question->id] = '—';
+                                            }
+                                        @endphp
+                                        {{ Str::limit($answers[$question->id], 10, '...') }}
+                                    </td>
+                                @endif
+                                @if ($question->type == 'info')
+                                    <td class="py-4 px-6 uppercase text-gray-600 border-b border-gray-400 text-center">
+                                    </td>
+                                @endif
+                                <td
+                                    class="py-4 px-6 uppercase text-sm text-gray-600 border-b border-gray-400 text-center">
+                                    @if ($question->type == 'multiple-choice')
+                                        {{ json_decode($question->options, true)['option-text-' . strval($question->answer)] }}
+                                    @endif
+                                    @if ($question->type == 'essay' || $question->type == 'speaking')
+                                        <a href="#">
+                                            <i class="fas fa-edit text-lg"></i>
+                                        </a>
+                                    @endif
+                                </td>
+                            </tr>
+                        @empty
                             <tr>
                                 <td colspan="5" class="text-center py-5">This exam has no questions</td>
                             </tr>
-                        @endif
+                        @endforelse
 
                     </tbody>
                 </table>

@@ -4,7 +4,9 @@ namespace App\Console;
 
 use App\Http\Controllers\ApportionmentController;
 use App\Http\Controllers\GatherController;
+use App\Http\Controllers\MeetingController;
 use App\Jobs\CreateClasses;
+use App\Models\Attempt;
 use App\Models\Classes;
 use App\Models\Enrolment;
 use App\Models\Schedule as ModelsSchedule;
@@ -15,6 +17,7 @@ use App\Notifications\UpcomingClassForTeacher;
 use Carbon\Carbon;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Notification;
@@ -82,7 +85,7 @@ class Kernel extends ConsoleKernel
                                 $enrolment->save();
                                 $preselection->delete();
 
-                                $classes_dates = ApportionmentController::calculateApportionment(count($user_schedule->selected_schedule), json_encode($user_schedule->selected_schedule), $enrolment->course->id)[2];
+                                $classes_dates = ApportionmentController::calculateApportionment(count($user_schedule->selected_schedule), json_encode($user_schedule->selected_schedule), $enrolment->course->id, true)[2];
                                 // dump();
                                 // URGENT SCHEDULE NEW CLASSES
                                 //ADDING CLASS DURATION (40 MIN) TO CLASS START DATETIME AND STORING IT IN ANOTHER VARIABLE (TO CREATE CLASS END DATETIME)//
@@ -98,9 +101,19 @@ class Kernel extends ConsoleKernel
                                     $classes_dates[$key][1] = $classes_dates[$key][1]->toDateTimeString();
                                 }
 
+                                //CREATING MEETING//
+                                $data = [
+                                    'topic' => $enrolment->student->first_name . ' ' . $enrolment->student->last_name . ' - Lesson Room',
+                                    'host_id' => $enrolment->teacher->id,
+                                    'atendee_id' => $enrolment->student->id,
+                                ];
+
+                                $request = new Request($data);
+                                $meeting_id = (new MeetingController)->store($request, true);
+
                                 //CREATING CLASSES (CLASS BOOKING)//
                                 foreach ($classes_dates as $date) {
-                                    CreateClasses::dispatch($date, $enrolment->id);
+                                    CreateClasses::dispatch($date, $enrolment->id, $meeting_id);
                                 }
                             }
                         }
@@ -132,6 +145,17 @@ class Kernel extends ConsoleKernel
 
                 if (!$notified_students->contains($class->student())) {
                     Notification::sendNow($class->student(), new UpcomingClassForStudent($class));
+                }
+            }
+        })->everyMinute();
+
+        $schedule->call(function () {
+            $attempts = Attempt::whereNull('completed_at')->get();
+
+            foreach ($attempts as $attempt) {
+                if (now() >= $attempt->created_at->copy()->addMinutes($attempt->duration())) {
+                    $attempt->completed_at = now()->toDateTimeString();
+                    $attempt->save();
                 }
             }
         })->everyMinute();

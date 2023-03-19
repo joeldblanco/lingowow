@@ -4,14 +4,22 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Exam extends Model
 {
     use HasFactory;
+    use SoftDeletes;
 
     protected $fillable = [
+        'title',
+        'description',
         'unit_id',
-        'min_score',
+        'type',
+        'passing_marks',
+        'total_marks',
+        'duration',
+        'status',
     ];
 
     /**
@@ -19,7 +27,7 @@ class Exam extends Model
      */
     public function questions()
     {
-        return $this->belongsToMany(Question::class);
+        return $this->hasMany(Question::class);
     }
 
     /**

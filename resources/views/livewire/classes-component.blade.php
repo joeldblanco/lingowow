@@ -1,22 +1,40 @@
 <div x-data="{ showCommentsModal: false, classDetails: @entangle('classDetails') }" id="classes_main" class="px-20 pt-10">
-    <div class="flex justify-start w-1/2 my-4 space-x-4 range-date-tour">
+    <div class="flex justify-between w-full my-4">
         {{-- <form action="{{ route('classes.index') }}"> --}}
-        <div>
-            <label class="block text-gray-700 text-sm font-bold mb-2" for="start_date">
-                Start Date
-            </label>
-            <input autocomplete="off" wire:model="start_date" type="text" id="start_date" name="start_date"
-                class="text-gray-500 border-gray-300 rounded-lg hover:border-gray-400">
+        <div class="flex space-x-4 range-date-tour">
+            <div>
+                <label class="block text-gray-700 text-sm font-bold mb-2" for="start_date">
+                    Start Date
+                </label>
+                <input autocomplete="off" wire:model.lazy="start_date" type="text" id="start_date" name="start_date"
+                    class="text-gray-500 border-gray-300 rounded-lg hover:border-gray-400">
+            </div>
+            <div>
+                <label class="block text-gray-700 text-sm font-bold mb-2" for="end_date">
+                    End Date
+                </label>
+                <input autocomplete="off" wire:model.lazy="end_date" type="text" id="end_date" name="end_date"
+                    class="text-gray-500 border-gray-300 rounded-lg hover:border-gray-400">
+            </div>
+            @role('admin')
+                <div>
+                    <label class="block text-gray-700 text-sm font-bold mb-2" for="end_date">
+                        Enrolment ID
+                    </label>
+                    <input autocomplete="off" wire:model.lazy="enrolment_id" type="number"
+                        class="text-gray-500 border-gray-300 rounded-lg hover:border-gray-400">
+                </div>
+            @endrole
         </div>
-        <div>
-            <label class="block text-gray-700 text-sm font-bold mb-2" for="end_date">
-                End Date
-            </label>
-            <input autocomplete="off" wire:model="end_date" type="text" id="end_date" name="end_date"
-                class="text-gray-500 border-gray-300 rounded-lg hover:border-gray-400">
-        </div>
-        {{-- <button class="bg-blue-700 rounded-md text-white py-2 px-4 hover:bg-blue-800">Search</button> --}}
+        @role('admin')
+            <div class="flex items-end">
+                <a class="bg-blue-700 rounded-md text-white py-2 px-4 hover:bg-blue-800 cursor-pointer"
+                    href="{{ route('classes.create') }}">Create</a>
+            </div>
+        @endrole
+
         {{-- </form> --}}
+
     </div>
     @if (count($classes) > 0)
         <div class="flex justify-center w-full items-center my-8">
@@ -24,7 +42,7 @@
                 <p class="text-2xl font-bold w-full text-center">Classes</p>
                 @role('admin')
                     <p class="text-xl w-full text-center text-gray-600">Classes pending review:
-                        {{ count($to_review_classes) }}</p>
+                        {{ count($to_review_classes) }}/{{ count($total_to_review_classes) }}</p>
                 @endrole
             </div>
         </div>
@@ -41,6 +59,7 @@
                     @hasanyrole('teacher|admin')
                         <th {{-- wire:click="sort('teacher')" --}} class="flex justify-center w-full">Student</th>
                     @endhasanyrole
+                    <th class="flex justify-center w-full">Course</th>
                     <th class="flex justify-center w-full">Class Datetime (Local)</th>
                     @hasanyrole('teacher|admin')
                         <th {{-- wire:click="sort('start_date')" --}} class="flex justify-center w-full">Comments</th>
@@ -77,10 +96,15 @@
                                     {{ $value->student()->last_name }}</a>
                             </td>
                         @endhasanyrole
+                        <td class="flex w-full justify-center">
+                            <a href="{{ route('courses.show', $value->enrolment->course->id) }}"
+                                class="hover:underline hover:text-blue-500">
+                                {{ $value->enrolment->course->name }}</a>
+                        </td>
                         @php
-                            $lesson_date = (new Carbon\Carbon($value->start_date))->setTimezone(session('session_info')['timezone']['id']);
+                            $lesson_date = (new Carbon\Carbon($value->start_date))->setTimezone(auth()->user()->timezone);
                         @endphp
-                        @if ($lesson_date->lt(Carbon\Carbon::now(session('session_info')['timezone']['id'])))
+                        @if ($lesson_date->lt(Carbon\Carbon::now(auth()->user()->timezone)))
                             <td class="flex w-full justify-center text-red-500 cursor-pointer hover:underline class-tour"
                                 wire:click="showClass({{ $value->id }})">
                                 {{ $lesson_date->format('d/m/Y - h:00 a') }}
@@ -131,7 +155,7 @@
     </div>
 
 
-    <x-modal type="info" name="classDetails">
+    <x-modal type="info" name="classDetails" class="w-1/4 mx-auto">
         <x-slot name="title">
             Details
         </x-slot>
@@ -155,13 +179,13 @@
                         Yes
                     @endif
                 </p> --}}
-                <p><span class="font-bold">Did the student receive the class?</span>
+                {{-- <p><span class="font-bold">Did the student receive the class?</span>
                     @if (empty($current_class->rating))
                         No
                     @else
                         Yes
                     @endif
-                </p>
+                </p> --}}
                 {{-- <p><span class="font-bold">Recording:</span> {{App\Http\Controllers\ClassController::getRecordingUrl($current_class)}}</p> --}}
             @endif
         </x-slot>
@@ -171,15 +195,20 @@
                 @role('student')
                     @if (
                         !empty($current_class) &&
-                            empty($current_class->rating) &&
                             App\Http\Controllers\ApportionmentController::getPeriod($current_class->start_date) ==
                                 (new Carbon\Carbon(App\Http\Controllers\ApportionmentController::currentPeriod()[0]))->format('F Y'))
-                        @if ($current_class->start_date > Carbon\Carbon::now()->addHours(1))
+                        @if ($current_class->start_date > Carbon\Carbon::now()->addHours(1) && $current_class->status != 1)
                             <a href="{{ route('classes.edit', $current_class->id) }}"
                                 class="bg-green-600 font-semibold text-white p-4 mr-1 rounded-full hover:bg-green-700 focus:outline-none focus:ring shadow-lg hover:shadow-none transition-all duration-300 rescheduling-button"
                                 @click=" classDetails = false">
                                 Request rescheduling
                             </a>
+                        @endif
+                        @if ($current_class->end_date < now())
+                            <p class="text-sm text-center mx-auto inline-block text-gray-600">Any complaints about this
+                                class?<br> Fill out the form <a
+                                    href="{{ route('classes.complaints', $current_class->id) }}"
+                                    class="hover:text-blue-600 underline" @click="classDetails = false">here.</a></p>
                         @endif
                     @endif
                 @endrole
@@ -237,9 +266,11 @@
         </x-slot>
     </x-modal>
 
-    @role('student')
-        <livewire:rating-form />
-    @endrole
+    {{-- @if (!Auth::user()->isImpersonated()) --}}
+    {{-- @role('student')
+            <livewire:rating-form />
+        @endrole --}}
+    {{-- @endif --}}
     @role('student')
         <x-shepherd-tour tourName="students/classes-tour" role="student" />
     @endrole

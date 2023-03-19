@@ -114,26 +114,16 @@ class MeetingController extends Controller
             }
 
             $meetings = Meeting::all();
-            $success = "Meeting created successfully";
-            session(['success' => $success]);
+
+            if ($return) {
+                return $meeting->id;
+            } else {
+                return view('meetings.index', compact('meetings'))->with('success', 'Meeting created successfully');
+            }
         } else {
             $meetings = Meeting::all();
             $error = json_decode($response->getBody(), true);
-            session(['error' => $error]);
-        }
-
-        // } else {
-        //     $meetings = Meeting::all();
-        //     $error = [
-        //         'message' => "Meeting already exists",
-        //     ];
-        //     session(['error' => $error]);
-        // }
-
-        if ($return) {
-            return $meeting->id;
-        } else {
-            return view('meetings.index', compact('meetings'));
+            return view('meetings.index', compact('meetings'))->with('error', $error);
         }
     }
 
@@ -218,15 +208,12 @@ class MeetingController extends Controller
         if ($success) {
             Meeting::find($meeting->id)->delete();
             $meetings = Meeting::all();
-            $success = "Meeting deleted successfully";
-            session(['success' => $success]);
-            return view('meetings.index', compact('meetings'));
+            return view('meetings.index', compact('meetings'))->with('success', 'Meeting deleted successfully');
         } else {
 
             $meetings = Meeting::all();
             $error = json_decode($response->getBody(), true);
-            session(['error' => $error]);
-            return view('meetings.index', compact('meetings'));
+            return view('meetings.index', compact('meetings'))->with('error', $error);
         }
     }
 
@@ -262,36 +249,98 @@ class MeetingController extends Controller
 
     public function getRecordings($link = false)
     {
-        $meetings = Meeting::find(auth()->user()->studentClasses->pluck('meeting_id')->unique()->toArray());
-        $recordings = [];
-        foreach ($meetings as $meeting) {
-            $path = 'meetings/' . $meeting->zoom_id() . '/recordings';
-            $url = $this->retrieveZoomUrl();
-            $response = Http::withHeaders([
-                'Authorization' => 'Bearer ' . $this->jwt,
-                'Content-Type'  => 'application/json',
-            ])->get($url . $path);
-            $recordings = json_decode($response->getBody(), true);
-            if ($response->getStatusCode() == 200) {
-                $password = $recordings["password"];
-                $recordings = $recordings["recording_files"];
-                foreach ($recordings as $key => $value) {
-                    $recordings[$key] = [
-                        "recording_start" => $value["recording_start"],
-                        "duration" => (new Carbon($value["recording_start"]))->diffInMinutes($value["recording_end"]),
-                        "play_url" => $value["play_url"],
-                        'password' => $password,
-                    ];
+        // Retrieve the meeting associated with the user's class
+        $meeting = Meeting::find(auth()->user()->studentClasses->pluck('meeting_id'))->first();
+
+        // Generate the URL to retrieve the meeting instances
+        $path = 'past_meetings/' . $meeting->zoom_id() . '/instances';
+        $url = $this->retrieveZoomUrl();
+
+        // Send an HTTP GET request to retrieve the meeting instances
+        $response = Http::withHeaders([
+            'Authorization' => 'Bearer ' . $this->jwt,
+            'Content-Type'  => 'application/json',
+        ])->get($url . $path);
+
+        // Decode the response into an array and extract each meeting instance's UUID
+        $meetingInstances = json_decode($response->getBody(), true);
+
+        // Initialize an array to store all the recordings
+        $allRecordings = [];
+
+        // Retrieve the recording details for each meeting instance
+        if (!empty($meetingInstances)) {
+            foreach ($meetingInstances['meetings'] as $meetingInstanceUUID) {
+                // Generate the URL to retrieve the recording details
+                $path = 'meetings/' . $meetingInstanceUUID['uuid'] . '/recordings';
+                $url = $this->retrieveZoomUrl();
+
+                // Send an HTTP GET request to retrieve the recording details
+                $response = Http::withHeaders([
+                    'Authorization' => 'Bearer ' . $this->jwt,
+                    'Content-Type'  => 'application/json',
+                ])->get($url . $path);
+
+                // Decode the response into an array
+                $recordings = json_decode($response->getBody(), true);
+                // If the response is OK (200), extract the necessary information and filter based on the date
+                if (!empty($recordings) && $response->getStatusCode() == 200) {
+                    $password = $recordings["password"];
+                    $recordings = array_filter($recordings["recording_files"], function ($value) {
+                        return Carbon::now()->diffInDays(new Carbon($value["recording_start"])) <= 7;
+                    });
+
+                    foreach ($recordings as $key => $value) {
+                        $recordings[$key] = [
+                            "recording_start" => (new Carbon($value["recording_start"]))->toDateTimeString(),
+                            "duration" => (new Carbon($value["recording_start"]))->diffInMinutes($value["recording_end"]),
+                            "play_url" => $value["play_url"],
+                            "download_url" => $value["download_url"],
+                            'password' => $password,
+                            'recording_type' => $value['recording_type'],
+                        ];
+                    }
+                } else {
+                    // If the response is not OK, initialize the recordings as an empty array
+                    $recordings = [];
                 }
-            } else {
-                $recordings = [];
+
+                // Add the recordings to the array of all recordings using the recording start date as the key
+                if (!empty($value)) $allRecordings[$value["recording_start"]] = $recordings;
             }
         }
 
+        // Filter the array of all recordings to remove empty arrays
+        $allRecordings = array_filter($allRecordings);
+
+        // Sort the array of all recordings by the recording start date
+        ksort($allRecordings);
+
+
+        // If the link is set, return the recordings
         if ($link) {
             return $recordings;
         }
 
-        return view('meetings.recordings', compact('recordings'));
+        // Return the view with the recordings
+        return view('meetings.recordings', compact('allRecordings'));
+    }
+
+    public function getZoomUser(Request $request)
+    {
+        $teacher = User::find($request->teacherId);
+        $path = 'users/' . $teacher->email;
+        $url = $this->retrieveZoomUrl();
+
+        $response = Http::withHeaders([
+            'Authorization' => 'Bearer ' . $this->jwt,
+            'Content-Type'  => 'application/json',
+        ])->get($url . $path);
+
+        if ($response->getStatusCode() === 200) {
+            return true;
+        } else {
+            return false;
+        }
     }
 }
