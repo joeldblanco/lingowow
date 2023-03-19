@@ -44,7 +44,7 @@ class CreateSchedule implements ShouldQueue
         $enrolment = Enrolment::find($enrolment_id);
 
         //ADDING CLASS DURATION (40 MIN) TO CLASS START DATETIME AND STORING IT IN ANOTHER VARIABLE (TO CREATE CLASS END DATETIME)//
-        $classes_dates = session('classes_dates');
+        // $classes_dates = session('classes_dates');
         foreach ($classes_dates as $key => $value) {
 
             // $classes_dates[$key] = [];

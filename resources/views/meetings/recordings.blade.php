@@ -1,82 +1,72 @@
 <x-app-layout>
-    {{-- <div class="w-full flex justify-center mt-4">
-        @if (session()->exists('success'))
-            <div class="rounded-md bg-green-500 font-semibold text-white w-1/2 px-3 py-3 flex items-center">
-                <i class="fas fa-info-circle text-white text-lg"></i>
-                <p class="px-3">{{session('success')}}</p>
-            </div>
-        @endif
-        @if (session()->exists('error'))
-            <div class="rounded-md bg-red-500 font-semibold text-white w-1/2 px-3 py-3 flex items-center">
-                <i class="fas fa-info-circle text-white text-lg"></i>
-                <p class="px-3">Error creating meeting! - {{ session('error')['message'] }}</p>
-            </div>
-        @endif
-        @php
-            session()->forget('success');
-            session()->forget('error');
-        @endphp
-    </div> --}}
-
     <div class="bg-white font-sans">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="p-6 sm:px-20 bg-white border-b border-gray-200">
-
                 <div class="bg-white w-full border border-gray-300 rounded-lg p-6 divide-y divide-gray-200">
                     <div class="flex justify-between items-center mb-6">
                         <p class="font-bold text-2xl">
                             Recordings
                         </p>
-                        {{-- <p>
-                            <a href="{{ route('meetings.create') }}"
-                                class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-                                Create Meeting
-                            </a>
-                        </p> --}}
                     </div>
                     <div class="pt-6 w-full">
                         <table class="table-auto text-left w-full border-collapse">
                             <thead>
-                                <tr class="text-center">
+                                <tr class="text-headcenter">
                                     <th
                                         class="py-4 px-6 bg-gray-100 font-bold uppercase text-sm text-gray-600 border-b border-gray-400 text-center">
-                                        Start Date</th>
+                                        Start Date (Local)</th>
                                     <th
-                                        class="py-4 px-6 bg-gray-100 font-bold uppercase text-sm text-gray-600 border-b border-gray-400 text-center">
+                                        class="thepy-4 px-6 bg-gray-100 font-bold uppercase text-sm text-gray-600 border-b border-gray-400 text-center">
                                         Duration</th>
                                     <th
-                                        class="py-4 px-6 bg-gray-100 font-bold uppercase text-sm text-gray-600 border-b border-gray-400 text-center">
+                                        class="thepy-4 px-6 bg-gray-100 font-bold uppercase text-sm text-gray-600 border-b border-gray-400 text-center">
                                         Play Url</th>
                                     <th
                                         class="py-4 px-6 bg-gray-100 font-bold uppercase text-sm text-gray-600 border-b border-gray-400 text-center">
+                                        Chat</th>
+                                    <th
+                                        class="py-4 pxthe-6 bg-gray-100 font-bold uppercase text-sm text-gray-600 border-b border-gray-400 text-center">
                                         Password</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                @forelse ($recordings as $recording)
-                                {{dd($recordings)}}
+                                @forelse ($allRecordings as $files)
                                     <tr class="text-center">
                                         <td class="py-4 px-6 border-b border-gray-400 text-center">
-                                            {{ $recording['recording_start'] }}
+                                            @php
+                                                $recordingDate = (new Carbon\Carbon($files[0]['recording_start']))->setTimezone(auth()->user()->timezone);
+                                            @endphp
+                                            {{ $recordingDate->format('d/m/Y - h:00 a') }}
                                         </td>
                                         <td class="py-4 px-6 border-b border-gray-400 text-center">
-                                            {{ $recording['duration'] }} min.</td>
+                                            {{ $files[0]['duration'] }} min.</td>
                                         <td class="py-4 px-6 border-b border-gray-400 text-center">
-                                            <a href="{{ $recording['play_url'] }}" target="_blank"
-                                                class="hover:text-lw-blue hover:font-bold hover:underline">{{ Str::limit($recording['play_url'], 45, '...') }}
+                                            <a href="{{ $files[0]['play_url'] }}" target="_blank"
+                                                class="hover:text-lw-blue hover:font-bold hover:underline">{{ Str::limit($files[0]['play_url'], 45, '...') }}
                                             </a>
                                         </td>
+                                        @if (!empty($files[1]))
+                                            <td class="py-4 px-6 border-b text-gray-600 border-gray-400 text-center">
+                                                <a href="{{ $files[1]['download_url'] }}">
+                                                    <i class="fas fa-file-download text-xl"></i>
+                                                </a>
+                                            </td>
+                                        @else
+                                            <td class="py-4 px-6 border-b text-gray-300 border-gray-400 text-center">
+                                                <i class="fas fa-file-download text-xl cursor-not-allowed"></i>
+                                            </td>
+                                        @endif
                                         <td class="py-4 px-6 border-b border-gray-400 text-center">
                                             <a id="texto-a-copiar" href="#"
                                                 class="text-gray-600 hover:text-black font-bold" alt="Copy to clipboard"
                                                 onclick="copiarTexto(); return false;">
-                                                {{ $recording['password'] }}
+                                                {{ $files[0]['password'] }}
                                             </a>
                                         </td>
                                     </tr>
                                 @empty
                                     <tr class="text-3xl font-bold">
-                                        <td colspan="4" class="text-center">
+                                        <td colspan="5" class="text-center">
                                             <div class="py-20 text-red-500">No recordings available.</div>
                                         </td>
                                     </tr>
@@ -90,7 +80,6 @@
             </div>
         </div>
     </div>
-
     <script>
         function copiarTexto() {
             // Selecciona el elemento con la ID "texto-a-copiar"
@@ -108,5 +97,4 @@
             window.getSelection().removeAllRanges();
         }
     </script>
-
 </x-app-layout>

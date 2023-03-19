@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Invoice;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Cart;
+use Gloudemans\Shoppingcart\Facades\Cart;
 use App\Item;
 use App\Jobs\StoreSelfEnrolment;
 use App\Mail\InvoicePaid;
@@ -102,7 +102,11 @@ class PaymentController extends Controller
             $student = auth()->user();
             dispatch(new StoreSelfEnrolment($student));
 
-            return redirect()->route('invoice.show', ['id' => session('invoice_id')]);
+            $invoice = Invoice::find(session('invoice_id'));
+            $invoice->payment_method = 'niubiz';
+            $invoice->save();
+
+            return redirect()->route('invoice.show', ['id' => $invoice->id]);
         } else {
             return redirect()->route('cart')->with('error', 'No se pudo procesar el pago');
         }
@@ -167,6 +171,7 @@ class PaymentController extends Controller
             $invoice->paid = 0;
         }
         $invoice->user_id = auth()->id();
+        $invoice->payment_method = 'niubiz';
         $invoice->save();
 
         // $items = array();

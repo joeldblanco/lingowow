@@ -1,7 +1,7 @@
 <x-app-layout>
     @php
-        if ($question->value == null) {
-            $question->value = 0;
+        if ($question->marks == null) {
+            $question->marks = 0;
         }
     @endphp
     <div class="bg-white font-sans" x-data="{ create_question: false, import_create: true, questionList: true, error: @if (session('error')) true @else false @endif }" x-cloak>
@@ -22,8 +22,12 @@
         @endif
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="p-6 sm:px-20 bg-white border-b border-gray-200">
-                <form action="{{ route('questions.update', [$exam_id, $question->id]) }}" enctype="multipart/form-data"
+
+                <form action="{{ route('questions.update', $question->id) }}" enctype="multipart/form-data"
                     method="POST" id="exam-form">
+                    @csrf
+                    @method('PATCH')
+
                     <div class="w-full h-full flex items-center justify-center">
                         <div class="leading-loose">
                             <div id="create-questions-form"
@@ -34,14 +38,14 @@
                                     <i class="fas fa-times cursor-pointer text-xl" @click="create_question=false"></i>
                                 </div>
                                 <div class="flex flex-col">
-                                    <label for="question-value" class="text-sm">Question Value</label>
-                                    <input type="number" name="question-value" id="question-value"
+                                    <label for="marks" class="text-sm">Question Value</label>
+                                    <input type="number" name="marks" id="marks"
                                         class="w-3/12 px-2 py-2 text-gray-700 bg-gray-200 rounded"
-                                        placeholder="{{ $question->value }}" min="0" max="100"
-                                        value="{{ $question->value }}" required>
+                                        placeholder="{{ $question->marks }}" min="0" max="100"
+                                        value="{{ $question->marks }}" required>
                                 </div>
-                                <select id="question-type" class="w-full px-2 py-2 text-gray-700 bg-gray-200 rounded"
-                                    name="question-type" disabled>
+                                <select id="type" class="w-full px-2 py-2 text-gray-700 bg-gray-200 rounded"
+                                    name="type" disabled>
                                     <option disabled hidden required>Type</option>
                                     <option value="info" @if ($question->type == 'info') selected @endif>Info
                                     </option>
@@ -50,7 +54,7 @@
                                     <option value="essay" @if ($question->type == 'essay') selected @endif>Essay
                                     </option>
                                 </select>
-                                <select id="question-type" class="hidden" name="question-type">
+                                <select id="type" class="hidden" name="type">
                                     <option value="info" @if ($question->type == 'info') selected @endif>Info
                                     </option>
                                     <option value="multiple-choice" @if ($question->type == 'multiple-choice') selected @endif>
@@ -58,21 +62,20 @@
                                     <option value="essay" @if ($question->type == 'essay') selected @endif>Essay
                                     </option>
                                 </select>
-                                <textarea id="question-description" class="w-full px-2 py-2 text-gray-700 bg-gray-200 rounded" placeholder="Description"
-                                    style="resize: none" rows="4" name="question-description" required>{{ $question->description }}</textarea>
+                                <textarea id="description" class="w-full px-2 py-2 text-gray-700 bg-gray-200 rounded" placeholder="Description"
+                                    style="resize: none" rows="4" name="description" required>{{ $question->description }}</textarea>
                                 @if ($question->type == 'multiple-choice')
                                     @php
-                                        $data = json_decode($question->data, 1);
-                                        $options = $data['options'];
+                                        $options = json_decode($question->options, 1);
                                     @endphp
                                     <div id="options">
                                         @for ($i = 1; $i <= 3; $i++)
                                             <div class="flex flex-row space-x-4 my-3 items-center">
-                                                <input type="radio" id="option" value="1"
-                                                    name="selected-option" required
-                                                    @if (!empty($options['selected-option']) && $options['selected-option'] == $i) checked @endif>
-                                                <input type="text" id="option-text"
-                                                    value="{{ !empty($options['option-text-' . $i]) &&  $options['option-text-' . $i] }}"
+                                                <input type="radio" id="option-{{ $i }}" name="answer"
+                                                    required value="{{ $i }}"
+                                                    @if (!empty($question->answer) && $question->answer == $i) checked @endif>
+                                                <input type="text" id="option-text-{{ $i }}"
+                                                    value="{{ $options['option-text-' . $i] }}"
                                                     placeholder="Option {{ $i }}"
                                                     name="option-text-{{ $i }}"
                                                     class="w-full px-2 py-2 text-gray-700 bg-gray-200 rounded" required>
@@ -85,27 +88,28 @@
                                 @endif
                                 <div class="flex pt-4 justify-end space-x-2">
                                     <a href="{{ url()->previous() }}"
-                                        class="px-4 py-1 text-white font-light tracking-wider bg-gray-400 rounded">Cancel</a>
+                                        class="px-4 py-1 text-white font-light tracking-wider bg-red-600 hover:bg-red-700 rounded">Cancel</a>
                                     <button
-                                        class="px-4 py-1 text-white font-light tracking-wider bg-green-900 rounded">Save</button>
+                                        class="px-4 py-1 text-white font-light tracking-wider bg-green-700 hover:bg-green-800 rounded">Save</button>
                                 </div>
                             </div>
                         </div>
                     </div>
                     {{ csrf_field() }}
                 </form>
+
             </div>
         </div>
     </div>
     <script>
         tinymce.init({
-            selector: '#question-description',
+            selector: '#description',
             plugins: 'wordcount',
         });
     </script>
-    <script>
-        $("#question-type").change(function() {
-            var option = $("#question-type").find(":selected").text();
+    {{-- <script>
+        $("#type").change(function() {
+            var option = $("#type").find(":selected").text();
             $('#options').empty();
 
             if (option == "Multiple choice") {
@@ -115,9 +119,9 @@
 
                     radio = $('<input>').attr({
                         type: 'radio',
-                        id: 'option',
+                        id: 'option-text-' + i,
                         value: i,
-                        name: 'selected-option'
+                        name: 'answer'
                     }).appendTo(option);
 
                     $('<input>').attr({
@@ -137,12 +141,12 @@
                 $('<input>').attr({
                     type: 'file',
                     class: 'w-full px-2 py-2 text-gray-700 bg-gray-200 rounded',
-                    name: 'question-file'
+                    name: 'file'
                 }).appendTo('#options');
             }
 
         });
 
-        // $("#question-type").val('{{ $question->type }}').trigger('change');
-    </script>
+        // $("#type").val('{{ $question->type }}').trigger('change');
+    </script> --}}
 </x-app-layout>

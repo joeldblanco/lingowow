@@ -57,11 +57,21 @@ class GradingController extends Controller
     {
         $user = User::find($id);
         $courses = $user->enrolments->pluck('course');
-        $attempts = Attempt::where('user_id', $user->id)->where('score', '!=', null)->get()->groupBy('exam_id');
-        foreach ($attempts as $key => $attempt) {
-            $attempts[$key] = $attempts[$key]->where('score', $attempt->max('score'))->first();
-        }
+        // $attempts = $user->attempts()->where('score', '!=', null)->get()->groupBy('exam_id');
+        // foreach ($attempts as $key => $attempt) {
+        //     $attempts[$key] = $attempts[$key]->where('score', $attempt->max('score'))->first();
+        // }
+
         $units = [];
+        $attempts = [];
+        foreach ($courses as $course) {
+            foreach ($course->units() as $unit) {
+                if ($unit->exams->where('status', 1)->count()) $units[] = $unit;
+                if ($unit->attempts->where('user_id', $user->id)->count() > 0) {
+                    $attempts[$unit->id] = $unit->attempts->where('user_id', $user->id)->where('score', $unit->attempts->max('score'))->sortBy('created_at')->first();
+                }
+            }
+        }
 
         return view('gradings.show', compact('user', 'attempts', 'courses', 'units'));
     }

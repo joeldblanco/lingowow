@@ -165,6 +165,7 @@ return [
         Srmklive\PayPal\Providers\PayPalServiceProvider::class,
         Gloudemans\Shoppingcart\ShoppingcartServiceProvider::class,
         Jerry\JWT\Providers\JWTProvider::class,
+        DaveJamesMiller\Breadcrumbs\BreadcrumbsServiceProvider::class,
 
         /*
          * Package Service Providers...
@@ -236,6 +237,7 @@ return [
         'View' => Illuminate\Support\Facades\View::class,
         'PayPal' => Srmklive\PayPal\Facades\PayPal::class,
         'Cart' => Gloudemans\Shoppingcart\Facades\Cart::class,
+        "Breadcrumbs" => DaveJamesMiller\Breadcrumbs\Facades\Breadcrumbs::class,
 
     ],
 

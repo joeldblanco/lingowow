@@ -6,7 +6,7 @@
         }
     @endphp
 
-    <div class="p-12 bg-gray-200 font-sans text-gray-600" x-data="{ profile: true, followers: false, friends: false, gallery: false, friend_requests: false, editProfile: false, newMessage: false, showPost: false }" x-cloak>
+    <div class="p-12 bg-gray-200 font-sans text-gray-600" x-data="{ profile: true, followers: false, friends: false, gallery: false, friend_requests: false, editProfile: false, showPost: false }" x-cloak>
         <div class="max-w-7xl border rounded-xl bg-white flex flex-col pt-3 px-3 mb-6">
             <div class="border rounded-xl bg-blue-600 h-56"
                 style="background-image: url('https://berrydashboard.io/static/media/img-profile-bg.2b15e931.png'); background-size: cover;">
@@ -261,7 +261,7 @@
                         @if (count($this->friends) > 0)
                             @foreach ($this->friends as $friend)
                                 <div class="flex flex-col mx-2 border rounded-xl bg-gray-50 w-full p-3 hover:border-blue-500"
-                                    wire:key="friend-{{ $friend->id }}">
+                                    wire:key="friend-{{ $friend->id }}" x-data="{ newMessage_{{ $friend->id }}: false }">
                                     <div class="flex justify-between">
                                         <div class="flex items-center space-x-3">
                                             <img class="rounded-full w-12"
@@ -277,47 +277,43 @@
                                         </div>
                                     </div>
                                     <div class="flex space-x-2">
-                                        {{-- <button
-                                class="transition-colors ease-out delay-75 flex border bg-white rounded my-4 py-2 space-x-3 w-1/2 items-center justify-center text-purple-500 hover:bg-purple-100">
-                                <i class="fas fa-video"></i>
-                            </button> --}}
-                                        <button @click="newMessage = true"
+                                        <button @click="newMessage_{{ $friend->id }} = true"
                                             class="transition-colors ease-out delay-75 flex border bg-white rounded my-4 py-2 space-x-3 w-full items-center justify-center text-blue-500 hover:bg-blue-100">
                                             <i class="far fa-comment-alt"></i>
                                         </button>
                                     </div>
-                                </div>
-                                <x-modal type="info" name="newMessage" class="w-1/2 mx-auto">
-                                    <x-slot name="title"></x-slot>
-
-                                    <x-slot name="content">
-                                        <form method="POST" action="{{ route('chat.message') }}">
-                                            @csrf
-                                            <div class="flex space-x-3 w-full p-3 items-center">
-                                                <img src="{{ Storage::url($friend->profile_photo_path) }}"
-                                                    alt="profile_pic" class="w-1/6 rounded-full">
-                                                <p class="w-3/4 font-bold text-xl">{{ $friend->first_name }}
-                                                    {{ $friend->last_name }}</p>
-                                                <input type="text" class="hidden" name="friend_id"
-                                                    value="{{ $friend->id }}">
-                                            </div>
-                                            <div class="w-full">
-                                                <textarea class="w-full rounded-lg border-gray-300" name="message" id="message" cols="30" rows="10"
-                                                    placeholder="Write a message" {{-- wire:model="text_message" --}}></textarea>
-                                                <div class="flex px-3 h-10 cursor-pointer hover:bg-gray-200 border border-gray-300 hover:border-white hover:text-blue-500 rounded-lg"
-                                                    {{-- wire:click="send_message" 
-                                        @click="newMessage = false" --}}>
-                                                    <button type="submit"
-                                                        class="mx-auto flex space-x-3 items-center font-bold">
-                                                        <p>Send</p>
-                                                        <i class="fas fa-paper-plane"></i>
-                                                    </button>
+                                    <x-modal type="info" name="newMessage_{{ $friend->id }}" class="w-1/2 mx-auto">
+                                        <x-slot name="title"></x-slot>
+    
+                                        <x-slot name="content">
+                                            <form method="POST" action="{{ route('chat.message') }}">
+                                                @csrf
+                                                <div class="flex space-x-3 w-full p-3 items-center">
+                                                    <img src="{{ Storage::url($friend->profile_photo_path) }}"
+                                                        alt="profile_pic" class="w-1/6 rounded-full">
+                                                    <p class="w-3/4 font-bold text-xl">{{ $friend->first_name }}
+                                                        {{ $friend->last_name }}</p>
+                                                    <input type="text" class="hidden" name="friend_id"
+                                                        value="{{ $friend->id }}">
                                                 </div>
-                                            </div>
-                                        </form>
-                                    </x-slot>
-                                    <x-slot name="footer" class="justify-center"></x-slot>
-                                </x-modal>
+                                                <div class="w-full">
+                                                    <textarea class="w-full rounded-lg border-gray-300" name="message" id="message" cols="30" rows="10"
+                                                        placeholder="Write a message" {{-- wire:model="text_message" --}}></textarea>
+                                                    <div class="flex px-3 h-10 cursor-pointer hover:bg-gray-200 border border-gray-300 hover:border-white hover:text-blue-500 rounded-lg"
+                                                        {{-- wire:click="send_message" 
+                                            @click="newMessage = false" --}}>
+                                                        <button type="submit"
+                                                            class="mx-auto flex space-x-3 items-center font-bold">
+                                                            <p>Send</p>
+                                                            <i class="fas fa-paper-plane"></i>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </form>
+                                        </x-slot>
+                                        <x-slot name="footer" class="justify-center"></x-slot>
+                                    </x-modal>
+                                </div>
                             @endforeach
                         @else
                             <p class="col-span-4 text-center text-2xl font-bold my-6">No friends to show</p>
@@ -474,7 +470,8 @@
                                             placeholder="First name" required value="{{ $user->first_name }}"
                                             class="w-full rounded-md p-3 text-gray-600 hover:border-gray-600 @if ($errors->has('first_name')) border-red-600 @else border-gray-300 @endif ">
                                         @if ($errors->has('first_name'))
-                                            <p class="text-xs font-light text-red-600">{{$errors->get('first_name')[0]}}</p>
+                                            <p class="text-xs font-light text-red-600">
+                                                {{ $errors->get('first_name')[0] }}</p>
                                         @endif
                                     </div>
                                     <div class="space-y-1">
@@ -482,7 +479,8 @@
                                             placeholder="Last name" required value="{{ $user->last_name }}"
                                             class="w-full rounded-md p-3 text-gray-600 hover:border-gray-600 @if ($errors->has('last_name')) border-red-600 @else border-gray-300 @endif ">
                                         @if ($errors->has('last_name'))
-                                            <p class="text-xs font-light text-red-600">{{$errors->get('last_name')[0]}}</p>
+                                            <p class="text-xs font-light text-red-600">
+                                                {{ $errors->get('last_name')[0] }}</p>
                                         @endif
                                     </div>
                                 </div>
@@ -496,7 +494,8 @@
                                             required value="{{ $user->email }}"
                                             class="w-full rounded-md p-3 text-gray-600 hover:border-gray-600 @if ($errors->has('email')) border-red-600 @else border-gray-300 @endif ">
                                         @if ($errors->has('email'))
-                                            <p class="text-xs font-light text-red-600">{{$errors->get('email')[0]}}</p>
+                                            <p class="text-xs font-light text-red-600">{{ $errors->get('email')[0] }}
+                                            </p>
                                         @endif
                                     </div>
                                 </div>
@@ -513,7 +512,8 @@
                                             placeholder="Street address" required value="{{ $user->street }}"
                                             class="w-full rounded-md p-3 text-gray-600 hover:border-gray-600 @if ($errors->has('street')) border-red-600 @else border-gray-300 @endif ">
                                         @if ($errors->has('street'))
-                                            <p class="text-xs font-light text-red-600">{{$errors->get('street')[0]}}</p>
+                                            <p class="text-xs font-light text-red-600">{{ $errors->get('street')[0] }}
+                                            </p>
                                         @endif
                                     </div>
                                 </div>
@@ -523,7 +523,8 @@
                                             required value="{{ $user->city }}"
                                             class="w-full rounded-md p-3 text-gray-600 hover:border-gray-600 @if ($errors->has('city')) border-red-600 @else border-gray-300 @endif ">
                                         @if ($errors->has('city'))
-                                            <p class="text-xs font-light text-red-600">{{$errors->get('city')[0]}}</p>
+                                            <p class="text-xs font-light text-red-600">{{ $errors->get('city')[0] }}
+                                            </p>
                                         @endif
                                     </div>
                                     <div class="space-y-1">
@@ -531,7 +532,8 @@
                                             required value="{{ $user->country }}"
                                             class="w-full rounded-md p-3 text-gray-600 hover:border-gray-600 @if ($errors->has('country')) border-red-600 @else border-gray-300 @endif ">
                                         @if ($errors->has('country'))
-                                            <p class="text-xs font-light text-red-600">{{$errors->get('country')[0]}}</p>
+                                            <p class="text-xs font-light text-red-600">
+                                                {{ $errors->get('country')[0] }}</p>
                                         @endif
                                     </div>
                                 </div>
@@ -541,7 +543,8 @@
                                             required value="{{ $user->zip_code }}"
                                             class="w-full rounded-md p-3 text-gray-600 hover:border-gray-600 @if ($errors->has('zip_code')) border-red-600 @else border-gray-300 @endif ">
                                         @if ($errors->has('zip_code'))
-                                            <p class="text-xs font-light text-red-600">{{$errors->get('zip_code')[0]}}</p>
+                                            <p class="text-xs font-light text-red-600">
+                                                {{ $errors->get('zip_code')[0] }}</p>
                                         @endif
                                     </div>
                                 </div>
@@ -619,7 +622,8 @@
                                             placeholder="First name" required value="{{ $user->first_name }}"
                                             class="w-full rounded-md p-3 text-gray-600 hover:border-gray-600 @if ($errors->has('first_name')) border-red-600 @else border-gray-300 @endif ">
                                         @if ($errors->has('first_name'))
-                                            <p class="text-xs font-light text-red-600">{{$errors->get('first_name')[0]}}</p>
+                                            <p class="text-xs font-light text-red-600">
+                                                {{ $errors->get('first_name')[0] }}</p>
                                         @endif
                                     </div>
                                     <div class="space-y-1">
@@ -627,7 +631,8 @@
                                             placeholder="Last name" required value="{{ $user->last_name }}"
                                             class="w-full rounded-md p-3 text-gray-600 hover:border-gray-600 @if ($errors->has('last_name')) border-red-600 @else border-gray-300 @endif ">
                                         @if ($errors->has('last_name'))
-                                            <p class="text-xs font-light text-red-600">{{$errors->get('last_name')[0]}}</p>
+                                            <p class="text-xs font-light text-red-600">
+                                                {{ $errors->get('last_name')[0] }}</p>
                                         @endif
                                     </div>
                                 </div>
@@ -641,7 +646,8 @@
                                             required value="{{ $user->email }}"
                                             class="w-full rounded-md p-3 text-gray-600 hover:border-gray-600 @if ($errors->has('email')) border-red-600 @else border-gray-300 @endif ">
                                         @if ($errors->has('email'))
-                                            <p class="text-xs font-light text-red-600">{{$errors->get('email')[0]}}</p>
+                                            <p class="text-xs font-light text-red-600">{{ $errors->get('email')[0] }}
+                                            </p>
                                         @endif
                                     </div>
                                 </div>

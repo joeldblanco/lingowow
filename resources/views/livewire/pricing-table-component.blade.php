@@ -73,7 +73,7 @@
                                         ${{ $product->regular_price * $plan->monthly_classes }}
                                     </span>
                                     <span
-                                        class="font-bold text-2xl">{{ $product->sale_price * $plan->monthly_classes }}</span>
+                                        class="font-bold text-2xl">${{ $product->sale_price * $plan->monthly_classes }}</span>
                                 @endif
                             @else
                                 @if ($product->sale_price == null)

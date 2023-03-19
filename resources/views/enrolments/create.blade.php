@@ -12,13 +12,13 @@
                         </p>
                         <div>
                             <div class="py-6 space-y-1">
-                                <p class="font-bold text-gray-600 mb-1">Guest</p>
+                                <p class="font-bold text-gray-600 mb-1">User</p>
                                 <select name="student_id" id="student_id"
                                     class="w-full rounded-md hover:border-gray-600 p-3 text-gray-600 @if ($errors->has('student_id')) border-red-600 @else border-gray-300 @endif">
-                                    <option value="none" selected disabled hidden>Select a guest</option>
-                                    @foreach ($guests as $guest)
-                                        <option value="{{ $guest->id }}">
-                                            {{ $guest->first_name . ' ' . $guest->last_name }}
+                                    <option value="none" selected disabled hidden>Select a user</option>
+                                    @foreach ($users as $user)
+                                        <option value="{{ $user->id }}">
+                                            {{ $user->first_name . ' ' . $user->last_name }}
                                         </option>
                                     @endforeach
                                 </select>
@@ -69,8 +69,14 @@
                                 address.
                             </p>
                         </div>
-                        <button
-                            class="bg-blue-500 py-1 px-3 rounded-md font-semibold text-white shadow-lg text-lg"
+                        <div class="bg-red-200 border border-red-400 w-full rounded-md p-5 text-red-500 space-y-4 hidden"
+                            id="userNotInZoom">
+                            <p>
+                                In order to create the enrolment's meeting, the teacher must registered to Lingowow's
+                                Zoom account.
+                            </p>
+                        </div>
+                        <button class="bg-blue-500 py-1 px-3 rounded-md font-semibold text-white shadow-lg text-lg"
                             id="saveButton">
                             Save
                         </button>
@@ -107,6 +113,29 @@
 
             $('#plan').show();
 
+        });
+
+        $('#teacher_id').change(function() {
+            $.ajax({
+                type: 'POST',
+                url: route('getZoomUser'),
+                data: {
+                    teacherId: this.value,
+                    '_token': $('meta[name="csrf-token"]').attr('content'),
+                },
+                success: function(zoomUser) {
+                    if (!zoomUser) {
+                        $('#userNotInZoom').show();
+                        $('#saveButton').hide();
+                    } else {
+                        $('#userNotInZoom').hide();
+                        $('#saveButton').show();
+                    }
+                },
+                error: function(data) {
+                    console.log(data["responseText"]);
+                }
+            });
         });
 
         // $(document).ready(function() {

@@ -12,8 +12,16 @@
         <div class="bg-white shadow-md rounded my-6">
             {{ $invoices->links() }}
             @foreach ($date as $month_year)
-                <div class="text-3xl font-bold w-full p-2 text-center bg-gray-100">
-                    <p class="bg-white p-4">{{ $month_year }}</p>
+                <div
+                    class="bg-white text-3xl font-bold w-full p-2 text-center flex justify-around border border-gray-200">
+                    <div class="w-3/4">
+                        <p class="p-4">{{ $month_year }}</p>
+
+                    </div>
+                    <div class="w-1/4 flex justify-center items-center">
+                        <a href="#"
+                            class="bg-lw-blue text-white text-sm text-center py-2 px-4 my-auto rounded-lg hover:bg-blue-800">Export</a>
+                    </div>
                 </div>
                 <table class="text-left w-full border-collapse mb-16">
                     <!--Border collapse doesn't work on this site yet but it's available in newer tailwind versions -->
@@ -24,7 +32,7 @@
                                 ID</th>
                             <th
                                 class="py-4 px-6 bg-gray-100 font-bold uppercase text-sm text-gray-600 border-b border-gray-400">
-                                Username</th>
+                                Customer</th>
                             <th
                                 class="py-4 px-6 bg-gray-100 font-bold uppercase text-sm text-gray-600 border-b border-gray-400">
                                 Total</th>
@@ -43,7 +51,8 @@
                                     <td class="py-4 px-6 border-b border-gray-400">{{ $invoice->id }}</td>
                                     <td class="py-4 px-6 border-b border-gray-400"><a
                                             href="{{ route('profile.show', $invoice->user->id) }}"
-                                            class="hover:text-blue-600 hover:underline">{{ $invoice->user->username }}</a>
+                                            class="hover:text-blue-600 hover:underline">{{ $invoice->user->first_name }}
+                                            {{ $invoice->user->last_name }}</a>
                                     </td>
                                     <td class="py-4 px-6 border-b border-gray-400">${{ $invoice->price }}</td>
                                     <td class="py-4 px-6 border-b border-gray-400">

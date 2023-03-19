@@ -35,7 +35,11 @@ class ClassController extends Controller
      */
     public function create()
     {
-        //
+        $teachers = User::role('teacher')->get();
+        $students = User::role('student')->get();
+        $enrolments = Enrolment::all();
+
+        return view('classes.create', compact('teachers', 'students', 'enrolments'));
     }
 
     /**
@@ -46,7 +50,23 @@ class ClassController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            // 'teacher_id' => 'required|numeric|exists:App\Models\User,id',
+            // 'student_id' => 'required|numeric|exists:App\Models\User,id',
+            'enrolment_id' => 'required|numeric|exists:App\Models\Enrolment,id',
+            'date_time' => 'required|date_format:Y-m-d\TH:i',
+        ]);
+        $date_time = Carbon::parse($request->date_time)->format('Y-m-d H:i:s');
+        $enrolment = Enrolment::find($request->enrolment_id);
+        $meeting_id = Meeting::where('host_id', $enrolment->teacher->id)->where('atendee_id', $enrolment->student->id)->first()->id;
+        Classes::create([
+            'enrolment_id' => $enrolment->id,
+            'start_date' => $date_time,
+            'end_date' => Carbon::parse($date_time)->addMinutes(40)->format('Y-m-d H:i:s'),
+            'meeting_id' => $meeting_id,
+        ]);
+
+        return redirect()->route('admin.classes.index');
     }
 
     /**
@@ -73,11 +93,14 @@ class ClassController extends Controller
         $enrolment = Enrolment::find($class->enrolment_id);
         $teacher_id = $enrolment->teacher_id;
         $student_id = $enrolment->student_id;
-        session(['teacher_id' => $teacher_id]);
+        session([
+            'teacher_id' => $teacher_id,
+            'toRescheduleClass' => $id,
+        ]);
 
         $class_date = $class->start_date;
         $class_date = new Carbon($class_date);
-        $class_date = $class_date->toCookieString();
+        $class_date = $class_date->timezone(auth()->user()->timezone)->format('Y/m/d H:00');
         // dd($class_date);
 
         $teacher_schedule = Schedule::where('user_id', $teacher_id)->select('selected_schedule')->get()->toArray();
@@ -198,7 +221,7 @@ class ClassController extends Controller
 
 
             $teacher = User::find(session('teacher_id'));
-            $timezone = Carbon::now()->setTimezone($teacher->timezone);
+            $timezone = Carbon::now()->setTimezone(auth()->user()->timezone);
             $schedule = [$data[0], $data[1]];
             $date = Carbon::now();
             $date_local = Carbon::parse('Next ' . Carbon::now()->setISODate($date->year, $date->weekOfYear, $schedule[1])->format('l') . ' at ' . $schedule[0] . ':00');
@@ -209,7 +232,7 @@ class ClassController extends Controller
             $teacher = User::find($class->teacher()->id);
             // dd(in_array($data, $schedules_reserves[1]),in_array($data, $schedules_reserves[0]), $schedules_reserves[1], $data);
             if (in_array([$data[0], $data[1]], $teacher->studentsSchedules()) || !in_array([$data[0], $data[1]], $teacher->schedules->first()->selected_schedule) || in_array([$data[0], $data[1]], $schedules_reserves[0]) || in_array($data, $schedules_reserves[1])) {
-                session(['message' => "Dear Linguado. That block is not available"]);
+                session(['message' => "Dear Student. That block is not available"]);
                 return redirect()->back();
             }
 
@@ -291,22 +314,24 @@ class ClassController extends Controller
         return $recordings;
     }
 
-    // public function checkClasses(Request $request)
-    // {
-    //     $request = $request->except(['_token', '_method']);
-    //     $role = Auth::user()->roles()->first()->name;
-    //     foreach ($request as $key => $value) {
-    //         $name = explode('_', $key)[0];
-    //         $id = explode('_', $key)[1];
+    public function registerComplain(Request $request)
+    {
+        $request->validate([
+            'subject' => 'required|string',
+            'complaint' => 'required|string',
+            'class_id' => 'required|numeric|exists:App\Models\Classes,id',
+        ]);
+        $request = $request->except(['_token', '_method']);
 
-    //         if ($name == 'teacher' && ($role == "teacher" || $role == "admin")) {
-    //             dispatch(new TeacherClassCheck($id, $value));
-    //         }
+        dd($request);
 
-    //         if ($name == 'student' && ($role == "student" || $role == "admin")) {
-    //             dispatch(new StudentClassCheck($id, $value));
-    //         }
-    //     }
-    //     return redirect()->back();
-    // }
+        return redirect()->route('classes.index');
+    }
+
+    public static function getClassesByPeriod($period)
+    {
+        $period = Carbon::parse('Second monday of ' . $period);
+
+        return ApportionmentController::getPeriod($period, true);
+    }
 }

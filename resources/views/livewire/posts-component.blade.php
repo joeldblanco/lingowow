@@ -71,7 +71,7 @@
                         </div>
                     </div>
                 @endif
-                <div class="mb-5">
+                <div class="mb-5 space-y-5">
                     <p>{{ json_decode($post->content, 1)['text'] }}</p>
                     @if (json_decode($post->content, 1)['photo_path'] != null)
                         <img class="rounded-lg m-auto w-auto max-h-96 shadow-xl transform hover:scale-105 transition duration-500 cursor-pointer"

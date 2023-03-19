@@ -46,11 +46,16 @@ class ClassroomController extends Controller
     {
         // $current_period = ApportionmentController::getPeriod('2022-05-17'); //TO_DELETE
         $current_period = ApportionmentController::currentPeriod();
-        $enrolment = Enrolment::where('student_id', $id)->first();
-        if (isset($enrolment)) {
-            $classes = Classes::where('enrolment_id', $enrolment->id)->whereDate('start_date', '>=', $current_period[0])->orderBy('start_date', 'asc')->get();
+        $enrolments = Enrolment::where('student_id', $id)->get();
+        if (count($enrolments) > 0) {
+            // $classes = Classes::where('enrolment_id', $enrolment->id)->whereDate('start_date', '>=', $current_period[0])->orderBy('start_date', 'asc')->get();
+            // dump($classes);
+            $classes = collect([]);
+            foreach($enrolments as $enrolment){
+                $classes = $classes->merge(Classes::where('enrolment_id', $enrolment->id)->whereDate('start_date', '>=', $current_period[0])->orderBy('start_date', 'asc')->get());
+            }
 
-            // $current_tz = auth()->user()->timezone;
+
             $student = User::find($id);
             $enter_classroom = false;
             $message = "Student doesn't have any class left.";
@@ -76,13 +81,11 @@ class ClassroomController extends Controller
 
                         $message2 = "On " . $classes[$key]->format('l') . ' at ' . $classes[$key]->format('g:00 a') . " UTC " . "(" . $classes[$key]->setTimezone(auth()->user()->timezone)->format('l') . " at " . $classes[$key]->setTimezone(auth()->user()->timezone)->format('g:00 a') . " " . auth()->user()->timezone . ").";
 
-                        if ($user == 'student') {
-                            $message1 = "Your next class is in " . $classes[$key]->diffForHumans(['parts' => 2]) . ".";
-                            break;
-                        }
-
                         if ($user == 'teacher') {
                             $message1 = "This student's next class is in " . $classes[$key]->diffForHumans(['parts' => 2]) . ".";
+                            break;
+                        } else {
+                            $message1 = "Your next class is in " . $classes[$key]->diffForHumans(['parts' => 2]) . ".";
                             break;
                         }
                     }

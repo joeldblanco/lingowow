@@ -56,7 +56,16 @@
                                     } else {
                                         $user_units = auth()
                                             ->user()
-                                            ->units->first()->order;
+                                            ->units->last();
+                                    
+                                        $user_units = $user_units
+                                            ->course()
+                                            ->modules->sortBy('order')
+                                            ->where('order', '<=', $user_units->module->order)
+                                            ->pluck('units')
+                                            ->flatten();
+                                    
+                                        $user_units = $user_units->count() - $user_units->where('module_id',auth()->user()->units->last()->module->id)->where('order','>',auth()->user()->units->last()->order)->count();
                                     }
                                 @endphp
                                 <script>

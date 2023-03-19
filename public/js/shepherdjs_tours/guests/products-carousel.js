@@ -11,10 +11,10 @@ const tour = new Shepherd.Tour({
 
 tour.addSteps([
     {
-        id: 'courses-carousel',
+        id: 'products-carousel',
         text: 'Welcome to our shop!🛍️ We have a variety of courses available for you to choose from 💻📖. Take a look and find the perfect one for you! ✨',
         attachTo: {
-            element: '.courses-carousel',
+            element: '.products-carousel',
             on: 'top'
         },
         buttons: [
@@ -109,7 +109,7 @@ tour.on('complete', () => {
         type: 'POST',
         url: route('complete-tour'),
         data: {
-            tourName: 'guests/courses-carousel',
+            tourName: 'guests/products-carousel',
             '_token': $('meta[name="csrf-token"]').attr('content'),
         },
         success: function (data) {

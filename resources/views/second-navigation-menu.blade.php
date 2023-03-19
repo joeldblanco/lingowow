@@ -98,8 +98,8 @@
         ],
         [
             'name' => 'Exams',
-            'route' => route('exam.index'),
-            'status' => request()->is('admin/exam', 'admin/exam/*'),
+            'route' => route('exams.index'),
+            'status' => request()->is('/exams', '/exams/*'),
             'parent_link' => request()->is('admin', 'admin/*'),
         ],
         [
@@ -125,6 +125,7 @@
             'route' => route('recordings.index'),
             'status' => request()->routeIs('recordings', 'recordings/*'),
             'parent_link' => request()->is('classes'),
+            'roles' => ['student'],
         ],
     ];
     
@@ -157,10 +158,12 @@
                         @foreach ($nav_links as $nav_link)
                             @if ($nav_link['parent_link'] || $nav_link['status'])
                                 @if ($nav_link['name'] == 'Recordings')
-                                    <x-jet-nav-link href="{{ $nav_link['route'] }}" :active="$nav_link['status']"
-                                        class="class-recordings">
-                                        {{ $nav_link['name'] }}
-                                    </x-jet-nav-link>
+                                    @if (auth()->user()->hasAnyRole($nav_link['roles']))
+                                        <x-jet-nav-link href="{{ $nav_link['route'] }}" :active="$nav_link['status']"
+                                            class="class-recordings">
+                                            {{ $nav_link['name'] }}
+                                        </x-jet-nav-link>
+                                    @endif
                                 @else
                                     <x-jet-nav-link href="{{ $nav_link['route'] }}" :active="$nav_link['status']">
                                         {{ $nav_link['name'] }}

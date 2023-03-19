@@ -25,7 +25,8 @@
                             <tr>
                                 <td class="hidden pb-4 md:table-cell">
                                     <a href="#">
-                                        <img src="{{ Storage::url($product->image) }}" class="w-20 rounded" alt="Thumbnail">
+                                        <img src="{{ Storage::url($product->image) }}" class="w-20 rounded"
+                                            alt="Thumbnail">
                                     </a>
                                 </td>
                                 <td>
@@ -324,14 +325,6 @@
                                         <span class="ml-2 mt-5px">Credit/Debit Card</span>
                                     </button>
                                 </a>
-                                {{-- <a href="{{ route('paypal-checkout') }}">
-                                    <button
-                                        class="flex justify-center w-full px-10 py-3 mt-6 font-bold text-white uppercase rounded-full shadow items-center focus:shadow-outline focus:outline-none"
-                                        style="background-color: #FFCC00; color: #2C2E2F;">
-                                        <i class="fab fa-paypal h-full text-xl"></i>
-                                        <span class="ml-2 mt-5px">PayPal</span>
-                                    </button>
-                                </a> --}}
                                 <!-- Set up a container element for the button -->
                                 <div id="paypal-button-container" class="mt-3"></div>
                             @endif
@@ -355,13 +348,15 @@
     </div>
 
     <!-- Include the PayPal JavaScript SDK -->
-    <script
-        src="https://www.paypal.com/sdk/js?client-id=Aau1Mwj0MPuEe3SsdsAsVZ0DvSSt8yrvLCqA-cT72bu6wbKXLHAXK_d9p4RuNRQpxk7nYpLl13GB69qX&currency=USD"
-        defer></script>
-
-        {{-- <script
+    @if (auth()->id() == 5)
+        <script
         src="https://www.paypal.com/sdk/js?client-id=AUa2ToyOsBrbfUh0FwDR4wg8A2A7bvgVFaW3XuAN4-zttVI-XImVMP6Bllg-_UziMRfP5wOSrZqPNAMD&currency=USD"
-        defer></script> --}}
+        defer></script>
+    @else
+        <script
+            src="https://www.paypal.com/sdk/js?client-id=Aau1Mwj0MPuEe3SsdsAsVZ0DvSSt8yrvLCqA-cT72bu6wbKXLHAXK_d9p4RuNRQpxk7nYpLl13GB69qX&currency=USD"
+            defer></script>
+    @endif
 
     <script defer>
         function runPaypalButtonFunction() {
