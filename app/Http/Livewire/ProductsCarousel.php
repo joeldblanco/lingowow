@@ -45,7 +45,7 @@ class ProductsCarousel extends Component
                 $this->course_products = $this->course_products->reject(function ($model) {
                     return str_contains($model->slug, 'old');
                 });
-                dd($this->course_products);
+                // dd($this->course_products, "Hola");
             }
         }
 

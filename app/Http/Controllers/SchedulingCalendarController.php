@@ -391,8 +391,10 @@ class SchedulingCalendarController extends Controller
                 $teachers[] = session('teacher_id');
             }
             $teachers = User::find($teachers);
-
+            // dd($teachers);
             foreach ($teachers as $teacher) {
+
+
                 // $T_schedule = $teacher->schedules->first()->selected_schedule;
                 // if ($T_schedule != null && in_array($day_of_exam, $T_schedule)) {
                 //     $classes = [];
@@ -423,6 +425,7 @@ class SchedulingCalendarController extends Controller
 
 
                 array_push($teachers_available, $teacher->id);
+                // dump($teachers_available);
             }
 
             // dd($teachers_available);
@@ -445,11 +448,17 @@ class SchedulingCalendarController extends Controller
                 }
 
                 $schedules_reserves = ScheduleReserve::schedulesReserves($teacher->id); // Posicion 0 para los horarios normales, Posicion 1 para los horarios de un solo dia.
-
+                $schedule_teacher = $teacher->schedules->first()->selected_schedule;
+                // dd($schedule_teacher, $cells);
                 // dd($teacher->studentsSchedules(), $teacher->schedules->first()->selected_schedule, $cells, $cell);
                 foreach ($cells as $cell) {
-                    if (in_array($cell, $schedules_reserves[0]) || (count($cells) == 1 && in_array($cell, $schedules_reserves[1])))
-                        dd($schedules_reserves[0], in_array($cell, $schedules_reserves[0]), (count($cells) == 1 && in_array($cell, $schedules_reserves[1])));
+                    if(!in_array($cell, $schedule_teacher)){
+                        Cart::destroy();
+                        session(['message' => "Dear Student. That block is not available"]);
+                        return redirect()->route("schedule.create")->with('error', "Sorry, you selected one or more unavailable blocks. Please try again.");
+                    }
+                    // if (in_array($cell, $schedules_reserves[0]) || (count($cells) == 1 && in_array($cell, $schedules_reserves[1])))
+                    //     dd($schedules_reserves[0], in_array($cell, $schedules_reserves[0]), (count($cells) == 1 && in_array($cell, $schedules_reserves[1])));
 
                     if (in_array($cell, $schedules_reserves[0]) || (count($cells) == 1 && in_array($cell, $schedules_reserves[1]))) {
                         Cart::destroy();

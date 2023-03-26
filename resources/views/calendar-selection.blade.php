@@ -72,9 +72,9 @@
                     @livewire('schedule', ['plan' => $plan, 'user_id' => auth()->id(), 'mode' => 'one'])
                 @else
                     @if (session('preselection'))
-                        @livewire('new-schedule', ['users' => auth()->id(), 'action' => 'schedulePreselection', 'limit' => $plan])
+                        @livewire('new-schedule', ['week' => null, 'users' => auth()->id(), 'action' => 'schedulePreselection', 'limit' => $plan])
                     @else
-                        @livewire('new-schedule', ['users' => auth()->id(), 'action' => 'scheduleSelection', 'limit' => $plan])
+                        @livewire('new-schedule', ['week' => null, 'users' => auth()->id(), 'action' => 'scheduleSelection', 'limit' => $plan])
                     @endif
                 @endif
                 {{-- <livewire:scheduling-calendar plan="{{$plan}}" /> --}}

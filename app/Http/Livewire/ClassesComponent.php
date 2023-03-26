@@ -31,6 +31,7 @@ class ClassesComponent extends Component
     public $end_date;
     public $classDetails = false;
     public $enrolment_id;
+    public $search;
     // public $sortBy = 'class_date';
     // public $sortDirection = 'asc';
 
@@ -95,11 +96,11 @@ class ClassesComponent extends Component
         $this->to_review_classes = [];
         $this->total_to_review_classes = [];
         if (auth()->user()->roles[0]->name == "teacher") {
-            $classes = User::find(auth()->id())->teacherClasses()->whereDate('start_date', '>=', $this->start_date)->whereDate('end_date', '<=', $this->end_date)->orderBy('start_date')->paginate(15);
+            $classes = User::find(auth()->id())->teacherClasses()->whereDate('start_date', '>=', $this->start_date)->whereDate('end_date', '<=', $this->end_date)->orderBy('start_date');
         } else if (auth()->user()->roles[0]->name == "student") {
-            $classes = User::find(auth()->id())->studentClasses()->whereDate('start_date', '>=', $this->start_date)->whereDate('end_date', '<=', $this->end_date)->orderBy('start_date')->paginate(15);
+            $classes = User::find(auth()->id())->studentClasses()->whereDate('start_date', '>=', $this->start_date)->whereDate('end_date', '<=', $this->end_date)->orderBy('start_date');
         } else if (auth()->user()->roles[0]->name == "admin") {
-            $classes = Classes::where('enrolment_id', 'like', '%' . $this->enrolment_id)->whereDate('start_date', '>=', $this->start_date)->whereDate('end_date', '<=', $this->end_date)->orderBy('start_date')->paginate(15);
+            $classes = Classes::where('enrolment_id', 'like', '%' . $this->enrolment_id)->whereDate('start_date', '>=', $this->start_date)->whereDate('end_date', '<=', $this->end_date)->orderBy('start_date') ;
             // foreach (Classes::whereDate('start_date', '>=', $this->start_date)->whereDate('end_date', '<=', $this->end_date)->get() as $key => $value) {
             foreach ($classes as $key => $value) {
                 // $this->students[$key] = $value->student();
@@ -121,6 +122,33 @@ class ClassesComponent extends Component
             if (empty($this->total_to_review_classes)) $this->total_to_review_classes = [];
             if (empty($this->to_review_classes)) $this->to_review_classes = [];
         }
+
+        //Prueba del GPT
+        // if ($this->search) {
+        //     $classes = $classes->where(function ($query) {
+        //         $query->whereHas('student', function ($query) {
+        //             $query->where('first_name', 'like', '%' . $this->search . '%')
+        //                 ->orWhere('last_name', 'like', '%' . $this->search . '%');
+        //         })->orWhereHas('teacher', function ($query) {
+        //             $query->where('first_name', 'like', '%' . $this->search . '%')
+        //                 ->orWhere('last_name', 'like', '%' . $this->search . '%');
+        //         });
+        //     });
+        // }
+        if ($this->search) {
+            $classes = $classes->where(function ($query) {
+                $query->whereHas('enrolment.student', function ($query) {
+                    $query->where('first_name', 'like', '%' . $this->search . '%')
+                        ->orWhere('last_name', 'like', '%' . $this->search . '%');
+                })->orWhereHas('enrolment.teacher', function ($query) {
+                    $query->where('first_name', 'like', '%' . $this->search . '%')
+                        ->orWhere('last_name', 'like', '%' . $this->search . '%');
+                });
+            });
+        }
+        $classes = $classes->paginate(15);
+        // dd($classes);
+        //Fin GPT
 
         // $this->current_class = $classes->last();
         if ($this->current_class) {
