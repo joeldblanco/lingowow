@@ -24,6 +24,18 @@
                     <input autocomplete="off" wire:model.lazy="enrolment_id" type="number"
                         class="text-gray-500 border-gray-300 rounded-lg hover:border-gray-400">
                 </div>
+                <div class="search-container">
+                    <label class="block text-gray-700 text-sm font-bold mb-2" for="">
+                        Search by name
+                    </label>
+                    <input wire:model="search" placeholder="Search..." type="text"
+                        class="input-search-name text-gray-500 border-gray-300 rounded-lg hover:border-gray-400">
+                    @if ($search)
+                        <button class="reset-btn" wire:click="$set('search', '')">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    @endif
+                </div>
             @endrole
         </div>
         @role('admin')

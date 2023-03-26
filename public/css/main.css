@@ -791,6 +791,31 @@ html {
   height: 1000px;
 }
 
+.search-container {
+  position: relative;
+}
+
+.input-search-name {
+  padding-right: 40px;
+}
+
+.reset-btn {
+  position: absolute;
+  right: 10px;
+  top: 53%;
+  /* transform: translateY(-50%); */
+  background-color: transparent;
+  border: none;
+  font-size: 16px;
+  color: #999;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.reset-btn:hover {
+  color: #333;
+}
+
 /* * {
   box-sizing: border-box;
   outline: 1px solid limegreen !important;
