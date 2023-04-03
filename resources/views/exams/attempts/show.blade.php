@@ -30,7 +30,7 @@
                                     {{ $question->marks }}</td>
                                 <td
                                     class="py-4 px-6 uppercase text-sm text-gray-600 border-b border-gray-400 text-center">
-                                    {{ $question->description }}</td>
+                                    {!! $question->description !!}</td>
                                 <td
                                     class="py-4 px-6 uppercase text-sm text-gray-600 border-b border-gray-400 text-center">
                                     {{ $question->type }}</td>
@@ -49,6 +49,10 @@
                                         @else
                                             <td
                                                 class="py-4 px-6 uppercase text-sm text-gray-600 border-b border-gray-400 text-center bg-red-100">
+                                                {{-- @if (!array_key_exists('option-text-' . $answers->where('question_id', $question->id)->first()->answer, json_decode($question->options, true))
+                                                )
+                                                    {{ dd($answers->where('question_id', $question->id)->first(), $question) }}
+                                                @endif --}}
                                                 {{ json_decode($question->options, true)['option-text-' . $answers->where('question_id', $question->id)->first()->answer] }}
                                             </td>
                                         @endif

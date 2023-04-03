@@ -152,10 +152,28 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach ($periodClasses as $key => $class)
+                    @php
+                        $students = collect([]);
+                        foreach ($periodClasses as $class) {
+                            $students->push($class->student());
+                        }
+                        $students_unique = $students->unique();
+                    @endphp
+                    @foreach ($students_unique as $student)
+                        {{-- @if ($teacher->id == $class->teacher()->id)
+                        @endif --}}
                         <tr class="border">
                             <td class="px-6 py-4 text-sm">{{ $student->first_name }} {{ $student->last_name }}</td>
                             @foreach ($teachers as $teacher)
+                                @php
+                                    $count = 0;
+
+                                    foreach ($periodClasses as $class) {
+                                        if ($teacher->id == $class->teacher()->id && $student->id == $class->student()->id) {
+                                            $count++;
+                                        }
+                                    }
+                                @endphp
                                 <td class="px-6 relative @if ($loop->last) pr-8 @endif"
                                     x-data="{ modalDetails: false }" x-cloak>
                                     {{-- @if ($students->count())
@@ -171,7 +189,7 @@
                                     @endif --}}
                                     <p class="cursor-pointer w-full text-right" @mouseenter="modalDetails = true"
                                         @click.outside="modalDetails = false" @mouseleave="modalDetails = false">
-                                        {{-- {{ $classes->count() }} --}}
+                                        {{ $count }}
                                     </p>
                                 </td>
                             @endforeach

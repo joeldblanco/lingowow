@@ -466,7 +466,7 @@ class SchedulingCalendarController extends Controller
                         ->first()->value,
                 );
 
-                $old_customers = [];
+                // $old_customers = [];
 
                 $course_products = Course::find($course_id)
                     ->products()
