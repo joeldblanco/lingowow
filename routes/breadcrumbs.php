@@ -13,6 +13,7 @@ Breadcrumbs::for('courses.show', function ($trail, $id) {
     $course = Course::find($id);
     $trail->parent('courses.index');
     $trail->push($course->name, route('courses.show', $id));
+    // dd($trail->parent('courses.index'), $trail->push($course->name, route('courses.show', $id)));
 });
 
 Breadcrumbs::for('modules.show', function ($trail, $id) {

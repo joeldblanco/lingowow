@@ -137,27 +137,37 @@ class CourseController extends Controller
                 $user_modules = new Collection([$modules->first()]);
             }
         } else if ($role == "student") {
-            $user_modules = new Collection();
-            if ($course->categories->pluck('name')->contains('Conversational')) {
-                $user_module = DB::table('module_user')->select('module_id')->where('user_id', auth()->user()->id)->first();
-                if (!empty($user_module)) {
-                    $user_module = Module::findOrFail($user_module->module_id);
-                    if ($user_module->course_id == $course->id)
-                        $user_modules->push($user_module);
-                }
-                $modules = $user_modules;
-            } else {
-                foreach ($modules as $module) {
-                    if (!empty($user->units->first())) {
-                        if ($module->order <= $user->units->first()->module->order) {
-                            $user_modules->push($module);
-                        }
-                    } else {
-                        $user_modules->push($modules->first());
+
+            //REVISAR QUE EL CURSO SOLICITADO SE ENCUENTRE ENTRE LOS CURSOS A LOS QUE EL ESTUDIANTE ESTÁ INSCRITO
+            $student_courses = $user->enrolments->pluck('course');
+            $course = Course::findOrFail($id);
+            // $unit_course = $unit->course();
+            if ($student_courses->contains($course)) {
+                $user_modules = new Collection();
+                if ($course->categories->pluck('name')->contains('Conversational')) {
+                    $user_module = DB::table('module_user')->select('module_id')->where('user_id', auth()->user()->id)->first();
+                    if (!empty($user_module)) {
+                        $user_module = Module::findOrFail($user_module->module_id);
+                        if ($user_module->course_id == $course->id)
+                            $user_modules->push($user_module);
                     }
+                    $modules = $user_modules;
+                } else {
+                    foreach ($modules as $module) {
+                        if (!empty($user->units->first())) {
+                            if ($module->order <= $user->units->first()->module->order) {
+                                $user_modules->push($module);
+                            }
+                        } else {
+                            $user_modules->push($modules->first());
+                        }
+                    }
+                    $user_modules = $user_modules->unique();
                 }
-                $user_modules = $user_modules->unique();
+            }else{
+                abort(403, 'USER DOES NOT HAVE THE RIGHT PERMISSIONS.');
             }
+
         } else if ($role == "teacher") {
             if ($course->categories->pluck('name')->contains('Conversational')) {
                 $user_modules = $user->modules->where('course_id', $course->id)->sortBy('order');

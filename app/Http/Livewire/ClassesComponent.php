@@ -32,6 +32,7 @@ class ClassesComponent extends Component
     public $classDetails = false;
     public $enrolment_id;
     public $search;
+    public $searchCourse;
     // public $sortBy = 'class_date';
     // public $sortDirection = 'asc';
 
@@ -100,7 +101,8 @@ class ClassesComponent extends Component
         } else if (auth()->user()->roles[0]->name == "student") {
             $classes = User::find(auth()->id())->studentClasses()->whereDate('start_date', '>=', $this->start_date)->whereDate('end_date', '<=', $this->end_date)->orderBy('start_date');
         } else if (auth()->user()->roles[0]->name == "admin") {
-            $classes = Classes::where('enrolment_id', 'like', '%' . $this->enrolment_id)->whereDate('start_date', '>=', $this->start_date)->whereDate('end_date', '<=', $this->end_date)->orderBy('start_date') ;
+            $classes = Classes::whereDate('start_date', '>=', $this->start_date)->whereDate('end_date', '<=', $this->end_date)->orderBy('start_date') ;
+            // where('enrolment_id', 'like', '%' . $this->enrolment_id)->
             // foreach (Classes::whereDate('start_date', '>=', $this->start_date)->whereDate('end_date', '<=', $this->end_date)->get() as $key => $value) {
             foreach ($classes as $key => $value) {
                 // $this->students[$key] = $value->student();
@@ -143,6 +145,13 @@ class ClassesComponent extends Component
                 })->orWhereHas('enrolment.teacher', function ($query) {
                     $query->where('first_name', 'like', '%' . $this->search . '%')
                         ->orWhere('last_name', 'like', '%' . $this->search . '%');
+                });
+            });
+        } 
+        if ($this->searchCourse){
+            $classes = $classes->where(function ($query) {
+                $query->whereHas('enrolment.course', function ($query) {
+                    $query->where('name', 'like', '%' . $this->searchCourse . '%');
                 });
             });
         }

@@ -97,7 +97,8 @@
                                     </div>
                                 @endrole
                             @endif
-                        </div>
+                        </div> 
+                        {{-- ->where('status', 1) --}}
                         @if ($unit->exams->where('status', 1)->count() > 0 && $role != 'guest')
                             @php
                                 $exam = $unit->exams->where('status', 1)->random();
