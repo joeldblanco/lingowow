@@ -11,6 +11,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 use App\Models\Comment;
+use App\Models\Complaint;
 use App\Models\Meeting;
 use App\Models\ScheduleReserve;
 use Illuminate\Support\Facades\Auth;
@@ -323,8 +324,30 @@ class ClassController extends Controller
         ]);
         $request = $request->except(['_token', '_method']);
 
-        dd($request);
+        $complaint = new Complaint;
+        $complaint->class_id = $request["class_id"];
+        $complaint->subject = $request["subject"];
+        $complaint->complaint = $request["complaint"];
+        $complaint->save();
 
+        return redirect()->route('classes.index');
+    }
+
+    public function updateComplain(Request $request)
+    {
+        $complaint = Complaint::find($request->complaint_id);
+
+        $complaint->subject = $request->subject;
+        $complaint->complaint = $request->complaint;
+        $complaint->save();
+        
+        return redirect()->route('classes.index');
+    }
+
+    public function deleteComplain(Complaint $complaint)
+    {
+        $complaint->delete();
+        
         return redirect()->route('classes.index');
     }
 

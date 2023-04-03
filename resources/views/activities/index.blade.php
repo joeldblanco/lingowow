@@ -62,7 +62,7 @@
                                 {{-- <td class="py-4 px-6 border-b border-gray-400 text-center">
                                     {{ $activity->created_at }}</td> --}}
                                 <td class="py-4 px-6 border-b border-gray-400 text-center">
-                                    <a id="{{ $activity->id }}" href="" class="btn-assign">
+                                    <a id="{{ $activity->id }}" href="#" class="btn-assign">
                                         <i class="fas fa-hand-point-left"></i>
                                     </a>
                                 </td>
@@ -94,9 +94,11 @@
                 </table>
 
                 <div class="grid place-content-center">
-                    <livewire:modal-users-menu />
+                    {{-- <livewire:modal-users-menu /> --}}
+                    @livewire('modal-users-menu')
                 </div>
             </div>
         </div>
     </div>
+    <script src="{{ asset('js/activities.js') }}"></script>
 </x-app-layout>

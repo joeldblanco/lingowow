@@ -34,7 +34,8 @@
 
                     <div class="flex mt-4 justify-between">
                         <label for="remember_me" class="flex items-center">
-                            <x-jet-checkbox id="remember_me" name="remember" />
+                            {{-- <x-jet-checkbox id="remember_me" name="remember" /> --}}
+                            <input type="checkbox" name="remember" id="remember_me" {{ old('remember') ? 'checked' : '' }}>
                             <span class="ml-2 text-sm text-gray-600">{{ __('Remember me') }}</span>
                         </label>
                         @if (Route::has('password.request'))

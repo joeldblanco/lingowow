@@ -554,6 +554,7 @@ class NewSchedule extends Component
 
     public function saveSchedule($data)
     {
+        // dd($data, session('toRescheduleClass'), $this->action);
         switch ($this->action) {
             case 'classRescheduling':
 
@@ -643,8 +644,13 @@ class NewSchedule extends Component
                     ]);
 
                     (new SchedulingCalendarController)->checkForTeachers($request);
+                }else{
+                    if($this->limit < count($data)){
+                        redirect()->route("schedule.create")->with('error', "Sorry, you selected one or more unavailable blocks. Please try again.");
+                    }else{
+                        redirect()->route("schedule.create")->with('error', "Sorry, you have selected fewer blocks than reflected in your plan. Please try again.");
+                    }
                 }
-
                 break;
             case 'schedulePreselection':
 

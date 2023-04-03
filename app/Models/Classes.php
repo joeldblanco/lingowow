@@ -72,4 +72,9 @@ class Classes extends Model
     {
         return $this->hasOne(Rating::class, 'class_id');
     }
+
+    public function complaints()
+    {
+        return $this->hasMany(Complaint::class, 'class_id');
+    }
 }

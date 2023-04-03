@@ -72,7 +72,23 @@
                     </div>
                 @endif
                 <div class="mb-5 space-y-5">
-                    <p>{{ json_decode($post->content, 1)['text'] }}</p>
+                    @php
+                        $content = json_decode($post->content, 1)['text'];
+                        $texto_con_enlaces = preg_replace_callback(
+                            '/\b(?:https?:\/\/)?(?:www\.)?([^\s]+(?:\.\w{2,3}){1,2})\b/i',
+                            function ($enlace) {
+                                $enlace_con_protocolo = $enlace[0];
+                                if (!preg_match('/^(http|https):\/\//i', $enlace_con_protocolo)) {
+                                    $enlace_con_protocolo = 'http://' . $enlace_con_protocolo;
+                                }
+                                return "<a class='font-medium text-blue-600 dark:text-blue-500 hover:underline' target='_blank' href='" . $enlace_con_protocolo . "'>" . $enlace[0] . '</a>';
+                            },
+                            $content,
+                        );
+                    @endphp
+                    <p>
+                        {!! $texto_con_enlaces !!}
+                    </p>
                     @if (json_decode($post->content, 1)['photo_path'] != null)
                         <img class="rounded-lg m-auto w-auto max-h-96 shadow-xl transform hover:scale-105 transition duration-500 cursor-pointer"
                             src="{{ Storage::url(json_decode($post->content, 1)['photo_path']) }}" alt="profile_pic">

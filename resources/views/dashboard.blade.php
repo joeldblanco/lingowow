@@ -198,7 +198,7 @@
                                 {{-- @php
                                     dd(now()->dayOfWeek);
                                 @endphp --}}
-                                @livewire('new-schedule', ['users' => auth()->id(), 'action' => 'studentShow'])
+                                @livewire('new-schedule', ['limit' => null, 'week' => null, 'users' => auth()->id(), 'action' => 'studentShow']) 
                                 {{-- @livewire('schedule', ['user_id' => auth()->id(), 'mode' => 'show', 'course_id' => $course_id]) --}}
                             {{-- @else --}}
                                 {{-- @livewire('schedule', ['user_id' => auth()->id(), 'mode' => 'show', 'course_id' => $course_id]) --}}
@@ -208,7 +208,7 @@
                     @endrole
                     @hasanyrole('teacher')
                         {{-- @if (auth()->id() == 7) --}}
-                        @livewire('new-schedule', ['users' => auth()->id(), 'action' => 'teacherShow'])
+                        @livewire('new-schedule', ['limit' => null, 'week' => null, 'users' => auth()->id(), 'action' => 'teacherShow'])
                         {{-- @livewire('schedule', ['user_id' => auth()->id(), 'mode' => 'show', 'course_id' => $course_id]) --}}
                         {{-- @endif --}}
                     @endrole

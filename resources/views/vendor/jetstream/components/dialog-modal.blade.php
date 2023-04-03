@@ -15,3 +15,4 @@
         {{ $footer }}
     </div>
 </x-jet-modal>
+ 

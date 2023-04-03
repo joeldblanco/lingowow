@@ -10,6 +10,7 @@
                     <h2 class="text-4xl font-bold text-gray-800 capitalize">My Units</h2>
                     @if ($module->course->categories->pluck('name')->contains('Conversational'))
                         @hasanyrole('admin|teacher')
+                            {{-- {{dd("Hola")}} --}}
                             <div class="relative">
                                 @if (count($module_units))
                                     <a href="{{ route('modules.details', $module_units->first()->module->id) }}"
@@ -96,7 +97,8 @@
                                     </div>
                                 @endrole
                             @endif
-                        </div>
+                        </div> 
+                        {{-- ->where('status', 1) --}}
                         @if ($unit->exams->where('status', 1)->count() > 0 && $role != 'guest')
                             @php
                                 $exam = $unit->exams->where('status', 1)->random();

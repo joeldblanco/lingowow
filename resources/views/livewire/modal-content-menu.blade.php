@@ -2,7 +2,7 @@
     <x-jet-dialog-modal wire:model="showModalMenu">
 
         <x-slot name="title">
-            <div class="w-full center-h">Select one activity</div>
+            <div class="w-full center-h">SELECT ONE ACTIVITY</div>
         </x-slot>
 
         <x-slot name="content">
