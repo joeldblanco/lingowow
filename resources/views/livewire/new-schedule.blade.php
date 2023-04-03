@@ -23,7 +23,7 @@
     @if ($action == 'classRescheduling')
         <div class="dateReason-tour mb-10">
             <input class="w-full mb-2" type="text" name="absenceReason" id="absenceReason"
-                placeholder="Reason for rescheduling" wire:model.lazy="absenceReason" required>
+                placeholder="Reason for rescheduling" wire:model.debounce.1000ms="absenceReason" required>
             <span class="text-red-500">
                 @error('absenceReason')
                     {{ $message }}
@@ -124,7 +124,7 @@
         @endhasanyrole
     @endif
 
-    <div wire:loading wire:target="saveSchedule">
+    <div wire:loading>
         @include('components.loading-state')
     </div>
 

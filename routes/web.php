@@ -20,6 +20,7 @@ use App\Invoice;
 use App\Http\Controllers\CourseController;
 use App\Http\Controllers\EnrolmentController;
 use App\Http\Controllers\ExamController;
+use App\Http\Controllers\ExportController;
 use App\Http\Controllers\FeatureController;
 use App\Http\Controllers\GatherController;
 use App\Http\Controllers\GradingController;
@@ -386,6 +387,12 @@ Route::middleware(['web', 'auth', 'verified', 'impersonate'])->group(function ()
         Route::get('/admin/classes', ClassesComponent::class)->name('admin.classes.index');
         Route::get('/classes/create', [ClassController::class, 'create'])->name('classes.create');
         Route::post('/classes', [ClassController::class, 'store'])->name('classes.store');
+
+
+
+
+        //ROUTES FOR EXPORTS//
+        Route::get('/export', [ExportController::class, 'export'])->name('export');
 
 
 
