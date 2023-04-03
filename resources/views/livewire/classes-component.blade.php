@@ -17,13 +17,13 @@
                     class="text-gray-500 border-gray-300 rounded-lg hover:border-gray-400">
             </div>
             @role('admin')
-                <div>
+                {{-- <div>
                     <label class="block text-gray-700 text-sm font-bold mb-2" for="end_date">
                         Enrolment ID
                     </label>
                     <input autocomplete="off" wire:model.lazy="enrolment_id" type="number"
                         class="text-gray-500 border-gray-300 rounded-lg hover:border-gray-400">
-                </div>
+                </div> --}}
                 <div class="search-container">
                     <label class="block text-gray-700 text-sm font-bold mb-2" for="">
                         Search by name
@@ -32,6 +32,18 @@
                         class="input-search-name text-gray-500 border-gray-300 rounded-lg hover:border-gray-400">
                     @if ($search)
                         <button class="reset-btn" wire:click="$set('search', '')">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    @endif
+                </div>
+                <div class="search-container">
+                    <label class="block text-gray-700 text-sm font-bold mb-2" for="">
+                        Search by course
+                    </label>
+                    <input wire:model="searchCourse" placeholder="Search..." type="text"
+                        class="input-search-name text-gray-500 border-gray-300 rounded-lg hover:border-gray-400">
+                    @if ($search)
+                        <button class="reset-btn" wire:click="$set('searchCourse', '')">
                             <i class="fas fa-times"></i>
                         </button>
                     @endif
@@ -217,10 +229,16 @@
                             </a>
                         @endif
                         @if ($current_class->end_date < now())
-                            <p class="text-sm text-center mx-auto inline-block text-gray-600">Any complaints about this
-                                class?<br> Fill out the form <a
-                                    href="{{ route('classes.complaints', $current_class->id) }}"
+                            @if (empty($current_class->complaints->first()))
+                                <p class="text-sm text-center mx-auto inline-block text-gray-600">Any complaints about this
+                                    class?<br> Fill out the form <a
+                                        href="{{ route('classes.complaints', $current_class->id) }}"
+                                        class="hover:text-blue-600 underline" @click="classDetails = false">here.</a></p>
+                            @else
+                            <p class="text-sm text-center mx-auto inline-block text-gray-600">Edit your complaint <a
+                                    href="{{ route('classes.complaints.edit', $current_class->id) }}"
                                     class="hover:text-blue-600 underline" @click="classDetails = false">here.</a></p>
+                            @endif
                         @endif
                     @endif
                 @endrole

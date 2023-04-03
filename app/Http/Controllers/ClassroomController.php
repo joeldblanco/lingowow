@@ -62,6 +62,9 @@ class ClassroomController extends Controller
             $user = User::find(auth()->id());
             $user = $user->getRoleNames();
             $user = $user[0];
+            $message1 = "";
+            $message2 = "";
+            $time = 0;
 
             foreach ($classes as $key => $value) {
                 $classes[$key] = Carbon::createFromTimeString($value->start_date);
@@ -82,10 +85,14 @@ class ClassroomController extends Controller
                         $message2 = "On " . $classes[$key]->format('l') . ' at ' . $classes[$key]->format('g:00 a') . " UTC " . "(" . $classes[$key]->setTimezone(auth()->user()->timezone)->format('l') . " at " . $classes[$key]->setTimezone(auth()->user()->timezone)->format('g:00 a') . " " . auth()->user()->timezone . ").";
 
                         if ($user == 'teacher') {
-                            $message1 = "This student's next class is in " . $classes[$key]->diffForHumans(['parts' => 2]) . ".";
+                            // $message1 = "This student's next class is in " . $classes[$key]->diffForHumans(['parts' => 2]) . ".";
+                            $message1 = "This student's next class is in ";
+                            $time = $classes[$key]->diffInSeconds();
                             break;
                         } else {
-                            $message1 = "Your next class is in " . $classes[$key]->diffForHumans(['parts' => 2]) . ".";
+                            // $message1 = "Your next class is in " . $classes[$key]->diffForHumans(['parts' => 2]) . ".";
+                            $message1 = "Your next class is in ";
+                            $time = $classes[$key]->diffInSeconds();
                             break;
                         }
                     }
@@ -99,7 +106,7 @@ class ClassroomController extends Controller
                 }
             }
 
-            return view('classroom.show', compact('enter_classroom', 'message1', 'message2', 'student', 'user'));
+            return view('classroom.show', compact('enter_classroom', 'message1', 'message2', 'student', 'user', 'time'));
         } else {
             abort(403, 'USER DOES NOT HAVE THE RIGHT PERMISSIONS.');
             // $message = "User is not enroled in any course.";

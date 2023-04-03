@@ -153,11 +153,11 @@ Route::middleware(['web', 'auth', 'verified', 'impersonate'])->group(function ()
     Route::get('/courses', [CourseController::class, 'index'])->name('courses.index');
     Route::middleware(['role:admin'])->get('/courses/create', [CourseController::class, 'create'])->name('courses.create');
     Route::middleware(['role:admin'])->post('/courses', [CourseController::class, 'store'])->name('courses.store');
-    Route::get('/courses/{id}', [CourseController::class, 'show'])->name('courses.show');
     Route::middleware(['role:admin'])->get('/courses/{id}/edit', [CourseController::class, 'edit'])->name('courses.edit');
     Route::middleware(['role:admin'])->patch('/courses/{course}', [CourseController::class, 'update'])->name('courses.update');
     Route::middleware(['role:admin'])->delete('/courses/{course}', [CourseController::class, 'destroy'])->name('courses.destroy');
     Route::middleware(['role:admin'])->get('admin/courses', [CourseController::class, 'adminIndex'])->name('admin.courses.index');
+    Route::get('/courses/{id}', [CourseController::class, 'show'])->name('courses.show');
 
     Route::get('courses/{id}/details', [CourseController::class, 'details'])->name('courses.details');
 
@@ -477,6 +477,8 @@ Route::middleware(['web', 'auth', 'verified', 'impersonate'])->group(function ()
     Route::middleware(['role:admin|student'])->get('/classes/{id}', [ClassController::class, 'edit'])->name('classes.edit');
     Route::middleware(['role:admin|student'])->post('/classes/update', [ClassController::class, 'update'])->name('classes.update');
     Route::middleware(['role:admin|student'])->post('/classes/complaint', [ClassController::class, 'registerComplain'])->name('classes.complaint');
+    Route::middleware(['role:admin|student'])->post('/classes/complaint/update', [ClassController::class, 'updateComplain'])->name('classes.complaint.update');
+    Route::middleware(['role:admin|student'])->post('/classes/complaint/delete/{complaint}', [ClassController::class, 'deleteComplain'])->name('classes.complaint.delete');
     Route::middleware(['role:admin|student'])->get('/classes/complaints/{id}', function ($class_id) {
         $class = Classes::find($class_id);
         if (empty($class)) {
@@ -489,6 +491,20 @@ Route::middleware(['web', 'auth', 'verified', 'impersonate'])->group(function ()
             return abort(403, 'Unauthorized action.');
         }
     })->name('classes.complaints');
+
+    Route::middleware(['role:admin|student'])->get('/classes/complaints/{id}/edit', function ($class_id) {
+        $class = Classes::find($class_id);
+        $complaint = $class->complaints->first();
+        if (empty($class) || empty($complaint)) {
+            return abort(404);
+        }
+
+        if ((auth()->user()->hasRole('student') && $class->student()->id == auth()->id()) || auth()->user()->hasRole('admin')) {
+            return view('classes.complaints-form-edit', compact('class_id', 'complaint'));
+        } else {
+            return abort(403, 'Unauthorized action.');
+        }
+    })->name('classes.complaints.edit');
     // Route::middleware(['role:teacher|student'])->post('/classes/check', [ClassController::class, 'checkClasses'])->name('classes.check');
 
     //ROUTES FOR POSTS//
