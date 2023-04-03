@@ -65,7 +65,7 @@
     @endif
 
     <div class="border-2">
-        <table class="border w-full h-full text-center select-none">
+        <table content-security-policy="default-src 'self'; style-src 'self' 'unsafe-inline';" class="border w-full h-full text-center select-none">
             <thead class="sticky top-0">
                 <tr class="bg-blue-50 sticky top-0">
                     <th class="border sticky top-0">LOCAL</th>

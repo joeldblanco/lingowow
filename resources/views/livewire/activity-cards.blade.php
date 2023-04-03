@@ -31,7 +31,7 @@ $activity_content = json_decode($activity_content->cards_group);
                 <h4 class="text-2xl font-bold text-gray-400 ml-5 mr-5">Keep clicking on the image to see his word</h4>
                 <div class="gallery js-flickity" data-flickity-options='{ "wrapAround": false, "draggable": false }'>
                     @foreach ($activity_content as $content)
-                       {{-- {{dd($content)}} --}}
+                        {{-- {{dd($content)}} --}}
                         <div class="gallery-cell">
                             <div
                                 class="py-6 px-6 my-4 mt-7 mb-2 mx-10">
@@ -39,7 +39,8 @@ $activity_content = json_decode($activity_content->cards_group);
                                 <div class="flip-card">
                                     <div class="flip-card-inner">
                                       <div class="flip-card-front rounded overflow-hidden shadow-lg">
-                                        <img src="{{ asset('storage/activity-cards/'.$content[0]) }}" alt="Avatar" style="width:auto;height:auto;">
+                                        <img src="{{ asset('storage/activity-cards/'.$content[0]) }}" alt="Avatar" style="width:100%;height:100%;object-fit:cover;">
+                                        {{-- {{dump(asset('storage/activity-cards/'.$content[0]))}} --}}
                                       </div>
                                       <div class="grid place-content-center flip-card-back rounded overflow-hidden shadow-lg">
                                         
@@ -69,7 +70,7 @@ $activity_content = json_decode($activity_content->cards_group);
               <h4 class="text-2xl font-bold text-gray-400 ml-5 mr-5">Write the word corresponding to the image</h4>
               <div class="gallery js-flickity" data-flickity-options='{ "wrapAround": false, "draggable": false }'>
                   @foreach ($activity_content as $content)
-                     
+                  
                       <div class="gallery-cell mb-5 pb-5">
                           <div
                               class="py-6 px-6 my-4 mt-7 mb-2 mx-10">

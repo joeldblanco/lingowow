@@ -423,7 +423,7 @@
   /* padding: 25px 25px; */
   position: fixed;
   bottom: 40px;
-  right: 40px;
+  left: 40px;
   transition: all 300ms ease 0ms;
   box-shadow: 0px 8px 15px rgba(0, 0, 0, 0.1);
   z-index: 99;
@@ -789,6 +789,31 @@ html {
 .homeHeigth{
   /* border: 2px solid black; */
   height: 1000px;
+}
+
+.search-container {
+  position: relative;
+}
+
+.input-search-name {
+  padding-right: 40px;
+}
+
+.reset-btn {
+  position: absolute;
+  right: 10px;
+  top: 53%;
+  /* transform: translateY(-50%); */
+  background-color: transparent;
+  border: none;
+  font-size: 16px;
+  color: #999;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.reset-btn:hover {
+  color: #333;
 }
 
 /* * {

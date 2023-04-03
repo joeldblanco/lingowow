@@ -5,146 +5,150 @@
             array_push($randomizer, $i);
         }
     @endphp
-
+    {{-- max-w-7xl --}}
     <div class="p-12 bg-gray-200 font-sans text-gray-600" x-data="{ profile: true, followers: false, friends: false, gallery: false, friend_requests: false, editProfile: false, showPost: false }" x-cloak>
-        <div class="max-w-7xl border rounded-xl bg-white flex flex-col pt-3 px-3 mb-6">
-            <div class="border rounded-xl bg-blue-600 h-56"
-                style="background-image: url('https://berrydashboard.io/static/media/img-profile-bg.2b15e931.png'); background-size: cover;">
-                {{-- <img src="https://berrydashboard.io/static/media/img-profile-bg.2b15e931.png" alt="cover_image" /> --}}
-            </div>
-            <div class="flex flex-row">
-                <div class="w-1/4 relative">
-                    <div class="w-32 h-32 z-10 absolute -top-14 right-5 rounded-full border-4 border-gray-400 bg-white @if ($user->id == auth()->id()) cursor-pointer @endif"
-                        @if ($user->id == auth()->id()) @click="editProfile = true" @endif>
-                        {{-- style="background-image: url('{{ Storage::url($user->profile_photo_path) }}')"> --}}
-                        <img src="{{ Storage::url($user->profile_photo_path) }}"
-                            class="w-full h-full rounded-full object-cover" alt="">
-                    </div>
+        <div class="flex justify-center">
+            <div class="flex flex-col justify-center w-5/6 border rounded-xl bg-white  pt-3 px-3 mb-6">
+                <div class="border rounded-xl bg-blue-600 h-56"
+                    style="background-image: url('https://berrydashboard.io/static/media/img-profile-bg.2b15e931.png'); background-size: cover;">
+                    {{-- <img src="https://berrydashboard.io/static/media/img-profile-bg.2b15e931.png" alt="cover_image" /> --}}
                 </div>
-                <div class="w-3/4 flex flex-col pt-5">
-                    <div class="flex flex-row">
-                        <div class="w-full">
-                            <p class="font-bold text-2xl">{{ $user->first_name }} {{ $user->last_name }}</p>
-                            {{-- <button onclick="copyToClipboard('id')"
+                <div class="flex flex-row">
+                    <div class="w-1/4 relative">
+                        <div class="w-32 h-32 z-10 absolute -top-14 right-5 rounded-full border-4 border-gray-400 bg-white @if ($user->id == auth()->id()) cursor-pointer @endif"
+                            @if ($user->id == auth()->id()) @click="editProfile = true" @endif>
+                            {{-- style="background-image: url('{{ Storage::url($user->profile_photo_path) }}')"> --}}
+                            <img src="{{ Storage::url($user->profile_photo_path) }}"
+                                class="w-full h-full rounded-full object-cover" alt="">
+                        </div>
+                    </div>
+                    <div class="w-3/4 flex flex-col pt-5">
+                        <div class="flex flex-row">
+                            <div class="w-full">
+                                <p class="font-bold text-2xl">{{ $user->first_name }} {{ $user->last_name }}</p>
+                                {{-- <button onclick="copyToClipboard('id')"
                                 class="font-semibold text-gray-400 cursor-pointer hover:text-blue-500 flex space-x-1 items-center">
                                 <p id="id">{{ md5($user->id) }}</p>
                                 <i class="far fa-copy text-xs"></i>
                             </button> --}}
-                        </div>
-                        <div class="w-3/4 flex justify-end">
+                            </div>
+                            <div class="w-3/4 flex justify-end">
 
-                            <div class="flex space-x-4">
-                                @hasanyrole('teacher|admin')
-                                    <button onclick="window.location.href='{{ route('attempt.index', $user->id) }}';"
-                                        class="border border-gray-500 rounded h-9 w-24 text-gray-500 hover:text-gray-700 hover:border-gray-700 hover:bg-gray-50">Attempts</button>
-                                    {{-- <button onclick="openClassroomPopupWindow(); return false;"
+                                <div class="flex space-x-4">
+                                    @hasanyrole('teacher|admin')
+                                        <button onclick="window.location.href='{{ route('attempt.index', $user->id) }}';"
+                                            class="border border-gray-500 rounded h-9 w-24 text-gray-500 hover:text-gray-700 hover:border-gray-700 hover:bg-gray-50">Attempts</button>
+                                        {{-- <button onclick="openClassroomPopupWindow(); return false;"
                                         class="border border-green-500 rounded h-9 w-24 text-green-500 hover:text-green-700 hover:border-green-700 hover:bg-green-50">Classroom</button> --}}
-                                    <a href="{{ route('classroom', $user->id) }}"
-                                        class="border border-green-500 rounded h-9 w-24 text-green-500 hover:text-green-700 hover:border-green-700 hover:bg-green-50 flex justify-center items-center">Classroom</a>
-                                @endhasanyrole
-                                @if ($user->id != auth()->id())
-                                    @if ($this->sent_request != null)
-                                        @if ($this->sent_request->status == 0 || $this->sent_request->status == 2)
-                                            {{-- <button
+                                        <a href="{{ route('classroom', $user->id) }}"
+                                            class="border border-green-500 rounded h-9 w-24 text-green-500 hover:text-green-700 hover:border-green-700 hover:bg-green-50 flex justify-center items-center">Classroom</a>
+                                    @endhasanyrole
+                                    @if ($user->id != auth()->id())
+                                        @if ($this->sent_request != null)
+                                            @if ($this->sent_request->status == 0 || $this->sent_request->status == 2)
+                                                {{-- <button
                                                 class="border border-blue-500 rounded h-9 w-24 text-blue-500 hover:text-blue-700 hover:border-blue-700 hover:bg-blue-50">Message</button> --}}
-                                            <button wire:click="cancelRequest({{ $user->id }})"
-                                                class="flex items-center px-3 rounded h-9 w-30 font-semibold text-white bg-red-700 hover:border-red-700 hover:bg-red-800 shadow-md">
-                                                <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
-                                                    xmlns="http://www.w3.org/2000/svg" fill="none"
-                                                    viewBox="0 0 24 24" wire:loading wire:target="cancelRequest">
-                                                    <circle class="opacity-25" cx="12" cy="12"
-                                                        r="10" stroke="currentColor" stroke-width="4"></circle>
-                                                    <path class="opacity-75" fill="currentColor"
-                                                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
-                                                    </path>
-                                                </svg>
-                                                Cancel Request
-                                            </button>
-                                        @else
-                                            <button
-                                                class="border border-blue-500 rounded h-9 w-24 text-blue-500 hover:text-blue-700 hover:border-blue-700 hover:bg-blue-50">Message</button>
-                                        @endif
-                                    @else
-                                        @if ($this->received_request != null)
-                                            @if ($this->received_request->status == 0)
-                                                <button wire:click="confirmRequest({{ $user->id }})"
-                                                    class="px-3 rounded h-9 w-30 font-semibold text-white bg-green-700 hover:border-green-700 hover:bg-green-800 shadow-md">Confirm</button>
-                                                <button wire:click="deleteRequest({{ $user->id }})"
-                                                    class="px-3 rounded h-9 w-30 font-semibold text-white bg-red-700 hover:border-red-700 hover:bg-red-800 shadow-md">Delete</button>
+                                                <button wire:click="cancelRequest({{ $user->id }})"
+                                                    class="flex items-center px-3 rounded h-9 w-30 font-semibold text-white bg-red-700 hover:border-red-700 hover:bg-red-800 shadow-md">
+                                                    <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+                                                        xmlns="http://www.w3.org/2000/svg" fill="none"
+                                                        viewBox="0 0 24 24" wire:loading wire:target="cancelRequest">
+                                                        <circle class="opacity-25" cx="12" cy="12"
+                                                            r="10" stroke="currentColor" stroke-width="4">
+                                                        </circle>
+                                                        <path class="opacity-75" fill="currentColor"
+                                                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                                                        </path>
+                                                    </svg>
+                                                    Cancel Request
+                                                </button>
+                                            @else
+                                                <button
+                                                    class="border border-blue-500 rounded h-9 w-24 text-blue-500 hover:text-blue-700 hover:border-blue-700 hover:bg-blue-50">Message</button>
                                             @endif
                                         @else
-                                            <button wire:click="sendRequest({{ $user->id }})"
-                                                class="flex items-center px-3 rounded h-9 w-max font-semibold text-white bg-blue-700 hover:border-blue-700 hover:bg-blue-800 shadow-md">
-                                                <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
-                                                    xmlns="http://www.w3.org/2000/svg" fill="none"
-                                                    viewBox="0 0 24 24" wire:loading wire:target="sendRequest">
-                                                    <circle class="opacity-25" cx="12" cy="12"
-                                                        r="10" stroke="currentColor" stroke-width="4"></circle>
-                                                    <path class="opacity-75" fill="currentColor"
-                                                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
-                                                    </path>
-                                                </svg>
-                                                Send Request
-                                            </button>
+                                            @if ($this->received_request != null)
+                                                @if ($this->received_request->status == 0)
+                                                    <button wire:click="confirmRequest({{ $user->id }})"
+                                                        class="px-3 rounded h-9 w-30 font-semibold text-white bg-green-700 hover:border-green-700 hover:bg-green-800 shadow-md">Confirm</button>
+                                                    <button wire:click="deleteRequest({{ $user->id }})"
+                                                        class="px-3 rounded h-9 w-30 font-semibold text-white bg-red-700 hover:border-red-700 hover:bg-red-800 shadow-md">Delete</button>
+                                                @endif
+                                            @else
+                                                <button wire:click="sendRequest({{ $user->id }})"
+                                                    class="flex items-center px-3 rounded h-9 w-max font-semibold text-white bg-blue-700 hover:border-blue-700 hover:bg-blue-800 shadow-md">
+                                                    <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+                                                        xmlns="http://www.w3.org/2000/svg" fill="none"
+                                                        viewBox="0 0 24 24" wire:loading wire:target="sendRequest">
+                                                        <circle class="opacity-25" cx="12" cy="12"
+                                                            r="10" stroke="currentColor" stroke-width="4">
+                                                        </circle>
+                                                        <path class="opacity-75" fill="currentColor"
+                                                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                                                        </path>
+                                                    </svg>
+                                                    Send Request
+                                                </button>
+                                            @endif
                                         @endif
+                                    @else
+                                        <button @click="editProfile = true"
+                                            class="px-3 rounded h-9 w-30 font-semibold text-white bg-blue-700 hover:border-blue-700 hover:bg-blue-800 shadow-md">Edit
+                                            Profile</button>
                                     @endif
-                                @else
-                                    <button @click="editProfile = true"
-                                        class="px-3 rounded h-9 w-30 font-semibold text-white bg-blue-700 hover:border-blue-700 hover:bg-blue-800 shadow-md">Edit
-                                        Profile</button>
-                                @endif
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="flex flex-row justify-end space-x-6 mx-3 pt-8">
-                        <button class="flex flex-col"
-                            @click=" profile = true, followers = false, friends = false, gallery = false, friend_requests = false ">
-                            <div class="flex px-1 font-semibold" :class="{ 'text-blue-500': profile == true }">
-                                <i class="fas fa-inbox mr-3"></i>
-                                PROFILE
-                            </div>
-                            <span class="w-full h-0.5" :class="{ 'bg-blue-500': profile == true }"></span>
-                        </button>
-                        {{-- <button class="flex flex-col" @click=" profile = false, followers = true, friends = false, gallery = false, friend_requests = false">
+                        <div class="flex flex-row justify-end space-x-6 mx-3 pt-8">
+                            <button class="flex flex-col"
+                                @click=" profile = true, followers = false, friends = false, gallery = false, friend_requests = false ">
+                                <div class="flex px-1 font-semibold" :class="{ 'text-blue-500': profile == true }">
+                                    <i class="fas fa-inbox mr-3"></i>
+                                    PROFILE
+                                </div>
+                                <span class="w-full h-0.5" :class="{ 'bg-blue-500': profile == true }"></span>
+                            </button>
+                            {{-- <button class="flex flex-col" @click=" profile = false, followers = true, friends = false, gallery = false, friend_requests = false">
                             <div class="flex px-1 font-semibold" :class="{'text-blue-500': followers == true}">
                                 <i class="fas fa-users mr-3"></i>
                                 FOLLOWERS
                             </div>
                             <span class="w-full h-0.5" :class="{'bg-blue-500': followers == true}"></span>
                         </button> --}}
-                        <button class="flex flex-col"
-                            @click=" profile = false, followers = false, friends = true, gallery = false, friend_requests = false">
-                            <div class="flex px-1 font-semibold" :class="{ 'text-blue-500': friends == true }">
-                                <i class="fas fa-user-friends mr-3"></i>
-                                FRIENDS
-                            </div>
-                            <span class="w-full h-0.5" :class="{ 'bg-blue-500': friends == true }"></span>
-                        </button>
-                        <button class="flex flex-col"
-                            @click=" profile = false, followers = false, friends = false, gallery = true, friend_requests = false">
-                            <div class="flex px-1 font-semibold" :class="{ 'text-blue-500': gallery == true }">
-                                <i class="fas fa-images mr-3"></i>
-                                GALLERY
-                            </div>
-                            <span class="w-full h-0.5" :class="{ 'bg-blue-500': gallery == true }"></span>
-                        </button>
-                        @if ($user->id == auth()->id())
                             <button class="flex flex-col"
-                                @click=" profile = false, followers = false, friends = false, gallery = false, friend_requests = true">
-                                <div class="flex px-1 font-semibold"
-                                    :class="{ 'text-blue-500': friend_requests == true }">
-                                    <i class="fas fa-user-plus mr-3"></i>
-                                    FRIEND REQUESTS
+                                @click=" profile = false, followers = false, friends = true, gallery = false, friend_requests = false">
+                                <div class="flex px-1 font-semibold" :class="{ 'text-blue-500': friends == true }">
+                                    <i class="fas fa-user-friends mr-3"></i>
+                                    FRIENDS
                                 </div>
-                                <span class="w-full h-0.5" :class="{ 'bg-blue-500': friend_requests == true }"></span>
+                                <span class="w-full h-0.5" :class="{ 'bg-blue-500': friends == true }"></span>
                             </button>
-                        @endif
+                            <button class="flex flex-col"
+                                @click=" profile = false, followers = false, friends = false, gallery = true, friend_requests = false">
+                                <div class="flex px-1 font-semibold" :class="{ 'text-blue-500': gallery == true }">
+                                    <i class="fas fa-images mr-3"></i>
+                                    GALLERY
+                                </div>
+                                <span class="w-full h-0.5" :class="{ 'bg-blue-500': gallery == true }"></span>
+                            </button>
+                            @if ($user->id == auth()->id())
+                                <button class="flex flex-col"
+                                    @click=" profile = false, followers = false, friends = false, gallery = false, friend_requests = true">
+                                    <div class="flex px-1 font-semibold"
+                                        :class="{ 'text-blue-500': friend_requests == true }">
+                                        <i class="fas fa-user-plus mr-3"></i>
+                                        FRIEND REQUESTS
+                                    </div>
+                                    <span class="w-full h-0.5"
+                                        :class="{ 'bg-blue-500': friend_requests == true }"></span>
+                                </button>
+                            @endif
+                        </div>
                     </div>
                 </div>
+
             </div>
-
         </div>
-
         {{-- PROFILE --}}
         <div class="flex flex-row space-x-10 w-5/6 mx-auto" x-show="profile" x-transition>
             <div class="flex flex-col w-2/6">
@@ -247,7 +251,7 @@
         </div> --}}
 
         {{-- FRIENDS --}}
-        <div class="flex flex-row space-x-10" x-show="friends" x-transition>
+        <div class="flex flex-row w-5/6 space-x-10 mx-auto" x-show="friends" x-transition>
             <div class="flex flex-col w-full">
                 <div class="w-full border rounded-xl bg-white flex flex-col p-5 mb-6">
                     <div class="flex mt-4 justify-between">
@@ -282,9 +286,10 @@
                                             <i class="far fa-comment-alt"></i>
                                         </button>
                                     </div>
-                                    <x-modal type="info" name="newMessage_{{ $friend->id }}" class="w-1/2 mx-auto">
+                                    <x-modal type="info" name="newMessage_{{ $friend->id }}"
+                                        class="w-1/2 mx-auto">
                                         <x-slot name="title"></x-slot>
-    
+
                                         <x-slot name="content">
                                             <form method="POST" action="{{ route('chat.message') }}">
                                                 @csrf
@@ -324,7 +329,7 @@
         </div>
 
         {{-- GALLERY --}}
-        <div class="flex flex-row space-x-10" x-show="gallery" x-transition>
+        <div class="flex flex-row space-x-10 w-5/6 mx-auto" x-show="gallery" x-transition>
             <div class="flex flex-col w-full">
                 <div class="w-full border rounded-xl bg-white flex flex-col p-5 mb-6">
                     <div class="flex mt-4 justify-between">

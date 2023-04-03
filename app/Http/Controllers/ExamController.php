@@ -74,11 +74,44 @@ class ExamController extends Controller
      */
     public function show(Exam $exam)
     {
+
+        $user = User::find(auth()->id());
+        $role = $user->roles->first()->name;
+
+        if ($role == "student") {
+            $unit_base = $user->units->first();
+            $unit_exam = Unit::find($exam->unit_id);
+            $unit_course = $unit_exam->course();
+            $student_courses = $user->enrolments->pluck('course');
+            $course = Course::findOrFail($unit_exam->module->course->id);
+
+            // COMPROBAR SI EL EXAMEN ES DE UN CURSO ADQUIRIDO POR EL ESTUDIANTE
+
+            if (!$student_courses->contains($course)) {
+                abort(403, 'USER DOES NOT HAVE THE RIGHT PERMISSIONS.');
+            }else{
+                // COMPROBAR SI EL EXAMEN ESTA DISPONIBLE DENTRO DE SUS UNIDADES PERMITIDAS EN USER-UNIT 
+                foreach ($user->units as $user_unit) {
+                    if ($user_unit->course()->id == $unit_course->id) {
+                        if ($unit_exam->module->order > $user_unit->module->order) {
+                            abort(403, 'USER DOES NOT HAVE THE RIGHT PERMISSIONS.');
+                        }
+    
+                        if ($unit_exam->module->order == $user_unit->module->order) {
+                            if ($unit_exam->order > $user_unit->order) {
+                                abort(403, 'USER DOES NOT HAVE THE RIGHT PERMISSIONS.');
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
         $attempt = null;
         if (auth()->user()->hasRole('student')) {
             $attempt = Attempt::where('user_id', auth()->id())->where('exam_id', $exam->id)->whereNull('completed_at')->first();
         }
-        
+
         return view('exams.show', compact('exam', 'attempt'));
     }
 

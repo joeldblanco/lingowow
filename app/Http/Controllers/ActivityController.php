@@ -117,11 +117,12 @@ class ActivityController extends Controller
         $data = json_decode($request->data, true);
         $unit = $request->unit;
         $file = $request->files;
-        // dd($data);
+        // dd($data, $file);
         $ruta = "";
-
+        // $indice = 0;
+        // $cadena = "";
         foreach ($file as $key => $value) {
-
+            // dd($value, count($value));
             if (explode("-", $key)[0] == "inputImage") {
                 $ruta = "activity-cards";
             }
@@ -133,8 +134,39 @@ class ActivityController extends Controller
                 foreach ($value as $keyFile => $valueFile) {
                     $id = explode("-", $key)[1];
                     // dump($valueFile);
-                    $request->file($key)[$keyFile]->storeAs($ruta, $id . "-" . $keyFile . "-" . $valueFile->getClientOriginalName(), "public");
+                    // $request->file($key)[$keyFile]->storeAs($ruta, $id . "-" . $keyFile . "-" . $valueFile->getClientOriginalName(), "public"); Por ahora
                     // dump($id . "-" . $keyFile . "-" . $valueFile->getClientOriginalName(), $ruta, explode("-", $key)[0]);
+                }
+                foreach ($data as $keyData => $valueData) {
+                    // dd(isset($valueData[$key."[]"]), $key."[]", $valueData);
+                    if ($valueData['type'] == 'cards' && isset($valueData[$key . "[]"])) {
+                        // dd($valueData['cards-images']);
+                        $orden_archivos = $valueData['cards-images'];
+                        $orden = explode(',', $orden_archivos);
+                        $archivos_ordenados = array();
+
+                        foreach ($orden as $o) {
+                            list($id, $index, $filename) = explode('-', $o);
+                            // dd($o, explode("/",$filename)[0]);
+                            // dd($this->getIndexFile($value, explode("/",$filename)[0]));
+                            $index = $this->getIndexFile($value, explode("/", $filename)[0]);
+                            $archivos_ordenados[$index] = $value[$index];
+                        }
+                        // $archivos_ordenados = array_values($archivos_ordenados);
+                        // dd($archivos_ordenados);
+                        $i = 0;
+                        foreach ($archivos_ordenados as $keyFile => $valueFile) {
+                            // $filename = $file->getClientOriginalName();
+                            // dump($filename);
+                            // $file->storeAs('uploads', $filename);
+                            $id = explode("-", $key)[1];
+                            // dump($valueFile);
+                            $request->file($key)[$keyFile]->storeAs($ruta, $id . "-" . $i . "-" . $valueFile->getClientOriginalName(), "public");
+                            // $valueFile->storeAs($ruta, $id . "-" . $keyFile . "-" . $valueFile->getClientOriginalName(), "public");
+                            $i++;
+                        }
+                        break;
+                    }
                 }
             }
 
@@ -222,6 +254,16 @@ class ActivityController extends Controller
         // $activities = Activity::Where('status', '1')->get();
         // return view('activities.index', compact('activities'));
         return redirect()->route('activities.index');
+    }
+
+
+    public function getIndexFile($files, $target)
+    {
+        foreach ($files as $index => $file) {
+            if ($file->getClientOriginalName() === $target) {
+                return $index;
+            }
+        }
     }
 
     /**

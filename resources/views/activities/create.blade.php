@@ -1,10 +1,15 @@
 @php
     use App\Models\Unit;
     use App\Models\ContentOfAct;
-
+    
     $units = Unit::all();
-    $qty_contents = ContentOfAct::all()->last()->id;
-    // dd($qty_contents);
+    $qty_contents = ContentOfAct::all()->last();
+    if (!empty($qty_contents)) {
+        $qty_contents = $qty_contents->id;
+    } else {
+        $qty_contents = 1;
+    }
+    // dd($units);
 @endphp
 
 <x-app-layout>
@@ -21,14 +26,14 @@
 
                     <div class="center-h w-1/4">ACTIVITY NAME</div>
                     <div class="center-h"><input class="inpWord w-5/6" id="activity-name" name="activity" type="text"
-                            value="Activity 2"></div>
+                            value="" placeholder="Activity name"></div>
                     <br>
 
 
 
                     {{-- <div class="activity-create">
-
-                    </div> --}}
+                            
+                        </div> --}}
 
                     <form id="activities-form-contents" enctype="multipart/form-data"
                         action="{{ route('admin.activities.storeFiles') }}" method="POST">
@@ -36,10 +41,14 @@
 
                         <div class="center-h w-1/4">Select the unit</div>
                         <div class="center-h">
+                            {{-- {{dump($units)}} --}}
+                            {{-- @foreach ($units as $unit)
+                            {{dd($unit->id, $unit->unit_name)}}
+                            @endforeach --}}
                             <select form="activities-form-contents" name="unit" class="inpWord w-2/6" required>
                                 <option hidden selected value="0">Select unit</option>
                                 @foreach ($units as $unit)
-                                <option value="{{$unit->id}}">{{$unit->unit_name}}</option>
+                                    <option value="{{ $unit->id }}">{{ $unit->name }}</option>
                                 @endforeach
                             </select>
                         </div>
@@ -70,15 +79,14 @@
                     <div class="grid place-content-center">
                         @livewire('modal-content-menu')
                     </div>
-                    <a href="#" class="btn-flotante" ><i
-                            class="fa fa-plus text-sm "></i></a>
+                    <a href="#" class="btn-flotante"><i class="fa fa-plus text-sm "></i></a>
                 </div>
                 {{-- wire:click="$set('showModalMenu', 'true')" --}}
             </div>
         </div>
 
     </div>
-
+    <script src="{{ asset('js/activities.js') }}"></script>
 
 
 </x-app-layout>
