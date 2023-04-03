@@ -155,6 +155,7 @@ class ClassesComponent extends Component
                 });
             });
         }
+        
         $classes = $classes->paginate(15);
         // dd($classes);
         //Fin GPT
