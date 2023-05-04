@@ -34,7 +34,7 @@ class ExamController extends Controller
      */
     public function create(Request $request)
     {
-        if (empty($request->module_id)) {
+        if (!empty($request->module_id)) {
             $courses = Course::all();
             return view('exams.create', compact('courses'));
         }

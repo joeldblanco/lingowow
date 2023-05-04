@@ -20,7 +20,8 @@
                                 <p><span class="mr-1 text-purple-300">$</span>{{ $data['this_month_earnings'] }}</p>
                                 <i class="fas fa-arrow-circle-up transform rotate-45 text-2xl text-purple-400"></i>
                             </div>
-                            <p class="text-purple-400 text-lg font-bold mb-4">Total Earnings ({{now()->format('M')}})</p>
+                            <p class="text-purple-400 text-lg font-bold mb-4">Total Earnings ({{ now()->format('M') }})
+                            </p>
                         </div>
                     </div>
                     <div onclick="location.href='{{ route('admin.invoices') }}';"
@@ -40,7 +41,8 @@
                                 <p>{{ $data['total_invoices'] }}</p>
                                 {{-- <i class="fas fa-arrow-circle-up transform rotate-45 text-2xl text-blue-300"></i> --}}
                             </div>
-                            <p class="text-blue-200 text-lg font-bold mb-4">Total Invoices ({{now()->format('M')}})</p>
+                            <p class="text-blue-200 text-lg font-bold mb-4">Total Invoices ({{ now()->format('M') }})
+                            </p>
                         </div>
                     </div>
                 </div>

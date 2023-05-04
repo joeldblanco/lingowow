@@ -120,7 +120,7 @@
                                     {{ $value->student()->last_name }}</a>
                             </td>
                         @endhasanyrole
-                        <td class="flex w-full justify-center">
+                        <td class="flex w-full justify-center text-center">
                             <a href="{{ route('courses.show', $value->enrolment->course->id) }}"
                                 class="hover:underline hover:text-blue-500">
                                 {{ $value->enrolment->course->name }}</a>

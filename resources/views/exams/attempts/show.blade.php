@@ -49,8 +49,7 @@
                                         @else
                                             <td
                                                 class="py-4 px-6 uppercase text-sm text-gray-600 border-b border-gray-400 text-center bg-red-100">
-                                                {{-- @if (!array_key_exists('option-text-' . $answers->where('question_id', $question->id)->first()->answer, json_decode($question->options, true))
-                                                )
+                                                {{-- @if (!array_key_exists('option-text-' . $answers->where('question_id', $question->id)->first()->answer, json_decode($question->options, true)))
                                                     {{ dd($answers->where('question_id', $question->id)->first(), $question) }}
                                                 @endif --}}
                                                 {{ json_decode($question->options, true)['option-text-' . $answers->where('question_id', $question->id)->first()->answer] }}
@@ -61,11 +60,20 @@
                                 @if ($question->type == 'essay')
                                     <td class="py-4 px-6 uppercase text-gray-600 border-b border-gray-400 text-center">
                                         @php
-                                            if (empty($answers->where('question_id', $question->id)->first()->answer)) {
+                                            if (empty($answers->where('question_id', $question->id)->first())) {
+                                                $answers->push(
+                                                    new App\Models\Answer([
+                                                        'question_id' => $question->id,
+                                                        'answer' => '—',
+                                                    ]),
+                                                );
+                                            } elseif (empty($answers->where('question_id', $question->id)->first()->answer)) {
                                                 $answers->where('question_id', $question->id)->first()->answer = '—';
                                             }
                                         @endphp
-                                        {{ Str::limit(strip_tags($answers->where('question_id', $question->id)->first()->answer), 10, '...') }}
+                                        @if (!empty($answers->where('question_id', $question->id)->first()))
+                                            {{ Str::limit(strip_tags($answers->where('question_id', $question->id)->first()->answer), 10, '...') }}
+                                        @endif
                                     </td>
                                 @endif
                                 @if ($question->type == 'info' || $question->type == 'speaking')
@@ -79,7 +87,7 @@
                                             {{ json_decode($question->options, true)['option-text-' . strval($question->answer)] }}
                                         @endif
                                     @endif
-                                    @if ($question->type == 'essay' || $question->type == 'speaking')
+                                    @if (($question->type == 'essay' || $question->type == 'speaking') && !empty($answers->where('question_id', $question->id)->first()))
                                         {{ $answers->where('question_id', $question->id)->first()->score }}
                                         @hasanyrole('teacher|admin')
                                             <a

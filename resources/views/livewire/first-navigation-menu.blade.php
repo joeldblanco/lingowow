@@ -32,10 +32,16 @@
             'roles' => ['student', 'guest', 'admin'],
         ],
         [
-            'name' => 'Gather',
+            'name' => 'Practice Room 🎯',
             'route' => 'https://app.gather.town/app/NMqppR61QkKUarTd/beach_bar',
             'status' => false,
             'roles' => ['student', 'teacher', 'admin'],
+        ],
+        [
+            'name' => 'Teachers',
+            'route' => route('teacherEarnings', ['id' => Auth::user()->id]),
+            'status' => false,
+            'roles' => ['teacher', 'admin'],
         ],
     ];
     
@@ -61,9 +67,9 @@
                                 <x-jet-nav-link href="{{ $nav_link['route'] }}" :active="$nav_link['status']" class="courses-link">
                                     {{ $nav_link['name'] }}
                                 </x-jet-nav-link>
-                            @elseif ($nav_link['name'] == 'Gather')
+                            @elseif ($nav_link['name'] == 'Practice Room 🎯')
                                 <x-jet-nav-link href="{{ $nav_link['route'] }}" target="_blank" :active="$nav_link['status']" class="gather-link">
-                                    {{ $nav_link['name'] }} <i class="ml-1 text-xs fas fa-external-link-alt"></i>
+                                    {{ $nav_link['name'] }} {{-- <i class="ml-1 text-xs fas fa-external-link-alt"></i> --}}
                                 </x-jet-nav-link>
                             @elseif ($nav_link['name'] == 'Shop 🛍️')
                                 <x-jet-nav-link href="{{ $nav_link['route'] }}" :active="$nav_link['status']" class="shop-link">
@@ -136,7 +142,7 @@
                 @endif
 
                 <!-- Messages Dropdown -->
-                <div class="ml-3 relative" wire:ignore>
+                <div class="ml-3 relative">
                     <x-jet-dropdown align="right" width="80">
                         <x-slot name="trigger">
                             <button
@@ -147,7 +153,7 @@
                                     $conversations = auth()->user()->conversations;
                                 @endphp
 
-                                <p class="absolute top-1 right-1 justify-center items-center w-3 h-3 text-xs font-bold text-white bg-red-500 rounded-full border-2 border-white dark:border-gray-900 hidden"
+                                <p wire:ignore class="absolute top-1 right-1 justify-center items-center w-3 h-3 text-xs font-bold text-white bg-red-500 rounded-full border-2 border-white dark:border-gray-900 hidden"
                                     id="unread_messages"></p>
                             </button>
                         </x-slot>
@@ -165,7 +171,7 @@
                                         <x-jet-dropdown-link href="{{ route('chat.show', $conversation->id) }}">
                                             <div class="flex justify-between items-center">
                                                 <p class="text-md font-normal text-gray-500"
-                                                    id="conversation_{{ $conversation->id }}">
+                                                    id="conversation_{{ $conversation->id }}" wire:ignore.self>
                                                     @if ($conversation->group_conversation)
                                                         {{ $conversation->name }}
                                                     @else
@@ -212,7 +218,7 @@
                                 class="flex text-sm border-2 border-transparent rounded-full focus:outline-none focus:border-gray-300 transition p-2">
                                 <i class="fas fa-bell text-gray-500 text-lg w-full"></i>
 
-                                <p class="absolute top-1 right-1 justify-center items-center w-3 h-3 text-xs font-bold text-white bg-red-500 rounded-full border-2 border-white dark:border-gray-900 hidden"
+                                <p wire:ignore class="absolute top-1 right-1 justify-center items-center w-3 h-3 text-xs font-bold text-white bg-red-500 rounded-full border-2 border-white dark:border-gray-900" style="display: none"
                                     id="unread_notifications"></p>
                             </button>
                         </x-slot>

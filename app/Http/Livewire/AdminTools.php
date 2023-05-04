@@ -59,7 +59,7 @@ class AdminTools extends Component
         if (empty($this->studentToAssociate)) {
             $this->studentToAssociate = User::role('student')->orderBy('first_name')->first();
 
-            if (!empty($this->studentToAssociate->units->first())) {
+            if (!empty($this->studentToAssociate)) {
                 $this->studentToAssociate = $this->studentToAssociate->units->first()->id;
             }
         }

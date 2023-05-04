@@ -75,7 +75,7 @@
                     @php
                         $content = json_decode($post->content, 1)['text'];
                         $texto_con_enlaces = preg_replace_callback(
-                            '/\b(?:https?:\/\/)?(?:www\.)?([^\s]+(?:\.\w{2,3}){1,2})\b/i',
+                            '/\b(?:https?:\/\/)?(?:www\.)?([^\s]+(?:\.\w{2,3}){1,2}(?:\/\S*)?)\b/i',
                             function ($enlace) {
                                 $enlace_con_protocolo = $enlace[0];
                                 if (!preg_match('/^(http|https):\/\//i', $enlace_con_protocolo)) {

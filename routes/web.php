@@ -42,6 +42,7 @@ use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\PlanController;
 // use App\Http\Controllers\PaypalController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\ShopController;
 use App\Models\Attempt;
 use App\Http\Controllers\UploadImages;
 use App\Http\Controllers\WhatsAppController;
@@ -218,7 +219,8 @@ Route::middleware(['web', 'auth', 'verified', 'impersonate'])->group(function ()
 
 
     //ROUTES FOR SHOP//
-    Route::middleware(['role:guest|student|admin'])->get('/shop', [PayPalPaymentController::class, 'getIndex'])->name('shop');
+    // Route::middleware(['role:guest|student|admin'])->get('/shop', [PayPalPaymentController::class, 'getIndex'])->name('shop');
+    Route::middleware(['role:guest|student|admin'])->get('/shop', [ShopController::class, 'index'])->name('shop');
     Route::middleware(['role:guest|student|admin'])->get('/shop/cart', function () {
         return view('cart');
     })->name("cart");
@@ -238,6 +240,9 @@ Route::middleware(['web', 'auth', 'verified', 'impersonate'])->group(function ()
     Route::middleware('checkPreviousUrlName:shop|schedule.check|schedule.create|enrolments.checkSchedule,shop')->get('/schedule/selection', [SchedulingCalendarController::class, 'create'])->name("schedule.create");
     Route::post('/schedule/update', [SchedulingCalendarController::class, 'update'])->name("schedule.update");
     Route::get('/schedule/destroy/{student_id}/{course_id}', [SchedulingCalendarController::class, 'destroy'])->name("schedule.destroy");
+
+    // Route::middleware('checkPreviousUrlName:shop|schedule.check|schedule.create|enrolments.checkSchedule,shop')->get('/shop/schedule/selection', [ShopController::class, 'scheduleSelection'])->name("shop.scheduleSelection");
+    Route::get('/shop/schedule/selection', [ShopController::class, 'scheduleSelection'])->name("shop.scheduleSelection");
 
 
 
@@ -291,6 +296,9 @@ Route::middleware(['web', 'auth', 'verified', 'impersonate'])->group(function ()
     Route::get('/schedule', function () {
         return view('newSchedule');
     })->name('newSchedule');
+
+    Route::middleware(['role:teacher|admin'])->get('/teachers/{id}/classes', [AnalyticsController::class, 'teacherEarnings'])->name('teacherEarnings');
+    Route::middleware(['role:teacher|admin'])->post('/teachers/agreement', [AnalyticsController::class, 'registerTeachersPayment'])->name('teacherAgreement');
 
 
 
@@ -371,11 +379,11 @@ Route::middleware(['web', 'auth', 'verified', 'impersonate'])->group(function ()
 
 
         //ROUTE FOR TESTING MAILS//
-        Route::get('/mail/test', function () {
-            $admin = User::find(6);
-            $student = User::find(5);
-            Notification::sendNow($admin, new BookedClass($student));
-        })->name('mail.test');
+        // Route::get('/mail/test', function () {
+        //     $admin = User::find(6);
+        //     $student = User::find(5);
+        //     Notification::sendNow($admin, new BookedClass($student));
+        // })->name('mail.test');
 
 
 

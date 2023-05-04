@@ -54,7 +54,7 @@ class Classes extends Model
      */
     public function enrolment()
     {
-        return $this->belongsTo(Enrolment::class);
+        return $this->belongsTo(Enrolment::class)->withTrashed();
     }
 
     /**

@@ -52,9 +52,9 @@ class ClassroomController extends Controller
             // dump($classes);
             $classes = collect([]);
             foreach($enrolments as $enrolment){
-                $classes = $classes->merge(Classes::where('enrolment_id', $enrolment->id)->whereDate('start_date', '>=', $current_period[0])->orderBy('start_date', 'asc')->get());
+                $classes = $classes->merge(Classes::where('enrolment_id', $enrolment->id)->whereDate('start_date', '>=', $current_period[0])->get());
             }
-
+            $classes = $classes->sortBy('start_date');
 
             $student = User::find($id);
             $enter_classroom = false;
@@ -77,7 +77,8 @@ class ClassroomController extends Controller
 
                     if (($diffInSeconds < 600 && $user == 'teacher') || ($diffInSeconds < 20 && $user == 'student') || $user == 'admin') {
 
-                        return redirect($student->studentClasses->sortBy('start_date')->first()->meeting->join_url);
+                        return redirect($value->meeting->join_url);
+                        // return redirect($student->studentClasses->sortBy('start_date')->first()->meeting->join_url);
 
                         break;
                     } else {
@@ -98,8 +99,8 @@ class ClassroomController extends Controller
                     }
                 } else {
                     $diffInSeconds = $classes[$key]->diffInSeconds();
-                    if ($user == 'admin' || (($classes[$key]->copy()->addMinutes(40) > now() && $diffInSeconds < 2400) && ($user == 'student' || $user == 'teacher'))) {
-                        return redirect($student->studentClasses->sortBy('start_date')->first()->meeting->join_url);
+                    if ($user == 'admin' || (($classes[$key]->copy()->addMinutes(40) > now() && $diffInSeconds < 4000) && ($user == 'student' || $user == 'teacher'))) {
+                        return redirect($value->meeting->join_url);
 
                         break;
                     }

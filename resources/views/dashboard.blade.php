@@ -2,7 +2,7 @@
 
     @php
         $session_info = json_decode((new Illuminate\Http\Client\PendingRequest())->get('http://ipwho.is/' . $_SERVER['REMOTE_ADDR'])->getBody(), true);
-        // dd($session_info['success']);
+        // dump(session('session_info')['timezone']['id']);
         if ($session_info['success'] == false) {
             session()->forget('session_info');
         } else {

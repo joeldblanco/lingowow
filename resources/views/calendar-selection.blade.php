@@ -68,8 +68,15 @@
                     }
                 @endphp
 
-                @if ($modality_course == 'exam')
-                    @livewire('schedule', ['plan' => $plan, 'user_id' => auth()->id(), 'mode' => 'one'])
+                @if (App\Models\Course::find($course_id)->categories()->pluck('name')->contains('Test'))
+                    <livewire:teachers-carousel />
+                    {{-- @livewire('schedule', ['plan' => $plan, 'user_id' => auth()->id(), 'mode' => 'one']) --}}
+                    @livewire('new-schedule', [
+                        'limit' => 1,
+                        'users' => App\Models\User::role('teacher')->pluck('id')->toArray(),
+                        'action' => 'examSelection',
+                        'week' => App\Http\Controllers\ApportionmentController::getWeekOfPeriod(now()),
+                    ])
                 @else
                     @if (session('preselection'))
                         @livewire('new-schedule', ['week' => null, 'users' => auth()->id(), 'action' => 'schedulePreselection', 'limit' => $plan])

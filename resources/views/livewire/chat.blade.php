@@ -20,7 +20,8 @@
 
 <div class="bg-gray-300 font-sans p-5 mx-5 rounded-xl flex" x-data="data()">
     @if (count($conversations) > 0)
-        <div class="bg-white overflow-hidden rounded-xl p-3 w-1/3 flex flex-col space-y-5 mr-5" x-show="conversations">
+        <div class="bg-white overflow-hidden rounded-xl p-3 w-1/3 flex flex-col space-y-5 mr-5" x-show="conversations"
+            x-transition>
             <div class="flex space-x-3 items-center">
                 <img src="{{ Storage::url(auth()->user()->profile_photo_path) }}" alt="profile_pic"
                     class="w-1/6 rounded-full">
@@ -89,6 +90,9 @@
             </div>
         </div>
         @if ($conversation)
+            @php
+                $participant = $conversation->users->where('id', '!=', auth()->user()->id)->first();
+            @endphp
             <div class="bg-white overflow-hidden rounded-xl p-5 w-full flex flex-col" x-show="currentConversation">
                 <div class="flex h-20 items-center border-b mb-3">
                     <div class="w-10 flex justify-center cursor-pointer p-3 rounded-full mr-2"
@@ -161,7 +165,8 @@
                     <div class="flex w-full">
                         <input type="text"
                             class="w-full pr-4 py-3 rounded-xl shadow focus:outline-none focus:shadow-outline text-gray-600 font-medium mr-3 border-gray-400 hover:border-gray-700"
-                            placeholder="Type a Message" wire:model="text_message" wire:keydown.enter="send_message">
+                            placeholder="Type a Message" wire:model.lazy="text_message"
+                            wire:keydown.enter="send_message">
                     </div>
                     <div
                         class="flex px-3 h-10 cursor-pointer hover:bg-gray-200 items-center hover:text-purple-500 rounded-lg">
@@ -174,7 +179,7 @@
                 </div>
             </div>
             <div class="overflow-hidden rounded-xl p-2 pb-0 w-1/3 flex flex-col space-y-5 ml-5" x-show="profileDetail"
-                x-cloak>
+                x-transition x-cloak>
                 <div class="h-3/6 w-full">
                     <div class="w-full flex">
                         <img src="{{ Storage::url($participant->profile_photo_path) }}" alt="profile_pic"
@@ -201,7 +206,7 @@
             </div>
         @else
             <div class="bg-white overflow-hidden rounded-xl p-5 w-full flex flex-col">
-                <p>Select a conversation o create a new one</p>
+                <p class="text-gray-500 text-xl font-bold">Select a conversation o create a new one</p>
             </div>
         @endif
     @else
@@ -273,6 +278,9 @@
             </div>
         </div>
     @endif
+    <div wire:loading>
+        @include('components.loading-state')
+    </div>
     {{-- @livewireScripts --}}
     <script>
         function data() {

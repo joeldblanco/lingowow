@@ -71,6 +71,11 @@ class AttemptController extends Controller
 
         if ($attempt == null) abort(404);
 
+        if (empty($attempt->score)) {
+            $request = new Request(['attempt_id' => $attempt->id]);
+            $this->correct($request);
+        }
+
         if ($attempt->user_id == auth()->id() || auth()->user()->roles[0]->name == "admin" || auth()->user()->roles[0]->name == "teacher") {
             $exam_id = $attempt->exam_id;
             if ($attempt->data != NULL) {
@@ -317,7 +322,7 @@ class AttemptController extends Controller
 
                 //Get all course's modules that are greater than this exam's unit's module
                 $nextModules = $exam->unit->course()->modules->where('order', '>', $exam->unit->module->order)->sortBy('order');
-                
+
                 if (!empty($nextModules) && $nextModules->count() > 0) {
 
                     //Get all exams in the next modules
