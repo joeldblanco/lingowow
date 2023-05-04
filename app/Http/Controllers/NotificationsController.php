@@ -58,6 +58,7 @@ class NotificationsController extends Controller
             $notification_data['schedule_string'] = str_replace('on ', '', $notification_data['schedule_string']);
         }
 
+
         switch ($notification_type) {
             case 'BookedClass':
                 $notification_icon = 'fas fa-bookmark';
@@ -84,6 +85,16 @@ class NotificationsController extends Controller
             case 'FriendRequest':
                 $notification_icon = 'fas fa-user-friends';
                 $notification_data = $user->first_name . ' ' . $user->last_name . ' has sent you a friend request.';
+                break;
+
+            case 'UpcomingClassForTeacher':
+                $notification_icon = 'fas fa-chalkboard-teacher';
+                $notification_data = 'Your next class is in ' . $notification_data['timeUntilClass'] . ' with student ' . $user->first_name . ' ' . $user->last_name . '.';
+                break;
+
+            case 'UpcomingClassForStudent':
+                $notification_icon = 'fas fa-chalkboard-teacher';
+                $notification_data = 'Your next class is in ' . $notification_data['timeUntilClass'] . ' with teacher ' . $user->first_name . ' ' . $user->last_name . '.';
                 break;
 
             default:

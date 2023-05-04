@@ -38,7 +38,7 @@ class PricingTableComponent extends Component
         }
     }
 
-    public function store($nOfClasses = null, $synchronous = false)
+    public function store($plan = null, $synchronous = false)
     {
         $enroled = Enrolment::where('student_id', auth()->id())
             // ->where('course_id',session('selected_course'))
@@ -58,8 +58,9 @@ class PricingTableComponent extends Component
             if ($enroled->course_id == session('selected_course') && $synchronous && ($now->greaterThan($current_period_end->copy()->subDays(7))) && empty($enroled->preselection)) {
                 $course_id = session('selected_course');
                 $product = Course::find($course_id)->products->first();
-                session(['plan' => $nOfClasses, 'preselection' => true]);
-                redirect()->route("schedule.create");
+                session(['preselection' => true]);
+                // redirect()->route("schedule.create");
+                redirect()->route("shop.scheduleSelection", ['plan' => $plan]);
             } else {
                 $this->popup_message = "User already enroled in a course.";
                 $this->popup_color = "red";
@@ -69,8 +70,8 @@ class PricingTableComponent extends Component
             $course_id = session('selected_course');
             $product = Course::find($course_id)->products->first();
             if ($synchronous) {
-                session(['plan' => $nOfClasses]);
-                redirect()->route("schedule.create");
+                // session(['plan' => $plan]);
+                redirect()->route("shop.scheduleSelection", ['plan' => $plan]);
             } else {
                 Cart::destroy();
                 Cart::add($product->id, $product->name, 1, ($product->sale_price == null ? $product->regular_price : $product->sale_price), ['editable' => false])->associate('App\Models\Product');

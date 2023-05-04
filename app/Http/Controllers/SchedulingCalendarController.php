@@ -452,9 +452,9 @@ class SchedulingCalendarController extends Controller
                 // dd($schedule_teacher, $cells);
                 // dd($teacher->studentsSchedules(), $teacher->schedules->first()->selected_schedule, $cells, $cell);
                 foreach ($cells as $cell) {
-                    if(!in_array($cell, $schedule_teacher)){
+                    if (!in_array($cell, $schedule_teacher)) {
                         Cart::destroy();
-                        session(['message' => "Dear Student. That block is not available"]);
+                        session(['message' => "Dear Student. That block is not available in teacher " . $teacher->first_name . " " . $teacher->last_name . " schedule."]);
                         return redirect()->route("schedule.create")->with('error', "Sorry, you selected one or more unavailable blocks. Please try again.");
                     }
                     // if (in_array($cell, $schedules_reserves[0]) || (count($cells) == 1 && in_array($cell, $schedules_reserves[1])))
@@ -462,7 +462,11 @@ class SchedulingCalendarController extends Controller
 
                     if (in_array($cell, $schedules_reserves[0]) || (count($cells) == 1 && in_array($cell, $schedules_reserves[1]))) {
                         Cart::destroy();
-                        session(['message' => "Dear Student. That block is not available"]);
+
+                        session(['message' => "Dear Student. That block is not available."]);
+                        
+                        if (in_array($cell, $schedules_reserves[0])) session(['message' => "Dear Student. That block is not available. It is already reserved by another student."]);
+
                         return redirect()->route("schedule.create")->with('error', "Sorry, you selected one or more unavailable blocks. Please try again.");
                     }
                 }

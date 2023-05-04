@@ -14,6 +14,21 @@ class Enrolment extends Model
     protected $guarded = ['*'];
 
     /**
+     * The attributes that are mass assignable.
+     *
+     * @var array
+     */
+    protected $fillable = ['student_id', 'teacher_id', 'course_id', 'deleted_at'];
+
+    /**
+     * Get the classes associated with the enrolment.
+     */
+    public function classes()
+    {
+        return $this->hasMany(Classes::class);
+    }
+
+    /**
      * Get the schedule associated with the enrolment.
      */
     public function schedule()
@@ -44,13 +59,6 @@ class Enrolment extends Model
     {
         return $this->belongsTo(User::class, 'student_id');
     }
-
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array
-     */
-    protected $fillable = ['student_id', 'teacher_id', 'course_id', 'deleted_at'];
 
     public function preselection()
     {

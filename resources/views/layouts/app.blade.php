@@ -53,7 +53,7 @@
     <x-jet-banner />
 
     @if (session('success'))
-        <div class="flex justify-center fixed bottom-5 left-5 z-20" x-data="{open: true}" x-show="open" x-cloak>
+        <div class="flex justify-center fixed bottom-5 left-5 z-20" x-data="{ open: true }" x-show="open" x-cloak>
             <div
                 class="w-full px-6 py-3 shadow-2xl flex flex-col items-center border-t sm:w-auto sm:m-4 sm:rounded-lg sm:flex-row sm:border bg-green-600 border-green-600 text-white">
                 <div>
@@ -72,7 +72,7 @@
     @endif
 
     @if (session('error'))
-        <div class="flex justify-center fixed bottom-5 left-5 z-20" x-data="{open: true}" x-show="open" x-cloak>
+        <div class="flex justify-center fixed bottom-5 left-5 z-20" x-data="{ open: true }" x-show="open" x-cloak>
             <div
                 class="w-full px-6 py-3 shadow-2xl flex flex-col items-center border-t sm:w-auto sm:m-4 sm:rounded-lg sm:flex-row sm:border bg-red-600 border-red-600 text-white">
                 <div>

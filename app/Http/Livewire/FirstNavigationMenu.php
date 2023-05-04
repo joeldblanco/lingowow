@@ -69,13 +69,21 @@ class FirstNavigationMenu extends Component
                     $this->notification_data[$key] = $user->first_name . ' ' . $user->last_name . ' has sent you a friend request.';
                     break;
 
+                case 'UpcomingClassForTeacher':
+                    $this->notification_data[$key] = 'Your next class is in ' . $data_array['timeUntilClass'] . ' with student ' . $user->first_name . ' ' . $user->last_name . '.';
+                    break;
+
+                case 'UpcomingClassForStudent':
+                    $this->notification_data[$key] = 'Your next class is in ' . $data_array['timeUntilClass'] . ' with teacher ' . $user->first_name . ' ' . $user->last_name . '.';
+                    break;
+
                 default:
                     // $notification_icon = 'fas fa-bell';
                     $this->notification_data[$key] = 'You have a new notification.';
                     break;
             }
         }
-        
+
         return view('livewire.first-navigation-menu');
     }
 }

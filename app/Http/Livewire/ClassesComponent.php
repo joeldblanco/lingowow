@@ -46,6 +46,7 @@ class ClassesComponent extends Component
         $this->start_date = ApportionmentController::currentPeriod(true)[0];
         $this->end_date = ApportionmentController::currentPeriod(true)[1];
         $this->enrolment_id = 0;
+        $this->resetPage();
     }
 
     public function loadComment($id)
@@ -92,6 +93,16 @@ class ClassesComponent extends Component
     //     }
     // }
 
+    public function updatingSearch()
+    {
+        $this->resetPage();
+    }
+
+    public function updatingSearchCourse()
+    {
+        $this->resetPage();
+    }
+
     public function render()
     {
         $this->to_review_classes = [];
@@ -101,7 +112,7 @@ class ClassesComponent extends Component
         } else if (auth()->user()->roles[0]->name == "student") {
             $classes = User::find(auth()->id())->studentClasses()->whereDate('start_date', '>=', $this->start_date)->whereDate('end_date', '<=', $this->end_date)->orderBy('start_date');
         } else if (auth()->user()->roles[0]->name == "admin") {
-            $classes = Classes::whereDate('start_date', '>=', $this->start_date)->whereDate('end_date', '<=', $this->end_date)->orderBy('start_date') ;
+            $classes = Classes::withTrashed()->whereDate('start_date', '>=', $this->start_date)->whereDate('end_date', '<=', $this->end_date)->orderBy('start_date') ;
             // where('enrolment_id', 'like', '%' . $this->enrolment_id)->
             // foreach (Classes::whereDate('start_date', '>=', $this->start_date)->whereDate('end_date', '<=', $this->end_date)->get() as $key => $value) {
             foreach ($classes as $key => $value) {
@@ -147,7 +158,8 @@ class ClassesComponent extends Component
                         ->orWhere('last_name', 'like', '%' . $this->search . '%');
                 });
             });
-        } 
+        }
+        
         if ($this->searchCourse){
             $classes = $classes->where(function ($query) {
                 $query->whereHas('enrolment.course', function ($query) {

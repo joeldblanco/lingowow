@@ -23,7 +23,7 @@
     @if ($action == 'classRescheduling')
         <div class="dateReason-tour mb-10">
             <input class="w-full mb-2" type="text" name="absenceReason" id="absenceReason"
-                placeholder="Reason for rescheduling" wire:model.debounce.1000ms="absenceReason" required>
+                placeholder="Reason for rescheduling" {{-- wire:model.debounce.1000ms="absenceReason" --}} required>
             <span class="text-red-500">
                 @error('absenceReason')
                     {{ $message }}
@@ -65,7 +65,8 @@
     @endif
 
     <div class="border-2">
-        <table content-security-policy="default-src 'self'; style-src 'self' 'unsafe-inline';" class="border w-full h-full text-center select-none">
+        <table content-security-policy="default-src 'self'; style-src 'self' 'unsafe-inline';"
+            class="border w-full h-full text-center select-none">
             <thead class="sticky top-0">
                 <tr class="bg-blue-50 sticky top-0">
                     <th class="border sticky top-0">LOCAL</th>
@@ -113,7 +114,7 @@
             $action == 'classRescheduling' ||
             $action == 'manualEnrolment' ||
             $action == 'scheduleSelection' ||
-            $action == 'examScheduling')
+            $action == 'examSelection')
         @hasanyrole('guest|student|admin')
             <div class="py-5 w-full flex justify-end">
                 <button onclick="saveSchedule()"
@@ -263,22 +264,28 @@
             function saveSchedule() {
 
                 let scheduleData = [];
-                if (@json(!empty($week))) {
-                    $('.selected').each(function() {
-                        scheduleData.push([$(this).attr('id').split('-')[0], $(
-                            this).attr('id').split('-')[1], $(this).attr('data-date')]);
-                    });
+                scheduleData[0] = $('#absenceReason').val();
+
+                if ($('#absenceReason').val() == "" && @json($action == 'classRescheduling')) {
+                    alert('Please enter an absence reason');
                 } else {
-                    $('.selected').each(function() {
-                        scheduleData.push([$(this).attr('id').split('-')[0], $(this).attr('id').split('-')[1]]);
-                    });
+                    scheduleData[1] = [];
+                    if (@json(!empty($week))) {
+                        $('.selected').each(function() {
+                            scheduleData[1].push([$(this).attr('id').split('-')[0], $(
+                                this).attr('id').split('-')[1], $(this).attr('data-date')]);
+                        });
+                    } else {
+                        $('.selected').each(function() {
+                            scheduleData[1].push([$(this).attr('id').split('-')[0], $(this).attr('id').split('-')[1]]);
+                        });
+                    }
+
+                    Livewire.emit('saveSchedule', scheduleData);
+                    startSelection = !startSelection;
+                    selection.disable();
+                    selection.clearSelection();
                 }
-
-                Livewire.emit('saveSchedule', scheduleData);
-
-                startSelection = !startSelection;
-                selection.disable();
-                selection.clearSelection();
             }
 
             window.addEventListener('scheduleUpdated', event => {

@@ -38,7 +38,7 @@ class Meeting extends Model
     }
 
     /**
-     * Get the phone associated with the user.
+     * Get the class associated with the meeting.
      */
     public function class()
     {

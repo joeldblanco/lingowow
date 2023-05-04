@@ -1,6 +1,5 @@
 <x-app-layout>
-
-    <div class="p-4 bg-gray-200 font-sans">
+    <div class="p-4 bg-gray-200 font-sans h-screen">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="overflow-hidden">
 
@@ -18,7 +17,7 @@
                         </tr>
                     </thead> --}}
                     <tbody class="flex flex-col bg-white p-10 rounded-xl w-full" x-data>
-                        @foreach ($notifications as $key => $value)
+                        @forelse ($notifications as $key => $value)
                             <tr class="@if ($notification_read_at[$key]) text-gray-500 @else text-gray-700 font-bold @endif cursor-pointer space-x-3 flex justify-around items-center border-dashed border-b @if (!$loop->last) mb-5 @endif py-5"
                                 @click="$wire.showNotification('{{ $notification_id[$key] }}')">
                                 <td class="text-center border-gray-200 w-1/12">
@@ -37,7 +36,14 @@
                                     </td>
                                 @endif
                             </tr>
-                        @endforeach
+                        @empty
+                            <tr
+                                class="text-gray-700 font-bold cursor-pointer space-x-3 flex justify-around items-center border-dashed border-b">
+                                <td class="text-center border-gray-200 w-full">
+                                    <p>There are no notifications.</p>
+                                </td>
+                            </tr>
+                        @endforelse
                     </tbody>
                 </table>
 

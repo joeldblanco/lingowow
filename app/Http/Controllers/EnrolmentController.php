@@ -213,31 +213,20 @@ class EnrolmentController extends Controller
     {
         $student = User::find($enrolment->student_id);
 
-        if (!empty($student)) {
-            // if ($student->roles[0]->name == 'student') {
-            $student->studentClasses->each(function ($class) {
-                // $deleted_class = $class->delete();
-                // dd($class);
+        if (!empty($enrolment)) {
+            $enrolment->classes->each(function ($class) {
                 if ($class->meeting != null) (new MeetingController)->destroy($class->meeting);
                 $class->delete();
             });
-
-            if ($student->enrolments->count()) {
-                // $student->schedules->where('enrolment_id', $student->enrolments->first()->id)->first()->delete();
-                $student->enrolments->first()->delete();
-                if ($student->schedules->first() != null) {
-                    // $student->schedules->first()->next_schedule = null;
-                    $student->schedules->first()->save();
-                    $student->schedules->first()->delete();
-                }
-            }
-
-            $student->removeRole('student');
-            $student->assignRole('guest');
-            // }
+            $enrolment->schedule->delete();
+            $enrolment->delete();
         }
 
-        $enrolment->delete();
+        if (!empty($student)) {
+            $student->removeRole('student');
+            $student->assignRole('guest');
+        }
+
         return redirect()->route('enrolments.index');
     }
 }

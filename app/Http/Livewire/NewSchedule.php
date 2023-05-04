@@ -5,11 +5,14 @@ namespace App\Http\Livewire;
 use App\Http\Controllers\SchedulingCalendarController;
 use App\Jobs\StoreSelfEnrolment;
 use App\Models\Classes;
+use App\Models\Comment;
 use App\Models\Enrolment;
 use App\Models\ScheduleReserve;
 use App\Models\User;
 use App\Notifications\ClassRescheduledToStudent;
 use App\Notifications\ClassRescheduledToTeacher;
+use App\Notifications\ExamScheduledToStudent;
+use App\Notifications\ExamScheduledToTeacher;
 use Carbon\Carbon;
 use DateTimeZone;
 use Illuminate\Support\Facades\DB;
@@ -49,9 +52,9 @@ class NewSchedule extends Component
         'loadSelectingSchedule',
     ];
 
-    protected $rules = [
-        'absenceReason' => 'required',
-    ];
+    // protected $rules = [
+    //     'absenceReason' => 'required',
+    // ];
 
     public function mount($limit = null, $week = null, $action, $users)
     {
@@ -91,6 +94,10 @@ class NewSchedule extends Component
 
                 // Get student schedule
                 $this->schedules = $this->utcToLocal($this->getUserSchedule($users));
+
+                $reserve = ScheduleReserve::withTrashed()->where('user_id', $this->users)->first();
+                if(!empty($reserve)) $reserve->delete();
+        
 
                 break;
 
@@ -157,6 +164,18 @@ class NewSchedule extends Component
 
                 break;
 
+            case 'examSelection':
+                $this->classForSelectees = "available";
+                $this->classForSelected = "available";
+
+                // Get teacher schedule
+                $this->users = session('first_teacher');
+
+                // Get teacher's free blocks
+                $this->schedules = $this->utcToLocal($this->getTeachersAvailability($users, $week));
+
+                break;
+
             case 'adminShow':
 
                 $this->classForSelected = "selected";
@@ -191,6 +210,11 @@ class NewSchedule extends Component
         if (!empty($teacherId)) {
             if ($this->action == 'scheduleSelection') {
                 $this->schedules = $this->utcToLocal($this->getTeachersAvailability($teacherId));
+            }
+
+            if ($this->action == 'examSelection') {
+                $this->users = $teacherId;
+                $this->schedules = $this->utcToLocal($this->getTeachersAvailability($this->users, $this->week));
             }
 
             if ($this->action == 'schedulePreselection') {
@@ -554,11 +578,10 @@ class NewSchedule extends Component
 
     public function saveSchedule($data)
     {
-        // dd($data, session('toRescheduleClass'), $this->action);
         switch ($this->action) {
             case 'classRescheduling':
 
-                $this->validate();
+                // $this->validate();
 
                 // Get class to reschedule
                 $toRescheduleClass = session('toRescheduleClass');
@@ -572,7 +595,7 @@ class NewSchedule extends Component
                     $classOldDate = (new Carbon($toRescheduleClass->start_date))->timezone($toRescheduleClass->teacher()->timezone)->isoFormat('MMMM Do - Oh:00 a');
 
                     // Get new class date
-                    $newClassDate = array_merge(...$data);
+                    $newClassDate = array_merge(...$data[1]);
 
                     // Convert new class date to Carbon object
                     $datetime = $newClassDate[2] . " " . $newClassDate[0] . ":00:00";
@@ -583,11 +606,21 @@ class NewSchedule extends Component
                     // Get new class date in UTC
                     $newClassDate = $newClassDate->timezone('UTC');
 
+                    $oldClassDate = (new Carbon($toRescheduleClass->start_date))->toDateTimeString();
+
                     // Update class date
                     $toRescheduleClass->start_date = $newClassDate;
                     $toRescheduleClass->end_date = $newClassDate->copy()->addMinutes(40);
                     $toRescheduleClass->status = 1;
                     $s = $toRescheduleClass->save();
+
+
+                    $comment = new Comment();
+                    $comment->author_id = auth()->user()->id;
+                    $comment->content = "Class rescheduled for the following reason: " . $data[0] . ". Original date: " . $oldClassDate . " - " . "New date: " . $newClassDate->toDateTimeString() . ".";
+                    $comment->commentable_id = $toRescheduleClass->id;
+                    $comment->commentable_type = 'App\Models\Classes';
+                    $comment->save();
 
                     $classNewDate = $toRescheduleClass->start_date->copy()->timezone($toRescheduleClass->teacher()->timezone)->isoFormat('MMMM Do - Oh:00 a');
                     Notification::sendNow($toRescheduleClass->student(), new ClassRescheduledToStudent());
@@ -608,13 +641,33 @@ class NewSchedule extends Component
 
                 break;
             case 'examSelection':
-                //
+
+                // Get exam date & time
+                $examDate = array_merge(...$data[1]);
+
+                if (!empty($examDate)) {
+
+                    // Convert exam date & time to Carbon object
+                    $datetime = $examDate[2] . " " . $examDate[0] . ":00:00";
+
+                    // Get exam date & time in user timezone
+                    $examDate = Carbon::createFromFormat('m/d H:i:s', $datetime, auth()->user()->timezone);
+
+                    // Get exam date & time in UTC
+                    $examDate = $examDate->timezone('UTC');
+
+                    // Store exam date & time in session
+                    // session(['examDateTime' => $examDate->toDateTimeString()]);
+
+                    Notification::sendNow(auth()->user(), new ExamScheduledToStudent());
+                    Notification::sendNow(User::find($this->users), new ExamScheduledToTeacher(auth()->user(), $examDate));
+                }
                 break;
             case 'manualEnrolment':
 
-                if ($this->limit == count($data)) {
+                if ($this->limit == count($data[1])) {
 
-                    $schedule = $this->localToUtc($data);
+                    $schedule = $this->localToUtc($data[1]);
                     $schedule = $this->utcToLocal($schedule);
 
                     $request = new Request([
@@ -631,9 +684,9 @@ class NewSchedule extends Component
 
             case 'scheduleSelection':
 
-                if ($this->limit == count($data)) {
+                if ($this->limit == count($data[1])) {
 
-                    $schedule = $this->localToUtc($data);
+                    $schedule = $this->localToUtc($data[1]);
                     $schedule = $this->utcToLocal($schedule);
 
                     $request = new Request([
@@ -644,19 +697,21 @@ class NewSchedule extends Component
                     ]);
 
                     (new SchedulingCalendarController)->checkForTeachers($request);
-                }else{
-                    if($this->limit < count($data)){
-                        redirect()->route("schedule.create")->with('error', "Sorry, you selected one or more unavailable blocks. Please try again.");
-                    }else{
-                        redirect()->route("schedule.create")->with('error', "Sorry, you have selected fewer blocks than reflected in your plan. Please try again.");
-                    }
+                } else {
+                    // if ($this->limit < count($data[1])) {
+                    //     session(['error' => 'Sorry, you selected one or more unavailable blocks. Please try again.']);
+                    //     redirect()->route("shop.scheduleSelection");
+                    // } else {
+                        session(['error' => 'Oops! Something went wrong. Please try again']);
+                        redirect()->route("shop.scheduleSelection");
+                    // }
                 }
                 break;
             case 'schedulePreselection':
 
-                if ($this->limit == count($data)) {
+                if ($this->limit == count($data[1])) {
 
-                    $schedule = $this->localToUtc($data);
+                    $schedule = $this->localToUtc($data[1]);
                     $schedule = $this->utcToLocal($schedule);
 
                     $request = new Request([
