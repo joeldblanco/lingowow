@@ -4,6 +4,7 @@ namespace App\Http\Livewire;
 
 use App\Http\Controllers\ApportionmentController;
 use App\Http\Controllers\MeetingController;
+use App\Http\Controllers\ShopController;
 use App\Models\Course;
 use App\Models\Product;
 use App\Models\Schedule;
@@ -45,23 +46,24 @@ class TeachersCarousel extends Component
         }
     }
 
-    public function saveTeacher($teacher_id)
-    {
-        Cart::destroy();
-        $course_id = session('selected_course');
+    // public function saveTeacher($teacher_id)
+    // {
+    //     Cart::destroy();
+    //     $course_id = session('selected_course');
 
-        $product = Course::find($course_id)->products->first();
+    //     $product = Course::find($course_id)->products->first();
 
-        $apportionment = ApportionmentController::calculateApportionment(session('plan'));
-        $product_qty = $apportionment[0];
-        Cart::add($product->id, $product->name, $product_qty, ($product->sale_price == null ? $product->regular_price : $product->sale_price))->associate('App\Models\Product');
-        session([
-            'selected_teacher' => $teacher_id,
-            'course_id' => $course_id,
-            'classes_dates' => $apportionment[1]
-        ]);
-        redirect()->route('cart');
-    }
+    //     $apportionment = ApportionmentController::calculateApportionment(session('plan'));
+    //     $product_qty = $apportionment[0];
+    //     // Cart::add($product->id, $product->name, $product_qty, ($product->sale_price == null ? $product->regular_price : $product->sale_price))->associate('App\Models\Product');
+    //     ShopController::addToCart($product->id, $product_qty);
+    //     session([
+    //         'selected_teacher' => $teacher_id,
+    //         'course_id' => $course_id,
+    //         'classes_dates' => $apportionment[1]
+    //     ]);
+    //     redirect()->route('cart');
+    // }
 
     public function loadSchedule($teacher_id = 0)
     {

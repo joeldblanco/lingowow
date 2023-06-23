@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "9713b8ffb6a5ec508ddadc6379315dd7",
+    "content-hash": "fd4fd3e644e5eac50dd8a919182a297e",
     "packages": [
         {
             "name": "aberkanidev/laravel-coupons",
@@ -70,6 +70,61 @@
                 "source": "https://github.com/aberkanimed/laravel-coupons/tree/v1.1.0"
             },
             "time": "2021-01-06T12:26:33+00:00"
+        },
+        {
+            "name": "apiip/apiip.net",
+            "version": "v1.1.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Apiipnet/php-apiip.net.git",
+                "reference": "9e007ceb590bdd94a7ba946efd2e019e69b91b69"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Apiipnet/php-apiip.net/zipball/9e007ceb590bdd94a7ba946efd2e019e69b91b69",
+                "reference": "9e007ceb590bdd94a7ba946efd2e019e69b91b69",
+                "shasum": ""
+            },
+            "require": {
+                "ext-json": "*",
+                "guzzlehttp/guzzle": "^6.3||^7.0",
+                "php": ">=7.4"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "ApiipClient\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "Apache-2.0"
+            ],
+            "authors": [
+                {
+                    "name": "Apiipnet",
+                    "email": "apiipnet.business@gmail.com",
+                    "homepage": "https://apiip.net"
+                }
+            ],
+            "description": "The official PHP library for apiip.net that allowing customers to automate IP address validation and geolocation lookup in websites, applications and back-office system. Visit our API docs at https://apiip.net/documentation",
+            "keywords": [
+                "IP API",
+                "apiip",
+                "apiip.net",
+                "geolocate with php",
+                "ip location api",
+                "ip to location",
+                "ip2location",
+                "iplocation api",
+                "php geolocation",
+                "php ip location"
+            ],
+            "support": {
+                "issues": "https://github.com/Apiipnet/php-apiip.net/issues",
+                "source": "https://github.com/Apiipnet/php-apiip.net/tree/v1.1.1"
+            },
+            "time": "2022-03-09T20:42:32+00:00"
         },
         {
             "name": "asm89/stack-cors",

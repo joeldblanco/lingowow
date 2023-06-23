@@ -2,9 +2,9 @@
 
 namespace App\Http\Livewire;
 
+use App\Http\Controllers\ShopController;
 use App\Invoice;
 use App\Item;
-use App\Jobs\StoreSelfEnrolment;
 use App\Mail\InvoicePaid;
 use App\Models\Course;
 use App\Models\Product;
@@ -91,13 +91,21 @@ class CartComponent extends Component
 
         // Cart::destroy();
 
-        dispatch(new StoreSelfEnrolment($this->user));
 
-        $invoice = Invoice::find(session('invoice_id'));
-        $invoice->payment_method = 'paypal';
-        $invoice->save();
 
-        return redirect()->route('invoice.show', $invoice->id);
+
+
+
+        //MOVED TO SHOPCONTROLLER
+        // dispatch(new StoreSelfEnrolment($this->user));
+
+        // $invoice = Invoice::find(session('invoice_id'));
+        // $invoice->payment_method = 'paypal';
+        // $invoice->save();
+
+        // return redirect()->route('invoice.show', $invoice->id);
+
+        ShopController::checkout($this->user, 'paypal');
     }
 
     public function updated($propertyName)

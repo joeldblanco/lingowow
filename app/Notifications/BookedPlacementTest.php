@@ -2,29 +2,31 @@
 
 namespace App\Notifications;
 
-use App\Models\Course;
+use App\Models\Schedule;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 use Illuminate\Notifications\Messages\BroadcastMessage;
 
-class StudentUnrolment extends Notification implements ShouldQueue
+class BookedPlacementTest extends Notification implements ShouldQueue
 {
     use Queueable;
 
-    public $student, $schedule_string, $course;
+    public $student, $schedule_string;
 
     /**
      * Create a new notification instance.
      *
      * @return void
      */
-    public function __construct($student_id, $course_id)
+    public function __construct($student_id)
     {
-        $this->course = Course::find($course_id);
         $this->student = User::find($student_id);
+        $examDate = Carbon::parse(session('examDate')[0]);
+        $this->schedule_string = 'Placement test booked on ' . $examDate->format('Y/d/m') . ' at ' . $examDate->format('g:i a') . ' UTC.';
     }
 
     /**
@@ -47,11 +49,11 @@ class StudentUnrolment extends Notification implements ShouldQueue
     public function toMail($notifiable)
     {
         return (new MailMessage)
-            ->subject('Unenrollment notice!')
+            ->subject('New Placement Test Booked: ' . $this->student->first_name . ' ' . $this->student->last_name)
             ->line('Greetings, dear ' . $notifiable->first_name . ' ' . $notifiable->last_name . '.')
-            ->line('We are writing to notify you that you have been unenroled from ' . $this->course->name)
-            ->line('Click the button below to purchase another package and continue enjoying our services.')
-            ->action('Shop', url('/shop'))
+            ->line('We are writing to notify you that a new Placement Test has been scheduled by student ' . $this->student->first_name . ' ' . $this->student->last_name . '. ' . $this->schedule_string)
+            ->line('Click the button below to check your current schedule.')
+            ->action('Check Schedule', route('dashboard'))
             ->line('If you have any questions, please contact us through the regular channels.');
     }
 
@@ -59,7 +61,7 @@ class StudentUnrolment extends Notification implements ShouldQueue
     {
         return [
             "user_id" => $this->student->id,
-            "course_name" => $this->course->name
+            "schedule_string" => $this->schedule_string
         ];
     }
 

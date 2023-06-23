@@ -52,7 +52,7 @@
                         </thead>
                         <tbody>
                             @foreach ($products as $product)
-                                <tr class="hover:bg-gray-200 module" id="{{ $product->id }}-{{ $product->order }}">
+                                <tr class="hover:bg-gray-200 module @if($product->status == 0) opacity-50 @endif" id="{{ $product->id }}-{{ $product->order }}">
                                     {{-- <td class="py-4 px-6 border-b border-gray-400"><a
                                             href="{{ route('profile.show', $product->id) }}"
                                             class="hover:text-blue-600 hover:underline">{{ $product->id }}</a></td> --}}

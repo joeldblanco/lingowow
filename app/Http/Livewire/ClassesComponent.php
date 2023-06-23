@@ -63,6 +63,7 @@ class ClassesComponent extends Component
     public function showClass($id)
     {
         $this->current_class = Classes::find($id);
+        // dd($this->current_class->enrolment_id);
         $this->enrolment = Enrolment::withTrashed()->where('id', $this->current_class->enrolment_id)->first();
         $this->classDetails = true;
     }
@@ -112,7 +113,7 @@ class ClassesComponent extends Component
         } else if (auth()->user()->roles[0]->name == "student") {
             $classes = User::find(auth()->id())->studentClasses()->whereDate('start_date', '>=', $this->start_date)->whereDate('end_date', '<=', $this->end_date)->orderBy('start_date');
         } else if (auth()->user()->roles[0]->name == "admin") {
-            $classes = Classes::withTrashed()->whereDate('start_date', '>=', $this->start_date)->whereDate('end_date', '<=', $this->end_date)->orderBy('start_date') ;
+            $classes = Classes::whereDate('start_date', '>=', $this->start_date)->whereDate('end_date', '<=', $this->end_date)->orderBy('start_date') ;
             // where('enrolment_id', 'like', '%' . $this->enrolment_id)->
             // foreach (Classes::whereDate('start_date', '>=', $this->start_date)->whereDate('end_date', '<=', $this->end_date)->get() as $key => $value) {
             foreach ($classes as $key => $value) {
@@ -167,8 +168,8 @@ class ClassesComponent extends Component
                 });
             });
         }
+        // dd($classes->get());
         $classes = $classes->paginate(15);
-        // dd($classes);
         //Fin GPT
 
         // $this->current_class = $classes->last();

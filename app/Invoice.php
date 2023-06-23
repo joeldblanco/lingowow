@@ -7,6 +7,13 @@ use Illuminate\Support\Facades\DB;
 
 class Invoice extends Model
 {
+    protected $fillable = [
+        'title',
+        'price',
+        'paid',
+        'user_id',
+    ];
+
     //
     public function items()
     {

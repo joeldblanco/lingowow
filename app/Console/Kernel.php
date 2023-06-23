@@ -147,6 +147,13 @@ class Kernel extends ConsoleKernel
                     Notification::sendNow($class->student(), new UpcomingClassForStudent($class));
                 }
             }
+
+
+            $reserves = ScheduleReserve::where('updated_at', '<=', Carbon::now()->subMinutes(20))->get();
+            foreach ($reserves as $reserve) {
+                $reserve->delete();
+            }
+
         })->everyMinute();
 
         $schedule->call(function () {

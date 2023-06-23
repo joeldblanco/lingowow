@@ -44,7 +44,14 @@
                                 class="py-4 px-6 bg-gray-100 font-bold uppercase text-sm text-gray-600 border-b border-gray-400">
                                 Date</th>
                             <th
-                                class="py-4 px-6 bg-gray-100 font-bold uppercase text-sm text-gray-600 border-b border-gray-400">
+                                class="py-4 px-6 bg-gray-100 font-bold uppercase text-sm text-gray-600 border-b border-gray-400 text-center">
+                                Method</th>
+                            <th
+                                class="py-4 px-6 bg-gray-100 font-bold uppercase text-sm text-gray-600 border-b border-gray-400 text-center">
+                                Paid</th>
+                            <th
+                                class="py-4 px-6 bg-gray-100 font-bold uppercase text-sm text-gray-600 border-b border-gray-400 text-center">
+                                Actions
                             </th>
                         </tr>
                     </thead>
@@ -60,11 +67,31 @@
                                 </td>
                                 <td class="py-4 px-6 border-b border-gray-400">${{ $invoice->price }}</td>
                                 <td class="py-4 px-6 border-b border-gray-400">
-                                    {{ $invoice->updated_at->isoFormat('L') }}
+                                    {{ $invoice->updated_at->isoFormat('DD/MM/YYYY') }}
                                 </td>
-                                <td class="py-4 px-6 border-b border-gray-400">
+                                <td class="py-4 px-6 border-b border-gray-400 text-center">
+                                    @if ($invoice->payment_method == 'niubiz')
+                                        <i class="fas fa-credit-card fa-lg" style="color: #3145b9;"></i>
+                                    @elseif ($invoice->payment_method == 'paypal')
+                                        <i class="fab fa-paypal fa-lg" style="color: #3145b9;"></i>
+                                    @else
+                                        <i class="fas fa-exclamation-triangle fa-lg text-yellow-500"></i>
+                                    @endif
+                                </td>
+                                <td class="py-4 px-6 border-b border-gray-400 text-center">
+                                    @if ($invoice->paid)
+                                        <i class="fas fa-check-circle text-green-600"></i>
+                                    @else
+                                        <i class="fas fa-times-circle text-red-600"></i>
+                                    @endif
+                                </td>
+                                <td class="py-4 flex justify-evenly border-b border-gray-400 px-auto">
                                     <a href="{{ route('invoice.show', $invoice->id) }}"
                                         class="text-gray-600 font-bold py-1 px-3 rounded text-xs bg-blue-50 hover:bg-blue-300">View</a>
+                                    @role('admin')
+                                        <a href="{{ route('invoice.edit', $invoice->id) }}"
+                                            class="text-gray-600 font-bold py-1 px-3 rounded text-xs bg-green-100 hover:bg-green-300">Edit</a>
+                                    @endrole
                                 </td>
                             </tr>
                             {{-- @endif --}}

@@ -39,7 +39,7 @@
         ],
         [
             'name' => 'Teachers',
-            'route' => route('teacherEarnings', ['id' => Auth::user()->id]),
+            'route' => route('teacherEarnings'),
             'status' => false,
             'roles' => ['teacher', 'admin'],
         ],

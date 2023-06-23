@@ -25,11 +25,11 @@ tour.addSteps([
         ]
     },
     {
-        id: 'teachers-edit-schedule-button',
-        text: 'You can update your schedule by clicking on the "Edit Schedule" button below.',
+        id: 'teachers-clear-schedule-button',
+        text: 'You can update your schedule by clicking on the "Clear Schedule" button.',
         attachTo: {
-            element: '.teachers-edit-schedule-button',
-            on: 'top'
+            element: '.teachers-clear-schedule-button',
+            on: 'bottom'
         },
         buttons: [
             {

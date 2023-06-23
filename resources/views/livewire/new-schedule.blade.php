@@ -4,7 +4,7 @@
         <div class="flex w-full justify-end space-x-4">
             <button onclick="startEdition()" x-show="editSchedule"
                 x-on:click="editSchedule = false, cancelEdition = true, saveEdition = true"
-                class="bg-lw-blue px-4 py-2 rounded-md text-white font-bold hover:bg-blue-800 mb-5">
+                class="bg-lw-blue px-4 py-2 rounded-md text-white font-bold hover:bg-blue-800 mb-5 teachers-clear-schedule-button">
                 Clear Schedule
                 <i class="fas fa-eraser"></i>
             </button>
@@ -80,14 +80,14 @@
                     @endforeach
                 </tr>
             </thead>
-            <tbody class="container" id="{{ $users }}">
+            <tbody class="container" @if (!empty($users)) id="{{ $users }}" @endif>
                 @for ($hour = 0; $hour < 24; $hour++)
                     <tr>
                         <td class="border">{{ Carbon\Carbon::now()->setHour($hour)->format('h:00 A') }}</td>
                         @foreach ($days as $key => $day)
                             <td id="{{ $hour }}-{{ $key }}"
                                 @if (!empty($date)) data-date="{{ $date[$key] }}" @endif
-                                class="border h-8 bg-gray-100 selectee @if (in_array([$hour, $key], $schedules)) {{ $classForSelected }} @endif">
+                                class="border h-8 bg-gray-100 selectee @if (in_array([$hour, $key], $schedules)) {{ $classForSelected }} @endif" style="width: 12.5%">
 
                                 @php
                                     $count = 0;

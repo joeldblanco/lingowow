@@ -9,6 +9,17 @@ use App\Models\Unit;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Invoice;
+use Gloudemans\Shoppingcart\Facades\Cart;
+use App\Item;
+use App\Mail\InvoicePaid;
+use App\Models\Module;
+use App\Models\Preselection;
+use App\Models\Product;
+use App\Models\Schedule;
+use App\Models\ScheduleReserve;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\Mail;
 
 class EnrolmentController extends Controller
 {
@@ -72,7 +83,7 @@ class EnrolmentController extends Controller
             ]);
 
             if ($request->student_id == null) {
-                $this->store($request);
+                EnrolmentController::store($request);
                 return redirect()->route('enrolments.index');
             } else {
                 $selected_teacher = $request->teacher_id;
@@ -110,32 +121,29 @@ class EnrolmentController extends Controller
      */
     public function store(Request $request)
     {
-        // $enrolment = new Enrolment([
-        //     'teacher_id' => $request->get('teacher_id'),
-        //     'student_id' => $request->get('student_id'),
-        //     'course_id' => $request->get('course_id'),
-        // ]);
-        // $enrolment->save();
+        dd($request);
 
-        if (empty($request->get('student_id'))) {
+        if (empty($request->get('student_id')) && !empty($request->get('teacher_id'))) {
             Enrolment::withTrashed()->updateOrCreate(
-                ['teacher_id' => $request->get('teacher_id'), 'course_id' => $request->get('course_id')],
+                ['student_id' => NULL, 'teacher_id' => $request->get('teacher_id'), 'course_id' => $request->get('course_id')],
                 ['deleted_at' => NULL]
             );
         }
 
-        if (empty($request->get('teacher_id'))) {
+        if (empty($request->get('teacher_id')) && !empty($request->get('student_id'))) {
             Enrolment::withTrashed()->updateOrCreate(
                 ['student_id' => $request->get('student_id'), 'course_id' => $request->get('course_id')],
                 ['deleted_at' => NULL]
             );
         }
 
-        if (Course::find($request->get('course_id'))->categories->pluck('name')->contains('Conversational') && ($request->get('student_id') == null) && ($request->get('teacher_id') != null)) {
+        dd((empty($request->get('student_id')) && !empty($request->get('teacher_id'))), (empty($request->get('teacher_id')) && !empty($request->get('student_id'))));
+
+        if (Course::find($request->get('course_id'))->categories->pluck('name')->contains('Conversational') && empty($request->get('student_id')) && !empty($request->get('teacher_id'))) {
             User::find($request->get('teacher_id'))->givePermissionTo('edit conversational courses');
         }
 
-        if (($request->get('student_id') != null) && ($request->get('teacher_id') != null)) {
+        if (!empty($request->get('student_id')) && !empty($request->get('teacher_id'))) {
             User::find($request->get('student_id'))->givePermissionTo('view units');
         }
 
@@ -218,7 +226,7 @@ class EnrolmentController extends Controller
                 if ($class->meeting != null) (new MeetingController)->destroy($class->meeting);
                 $class->delete();
             });
-            $enrolment->schedule->delete();
+            if (!empty($enrolment->schedule)) $enrolment->schedule->delete();
             $enrolment->delete();
         }
 
@@ -228,5 +236,430 @@ class EnrolmentController extends Controller
         }
 
         return redirect()->route('enrolments.index');
+    }
+
+    public static function storeSelfEnrolment($student_id, $course_id, $teacher_id = null)
+    {
+        //GETTING STUDENT AND COURSE//
+        $student = User::find($student_id);
+        $course = Course::find($course_id);
+
+        //CHANGING STUDENT'S ROLE FROM 'GUEST' TO 'STUDENT'//
+        $student->removeRole('guest');
+        $student->assignRole('student');
+
+        if ($course->categories()->pluck('name')->contains('Synchronous')) {
+
+            $teacher = User::find(session('teacher_id'));
+
+            $enrolment = Enrolment::where('student_id', $student->id)
+                ->where('course_id', $course_id)
+                ->withTrashed()
+                ->first();
+
+            if (!empty($enrolment)) {
+                $deleted = $enrolment->trashed();
+            }
+
+            if ($enrolment && !$deleted) {
+                $current_period = json_decode(DB::table('metadata')->where('key', '=', 'current_period')->first()->value);
+                $now = Carbon::now();
+                $current_period_end = new Carbon($current_period->end_date);
+
+                if (session('preselection') == true) {
+                    $preselection = Preselection::withTrashed()->updateOrCreate(
+                        ['enrolment_id' => $enrolment->id],
+                        ['teacher_id' => $teacher->id, 'schedule' => json_decode(session('user_schedule')), 'deleted_at' => NULL]
+                    );
+                    session()->forget('preselection');
+
+                    $scheduleReservation = ScheduleReserve::where('user_id', $enrolment->student->id)->first();
+                    if (!empty($scheduleReservation)) {
+                        $scheduleReservation->delete();
+                    }
+
+                    return redirect()->route('invoice.show', $invoice->id);
+                } else {
+                    dd("User has an active enrolment in this course.");
+                }
+            } else {
+
+                //CREATING STUDENT'S ENROLMENT//
+                $enrolment = Enrolment::create([
+                    'student_id' => $student->id,
+                    'course_id' => $course_id,
+                    'teacher_id' => $teacher->id
+                ]);
+            }
+
+            GatherController::editGuestsList([$student->id, $teacher->id]);
+        } else {
+
+            //CREATING STUDENT'S ENROLMENT (OR UPDATING IT, IN CASE IT ALREADY EXISTS BUT IS SOFTDELETED)//
+            $enrolment = Enrolment::withTrashed()->updateOrCreate(
+                ['student_id' => $student->id, 'course_id' => $course_id],
+                ['teacher_id' => NULL, 'deleted_at' => NULL]
+            );
+            GatherController::editGuestsList([$student->id]);
+        }
+
+        if ($student->id != null) {
+
+            User::find($student->id)->givePermissionTo('view units');
+            $course = Course::find($course_id);
+
+            if ($course->categories->pluck('name')->contains('Conversational')) {
+                $modules_ids = DB::table('module_user')->select('module_id')->where('user_id', $student->id)->get();
+                $modules = Module::find($modules_ids->pluck('module_id')->toArray());
+                $module = $modules->where('course_id', $course->id)->first();
+                if (empty($module)) {
+                    $order = $course->modules->sortBy('order')->last() == null ? 1 : $course->modules->sortBy('order')->last()->order + 1;
+                    $module = Module::create([
+                        'name' => $student->first_name . ' ' . $student->last_name . ' - Lesson Room',
+                        'course_id' => $course_id,
+                        'description' => 'Welcome to your Conversational Course. 
+
+                        Most of the content set here is based on the information sent by our students. 
+                        
+                        On this course, you will practice and improve the language you know. 
+                        
+                        Enjoy the journey.',
+                        'status' => 1,
+                        'order' => $order,
+                    ]);
+
+                    DB::table('module_user')->insertOrIgnore([
+                        ['module_id' => $module->id, 'user_id' => $student->id],
+                        ['module_id' => $module->id, 'user_id' => session('teacher_id')]
+                    ]);
+                } else {
+                    $module = Module::find($module->id);
+                    if ($module->course_id)
+                        DB::table('module_user')->insertOrIgnore([
+                            ['module_id' => $module->id, 'user_id' => $student->id],
+                            ['module_id' => $module->id, 'user_id' => session('teacher_id')]
+                        ]);
+                }
+            } else {
+                $unit = $course->units()->sortBy('order')->pluck('exams')->reject(function ($innerCollection) {
+                    return $innerCollection->isEmpty();
+                })->flatten()->first();
+
+                if (empty($unit)) {
+                    $unit_id = $course->units()->sortBy('order')->first()->id;
+                } else {
+                    $unit_id = $unit->unit_id;
+                }
+
+                $current_unit = DB::table('unit_user')->select('unit_id')->where('user_id', $student->id)->first();
+
+                if (empty($current_unit)) {
+                    DB::table('unit_user')->insertOrIgnore([
+                        ['unit_id' => $unit_id, 'user_id' => $student->id]
+                    ]);
+                }
+            }
+        }
+
+        return $enrolment->id;
+    }
+
+    public static function calculateApportionment($plan = null, $schedule = null, $course_id = null, $preselection = null)
+    {
+        if (empty(session('student_id'))) {
+            $user = auth()->user();
+        } else {
+            $user = User::find(session('student_id'));
+        }
+
+        if ($schedule == null) {
+            $schedule = session("user_schedule");
+        }
+
+        $schedule = json_decode($schedule);
+
+        if ($course_id == null) {
+            $course_id = session("selected_course");
+        }
+        // $product = Course::find($course_id)->products->first();
+
+        $today = Carbon::now()->setTimezone('UTC');
+        $today->addDays(1);
+        // if (auth()->user()->roles[0]->name == 'student' || auth()->user()->roles[0]->name == 'guest') {
+        //     $today->addDays(1);
+        // }
+
+        $current_period = ApportionmentController::currentPeriod();
+        $next_period = ApportionmentController::nextPeriod();
+
+        $current_period_start = new Carbon($current_period[0]);
+        $current_period_end = new Carbon($current_period[1]);
+
+        $next_period_start = new Carbon($next_period[0]);
+        $next_period_end = new Carbon($next_period[1]);
+
+
+
+        // $timezone = Carbon::now()->setTimezone($user->timezone);
+        // $schedule_utc = [];
+        // foreach ($schedule as $key => $value) {
+        //     $date = Carbon::now();
+        //     $date_local = Carbon::parse('Next ' . Carbon::now()->setISODate($date->year, $date->weekOfYear, $value[1])->format('l') . ' at ' . $value[0] . ':00');
+        //     $schedule_utc[$key][0] = (int)$date_local->copy()->subHours($timezone->offsetHours)->hour;
+        //     $schedule_utc[$key][1] = (int)$date_local->copy()->subHours($timezone->offsetHours)->dayOfWeek;
+        // }        
+
+
+
+        if (empty($preselection)) {
+            $qty = 0;
+            $days = [];
+            foreach ($schedule as $key => $value) {
+                $day = $value[1];
+                $time = $value[0];
+                $qty += $today->diffInDaysFiltered(function (Carbon $date) use (&$day, &$time, &$days, &$current_period_start) {
+                    if ($date->isDayOfWeek($day) && $date->greaterThanOrEqualTo($current_period_start)) {
+                        $date->hour = $time;
+                        $date->minute = 0;
+                        $date->second = 0;
+                        array_push($days, $date->toDateTimeString());
+                    }
+
+                    return $date->isDayOfWeek($day);
+                }, $current_period_end->copy()->addDay()); //It's necessary to add a day '->addDay()' to the end date to include the last day of the period
+            }
+
+            if ($qty <= 0) {
+                $qty = 0;
+                $days = [];
+                foreach ($schedule as $key => $value) {
+                    $day = $value[1];
+                    $time = $value[0];
+
+                    $qty += $next_period_start->diffInDaysFiltered(function (Carbon $date) use (&$day, &$time, &$days) {
+
+                        if ($date->isDayOfWeek($day)) {
+                            $date->hour = $time;
+                            $date->minute = 0;
+                            $date->second = 0;
+                            array_push($days, $date->toDateTimeString());
+                        }
+                        // if($date->isDayOfWeek($day)) array_push($days,get_class_methods($date));
+                        return $date->isDayOfWeek($day);
+                    }, $next_period_end->copy()->addDay()); //It's necessary to add a day '->addDay()' to the end date to include the last day of the period
+                }
+            }
+
+            // $teacher_id == null ? session("teacher_id") : $teacher_id;
+            // $teacher_classes = User::find($teacher_id)->teacherClasses;
+
+            //CONSULTA DE CLASES REAGENDADAS EN EL PERIODO ACTUAL PARA RESTAR AL COBRO
+
+
+            $period_start_c = new Carbon($current_period[0]);
+            $period_end_c = new Carbon($current_period[1]);
+
+            $absence = User::find(session('teacher_id'))->teacherClasses()->where('status', 1)->whereBetween('start_date', [$today->toDateTimeString(), ApportionmentController::currentPeriod()[1]])->orderBy('start_date', 'asc')->get()->pluck('start_date');
+
+            // $absence = Classes::select("start_date")
+            //     ->where("status", "1")
+            //     ->whereBetween("start_date", [$period_start_c->subDay()->toDateTimeString(), $period_end_c->toDateTimeString()])
+            //     ->get();
+
+            if ($absence != null) {
+                foreach ($absence as $key => $start_date) {
+                    $absence[$key] = $start_date;
+                }
+                $absence = json_decode($absence);
+            } else {
+                $absence = [];
+            }
+
+            $days_diff = array_diff($days, $absence);
+            $days_diff = array_values($days_diff);
+
+            $qty_diff = sizeof($days_diff);
+        } else {
+
+            $qty = 0;
+            $days = [];
+            $absence = [];
+            foreach ($schedule as $key => $value) {
+                $day = $value[1];
+                $time = $value[0];
+
+                $qty += $next_period_start->diffInDaysFiltered(function (Carbon $date) use (&$day, &$time, &$days) {
+
+                    if ($date->isDayOfWeek($day)) {
+                        $date->hour = $time;
+                        $date->minute = 0;
+                        $date->second = 0;
+                        array_push($days, $date->toDateTimeString());
+                    }
+                    // if($date->isDayOfWeek($day)) array_push($days,get_class_methods($date));
+                    return $date->isDayOfWeek($day);
+                }, $next_period_end->copy()->addDay()); //It's necessary to add a day '->addDay()' to the end date to include the last day of the period
+            }
+
+            $days_diff = array_diff($days, $absence);
+            $days_diff = array_values($days_diff);
+
+            $qty_diff = sizeof($days_diff);
+        }
+
+        return [$qty_diff, $days_diff, $days, $absence];
+    }
+
+    public static function isPreselection()
+    {
+        return false;
+
+        return true;
+    }
+
+    public static function isBookable()
+    {
+    }
+
+    public static function enrolStudent($studentId, $courseId, $teacherId = null)
+    {
+        //GETTING STUDENT AND COURSE//
+        $student = User::find($studentId);
+        $course = Course::find($courseId);
+
+        //CHANGING STUDENT'S ROLE FROM 'GUEST' TO 'STUDENT'//
+        $student->removeRole('guest');
+        $student->assignRole('student');
+
+        //GETTING IF STUDENT IS ALREADY ENROLLED//
+        $enrolment = Enrolment::where('student_id', $studentId)
+            ->where('course_id', $courseId)
+            ->first();
+
+        //IF STUDENT IS ALREADY ENROLLED BUT PREENROLMENT IS NOT AVAILABLE RETURN BACK WITH ERROR//
+        if ($enrolment && !EnrolmentController::isPreenrolmentAvailable()) return false;
+
+        //IF STUDENT IS ALREADY ENROLLED BUT PREENROLMENT IS AVAILABLE CREATE STUDENT'S PREENROLMENT//
+        if ($enrolment && EnrolmentController::isPreenrolmentAvailable()) {
+            $enrolment->restore();
+            return redirect()->back()->with('success', 'Student preselected in this course.');
+        }
+
+        //CREATING STUDENT'S ENROLMENT//
+        $enrolment = Enrolment::create([
+            'student_id' => $studentId,
+            'course_id' => $courseId,
+            'teacher_id' => $teacherId
+        ]);
+
+        //GIVING STUDENT ACCESS TO GATHER//
+        GatherController::editGuestsList([$studentId, $teacherId]);
+
+        //GIVE STUDENT PERMISSION TO VIEW UNITS//
+        $student->givePermissionTo('view units');
+
+        //CHECK IF COURSE IS CONVERSATIONAL COURSE//
+        if ($course->categories->pluck('name')->contains('Conversational')) {
+
+            // GETTING STUDENT'S MODULES
+            $moduleIds = DB::table('module_user')->where('user_id', $student->id)->pluck('module_id')->toArray();
+            $modules = Module::whereIn('id', $moduleIds)->get();
+
+            // GETTING STUDENT'S MODULES IN THE CONVERSATIONAL COURSE
+            $module = $modules->where('course_id', $course->id)->first();
+
+            //IF STUDENT DOESN'T HAVE MODULES IN THE CONVERSATIONAL COURSE, CREATE THEM//
+            if (empty($module)) {
+
+                // GETTING THE LAST MODULE'S ORDER
+                $order = $course->modules->max('order') + 1;
+
+                // CREATING THE MODULE
+                $module = Module::create([
+                    'name' => "{$student->first_name} {$student->last_name} - Lesson Room",
+                    'course_id' => $course->id,
+                    'description' => 'Welcome to your Conversational Course. 
+                
+                        Most of the content set here is based on the information sent by our students. 
+            
+                        On this course, you will practice and improve the language you know. 
+            
+                        Enjoy the journey.',
+                    'status' => 1,
+                    'order' => $order,
+                ]);
+
+                // ASSOCIATING MODULE AND USER IN DATABASE
+                DB::table('module_user')->insertOrIgnore([
+                    ['module_id' => $module->id, 'user_id' => $student->id],
+                    ['module_id' => $module->id, 'user_id' => session('teacher_id')]
+                ]);
+            } else {
+
+                //IF STUDENT ALREADY HAS MODULES IN THE CONVERSATIONAL COURSE, ASSIGN THEM//
+                $module = Module::find($module->id);
+
+                if ($module->course_id)
+                    DB::table('module_user')->insertOrIgnore([
+                        ['module_id' => $module->id, 'user_id' => $student->id],
+                        ['module_id' => $module->id, 'user_id' => session('teacher_id')]
+                    ]);
+            }
+        } else {
+
+            //GETTING STUDENT'S UNITS IN THE COURSE//
+            $unit = $course->units()->sortBy('order')->pluck('exams')->reject(function ($innerCollection) {
+                return $innerCollection->isEmpty();
+            })->flatten()->first();
+
+            //IF STUDENT HAS UNITS IN THE COURSE ASSIGN THEM, IF NOT ASSIGN THEM THE FISRST UNIT OF THE COURSE//
+            if (empty($unit)) {
+                $unit_id = $course->units()->sortBy('order')->first();
+                if (!empty($unit_id)) $unit_id = $unit_id->id;
+            } else {
+                $unit_id = $unit->unit_id;
+            }
+
+            //CHECK IF RELATION STUDENT-UNIT EXISTS IN DATABASE//
+            $current_unit = DB::table('unit_user')
+                ->where('user_id', $student->id)
+                ->value('unit_id');
+
+            //IF RELATION DOESN'T EXIST, CREATE IT//
+            if (empty($current_unit)) {
+                DB::table('unit_user')->insertOrIgnore([
+                    ['unit_id' => $unit_id, 'user_id' => $student->id]
+                ]);
+            }
+        }
+
+        return $enrolment->id;
+    }
+
+    public static function isPreenrolmentAvailable()
+    {
+        $current_period = DB::table('metadata')->where('key', 'current_period')->value('value');
+
+        $current_period_end = Carbon::parse(json_decode($current_period)->end_date);
+
+        if (Carbon::now()->greaterThan($current_period_end->copy()->subDays(7))) return true;
+
+        return false;
+    }
+
+    public static function createSchedule($enrolmentId, $userSchedule)
+    {
+        //GETTING ENROLMENT//
+        $enrolment = Enrolment::find($enrolmentId);
+
+        // UPDATING OR CREATING A SCHEDULE ON THE DATABASE FOR THE GIVEN USER AND ENROLMENT
+        Schedule::withTrashed()->updateOrCreate(
+            ['user_id' => $enrolment->student->id, 'enrolment_id' => $enrolmentId],
+            ['selected_schedule' => $userSchedule, 'deleted_at' => NULL]
+        );
+
+        $classDates = EnrolmentController::calculateApportionment($userSchedule);
+
+        return $classDates[1];
     }
 }

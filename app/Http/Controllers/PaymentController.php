@@ -12,6 +12,7 @@ use App\Mail\InvoicePaid;
 use App\Models\Course;
 use App\Models\Enrolment;
 use App\Models\User;
+use App\View\Components\NiubizCheckoutButton;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Mail;
@@ -30,10 +31,13 @@ class PaymentController extends Controller
         $now = Carbon::now('UTC');
         $expirationTimeInMinutes = $timestamp->diffInMinutes($now);
 
-        return view('payments.checkout', compact('sessionToken', 'purchaseNumber', 'ammount', 'expirationTimeInMinutes'));
+        $button = new NiubizCheckoutButton($sessionToken, $purchaseNumber, $ammount, $expirationTimeInMinutes);
+
+        // return view('payments.checkout', compact('sessionToken', 'purchaseNumber', 'ammount', 'expirationTimeInMinutes'));
+        return $button;
     }
 
-    public function getSecurityToken()
+    public static function getSecurityToken()
     {
         $path = "https://apiprod.vnforapps.com/api.security/v1/security";
         $auth = base64_encode(env('NIUBIZ_API_USERNAME', '') . ":" . env('NIUBIZ_API_PASSWORD', ''));
@@ -48,7 +52,7 @@ class PaymentController extends Controller
         return $response->getStatusCode() === 201 ? $response->body() : null;
     }
 
-    public function getSessionToken($securityToken)
+    public static function getSessionToken($securityToken)
     {
         // This code creates an array called $items, which is populated with the contents of a Cart object.
         // For each item in the Cart, an array containing the item's name, price, and quantity is added to the $items array.
@@ -99,14 +103,8 @@ class PaymentController extends Controller
 
         if ($approved) {
 
-            $student = auth()->user();
-            dispatch(new StoreSelfEnrolment($student));
-
-            $invoice = Invoice::find(session('invoice_id'));
-            $invoice->payment_method = 'niubiz';
-            $invoice->save();
-
-            return redirect()->route('invoice.show', ['id' => $invoice->id]);
+            $user = auth()->user();
+            ShopController::checkout($user, 'niubiz');
         } else {
             return redirect()->route('cart')->with('error', 'No se pudo procesar el pago');
         }

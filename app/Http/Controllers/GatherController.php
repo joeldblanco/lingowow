@@ -68,8 +68,11 @@ class GatherController extends Controller
 
     public static function editGuestsList($ids)
     {
+        $filteredIds = array_filter($ids, function ($id) {
+            return $id !== null;
+        });
 
-        $users = User::find($ids);
+        $users = User::find($filteredIds);
 
         $guestlist = array();
         foreach ($users as $user) {
