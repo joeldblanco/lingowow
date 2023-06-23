@@ -1,16 +1,21 @@
 <x-app-layout>
 
     @php
-        $session_info = json_decode((new Illuminate\Http\Client\PendingRequest())->get('http://ipwho.is/' . $_SERVER['REMOTE_ADDR'])->getBody(), true);
-        // dump(session('session_info')['timezone']['id']);
-        if ($session_info['success'] == false) {
+        $session_info = json_decode((new Illuminate\Http\Client\PendingRequest())->get('http://ip-api.com/json/' . $_SERVER['REMOTE_ADDR'])->getBody(), true);
+        // dump($session_info['timezone']);
+        if ($session_info['status'] == "fail") {
             session()->forget('session_info');
         } else {
             if (!Auth::user()->isImpersonated()) {
                 session(['session_info' => $session_info]);
-                auth()
-                    ->user()
-                    ->update(['timezone' => session('session_info')['timezone']['id']]);
+                // auth()
+                //     ->user()
+                //     ->update(['timezone' => session('session_info')['timezone']['id']]);
+        
+                $user = auth()->user();
+                $user->timezone = session('session_info')['timezone'];
+                $user->ip = session('session_info')['query'];
+                $user->save();
             }
         }
     @endphp
@@ -140,7 +145,23 @@
                                             ->pluck('units')
                                             ->flatten();
                                     
-                                        $user_units = $user_units->count() - $user_units->where('module_id',auth()->user()->units->last()->module->id)->where('order','>',auth()->user()->units->last()->order)->count();
+                                        $user_units =
+                                            $user_units->count() -
+                                            $user_units
+                                                ->where(
+                                                    'module_id',
+                                                    auth()
+                                                        ->user()
+                                                        ->units->last()->module->id,
+                                                )
+                                                ->where(
+                                                    'order',
+                                                    '>',
+                                                    auth()
+                                                        ->user()
+                                                        ->units->last()->order,
+                                                )
+                                                ->count();
                                     }
                                 @endphp
                                 <script>
@@ -193,17 +214,15 @@
                 <div class="mt-5">
                     @role('student')
                         @if ($course_modality == 'synchronous')
-
                             {{-- @if (auth()->id() == 9 || auth()->id() == 5) --}}
-                                {{-- @php
+                            {{-- @php
                                     dd(now()->dayOfWeek);
                                 @endphp --}}
-                                @livewire('new-schedule', ['limit' => null, 'week' => null, 'users' => auth()->id(), 'action' => 'studentShow']) 
-                                {{-- @livewire('schedule', ['user_id' => auth()->id(), 'mode' => 'show', 'course_id' => $course_id]) --}}
+                            @livewire('new-schedule', ['limit' => null, 'week' => null, 'users' => auth()->id(), 'action' => 'studentShow'])
+                            {{-- @livewire('schedule', ['user_id' => auth()->id(), 'mode' => 'show', 'course_id' => $course_id]) --}}
                             {{-- @else --}}
-                                {{-- @livewire('schedule', ['user_id' => auth()->id(), 'mode' => 'show', 'course_id' => $course_id]) --}}
+                            {{-- @livewire('schedule', ['user_id' => auth()->id(), 'mode' => 'show', 'course_id' => $course_id]) --}}
                             {{-- @endif --}}
-
                         @endif
                     @endrole
                     @hasanyrole('teacher')

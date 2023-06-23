@@ -18,6 +18,7 @@ class Product extends Model
         'regular_price',
         'sale_price',
         'image',
+        'status',
     ];
 
 

@@ -175,6 +175,14 @@ class User extends Authenticatable implements MustVerifyEmail
     }
 
     /**
+     * Get all the teacher's classes with trahsed parents.
+     */
+    public function teacherClassesWithTrashedParents()
+    {
+        return $this->hasManyThrough(Classes::class, Enrolment::class, 'teacher_id')->withTrashedParents();
+    }
+
+    /**
      * Get all the user's friends.
      */
     public function friends()

@@ -13,7 +13,7 @@ class StudentUnrolmentToTeacher extends Notification implements ShouldQueue
 {
     use Queueable;
 
-    public $student, $schedule_string;
+    public $student, $schedule_string, $course;
 
     /**
      * Create a new notification instance.
@@ -22,7 +22,7 @@ class StudentUnrolmentToTeacher extends Notification implements ShouldQueue
      */
     public function __construct($student, $course_id, $deleted_schedule)
     {
-        $this->course = Course::find($course_id)->select('name')->first();
+        $this->course = Course::find($course_id);
         $this->student = $student;
         $schedule = json_decode($deleted_schedule->selected_schedule);
         $schedule_string = "";

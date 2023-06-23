@@ -170,7 +170,7 @@ class CourseController extends Controller
 
         } else if ($role == "teacher") {
             if ($course->categories->pluck('name')->contains('Conversational')) {
-                $user_modules = $user->modules->where('course_id', $course->id)->sortBy('order');
+                $user_modules = $user->modules->where('course_id', $course->id)->sortBy('name');
                 $modules = $user_modules;
             } else {
                 $user_modules = $modules;

@@ -231,6 +231,9 @@ Route::middleware(['web', 'auth', 'verified', 'impersonate'])->group(function ()
     //ROUTES FOR INVOICES//
     Route::middleware(['role:guest|student|admin'])->get('/shop/invoices', [InvoiceController::class, 'index'])->name("invoices");
     Route::middleware(['role:guest|student|admin'])->get('/shop/invoice/{id}', [InvoiceController::class, 'show'])->name('invoice.show');
+    Route::middleware(['role:admin'])->get('/shop/invoice/{id}/edit', [InvoiceController::class, 'edit'])->name('invoice.edit');
+    Route::middleware(['role:admin'])->patch('/shop/invoice/{id}', [InvoiceController::class, 'update'])->name('invoice.update');
+    Route::middleware(['role:admin'])->delete('/shop/invoice/{id}', [InvoiceController::class, 'destroy'])->name('invoice.destroy');
 
 
 
@@ -243,13 +246,14 @@ Route::middleware(['web', 'auth', 'verified', 'impersonate'])->group(function ()
 
     // Route::middleware('checkPreviousUrlName:shop|schedule.check|schedule.create|enrolments.checkSchedule,shop')->get('/shop/schedule/selection', [ShopController::class, 'scheduleSelection'])->name("shop.scheduleSelection");
     Route::get('/shop/schedule/selection', [ShopController::class, 'scheduleSelection'])->name("shop.scheduleSelection");
+    // Route::get('/shop/niubiz/checkout', [ShopController::class, 'checkout'])->name("shop.niubizCheckout");
 
 
 
 
 
     //ROUTES FOR EXAMS//
-    Route::middleware(['role:admin'])->get('/exams', [ExamController::class, 'index'])->name('exams.index');
+    Route::middleware(['role:admin|teacher'])->get('/exams', [ExamController::class, 'index'])->name('exams.index');
     Route::middleware(['role:admin|teacher'])->get('/exams/create', [ExamController::class, 'create'])->name('exams.create');
     Route::middleware(['role:admin|teacher'])->post('/exams', [ExamController::class, 'store'])->name('exams.store');
     Route::middleware(['role:admin|teacher|student'])->get('/exams/{exam}', [ExamController::class, 'show'])->name('exams.show');
@@ -297,7 +301,7 @@ Route::middleware(['web', 'auth', 'verified', 'impersonate'])->group(function ()
         return view('newSchedule');
     })->name('newSchedule');
 
-    Route::middleware(['role:teacher|admin'])->get('/teachers/{id}/classes', [AnalyticsController::class, 'teacherEarnings'])->name('teacherEarnings');
+    Route::middleware(['role:teacher|admin'])->get('/teachers/classes', [AnalyticsController::class, 'teacherEarnings'])->name('teacherEarnings');
     Route::middleware(['role:teacher|admin'])->post('/teachers/agreement', [AnalyticsController::class, 'registerTeachersPayment'])->name('teacherAgreement');
 
 
@@ -315,7 +319,7 @@ Route::middleware(['web', 'auth', 'verified', 'impersonate'])->group(function ()
 
 
         //ROUTES FOR PRODUCTS//
-        Route::resource('admin/products', ProductController::class);
+        Route::resource('products', ProductController::class);
 
 
 

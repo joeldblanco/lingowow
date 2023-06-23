@@ -361,199 +361,149 @@ class SchedulingCalendarController extends Controller
      */
     public function checkForTeachers(Request $request)
     {
-        if ($request->error == "false") {
+        $cells = json_decode($request->data);
+        $cells = NewSchedule::localToUtc($cells);
 
+        session(['user_schedule' => json_encode($cells)]);
+        session(['schedule_reserve' => json_encode($cells)]);
 
-            $cells = json_decode($request->data);
-            $cells = (new NewSchedule)->localToUtc($cells);
+        // $teachers = [];
+        // $teachers_available = [];
+        // $day_of_exam = [$cells[0][0], $cells[0][1]];
 
-            session(['user_schedule' => json_encode($cells)]);
-            session(['schedule_reserve' => json_encode($cells)]);
+        $course_id = session('selected_course');
+        // $modality = Course::find($course_id)->modality;
+        // $error = false;
 
-            $teachers = [];
-            $teachers_available = [];
-            $day_of_exam = [$cells[0][0], $cells[0][1]];
+        // if ($modality == "exam") {
 
-            $course_id = session('selected_course');
-            $modality = Course::find($course_id)->modality;
-            $error = false;
+            //Get all teachers in an array
+            // $teachers = User::role('teacher')->get()->toArray(); //EL ARRAY $teachers DEBERÍA LLENARSE SOLO CON LOS PROFESORES QUE ESTÉN DISPUESTOS A DAR EXÁMENES DE CLASIFICACIÓN
 
-            if ($modality == "exam") {
-                // dd(session('teacher_id', "hola"));
-                $model_roles = DB::table('model_has_roles')->select('role_id', 'model_id')->get();
-                foreach ($model_roles as $model_role) {
+            // $model_roles = DB::table('model_has_roles')->select('role_id', 'model_id')->get();
+            // foreach ($model_roles as $model_role) {
 
-                    if ($model_role->role_id == 3) {
-                        $teachers[] = $model_role->model_id;
-                    }
-                }
-            } else {
-                $teachers[] = session('teacher_id');
-            }
-            $teachers = User::find($teachers);
-            // dd($teachers);
-            foreach ($teachers as $teacher) {
+            //     if ($model_role->role_id == 3) {
+            //         $teachers[] = $model_role->model_id; 
+            //     }
+            // }
+        // } else {
+        //     $teachers[] = session('teacher_id');
+        // }
+        // $teachers = User::find($teachers);
 
+        // foreach ($teachers as $teacher) {
+        //     array_push($teachers_available, $teacher->id);
+        // }
 
-                // $T_schedule = $teacher->schedules->first()->selected_schedule;
-                // if ($T_schedule != null && in_array($day_of_exam, $T_schedule)) {
-                //     $classes = [];
-                //     foreach ($teacher->teacherClasses as $class) {
-                //         $classes[] = [(new Carbon($class->start_date))->isoFormat('H'), (new Carbon($class->start_date))->isoFormat('d')];
-                //     }
+        // $teachers_available[] = session('teacher_id');
 
-                //     if (!in_array($day_of_exam, $classes)) {
-                //         // dd($modality, new Carbon(),(Carbon::create((new Carbon())->year, $cells[0][3], $cells[0][4], $cells[0][0], 0)), !(Carbon::create((new Carbon())->year, $cells[0][3], $cells[0][4], $cells[0][0], 0))->lessThan(new Carbon()));
-                //         if (($modality == "exam" && (Carbon::create((new Carbon())->year, $cells[0][3], $cells[0][4], $cells[0][0], 0))->lessThan(new Carbon()) == false) || $modality == "synchronous") {
-                //             // dd("todo perfect");
-                //             array_push($teachers_available, $teacher->id);
-                //         }
-                //     } else {
-                //         if ($modality != "exam") {
-                //             $error = true;
-                //             break;
-                //         }
-                //     }
-                //     // dd($T_schedule,$classes);
-                // } else {
-                //     if ($modality != "exam") {
-                //         $error = true;
-                //         break;
-                //     }
-                // }
+        // if (count($teachers_available) > 0 && !$error) {
 
-
-
-                array_push($teachers_available, $teacher->id);
-                // dump($teachers_available);
-            }
-
-            // dd($teachers_available);
-
-            if (count($teachers_available) > 0 && !$error) {
-
-                if (session()->exists('enrolment_type') && session('enrolment_type') == "manual_enrolment") {
-                    $student = User::find(session('student_id'));
-                } else {
-                    $student = auth()->user();
-                }
-
-                $T_selected = rand(0, count($teachers_available) - 1);
-                // || (count($cells) == 1 && in_array($cell, $schedules_reserves[1]))
-                $teacher = User::find($teachers_available[$T_selected]); //IMPORTANTE!!!!!! AQUI SUSTITUIR EL 7 POR "$T_selected"
-
-                $scheduleReservation = ScheduleReserve::where('user_id', $student->id)->first();
-                if (!empty($scheduleReservation)) {
-                    $scheduleReservation->delete();
-                }
-
-                $schedules_reserves = ScheduleReserve::schedulesReserves($teacher->id); // Posicion 0 para los horarios normales, Posicion 1 para los horarios de un solo dia.
-                $schedule_teacher = $teacher->schedules->first()->selected_schedule;
-                // dd($schedule_teacher, $cells);
-                // dd($teacher->studentsSchedules(), $teacher->schedules->first()->selected_schedule, $cells, $cell);
-                foreach ($cells as $cell) {
-                    if (!in_array($cell, $schedule_teacher)) {
-                        Cart::destroy();
-                        session(['message' => "Dear Student. That block is not available in teacher " . $teacher->first_name . " " . $teacher->last_name . " schedule."]);
-                        return redirect()->route("schedule.create")->with('error', "Sorry, you selected one or more unavailable blocks. Please try again.");
-                    }
-                    // if (in_array($cell, $schedules_reserves[0]) || (count($cells) == 1 && in_array($cell, $schedules_reserves[1])))
-                    //     dd($schedules_reserves[0], in_array($cell, $schedules_reserves[0]), (count($cells) == 1 && in_array($cell, $schedules_reserves[1])));
-
-                    if (in_array($cell, $schedules_reserves[0]) || (count($cells) == 1 && in_array($cell, $schedules_reserves[1]))) {
-                        Cart::destroy();
-
-                        session(['message' => "Dear Student. That block is not available."]);
-                        
-                        if (in_array($cell, $schedules_reserves[0])) session(['message' => "Dear Student. That block is not available. It is already reserved by another student."]);
-
-                        return redirect()->route("schedule.create")->with('error', "Sorry, you selected one or more unavailable blocks. Please try again.");
-                    }
-                }
-                Cart::destroy();
-
-
-                $old_customers = json_decode(
-                    DB::table('metadata')
-                        ->where('key', 'old_customers')
-                        ->first()->value,
-                );
-
-                // $old_customers = [];
-
-                $course_products = Course::find($course_id)
-                    ->products()
-                    ->whereHas('categories', function ($query) {
-                        $query->where('name', 'course');
-                    })
-                    ->get();
-
-                $product = $course_products->first();
-                foreach ($course_products as $course_product) {
-                    if (in_array($student->id, $old_customers) && str_contains($course_product->slug, 'old')) {
-                        $product = $course_product;
-                        break;
-                    }
-                    if (!in_array($student->id, $old_customers) && !str_contains($course_product->slug, 'old')) {
-                        $product = $course_product;
-                        break;
-                    }
-                }
-
-                $apportionment = ApportionmentController::calculateApportionment();
-                if (session('preselection') == true) $apportionment = ApportionmentController::calculateApportionment(null, null, null, true);
-                $product_qty = $apportionment[0];
-
-                if ($modality == "exam") {
-                    $product_qty = 1;
-                    session(['teacher_id' => $teachers_available[$T_selected]]); //IMPORTANTE!!!!!! AQUI SUSTITUIR EL 7 POR "$T_selected"
-                }
-
-                self::saveScheduleReserve($cells);
-
-                Cart::add($product->id, $product->name, $product_qty, ($product->sale_price == null ? $product->regular_price : $product->sale_price), ['editable' => false])->associate('App\Models\Product');
-                session([
-                    'course_id' => $course_id,
-                    'classes_dates' => $apportionment[1]
-                ]);
-
-                if (session()->exists('enrolment_type') && session('enrolment_type') == "manual_enrolment") {
-                    $student = User::find(session('student_id'));
-                    dispatch(new StoreSelfEnrolment($student));
-                    session()->forget('enrolment_type');
-                    session()->forget('student_id');
-                    return redirect()->route('enrolments.index');
-                } else {
-                    return redirect()->route('cart');
-                }
-            } else {
-                Cart::destroy();
-                if ($modality == "exam") {
-                    $message = "Sorry dear Student. There are not teachers availables for that date";
-                } else {
-                    $message = "Dear Student. That block is not available";
-                    session()->forget('teacher_id');
-                }
-            }
+        if (session()->exists('enrolment_type') && session('enrolment_type') == "manual_enrolment") {
+            $student = User::find(session('student_id'));
         } else {
-            Cart::destroy();
-            $message = "Request rejected";
-            switch ($request->error) {
-                case "same_day":
-                    $message .= ". You cannot select two classes for the same day.";
-                    break;
-                case "not_enough_days":
-                    $message .= ". You selected fewer classes than those reflected in your plan.";
-                    break;
-                case "too_much_days":
-                    $message .= ". You selected more classes than those reflected in your plan.";
-                    break;
+            $student = auth()->user();
+        }
+
+        // $T_selected = rand(0, count($teachers_available) - 1);
+        // $teacher = User::find($teachers_available[$T_selected]);
+        $teacher = User::find(session('teacher_id'));
+
+        $scheduleReservation = ScheduleReserve::where('user_id', $student->id)->first();
+        if (!empty($scheduleReservation)) {
+            $scheduleReservation->delete();
+        }
+
+        $schedules_reserves = ScheduleReserve::schedulesReserves($teacher->id); // Posicion 0 para los horarios normales, Posicion 1 para los horarios de un solo dia.
+        $schedule_teacher = $teacher->schedules->first()->selected_schedule;
+
+        foreach ($cells as $cell) {
+            if (!in_array($cell, $schedule_teacher)) {
+                Cart::destroy();
+                session(['message' => "Dear Student. That block is not available in teacher " . $teacher->first_name . " " . $teacher->last_name . " schedule."]);
+                return redirect()->route("schedule.create")->with('error', "Sorry, you selected one or more unavailable blocks. Please try again.");
+            }
+
+            if (in_array($cell, $schedules_reserves[0]) || (count($cells) == 1 && in_array($cell, $schedules_reserves[1]))) {
+                Cart::destroy();
+
+                session(['message' => "Dear Student. That block is not available."]);
+
+                if (in_array($cell, $schedules_reserves[0])) session(['message' => "Dear Student. That block is not available. It is already reserved by another student."]);
+
+                return redirect()->route("schedule.create")->with('error', "Sorry, you selected one or more unavailable blocks. Please try again.");
+            }
+        }
+        Cart::destroy();
+
+
+        $old_customers = json_decode(
+            DB::table('metadata')
+                ->where('key', 'old_customers')
+                ->first()->value,
+        );
+
+        $course_products = Course::find($course_id)
+            ->products()
+            ->whereHas('categories', function ($query) {
+                $query->where('name', 'course');
+            })
+            ->get();
+
+        $product = $course_products->first();
+        foreach ($course_products as $course_product) {
+            if (in_array($student->id, $old_customers) && str_contains($course_product->slug, 'old')) {
+                $product = $course_product;
+                break;
+            }
+            
+            if (!in_array($student->id, $old_customers) && !str_contains($course_product->slug, 'old')) {
+                $product = $course_product;
+                break;
             }
         }
 
-        session(['message' => $message]);
-        //dd($message);
-        return redirect()->route("schedule.create");
+        $apportionment = ApportionmentController::calculateApportionment();
+        if (session('preselection') == true) $apportionment = ApportionmentController::calculateApportionment(null, null, null, true);
+        $product_qty = $apportionment[0];
+
+        // if ($modality == "exam") {
+        //     $product_qty = 1;
+        //     session(['teacher_id' => $teachers_available[$T_selected]]); //IMPORTANTE!!!!!! AQUI SUSTITUIR EL 7 POR "$T_selected"
+        // }
+
+        self::saveScheduleReserve($cells);
+
+        // Cart::add($product->id, $product->name, $product_qty, ($product->sale_price == null ? $product->regular_price : $product->sale_price), ['editable' => false])->associate('App\Models\Product');
+        ShopController::addToCart($product->id, $product_qty);
+        session([
+            'course_id' => $course_id,
+            'classes_dates' => $apportionment[1]
+        ]);
+
+        if (session()->exists('enrolment_type') && session('enrolment_type') == "manual_enrolment") {
+            $student = User::find(session('student_id'));
+            dispatch(new StoreSelfEnrolment($student));
+            session()->forget('enrolment_type');
+            session()->forget('student_id');
+
+            return redirect()->route('enrolments.index');
+        } else {
+            return redirect()->route('cart');
+        }
+        // } else {
+        //     Cart::destroy();
+        //     if ($modality == "exam") {
+        //         $message = "Sorry, dear student. There are not teachers available for that date.";
+        //     } else {
+        //         $message = "Dear Student, that block is not available.";
+        //         session()->forget('teacher_id');
+        //     }
+        // }
+
+        // session(['message' => $message]);
+        // return redirect()->route("schedule.create");
     }
 
     public static function saveScheduleReserve($schedule = [])

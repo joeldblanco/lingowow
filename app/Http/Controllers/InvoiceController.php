@@ -72,7 +72,8 @@ class InvoiceController extends Controller
      */
     public function edit($id)
     {
-        //
+        $invoice = Invoice::find($id);
+        return view('admin.invoices.edit', compact('invoice'));
     }
 
     /**
@@ -84,7 +85,19 @@ class InvoiceController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        if ($request->invoice_paid == 'on') {
+            $invoice_paid = 1;
+        } elseif ($request->invoice_paid == null) {
+            $invoice_paid = 0;
+        } else {
+            return redirect()->route('admin.invoices')->with('error', 'Invoice not updated.');
+        }
+
+        $invoice = Invoice::find($id);
+        $invoice->paid = $invoice_paid;
+        $invoice->save();
+
+        return redirect()->route('admin.invoices')->with('success', 'Invoice updated successfully.');
     }
 
     /**
@@ -95,6 +108,24 @@ class InvoiceController extends Controller
      */
     public function destroy($id)
     {
-        //
+        $invoice = Invoice::find($id);
+        $invoice->delete();
+
+        return redirect()->route('admin.invoices')->with('success', 'Invoice deleted successfully.');
+    }
+
+    /**
+     * Pay the specified invoice.
+     *
+     * @param  int  $id
+     * @return bool $status
+     */
+    public static function pay($id)
+    {
+        $invoice = Invoice::find($id);
+        $invoice->paid = 1;
+        $invoice->save();
+
+        return true;
     }
 }

@@ -12,11 +12,7 @@
             @if (!empty($response['code']))
                 <div x-show="open" x-transition.duration.200ms x-data="open" x-init="setTimeout(() => open = false, 3000)"
                     class="py-4 px-4 text-white font-semibold rounded-lg text-center
-                    @if ($response['code'] == 'success')
-bg-green-500
-@else
-bg-red-500
-@endif">
+                    @if ($response['code'] == 'success') bg-green-500 @else bg-red-500 @endif">
                     <span class="font-bold">{{ $response['message'] }}</span>
                 </div>
             @endif

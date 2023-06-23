@@ -53,7 +53,7 @@ class UnitController extends Controller
     {
         // Validate the request data
         $validatedData = $request->validate([
-            'name' => 'required',
+            'name' => 'required|string|max:250',
             'status' => 'required',
             'module_id' => 'required',
             'image' => 'image|mimes:jpeg,png,jpg|max:2048',

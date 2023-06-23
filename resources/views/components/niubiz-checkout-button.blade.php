@@ -1,5 +1,4 @@
-<x-app-layout>
-
+<div>
     <script type="text/javascript" src="https://static-content.vnforapps.com/v2/js/checkout.js"></script>
 
     @php
@@ -29,12 +28,14 @@
             });
             VisanetCheckout.open();
         }
-        openForm();
+        // openForm();
     </script>
 
-    <div class="w-full flex h-96 justify-center items-center">
-        <button onclick="openForm();" class="bg-lw-blue text-white px-4 py-2 rounded-md text-3xl hover:bg-blue-800">Pay
-            here</button>
-    </div>
-
-</x-app-layout>
+    {{-- <div class="w-full flex h-96 justify-center items-center"> --}}
+        <button onclick="openForm();"
+            class="flex justify-center w-full px-10 py-3 mt-6 font-medium text-white uppercase bg-gray-800 rounded-full shadow items-center hover:bg-gray-700 focus:shadow-outline focus:outline-none">
+            <i class="fas fa-credit-card h-full text-xl"></i>
+            <span class="ml-2 mt-5px">Credit/Debit Card</span>
+        </button>
+    {{-- </div> --}}
+</div>

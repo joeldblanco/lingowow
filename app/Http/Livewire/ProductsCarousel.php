@@ -10,7 +10,7 @@ class ProductsCarousel extends Component
 {
 
     public $loadingState = false;
-    public $course_products, $other_products, $old_courses_products;
+    public $course_products, $other_products, $old_courses_products, $products;
 
     public function selectProduct($product_id)
     {
@@ -45,7 +45,6 @@ class ProductsCarousel extends Component
                 $this->course_products = $this->course_products->reject(function ($model) {
                     return str_contains($model->slug, 'old');
                 });
-                // dd($this->course_products, "Hola");
             }
         }
 
@@ -55,6 +54,11 @@ class ProductsCarousel extends Component
 
         $this->course_products = $this->course_products->sortBy('id');
         $this->other_products = $this->other_products->sortBy('id');
+
+        $this->products = Product::where('status',1)->get();
+        $this->products = $this->products->reject(function ($model) {
+            return str_contains($model->slug, 'old');
+        });
 
         return view('livewire.products-carousel');
     }

@@ -34,7 +34,7 @@ class StoreSelfEnrolment implements ShouldQueue
      *
      * @return void
      */
-    public function __construct($student = null)
+    public function __construct($student = null, $course_id = null)
     {
         if (empty($student)) {
             $student = auth()->user();
@@ -95,7 +95,7 @@ class StoreSelfEnrolment implements ShouldQueue
             }
         }
 
-        $course_id = session('selected_course');
+        if (empty($course_id)) $course_id = session('selected_course');
 
         //CHANGING STUDENT'S ROLE FROM 'GUEST' TO 'STUDENT'//
         $student->removeRole('guest');
@@ -137,16 +137,19 @@ class StoreSelfEnrolment implements ShouldQueue
                 }
             } else {
                 //CREATING STUDENT'S ENROLMENT (OR UPDATING IT, IN CASE IT ALREADY EXISTS BUT IS SOFTDELETED)//
-                $enrolment = Enrolment::withTrashed()->updateOrCreate(
-                    ['student_id' => $student->id, 'course_id' => $course_id],
-                    ['teacher_id' => $teacher->id, 'deleted_at' => NULL]
-                );
+                $enrolment = Enrolment::create([
+                    'student_id' => $student->id,
+                    'course_id' => $course_id,
+                    'teacher_id' => $teacher->id
+                ]);
 
                 // dd($enrolment);
             }
 
             // SchedulingCalendarController::store($student->id, $enrolment);
-            dispatch(new CreateSchedule($student->id, $enrolment->id));
+            // dispatch(new CreateSchedule($student->id, $enrolment->id)); //MOVED TO SHOPCONTROLLER
+            session(['enrolment_id' => $enrolment->id]);
+
             GatherController::editGuestsList([$student->id, $teacher->id]);
         } else {
 

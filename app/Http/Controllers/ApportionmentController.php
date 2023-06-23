@@ -36,10 +36,10 @@ class ApportionmentController extends Controller
         // $product = Course::find($course_id)->products->first();
 
         $today = Carbon::now()->setTimezone('UTC');
-        // $today->addDays(1);
-        if (auth()->user()->roles[0]->name == 'student' || auth()->user()->roles[0]->name == 'guest') {
-            $today->addDays(1);
-        }
+        $today->addDays(1);
+        // if (auth()->user()->roles[0]->name == 'student' || auth()->user()->roles[0]->name == 'guest') {
+        //     $today->addDays(1);
+        // }
 
         $current_period = ApportionmentController::currentPeriod();
         $next_period = ApportionmentController::nextPeriod();
@@ -70,8 +70,8 @@ class ApportionmentController extends Controller
             foreach ($schedule as $key => $value) {
                 $day = $value[1];
                 $time = $value[0];
-                $qty += $today->diffInDaysFiltered(function (Carbon $date) use (&$day, &$time, &$days) {
-                    if ($date->isDayOfWeek($day)) {
+                $qty += $today->diffInDaysFiltered(function (Carbon $date) use (&$day, &$time, &$days, &$current_period_start) {
+                    if ($date->isDayOfWeek($day) && $date->greaterThanOrEqualTo($current_period_start)) {
                         $date->hour = $time;
                         $date->minute = 0;
                         $date->second = 0;

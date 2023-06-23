@@ -108,6 +108,11 @@
                     <tr class="flex justify-around @if (auth()->user()->getRoleNames()[0] == 'admin' && empty($value->rating)) bg-yellow-100 @endif">
                         @hasanyrole('student|admin')
                             <td class="flex w-full justify-center">
+                                
+                                @if ($value->teacher() == null)
+                                    {{ dd($value) }}
+                                @endif
+                                
                                 <a href="{{ route('profile.show', $value->teacher()->id) }}"
                                     class="hover:underline hover:text-blue-500 teacher-tour">{{ $value->teacher()->first_name }}
                                     {{ $value->teacher()->last_name }}</a>
@@ -235,9 +240,9 @@
                                         href="{{ route('classes.complaints', $current_class->id) }}"
                                         class="hover:text-blue-600 underline" @click="classDetails = false">here.</a></p>
                             @else
-                            <p class="text-sm text-center mx-auto inline-block text-gray-600">Edit your complaint <a
-                                    href="{{ route('classes.complaints.edit', $current_class->id) }}"
-                                    class="hover:text-blue-600 underline" @click="classDetails = false">here.</a></p>
+                                <p class="text-sm text-center mx-auto inline-block text-gray-600">Edit your complaint <a
+                                        href="{{ route('classes.complaints.edit', $current_class->id) }}"
+                                        class="hover:text-blue-600 underline" @click="classDetails = false">here.</a></p>
                             @endif
                         @endif
                     @endif

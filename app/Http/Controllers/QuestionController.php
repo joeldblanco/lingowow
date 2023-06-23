@@ -70,9 +70,11 @@ class QuestionController extends Controller
         $file = $request->file('file');
         $path_to_file = $file == null ? null : $request->file('file')->storeAs('public/questions/files', time() . '.' . $file->getClientOriginalExtension());
 
+        // dd($file, $path_to_file);
+
         $order = Question::where('exam_id', $exam_id)->max('order') + 1;
 
-        Question::create([
+        $question = Question::create([
             'exam_id' => $exam_id,
             'title' => $request->title,
             'description' => $request->description,
