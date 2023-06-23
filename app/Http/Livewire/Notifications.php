@@ -4,15 +4,23 @@ namespace App\Http\Livewire;
 
 use App\Models\User;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
 use Livewire\Component;
+use Livewire\WithPagination;
 
 class Notifications extends Component
 {
+    use WithPagination;
     public $notifications, $notification_id, $notification_type, $notification_data, $notification_created_at, $notification_read_at, $notification_icon;
+    public $perPage, $currentPage;
 
-    public function mount()
+    public function mount($perPage = 10, $currentPage = 1)
     {
+        $this->perPage = $perPage;
+        $this->currentPage = $currentPage;
+
         $this->notifications = auth()->user()->notifications;
 
         foreach ($this->notifications as $key => $value) {
@@ -52,6 +60,16 @@ class Notifications extends Component
                     $this->notification_data[$key] = $user->first_name . ' ' . $user->last_name . ' has sent you a friend request.';
                     break;
 
+                case 'UpcomingClassForStudent':
+                    $this->notification_icon[$key] = 'fas fa-chalkboard-teacher';
+                    $this->notification_data[$key] = 'Your next class is in ' . $data_array['timeUntilClass'] . ' with teacher ' . $user->first_name . ' ' . $user->last_name . '.';
+                    break;
+
+                case 'UpcomingClassForTeacher':
+                    $this->notification_icon[$key] = 'fas fa-chalkboard-teacher';
+                    $this->notification_data[$key] = 'Your next class is in ' . $data_array['timeUntilClass'] . ' with student ' . $user->first_name . ' ' . $user->last_name . '.';
+                    break;
+
                 default:
                     $this->notification_icon[$key] = "fas fa-bell";
                     $this->notification_data[$key] = "You have a new notification.";
@@ -65,6 +83,7 @@ class Notifications extends Component
 
             $this->notification_id[$key] = $value->id;
         }
+        $this->resetPage();
     }
 
     public function showNotification($notification_id)
@@ -74,6 +93,18 @@ class Notifications extends Component
 
     public function render()
     {
-        return view('livewire.notifications');
+        $this->notifications = new Collection($this->notifications);
+        $paginatedNotifications = new LengthAwarePaginator(
+            $this->notifications->forPage($this->currentPage, $this->perPage),
+            $this->notifications->count(),
+            $this->perPage,
+            $this->currentPage,
+            [
+                'path' => LengthAwarePaginator::resolveCurrentPath(),
+                'pageName' => 'page',
+            ]
+        );
+
+        return view('livewire.notifications', ['paginatedNotifications' => $paginatedNotifications]);
     }
 }

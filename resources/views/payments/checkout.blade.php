@@ -37,13 +37,4 @@
             here</button>
     </div>
 
-    {{-- <form action="{{ route('payments.checkout', ['purchaseNumber' => $purchaseNumber]) }}" method="post">
-
-        <script type="text/javascript" src="https://static-content.vnforapps.com/v2/js/checkout.js"
-            data-sessiontoken={{ $sessionKey }} data-channel="web" data-merchantid="{{ env('NIUBIZ_MERCHANT_ID') }}"
-            data-purchasenumber="{{ $purchaseNumber }}" data-amount={{ $ammount }}
-            data-expirationminutes=20 data-timeouturl="about:blank"
-            data-merchantlogo="{{ Storage::url('images/logo_lw_for_niubiz.png') }}" data-formbuttoncolor="#3246BA" />
-    </form> --}}
-
 </x-app-layout>

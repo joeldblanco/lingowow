@@ -16,6 +16,9 @@ use App\Models\Meeting;
 use App\Models\ScheduleReserve;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Pagination\LengthAwarePaginator;
+use App\Notifications\BookedClass;
+use App\Notifications\BookedPlacementTest;
+use Illuminate\Support\Facades\Notification;
 
 class ClassController extends Controller
 {
@@ -340,14 +343,14 @@ class ClassController extends Controller
         $complaint->subject = $request->subject;
         $complaint->complaint = $request->complaint;
         $complaint->save();
-        
+
         return redirect()->route('classes.index');
     }
 
     public function deleteComplain(Complaint $complaint)
     {
         $complaint->delete();
-        
+
         return redirect()->route('classes.index');
     }
 
@@ -356,5 +359,46 @@ class ClassController extends Controller
         $period = Carbon::parse('Second monday of ' . $period);
 
         return ApportionmentController::getPeriod($period, true);
+    }
+
+    public static function bookClasses($classDates, $enrolmentId)
+    {
+        $enrolment = Enrolment::find($enrolmentId);
+
+        if ($enrolment->course->categories()->pluck('name')->contains('Test')) {
+            $meetingTopic = $enrolment->student->first_name . ' ' . $enrolment->student->last_name . ' - Placement Test';
+        } else {
+            $meetingTopic = $enrolment->student->first_name . ' ' . $enrolment->student->last_name . ' - Lesson Room';
+        }
+
+        //BOOKING STUDENT'S MEETINGS//
+        $meetingData = [
+            'topic' => $meetingTopic,
+            'host_id' => $enrolment->teacher->id,
+            'atendee_id' => $enrolment->student->id,
+        ];
+        $request = new Request($meetingData);
+        $meetingId = (new MeetingController)->store($request, true);
+
+        //ADDING CLASS DURATION (40 MIN) TO CLASS START DATETIME AND STORING IT IN ANOTHER VARIABLE (TO CREATE CLASS END DATETIME)//
+        foreach ($classDates as $date) {
+            $startDateTime = Carbon::parse($date)->toDateTimeString();
+            $endDateTime = Carbon::parse($date)->addMinutes(40)->toDateTimeString();
+            Classes::create([
+                'start_date' => $startDateTime,
+                'end_date' => $endDateTime,
+                'enrolment_id' => $enrolment->id,
+                'meeting_id' => $meetingId,
+            ]);
+        }
+
+        //SENDING NOTIFICATION TO TEACHER//
+        if ($enrolment->course->categories()->pluck('name')->contains('Test')) {
+            Notification::sendNow($enrolment->teacher, new BookedPlacementTest($enrolment->student->id));
+        } else {
+            Notification::sendNow($enrolment->teacher, new BookedClass($enrolment->student->id));
+        }
+
+        return $classDates;
     }
 }

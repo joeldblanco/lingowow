@@ -1,17 +1,21 @@
 <x-app-layout>
     @php
-        $date = [];
+        // $date = [];
         
-        foreach ($invoices as $invoice) {
-            $date[] = (new Carbon\Carbon($invoice->created_at))->isoFormat('MMMM G');
-        }
+        // foreach ($invoices as $invoice) {
+        //     $date[] = (new Carbon\Carbon($invoice->created_at))->isoFormat('MMMM G');
+        // }
         
-        $date = array_unique($date);
+        // $date = array_unique($date);
+        $invoicesByDate = collect($invoices->items())->groupBy(function ($item, $key) {
+            return (new Carbon\Carbon($item->created_at))->isoFormat('MMMM G');
+        });
+        
     @endphp
     <div class="w-4/5 mx-auto">
         <div class="bg-white shadow-md rounded my-6">
             {{ $invoices->links() }}
-            @foreach ($date as $month_year)
+            @foreach ($invoicesByDate->sortBy('created_at') as $month_year => $invoicesGroup)
                 <div
                     class="bg-white text-3xl font-bold w-full p-2 text-center flex justify-around border border-gray-200">
                     <div class="w-3/4">
@@ -19,7 +23,7 @@
 
                     </div>
                     <div class="w-1/4 flex justify-center items-center">
-                        <a href="#"
+                        <a href="{{ route('export', ['month' => $invoicesGroup->first()->created_at->month]) }}"
                             class="bg-lw-blue text-white text-sm text-center py-2 px-4 my-auto rounded-lg hover:bg-blue-800">Export</a>
                     </div>
                 </div>
@@ -40,30 +44,57 @@
                                 class="py-4 px-6 bg-gray-100 font-bold uppercase text-sm text-gray-600 border-b border-gray-400">
                                 Date</th>
                             <th
-                                class="py-4 px-6 bg-gray-100 font-bold uppercase text-sm text-gray-600 border-b border-gray-400">
+                                class="py-4 px-6 bg-gray-100 font-bold uppercase text-sm text-gray-600 border-b border-gray-400 text-center">
+                                Method</th>
+                            <th
+                                class="py-4 px-6 bg-gray-100 font-bold uppercase text-sm text-gray-600 border-b border-gray-400 text-center">
+                                Paid</th>
+                            <th
+                                class="py-4 px-6 bg-gray-100 font-bold uppercase text-sm text-gray-600 border-b border-gray-400 text-center">
+                                Actions
                             </th>
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach ($invoices as $invoice)
-                            @if ((new Carbon\Carbon($invoice->created_at))->isoFormat('MMMM G') == $month_year)
-                                <tr class="hover:bg-gray-200">
-                                    <td class="py-4 px-6 border-b border-gray-400">{{ $invoice->id }}</td>
-                                    <td class="py-4 px-6 border-b border-gray-400"><a
-                                            href="{{ route('profile.show', $invoice->user->id) }}"
-                                            class="hover:text-blue-600 hover:underline">{{ $invoice->user->first_name }}
-                                            {{ $invoice->user->last_name }}</a>
-                                    </td>
-                                    <td class="py-4 px-6 border-b border-gray-400">${{ $invoice->price }}</td>
-                                    <td class="py-4 px-6 border-b border-gray-400">
-                                        {{ $invoice->updated_at->isoFormat('L') }}
-                                    </td>
-                                    <td class="py-4 px-6 border-b border-gray-400">
-                                        <a href="{{ route('invoice.show', $invoice->id) }}"
-                                            class="text-gray-600 font-bold py-1 px-3 rounded text-xs bg-blue-50 hover:bg-blue-300">View</a>
-                                    </td>
-                                </tr>
-                            @endif
+                        @foreach ($invoicesGroup as $invoice)
+                            {{-- @if ((new Carbon\Carbon($invoice->created_at))->isoFormat('MMMM G') == $month_year) --}}
+                            <tr class="hover:bg-gray-200">
+                                <td class="py-4 px-6 border-b border-gray-400">{{ $invoice->id }}</td>
+                                <td class="py-4 px-6 border-b border-gray-400"><a
+                                        href="{{ route('profile.show', $invoice->user->id) }}"
+                                        class="hover:text-blue-600 hover:underline">{{ $invoice->user->first_name }}
+                                        {{ $invoice->user->last_name }}</a>
+                                </td>
+                                <td class="py-4 px-6 border-b border-gray-400">${{ $invoice->price }}</td>
+                                <td class="py-4 px-6 border-b border-gray-400">
+                                    {{ $invoice->updated_at->isoFormat('DD/MM/YYYY') }}
+                                </td>
+                                <td class="py-4 px-6 border-b border-gray-400 text-center">
+                                    @if ($invoice->payment_method == 'niubiz')
+                                        <i class="fas fa-credit-card fa-lg" style="color: #3145b9;"></i>
+                                    @elseif ($invoice->payment_method == 'paypal')
+                                        <i class="fab fa-paypal fa-lg" style="color: #3145b9;"></i>
+                                    @else
+                                        <i class="fas fa-exclamation-triangle fa-lg text-yellow-500"></i>
+                                    @endif
+                                </td>
+                                <td class="py-4 px-6 border-b border-gray-400 text-center">
+                                    @if ($invoice->paid)
+                                        <i class="fas fa-check-circle text-green-600"></i>
+                                    @else
+                                        <i class="fas fa-times-circle text-red-600"></i>
+                                    @endif
+                                </td>
+                                <td class="py-4 flex justify-evenly border-b border-gray-400 px-auto">
+                                    <a href="{{ route('invoice.show', $invoice->id) }}"
+                                        class="text-gray-600 font-bold py-1 px-3 rounded text-xs bg-blue-50 hover:bg-blue-300">View</a>
+                                    @role('admin')
+                                        <a href="{{ route('invoice.edit', $invoice->id) }}"
+                                            class="text-gray-600 font-bold py-1 px-3 rounded text-xs bg-green-100 hover:bg-green-300">Edit</a>
+                                    @endrole
+                                </td>
+                            </tr>
+                            {{-- @endif --}}
                         @endforeach
                     </tbody>
                 </table>

@@ -105,7 +105,8 @@ class ModuleController extends Controller
         } else if ($role == "guest") {
 
             if ($user->hasPermissionTo('view units')) {
-                $user_units = $module->units->where('status', 1)->sortBy('order')->where('order', '<=', $user->units->first()->order);
+                
+                if($user->units->count() > 0) $user_units = $module->units->where('status', 1)->sortBy('order')->where('order', '<=', $user->units->first()->order);
 
                 if ($module->course->categories->pluck('name')->contains('Conversational')) {
                     if ($user->modules->sortBy('order')->contains($module)) {

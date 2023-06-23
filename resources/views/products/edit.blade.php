@@ -104,6 +104,22 @@
                                 @endif
                                 <p class="text-gray-500 text-sm font-light">Please select a course for the product</p>
                             </div>
+                            <div class="py-6 space-y-1">
+                                <p class="font-bold text-gray-600 mb-1">Course</p>
+                                <select id="status"
+                                    class="w-3/4 px-2 py-2 hover:border-gray-600 text-gray-600  border-gray-300 rounded"
+                                    name="status">
+                                    <option selected disabled hidden required>Status</option>
+                                    <option value="0" @if ($product->status == 0) selected @endif>Inactive
+                                    </option>
+                                    <option value="1" @if ($product->status == 1) selected @endif>Active
+                                    </option>
+                                </select>
+                                @if ($errors->has('status'))
+                                    <p class="text-xs font-light text-red-600">{{ $errors->get('status')[0] }}</p>
+                                @endif
+                                <p class="text-gray-500 text-sm font-light">Please select a status for the product</p>
+                            </div>
                             {{-- <div class="pb-6 space-y-1">
                                 {{ dd($product->features) }}
                                 <p class="font-bold text-gray-600 mb-1">Features</p>

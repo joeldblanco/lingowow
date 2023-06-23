@@ -37,6 +37,9 @@ class ApportionmentController extends Controller
 
         $today = Carbon::now()->setTimezone('UTC');
         $today->addDays(1);
+        // if (auth()->user()->roles[0]->name == 'student' || auth()->user()->roles[0]->name == 'guest') {
+        //     $today->addDays(1);
+        // }
 
         $current_period = ApportionmentController::currentPeriod();
         $next_period = ApportionmentController::nextPeriod();
@@ -67,8 +70,8 @@ class ApportionmentController extends Controller
             foreach ($schedule as $key => $value) {
                 $day = $value[1];
                 $time = $value[0];
-                $qty += $today->diffInDaysFiltered(function (Carbon $date) use (&$day, &$time, &$days) {
-                    if ($date->isDayOfWeek($day)) {
+                $qty += $today->diffInDaysFiltered(function (Carbon $date) use (&$day, &$time, &$days, &$current_period_start) {
+                    if ($date->isDayOfWeek($day) && $date->greaterThanOrEqualTo($current_period_start)) {
                         $date->hour = $time;
                         $date->minute = 0;
                         $date->second = 0;
@@ -194,7 +197,7 @@ class ApportionmentController extends Controller
         $end_period = new Carbon($current_period[1]);
 
         if ($start_period->month == $end_period->month) {
-            $next_period_start = $start_period->copy()->addMonth()->startOfMonth()->next(Carbon::MONDAY);
+            $next_period_start = $start_period->copy()->addMonth()->firstOfMonth(Carbon::MONDAY);
             $next_period_end = $next_period_start->copy()->addDays(5);
             $next_period_end->addWeeks(3);
             $next_period_end->addDays(1);
@@ -207,6 +210,30 @@ class ApportionmentController extends Controller
         // dd($next_period_start,$next_period_end, $start_period, $end_period);
         if ($onlyDate) return [$next_period_start->toDateString(), $next_period_end->toDateString()];
         return [$next_period_start->toDateTimeString(), $next_period_end->toDateTimeString()];
+    }
+
+    public static function previousPeriod($onlyDate = false)
+    {
+        $current_period = DB::table("metadata")->where("key", "current_period")->first()->value;
+        $current_period = array_values(json_decode($current_period, 1));
+
+        $start_period = new Carbon($current_period[0]);
+        $end_period = new Carbon($current_period[1]);
+
+        // if ($start_period->month == $end_period->month) {
+        $previous_period_start = $start_period->copy()->subMonth()->startOfMonth()->next(Carbon::MONDAY);
+        $previous_period_end = $previous_period_start->copy()->addDays(5);
+        $previous_period_end->addWeeks(3);
+        $previous_period_end->addDays(1);
+        // } else {
+        //     $previous_period_start = $end_period->copy()->firstOfMonth(Carbon::MONDAY);
+        //     $previous_period_end = $previous_period_start->copy()->subDays(5);
+        //     $previous_period_end->subWeeks(3);
+        //     $previous_period_end->subDays(1);
+        // }
+        // dd($previous_period_start,$previous_period_end, $start_period, $end_period);
+        if ($onlyDate) return [$previous_period_start->toDateString(), $previous_period_end->toDateString()];
+        return [$previous_period_start->toDateTimeString(), $previous_period_end->toDateTimeString()];
     }
 
     public static function getPeriod($class, $extended = false)
@@ -244,6 +271,14 @@ class ApportionmentController extends Controller
         }
 
         return $class_period;
+    }
+
+    public static function getWeekOfPeriod($date)
+    {
+        $period = static::getPeriod($date, true);
+        $weekOfPeriod = now()->diffInWeeks(Carbon::createFromDate($period[0])) + 1;
+
+        return $weekOfPeriod;
     }
 
     // public static function getPreviousPeriod($class, $extended = false){

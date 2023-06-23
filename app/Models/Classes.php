@@ -4,12 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
+// use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Classes extends Model
 {
     use HasFactory;
-    use SoftDeletes;
+    // use SoftDeletes;
 
     /**
      * The table associated with the model.
@@ -54,7 +54,7 @@ class Classes extends Model
      */
     public function enrolment()
     {
-        return $this->belongsTo(Enrolment::class);
+        return $this->belongsTo(Enrolment::class)->withTrashed();
     }
 
     /**

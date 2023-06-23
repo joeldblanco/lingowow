@@ -1,6 +1,6 @@
 <x-app-layout>
 
-    @if (session('message'))
+    {{-- @if (session('message'))
 
         <div x-data="{ showModal1: true }">
             <div class="fixed inset-0 w-full h-full z-20 bg-black bg-opacity-50 duration-300 overflow-y-auto"
@@ -52,14 +52,14 @@
         @php
             session()->forget('message');
         @endphp
-    @endif
+    @endif --}}
 
     <div style="height: 100%" class="bg-white font-sans">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden">
 
                 @if ($plan != 1)
-                    <livewire:teachers-carousel />
+                    @livewire('teachers-carousel')
                 @endif
                 @php
                     $course_id = session('selected_course');
@@ -68,16 +68,24 @@
                     }
                 @endphp
 
-                @if ($modality_course == 'exam')
-                    @livewire('schedule', ['plan' => $plan, 'user_id' => auth()->id(), 'mode' => 'one'])
+                @if (App\Models\Course::find($course_id)->categories()->pluck('name')->contains('Test'))
+                    @php
+                        $available_teachers = [7];
+                    @endphp
+                    @livewire('teachers-carousel', ['available_teachers' => $available_teachers])
+                    @livewire('new-schedule', [
+                        'limit' => 2,
+                        'users' => $available_teachers,
+                        'action' => 'examSelection',
+                        'week' => App\Http\Controllers\ApportionmentController::getWeekOfPeriod(now()),
+                    ])
                 @else
-                    @if (session('preselection'))
-                        @livewire('new-schedule', ['week' => null, 'users' => auth()->id(), 'action' => 'schedulePreselection', 'limit' => $plan])
+                    @if (!empty($preselection))
+                        @livewire('new-schedule', ['week' => null, 'users' => auth()->id(), 'action' => 'schedulePreselection', 'limit' => $plan, 'data' => ['product_id' => $product_id]])
                     @else
-                        @livewire('new-schedule', ['week' => null, 'users' => auth()->id(), 'action' => 'scheduleSelection', 'limit' => $plan])
+                        @livewire('new-schedule', ['week' => null, 'users' => auth()->id(), 'action' => 'scheduleSelection', 'limit' => $plan, 'data' => ['product_id' => $product_id]])
                     @endif
                 @endif
-                {{-- <livewire:scheduling-calendar plan="{{$plan}}" /> --}}
 
                 @role('guest')
                     <x-shepherd-tour tourName="guests/teachers-carousel" role="guest" />

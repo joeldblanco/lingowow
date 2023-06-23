@@ -22,25 +22,30 @@ class AnalyticsController extends Controller
     public function index()
     {
         $current_period = ApportionmentController::currentPeriod();
-        // $current_period = ApportionmentController::getPeriod('2023-02-06', true);
-        $invoices = Invoice::where('created_at', '>=', $current_period[0])->where('created_at', '<=', $current_period[1])->get();
+        // $current_period = ApportionmentController::getPeriod('2023-05-04', true); //UNCOMMENT THIS TO CALCULATE THE PAYMENT FOR A SPECIFIC PERIOD 1/3
+        $invoices = Invoice::where('created_at', '>=', Carbon::parse($current_period[0])->startOfMonth())->where('created_at', '<=', Carbon::parse($current_period[0])->endOfMonth())->get();
         $payment = [];
         $classes = [];
         $profit = [];
         $paypal_commissions = [];
 
+        $paymentForRegularClass = json_decode(DB::table('metadata')->where('key', 'payment_per_class')->first()->value)->regular;
+        $paymentForSpecialClass = json_decode(DB::table('metadata')->where('key', 'payment_per_class')->first()->value)->special;
+        $paymentForPlacementTest = json_decode(DB::table('metadata')->where('key', 'payment_per_class')->first()->value)->placement_test;
+
         $guests = User::role('guest')->get();
         $students = User::role('student')->get();
-        $teachers = User::role('teacher')->get();
+        $teachers = User::role('teacher')->orderBy('first_name')->get();
         $admins = User::role('admin')->get();
 
         foreach ($teachers as $key => $value) {
             $enrolments = Enrolment::where('teacher_id', $value->id)->get();
-            // $enrolments = Enrolment::withTrashed()->where('teacher_id', $value->id)->get();
+            // $enrolments = Enrolment::withTrashed()->where('teacher_id', $value->id)->get(); //UNCOMMENT THIS TO CALCULATE THE PAYMENT FOR A SPECIFIC PERIOD 2/3
 
             foreach ($enrolments as $enrolment) {
-                $monthly_classes = Classes::where('enrolment_id', $enrolment->id)->whereDate('start_date', '>=', $current_period[0])->whereDate('end_date', '<', now())->count();
-                // $monthly_classes = Classes::where('enrolment_id', $enrolment->id)->whereDate('start_date', '>=', $current_period[0])->whereDate('end_date', '<', $current_period[1])->count();
+                $monthly_classes = Classes::where('enrolment_id', $enrolment->id)->whereDate('start_date', '>=', $current_period[0])->whereDate('end_date', '<=', now())->count();
+                // $monthly_classes = Classes::where('enrolment_id', $enrolment->id)->whereDate('start_date', '>=', $current_period[0])->whereDate('end_date', '<=', $current_period[1])->count(); //UNCOMMENT THIS TO CALCULATE THE PAYMENT FOR A SPECIFIC PERIOD 3/3
+
 
                 $product = Course::find($enrolment->course_id)->products->first();
                 if ($product->sale_price == NULL) {
@@ -50,19 +55,32 @@ class AnalyticsController extends Controller
                 }
 
                 if (str_contains($product->slug, "english-regular")) {
-                    $teacher_payment = 4.99;
+                    $teacher_payment = $paymentForRegularClass;
                 } else if (str_contains($product->slug, "english-conversational")) {
-                    $teacher_payment = 6.99;
+                    $teacher_payment = $paymentForSpecialClass;
                 } else if (str_contains($product->slug, "spanish-regular")) {
-                    $teacher_payment = 6.99;
+                    $teacher_payment = $paymentForSpecialClass;
                 } else if (str_contains($product->slug, "spanish-conversational")) {
-                    $teacher_payment = 7.99;
+                    $teacher_payment = $paymentForSpecialClass;
+                } else if (str_contains($product->slug, "placement-test")) {
+                    $teacher_payment = $paymentForPlacementTest;
                 }
 
-                $classes[$value->id][] = ($monthly_classes * $teacher_payment);
-                $profit[$value->id][] = ($monthly_classes * $product_price);
+                // dd($enrolment->id, Classes::where('enrolment_id', $enrolment->id)->whereDate('start_date', '>=', $current_period[0])->whereDate('end_date', '<=', now())->count());
+
+                if ($product->plans->pluck('slug')->contains(function ($slug) {
+                    return str_contains($slug, 'single-payment');
+                })) {
+                    $classes[$value->id][] = $teacher_payment;
+                    $profit[$value->id][] = $product_price;
+                } else {
+                    $classes[$value->id][] = ($monthly_classes * $teacher_payment);
+                    $profit[$value->id][] = ($monthly_classes * $product_price);
+                }
             }
         }
+
+        // dd($current_period[0]);
 
         $total_payment = 0;
         foreach ($classes as $key => $value) {
@@ -239,11 +257,11 @@ class AnalyticsController extends Controller
         }
 
         $allPeriods = array_values(array_unique($allPeriods));
-        foreach ($allPeriods as $key => $period) {
-            $allPeriods[$key] = (new Carbon($period))->isoFormat('MMMM Y');
+        foreach ($allPeriods as $key => $value) {
+            $allPeriods[$key] = (new Carbon($value))->isoFormat('MMMM Y');
         }
 
-        return view('admin.analytics.earnings', compact('teachers', 'synchronousCourses', 'courses', 'enrolments', 'allPeriods', 'periodClasses'));
+        return view('admin.analytics.earnings', compact('teachers', 'synchronousCourses', 'courses', 'enrolments', 'allPeriods', 'periodClasses', 'period'));
     }
 
     /**
@@ -256,5 +274,63 @@ class AnalyticsController extends Controller
         $period = ClassController::getClassesByPeriod($request->month);
 
         return $this->earnings($period);
+    }
+
+    /**
+     * Show the earnings by teacher.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function teacherEarnings(Request $request)
+    {
+        $period = $request->period;
+        $id = $request->teacher_id;
+
+        if (auth()->user()->hasRole('teacher') && empty($id)) {
+            $id = auth()->user()->id;
+        }
+
+        if (auth()->user()->hasRole('teacher') && $id != auth()->user()->id) {
+            return abort(403, 'Unauthorized action.');
+        }
+
+        $teachers = User::role('teacher')->orderBy('first_name')->get();
+
+        if (empty($period)) {
+            $period = ApportionmentController::getPeriod(Carbon::now(), true);
+        } else {
+            $period = ApportionmentController::getPeriod($period, true);
+        }
+
+        if (empty($id)) {
+            $id = $teachers->first()->id;
+        }
+
+        $teacher = User::find($id);
+        $classes = [];
+        foreach ($teacher->teacherClassesWithTrashedParents->whereBetween('start_date', $period) as $class) {
+            $classes[$class->enrolment_id][] = $class;
+        }
+
+        $groupedClasses = collect($classes);
+
+        return view('admin.analytics.teacherEarnings', compact('teacher', 'groupedClasses', 'teachers', 'period'));
+    }
+
+    /**
+     * Update the specified resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function registerTeachersPayment(Request $request)
+    {
+        $request->validate([
+            'teacher_id' => 'required|numeric|exists:App\Models\User,id',
+            'supporting_document' => 'required|file|mimes:pdf|max:2048',
+            'agreement_checkbox' => 'required',
+        ]);
+
+        dd($request);
     }
 }

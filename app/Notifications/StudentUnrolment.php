@@ -23,7 +23,7 @@ class StudentUnrolment extends Notification implements ShouldQueue
      */
     public function __construct($student_id, $course_id)
     {
-        $this->course = Course::find($course_id)->select('name')->first();
+        $this->course = Course::find($course_id);
         $this->student = User::find($student_id);
     }
 

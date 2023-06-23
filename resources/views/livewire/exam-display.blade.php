@@ -84,14 +84,29 @@
                             </ul>
                         @elseif($question->type == 'info')
                             @if ($question->file_path != null)
-                                <audio id="player">
-                                    <source src="{{ asset(Storage::url($question->file_path)) }}" type="audio/mpeg">
-                                    Your browser does not support the audio tag.
-                                </audio>
-                                <div class="flex items-center space-x-5">
-                                    <i class="play cursor-pointer text-blue-500 text-2xl fas fa-play my-5 ml-5"></i>
-                                    <progress id="seekbar" value="0" max="1" class="w-full"></progress>
-                                </div>
+                                @php
+                                    $extension = pathinfo($question->file_path, PATHINFO_EXTENSION);
+                                    $isImage = in_array($extension, ['jpg', 'jpeg', 'png', 'gif']);
+                                    $isAudio = in_array($extension, ['mp3', 'wav', 'ogg']);
+                                @endphp
+                                @if ($isImage)
+                                    <img class="h-auto rounded-sm object-scale-down"
+                                        src="{{ Storage::url($question->file_path) }}"
+                                        alt="{{ Auth::user()->name }}" />
+                                @elseif ($isAudio)
+                                    <audio id="player">
+                                        <source src="{{ asset(Storage::url($question->file_path)) }}"
+                                            type="audio/mpeg">
+                                        Your browser does not support the audio tag.
+                                    </audio>
+                                    <div class="flex items-center space-x-5">
+                                        <i class="play cursor-pointer text-blue-500 text-2xl fas fa-play my-5 ml-5"></i>
+                                        <progress id="seekbar" value="0" max="1"
+                                            class="w-full"></progress>
+                                    </div>
+                                @else
+                                    <p>No se reconoce el tipo de archivo.</p>
+                                @endif
                             @endif
                         @elseif($question->type == 'essay')
                             @if ($question->file_path != null)

@@ -20,6 +20,7 @@ use App\Invoice;
 use App\Http\Controllers\CourseController;
 use App\Http\Controllers\EnrolmentController;
 use App\Http\Controllers\ExamController;
+use App\Http\Controllers\ExportController;
 use App\Http\Controllers\FeatureController;
 use App\Http\Controllers\GatherController;
 use App\Http\Controllers\GradingController;
@@ -41,6 +42,7 @@ use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\PlanController;
 // use App\Http\Controllers\PaypalController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\ShopController;
 use App\Models\Attempt;
 use App\Http\Controllers\UploadImages;
 use App\Http\Controllers\WhatsAppController;
@@ -217,7 +219,8 @@ Route::middleware(['web', 'auth', 'verified', 'impersonate'])->group(function ()
 
 
     //ROUTES FOR SHOP//
-    Route::middleware(['role:guest|student|admin'])->get('/shop', [PayPalPaymentController::class, 'getIndex'])->name('shop');
+    // Route::middleware(['role:guest|student|admin'])->get('/shop', [PayPalPaymentController::class, 'getIndex'])->name('shop');
+    Route::middleware(['role:guest|student|admin'])->get('/shop', [ShopController::class, 'index'])->name('shop');
     Route::middleware(['role:guest|student|admin'])->get('/shop/cart', function () {
         return view('cart');
     })->name("cart");
@@ -228,6 +231,9 @@ Route::middleware(['web', 'auth', 'verified', 'impersonate'])->group(function ()
     //ROUTES FOR INVOICES//
     Route::middleware(['role:guest|student|admin'])->get('/shop/invoices', [InvoiceController::class, 'index'])->name("invoices");
     Route::middleware(['role:guest|student|admin'])->get('/shop/invoice/{id}', [InvoiceController::class, 'show'])->name('invoice.show');
+    Route::middleware(['role:admin'])->get('/shop/invoice/{id}/edit', [InvoiceController::class, 'edit'])->name('invoice.edit');
+    Route::middleware(['role:admin'])->patch('/shop/invoice/{id}', [InvoiceController::class, 'update'])->name('invoice.update');
+    Route::middleware(['role:admin'])->delete('/shop/invoice/{id}', [InvoiceController::class, 'destroy'])->name('invoice.destroy');
 
 
 
@@ -238,12 +244,16 @@ Route::middleware(['web', 'auth', 'verified', 'impersonate'])->group(function ()
     Route::post('/schedule/update', [SchedulingCalendarController::class, 'update'])->name("schedule.update");
     Route::get('/schedule/destroy/{student_id}/{course_id}', [SchedulingCalendarController::class, 'destroy'])->name("schedule.destroy");
 
+    // Route::middleware('checkPreviousUrlName:shop|schedule.check|schedule.create|enrolments.checkSchedule,shop')->get('/shop/schedule/selection', [ShopController::class, 'scheduleSelection'])->name("shop.scheduleSelection");
+    Route::get('/shop/schedule/selection', [ShopController::class, 'scheduleSelection'])->name("shop.scheduleSelection");
+    // Route::get('/shop/niubiz/checkout', [ShopController::class, 'checkout'])->name("shop.niubizCheckout");
+
 
 
 
 
     //ROUTES FOR EXAMS//
-    Route::middleware(['role:admin'])->get('/exams', [ExamController::class, 'index'])->name('exams.index');
+    Route::middleware(['role:admin|teacher'])->get('/exams', [ExamController::class, 'index'])->name('exams.index');
     Route::middleware(['role:admin|teacher'])->get('/exams/create', [ExamController::class, 'create'])->name('exams.create');
     Route::middleware(['role:admin|teacher'])->post('/exams', [ExamController::class, 'store'])->name('exams.store');
     Route::middleware(['role:admin|teacher|student'])->get('/exams/{exam}', [ExamController::class, 'show'])->name('exams.show');
@@ -291,6 +301,9 @@ Route::middleware(['web', 'auth', 'verified', 'impersonate'])->group(function ()
         return view('newSchedule');
     })->name('newSchedule');
 
+    Route::middleware(['role:teacher|admin'])->get('/teachers/classes', [AnalyticsController::class, 'teacherEarnings'])->name('teacherEarnings');
+    Route::middleware(['role:teacher|admin'])->post('/teachers/agreement', [AnalyticsController::class, 'registerTeachersPayment'])->name('teacherAgreement');
+
 
 
     //ROUTES FOR ADMINISTRATION//
@@ -306,7 +319,7 @@ Route::middleware(['web', 'auth', 'verified', 'impersonate'])->group(function ()
 
 
         //ROUTES FOR PRODUCTS//
-        Route::resource('admin/products', ProductController::class);
+        Route::resource('products', ProductController::class);
 
 
 
@@ -370,11 +383,11 @@ Route::middleware(['web', 'auth', 'verified', 'impersonate'])->group(function ()
 
 
         //ROUTE FOR TESTING MAILS//
-        Route::get('/mail/test', function () {
-            $admin = User::find(6);
-            $student = User::find(5);
-            Notification::sendNow($admin, new BookedClass($student));
-        })->name('mail.test');
+        // Route::get('/mail/test', function () {
+        //     $admin = User::find(6);
+        //     $student = User::find(5);
+        //     Notification::sendNow($admin, new BookedClass($student));
+        // })->name('mail.test');
 
 
 
@@ -386,6 +399,12 @@ Route::middleware(['web', 'auth', 'verified', 'impersonate'])->group(function ()
         Route::get('/admin/classes', ClassesComponent::class)->name('admin.classes.index');
         Route::get('/classes/create', [ClassController::class, 'create'])->name('classes.create');
         Route::post('/classes', [ClassController::class, 'store'])->name('classes.store');
+
+
+
+
+        //ROUTES FOR EXPORTS//
+        Route::get('/export', [ExportController::class, 'export'])->name('export');
 
 
 

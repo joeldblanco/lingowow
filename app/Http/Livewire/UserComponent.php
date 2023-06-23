@@ -2,6 +2,7 @@
 
 namespace App\Http\Livewire;
 
+use App\Http\Controllers\GatherController;
 use App\Models\Enrolment;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
@@ -47,6 +48,8 @@ class UserComponent extends Component
         $user->removeRole($user->roles[0]->id);
         $user->assignRole($this->user_role);
         $user->save();
+
+        GatherController::setGuestsList();
     }
 
     public function deleteUser()

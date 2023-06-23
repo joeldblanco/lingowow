@@ -57,10 +57,6 @@
                                             class="hover:bg-gray-200 p-2 rounded-xl" @click="showTypes = false">Url</a>
                                         <a href="{{ route('contents.create', ['type' => 'media', 'unit_id' => $unit->id]) }}"
                                             class="hover:bg-gray-200 p-2 rounded-xl" @click="showTypes = false">Media</a>
-                                        {{-- <a href="{{ route('contents.create', ['type' => 'image', 'unit_id' => $unit->id]) }}"
-                            class="hover:bg-gray-200 p-2 rounded-xl" @click="showTypes = false">Image</a>
-                        <a href="{{ route('contents.create', ['type' => 'video', 'unit_id' => $unit->id]) }}"
-                            class="hover:bg-gray-200 p-2 rounded-xl" @click="showTypes = false">Video</a> --}}
                                     </div>
                                 </div>
                             </div>

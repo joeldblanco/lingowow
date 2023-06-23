@@ -46,6 +46,7 @@ class ClassesComponent extends Component
         $this->start_date = ApportionmentController::currentPeriod(true)[0];
         $this->end_date = ApportionmentController::currentPeriod(true)[1];
         $this->enrolment_id = 0;
+        $this->resetPage();
     }
 
     public function loadComment($id)
@@ -62,6 +63,7 @@ class ClassesComponent extends Component
     public function showClass($id)
     {
         $this->current_class = Classes::find($id);
+        // dd($this->current_class->enrolment_id);
         $this->enrolment = Enrolment::withTrashed()->where('id', $this->current_class->enrolment_id)->first();
         $this->classDetails = true;
     }
@@ -91,6 +93,16 @@ class ClassesComponent extends Component
     //         $this->sortDirection = 'asc';
     //     }
     // }
+
+    public function updatingSearch()
+    {
+        $this->resetPage();
+    }
+
+    public function updatingSearchCourse()
+    {
+        $this->resetPage();
+    }
 
     public function render()
     {
@@ -147,7 +159,8 @@ class ClassesComponent extends Component
                         ->orWhere('last_name', 'like', '%' . $this->search . '%');
                 });
             });
-        } 
+        }
+        
         if ($this->searchCourse){
             $classes = $classes->where(function ($query) {
                 $query->whereHas('enrolment.course', function ($query) {
@@ -155,9 +168,9 @@ class ClassesComponent extends Component
                 });
             });
         }
+        // dd($classes->get());
         
         $classes = $classes->paginate(15);
-        // dd($classes);
         //Fin GPT
 
         // $this->current_class = $classes->last();

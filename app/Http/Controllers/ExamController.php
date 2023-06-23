@@ -22,7 +22,25 @@ class ExamController extends Controller
      */
     public function index()
     {
-        $exams = Exam::all();
+
+
+        if (auth()->user()->hasRole('admin')) {
+            $exams = Exam::all();
+        }
+
+        if (auth()->user()->hasRole('teacher')) {
+            $exams = Exam::all();
+            
+            $modules = auth()->user()->modules->intersect($exams->pluck('unit')->pluck('module'));
+            
+            $exams = $modules->flatMap(function ($module) {
+                return $module->exams();
+            });
+
+            $exams = $exams->reject(function ($subcoleccion) {
+                return $subcoleccion->isEmpty();
+            })->flatten();
+        }
 
         return view('exams.index', compact('exams'));
     }
@@ -34,9 +52,18 @@ class ExamController extends Controller
      */
     public function create(Request $request)
     {
-        if (empty($request->module_id)) {
-            $courses = Course::all();
-            return view('exams.create', compact('courses'));
+        if (!empty($request->module_id)) {
+            if (auth()->user()->hasRole('admin')) {
+                $courses = Course::all();
+                $modules = $courses->pluck('modules')->flatten();
+            }
+
+            if (auth()->user()->hasRole('teacher')) {
+                $courses = auth()->user()->modules->pluck('course')->filter()->unique();
+                $modules = auth()->user()->modules;
+            }
+
+            return view('exams.create', compact('courses', 'modules'));
         }
 
         return abort(404);
@@ -89,14 +116,14 @@ class ExamController extends Controller
 
             if (!$student_courses->contains($course)) {
                 abort(403, 'USER DOES NOT HAVE THE RIGHT PERMISSIONS.');
-            }else{
+            } else {
                 // COMPROBAR SI EL EXAMEN ESTA DISPONIBLE DENTRO DE SUS UNIDADES PERMITIDAS EN USER-UNIT 
                 foreach ($user->units as $user_unit) {
                     if ($user_unit->course()->id == $unit_course->id) {
                         if ($unit_exam->module->order > $user_unit->module->order) {
                             abort(403, 'USER DOES NOT HAVE THE RIGHT PERMISSIONS.');
                         }
-    
+
                         if ($unit_exam->module->order == $user_unit->module->order) {
                             if ($unit_exam->order > $user_unit->order) {
                                 abort(403, 'USER DOES NOT HAVE THE RIGHT PERMISSIONS.');

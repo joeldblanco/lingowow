@@ -86,6 +86,8 @@ class Chat extends Component
                 Notification::send($this->users_notifications, new \App\Notifications\MessageRead());
             }
         }
+
+        $this->participant = $this->conversation->users->where('id', '!=', auth()->id())->first();
     }
 
     //FUNCTION FOR SENDING MESSAGES (TRIGGERED WHEN 'SEND' BUTTON IS CLICKED)//
@@ -156,7 +158,7 @@ class Chat extends Component
         $user = User::find(auth()->id());
         $this->friends = $user->friends();
         $this->conversations = $user->conversations;
-        $this->conversations_id = [];
+        // $this->conversations_id = [];
 
         return view('livewire.chat');
     }

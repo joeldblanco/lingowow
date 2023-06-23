@@ -7,7 +7,7 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <link rel="shortcut icon" href="{{ asset('favicon.ico') }}">
 
-    <title>{{ config('app.name', 'Laravel') }}</title>
+    <title>{{ config('app.name', 'Lingowow') }}</title>
 
     <!-- Fonts -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap">
@@ -28,8 +28,7 @@
     <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" defer></script>
     <script src="{{ asset('js/app.js') }}" defer></script>
     <script src="{{ asset('js/eventListeners.js') }}" defer></script>
-    <script src="https://cdn.jsdelivr.net/npm/shepherd.js@8.3.1/dist/js/shepherd.min.js" defer></script>
-    <script src="https://cdn.jsdelivr.net/npm/shepherd.js@8.3.1/dist/js/shepherd.min.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/shepherd.js@8.3.1/dist/js/shepherd.min.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/shepherd.js@8.3.1/dist/css/shepherd.css" />
     <script src="https://kit.fontawesome.com/968fe8efd4.js" crossorigin="anonymous" defer></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/flickity/2.2.2/flickity.pkgd.min.js"
@@ -53,7 +52,7 @@
     <x-jet-banner />
 
     @if (session('success'))
-        <div class="flex justify-center fixed bottom-5 left-5 z-20" x-data="{open: true}" x-show="open" x-cloak>
+        <div class="flex justify-center fixed bottom-5 left-5 z-20" x-data="{ open: true }" x-show="open" x-cloak>
             <div
                 class="w-full px-6 py-3 shadow-2xl flex flex-col items-center border-t sm:w-auto sm:m-4 sm:rounded-lg sm:flex-row sm:border bg-green-600 border-green-600 text-white">
                 <div>
@@ -72,7 +71,7 @@
     @endif
 
     @if (session('error'))
-        <div class="flex justify-center fixed bottom-5 left-5 z-20" x-data="{open: true}" x-show="open" x-cloak>
+        <div class="flex justify-center fixed bottom-5 left-5 z-20" x-data="{ open: true }" x-show="open" x-cloak>
             <div
                 class="w-full px-6 py-3 shadow-2xl flex flex-col items-center border-t sm:w-auto sm:m-4 sm:rounded-lg sm:flex-row sm:border bg-red-600 border-red-600 text-white">
                 <div>
@@ -124,6 +123,13 @@
         @if (auth()->user()->hasRole('admin') || Auth::user()->isImpersonated())
             @livewire('admin-tools')
         @endif
+
+        @if (Route::currentRouteName() !== 'cart')
+            @if (Cart::count() > 0)
+                @livewire('cart-summary', ['show' => true])
+            @endif
+        @endif
+
 
 
         @include('footer')

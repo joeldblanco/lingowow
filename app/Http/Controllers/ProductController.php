@@ -51,6 +51,7 @@ class ProductController extends Controller
             'regular_price' => 'required|numeric',
             'sale_price' => 'numeric|nullable',
             'course_id' => 'numeric|exists:App\Models\Course,id',
+            'status' => 'required|in:1,0'
         ]);
 
         if ((int) $request->sale_price <= 0) {
@@ -82,6 +83,7 @@ class ProductController extends Controller
             'regular_price' => $request->regular_price,
             'sale_price' => $sale_price,
             'image' => $product_image,
+            'status' => $request->status,
         ]);
 
         if (!empty($request->categories)) {
@@ -100,7 +102,7 @@ class ProductController extends Controller
      */
     public function show(Product $product)
     {
-        //
+        return view('products.show', compact('product'));
     }
 
     /**
@@ -132,6 +134,7 @@ class ProductController extends Controller
             'description' => 'required',
             'regular_price' => 'required|numeric',
             'sale_price' => 'numeric|nullable',
+            'status' => 'required|in:1,0',
         ]);
 
         if (!empty($request->categories)) {
@@ -158,6 +161,7 @@ class ProductController extends Controller
             'regular_price' => $request->regular_price,
             'sale_price' => $sale_price,
             'image' => $product_image,
+            'status' => $request->status,
         ]);
 
         if (!empty($request->categories)) {

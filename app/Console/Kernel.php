@@ -56,10 +56,10 @@ class Kernel extends ConsoleKernel
                 //HERE ALL NEW PERIOD CALCULATIONS ARE MADE
 
 
-                $users = Enrolment::where('student_id', '!=', null)->get()->pluck('student');
-                foreach ($users as $user) {
-                    $classes = $user->studentClasses;
-                    $pending_classes = count($user->studentClasses);
+                $students = Enrolment::where('student_id', '!=', null)->get()->pluck('student');
+                foreach ($students as $student) {
+                    $classes = $student->studentClasses;
+                    $pending_classes = count($student->studentClasses);
                     foreach ($classes as $class) {
                         if ($class->start_date <= now()) {
                             $pending_classes--;
@@ -67,17 +67,17 @@ class Kernel extends ConsoleKernel
                     }
 
                     if ($pending_classes <= 0) {
-                        $enrolment = Enrolment::where('student_id', $user->id)->first();
+                        $enrolment = Enrolment::where('student_id', $student->id)->first();
                         if ($enrolment && $enrolment->course->modality == 'synchronous') {
-                            $user_schedule = ModelsSchedule::where('user_id', $user->id)->where('enrolment_id', $enrolment->id)->first();
+                            $user_schedule = ModelsSchedule::where('user_id', $student->id)->where('enrolment_id', $enrolment->id)->first();
                             $preselection = $enrolment->preselection;
                             if (empty($preselection)) {
                                 $enrolment->delete();
                                 $user_schedule->delete();
-                                $user->removeRole('student');
-                                $user->assignRole('guest');
+                                $student->removeRole('student');
+                                $student->assignRole('guest');
                             } else {
-                                $user_schedule = ModelsSchedule::where('user_id', $user->id)->where('enrolment_id', $enrolment->id)->first();
+                                $user_schedule = ModelsSchedule::where('user_id', $student->id)->where('enrolment_id', $enrolment->id)->first();
                                 $user_schedule->selected_schedule = $preselection->schedule;
                                 $user_schedule->save();
 
@@ -147,6 +147,13 @@ class Kernel extends ConsoleKernel
                     Notification::sendNow($class->student(), new UpcomingClassForStudent($class));
                 }
             }
+
+
+            $reserves = ScheduleReserve::where('updated_at', '<=', Carbon::now()->subMinutes(20))->get();
+            foreach ($reserves as $reserve) {
+                $reserve->delete();
+            }
+
         })->everyMinute();
 
         $schedule->call(function () {

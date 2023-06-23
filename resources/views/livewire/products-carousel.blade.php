@@ -36,7 +36,7 @@
     </style>
     <h3 class="text-4xl font-bold my-10 text-gray-800">Courses</h3>
     <div class="products-carousel flex flex-wrap w-full justify-evenly items-end" {{-- gallery js-flickity  data-flickity-options='{ "wrapAround": true }' wire:ignore --}}>
-        @foreach ($course_products as $product)
+        @foreach ($products as $product)
             <div class="w-1/3 h-5/6 max-h-" @if ($loop->first) id="course-card" @endif>
                 {{-- <div class="relative bg-white rounded-3xl w-64 my-4 shadow-xl mt-7 mb-2 mx-10 flex flex-col">
                     <div class="bg-green-600 w-full p-4 rounded-t-lg text-white">
@@ -76,7 +76,7 @@
                         style="background-image: url('{{ Storage::url($product->image) }}');"
                         onMouseOver="this.style.backgroundImage='linear-gradient(90deg, rgba(50,70,186,0.6) 0%, rgba(28,117,187,0.6) 80%), url({{ Storage::url($product->image) }})'"
                         onMouseOut="this.style.backgroundImage='url({{ Storage::url($product->image) }})'">
-                        <div class="flex flex-col items-center">
+                        <div class="flex flex-col items-center" style="max-width: calc(100% - 2rem)">
                             <div class="w-full image-cover rounded-t-md blur-xl">
                                 {{-- <div
                                     class="p-2 m-4 w-16 h-16 text-center bg-gray-700 rounded-full text-white float-right fd-cl group-hover:opacity-25">
@@ -85,7 +85,7 @@
                                     <span class="text-xs tracking-wide font-bold uppercase block font-sans">April</span>
                                 </div> --}}
                             </div>
-                            <div class="py-8 px-4 bg-white rounded-b-md fd-cl group-hover:opacity-25 w-10/12">
+                            <div class="py-8 px-4 bg-white rounded-b-md fd-cl group-hover:opacity-25 w-full">
                                 <span
                                     class="block text-lg text-gray-800 font-bold tracking-wide">{{ $product->name }}</span>
                                 {{-- <span class="block text-gray-600 text-sm">{{ $product->description }} --}}
@@ -120,9 +120,9 @@
                             <div class="flex flex-col items-center">
                                 <div class="w-full image-cover rounded-t-md blur-xl">
                                 </div>
-                                <div class="py-8 px-4 bg-white rounded-b-md fd-cl group-hover:opacity-25 w-10/12">
+                                <div class="py-8 px-4 bg-white rounded-b-md fd-cl group-hover:opacity-25 w-full">
                                     <span
-                                        class="block text-lg text-gray-800 font-bold tracking-wide">{{ $product->name }}</span>
+                                        class="block text-lg text-gray-800 font-bold tracking-wide">{{ $product->name }}
                                     </span>
                                 </div>
                             </div>

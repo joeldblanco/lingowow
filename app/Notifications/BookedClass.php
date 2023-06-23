@@ -24,7 +24,7 @@ class BookedClass extends Notification implements ShouldQueue
      */
     public function __construct($student_id)
     {
-        $this->student = User::find($student_id)->first();
+        $this->student = User::find($student_id);
         $schedule = Schedule::select('selected_schedule')
             ->where('user_id', $student_id)
             ->first();
@@ -81,7 +81,7 @@ class BookedClass extends Notification implements ShouldQueue
         return (new MailMessage)
             ->subject('New Class Booked: ' . $this->student->first_name . ' ' . $this->student->last_name)
             ->line('Greetings, dear ' . $notifiable->first_name . ' ' . $notifiable->last_name . '.')
-            ->line('We are writing to notify you that a new class has been scheduled by student ' . $this->student->first_name . ' ' . $this->student->last_name . ' ' . $this->schedule_string)
+            ->line('We are writing to notify you that a new class has been scheduled by student ' . $this->student->first_name . ' ' . $this->student->last_name . '. ' . $this->schedule_string)
             ->line('Click the button below to check your current schedule.')
             ->action('Check Schedule', route('dashboard'))
             ->line('If you have any questions, please contact us through the regular channels.');

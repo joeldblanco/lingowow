@@ -67,7 +67,7 @@ class ClassRescheduledToTeacher extends Notification implements ShouldQueue
         return (new MailMessage)
             ->subject('Class Rescheduled: ' . $this->student->first_name . ' ' . $this->student->last_name)
             ->line('Greetings, dear ' . $notifiable->first_name . ' ' . $notifiable->last_name . '.')
-            ->line('We are writing to notify you that a class has been rescheduled by student ' . $this->student->first_name . ' ' . $this->student->last_name . ' from ' . $this->classOldDate . ' to ' . $this->classNewDate)
+            ->line('We are writing to notify you that a class has been rescheduled by student ' . $this->student->first_name . ' ' . $this->student->last_name . ' from ' . $this->classOldDate . ' to ' . $this->classNewDate . '.')
             ->line('Click the button below to check your classes.')
             ->action('Classes', route('classes.index'))
             ->line('If you have any questions, please contact us through the regular channels.');

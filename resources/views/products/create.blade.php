@@ -81,7 +81,7 @@
                                 @endif
                                 <p class="text-gray-500 text-sm font-light">Please select a category for the product</p>
                             </div>
-                            <div class="py-6 space-y-1">
+                            <div class="pt-6 space-y-1">
                                 <p class="font-bold text-gray-600 mb-1">Course</p>
                                 <select name="course_id" id="course_id"
                                     class="w-full rounded-md hover:border-gray-600 p-3 text-gray-600 @if ($errors->has('course_id')) border-red-600 @else border-gray-300 @endif">
@@ -96,6 +96,21 @@
                                     <p class="text-xs font-light text-red-600">{{ $errors->get('course_id')[0] }}</p>
                                 @endif
                                 <p class="text-gray-500 text-sm font-light">Please select a course for the product</p>
+                            </div>
+
+                            <div class="py-6 space-y-1">
+                                <p class="font-bold text-gray-600 mb-1">Status</p>
+                                <select id="status"
+                                    class="w-3/4 px-2 py-2 hover:border-gray-600 text-gray-600  border-gray-300 rounded"
+                                    name="status">
+                                    <option selected disabled hidden required>Status</option>
+                                    <option value="0" selected>Inactive</option>
+                                    <option value="1">Active</option>
+                                </select>
+                                @if ($errors->has('status'))
+                                    <p class="text-xs font-light text-red-600">{{ $errors->get('status')[0] }}</p>
+                                @endif
+                                <p class="text-gray-500 text-sm font-light">Please select a status for the product</p>
                             </div>
                         </div>
                     </div>

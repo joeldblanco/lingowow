@@ -2,7 +2,7 @@
 
 
 
-    <x-modal type="info" name="pricingTableModal">
+    <x-modal type="info" name="pricingTableModal" class="px-4">
         <x-slot name="title">
         </x-slot>
 
@@ -92,13 +92,19 @@
                         </div>
                         <div class="text-center
                                                 mb-8 mt-4">
-                            @if ($product->courses->first()->modality == 'synchronous')
+                            {{-- @if ($product->categories->pluck('name')->contains('Synchronous'))
                                 <button wire:click="store('{{ $plan->monthly_classes / 4 }}', true)"
+                                    class=" @if ($loop->index == 1) select-button @endif inline-block bg-blue-800 text-white px-4 py-2 rounded-lg hover:bg-blue-900 hover:text-white hover:no-underline">Select</button>
+                            @elseif($product->categories->pluck('name')->contains('Test'))
+                                <button wire:click="store(1, true)"
                                     class=" @if ($loop->index == 1) select-button @endif inline-block bg-blue-800 text-white px-4 py-2 rounded-lg hover:bg-blue-900 hover:text-white hover:no-underline">Select</button>
                             @else
                                 <button wire:click="store()"
                                     class=" @if ($loop->index == 1) select-button @endif inline-block bg-blue-800 text-white px-4 py-2 rounded-lg hover:bg-blue-900 hover:text-white hover:no-underline">Select</button>
-                            @endif
+                            @endif --}}
+
+                            <button wire:click="store({{ $product->id }}, {{ $plan->id }})"
+                                class=" @if ($loop->index == 1) select-button @endif inline-block bg-blue-800 text-white px-4 py-2 rounded-lg hover:bg-blue-900 hover:text-white hover:no-underline">Select</button>
 
                         </div>
                     </div>

@@ -34,7 +34,7 @@
                                     <option selected disabled hidden required>Unit</option>
                                     @foreach ($courses as $course)
                                         <option class="font-bold text-gray-400" disabled>{{ $course->name }}</option>
-                                        @foreach ($course->modules as $module)
+                                        @foreach ($modules->where('course_id', $course->id) as $module)
                                             <option class="font-bold text-gray-400" disabled>-{{ $module->name }}
                                             </option>
                                             @foreach ($module->units->nth(2, 1) as $unit)
