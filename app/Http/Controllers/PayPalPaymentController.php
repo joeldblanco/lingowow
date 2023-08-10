@@ -124,7 +124,7 @@ class PayPalPaymentController extends Controller
 
                 Cart::destroy();
 
-                return redirect()->route('invoice.show', ['id' => $invoice_id]);
+                return redirect()->route('invoices.show', ['id' => $invoice_id]);
             } else {
                 session()->put(['code' => 'danger', 'message' => "Error processing PayPal payment for Order $invoice->id!"]);
             }

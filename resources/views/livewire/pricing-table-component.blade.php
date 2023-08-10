@@ -59,7 +59,6 @@
                                 </div>
                             @endforeach
                         </div>
-                        {{-- {{dd($product->sale_price)}} --}}
                         <div class="w-full text-center px-8 pt-8 text-xl mt-auto flex-col flex">
                             @if ($product->categories->pluck('name')->contains('Synchronous'))
                                 @if ($product->sale_price == null)

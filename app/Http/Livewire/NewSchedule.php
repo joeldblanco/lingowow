@@ -15,10 +15,7 @@ use App\Models\ScheduleReserve;
 use App\Models\User;
 use App\Notifications\ClassRescheduledToStudent;
 use App\Notifications\ClassRescheduledToTeacher;
-use App\Notifications\ExamScheduledToStudent;
-use App\Notifications\ExamScheduledToTeacher;
 use Carbon\Carbon;
-use DateTimeZone;
 use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 use Illuminate\Http\Request;
@@ -669,9 +666,16 @@ class NewSchedule extends Component
 
                 break;
             case 'examSelection':
+
                 if ($this->limit == count($data[1])) {
                     // Get exam date & time
                     $examDate = array_merge(...$data[1]);
+
+                    if (isset($this->data['manualEnrolment']) && $this->data['manualEnrolment'] == true) {
+                        $user = User::find(session('student_id'));
+                    } else {
+                        $user = auth()->user();
+                    }
 
                     if (!empty($examDate)) {
 
@@ -680,8 +684,8 @@ class NewSchedule extends Component
                         $datetime2 = $examDate[5] . " " . $examDate[3] . ":00:00";
 
                         // Get exam date & time in UTC
-                        $examDate1 = Carbon::createFromFormat('m/d H:i:s', $datetime1, auth()->user()->timezone)->timezone('UTC');
-                        $examDate2 = Carbon::createFromFormat('m/d H:i:s', $datetime2, auth()->user()->timezone)->timezone('UTC');
+                        $examDate1 = Carbon::createFromFormat('m/d H:i:s', $datetime1, $user->timezone)->timezone('UTC');
+                        $examDate2 = Carbon::createFromFormat('m/d H:i:s', $datetime2, $user->timezone)->timezone('UTC');
                         session(['examDate1' => [$examDate1->toDateTimeString()]]);
                         session(['examDate2' => [$examDate2->toDateTimeString()]]);
 
@@ -696,9 +700,23 @@ class NewSchedule extends Component
                             ShopController::saveScheduleReserve($examDate1, "exam");
                             ShopController::saveScheduleReserve($examDate2, "exam");
 
-                            $product_id = Product::where('name', 'Placement Test')->first()->id;
+                            if (isset($this->data['manualEnrolment']) && $this->data['manualEnrolment'] == true) {
+                                $enrolmentId = EnrolmentController::enrolStudent($user->id, session('selected_course'), session('selected_teacher'));
+                                EnrolmentController::createSchedule($enrolmentId, []);
+                                ClassController::bookClasses(session('examDate1'), $enrolmentId);
+                                ClassController::bookClasses(session('examDate2'), $enrolmentId);
 
-                            ShopController::addToCart($product_id);
+                                $invoice_id = ShopController::createInvoice($user);
+                                $invoice = Invoice::find($invoice_id);
+                                $invoice->payment_method = null;
+                                $invoice->paid = 1;
+                                $invoice->save();
+
+                                return redirect()->route("enrolments.index")->with('success', 'User succesfully enroled!');
+                            } else {
+                                $product_id = Product::where('name', 'Placement Test')->first()->id;
+                                ShopController::addToCart($product_id);
+                            }
                         } else {
                             return redirect()->route("shop")->with('error', 'Oops! One or more selected blocks are unavailable.');
                         }

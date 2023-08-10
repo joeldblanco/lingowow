@@ -46,65 +46,6 @@ class CartComponent extends Component
 
     public function paypalCheckout()
     {
-        // $cart = [];
-        // if (Invoice::all()->last() != null) {
-        //     $order_id = Invoice::all()->last()->id + 1;
-        // } else {
-        //     $order_id = 1;
-        // }
-
-        // $items = array();
-
-        // foreach (Cart::content() as $item) {
-        //     array_push($items, ['name'  => $item->name, 'price' => $item->price, 'qty' => $item->qty]);
-        // }
-
-        // $cart['items'] = $items;
-
-        // $cart['invoice_id'] = config('paypal.invoice_prefix') . '_' . $order_id;
-        // $cart['invoice_description'] = "Invoice #$order_id";
-
-        // $total = 0;
-        // foreach ($cart['items'] as $item) {
-        //     $total += $item['price'] * $item['qty'];
-        // }
-        // $cart['total'] = $total;
-
-        // $invoice = new Invoice();
-        // $invoice->title = $cart['invoice_description'];
-        // $invoice->price = $cart['total'];
-        // $invoice->paid = 1;
-        // $invoice->user_id = $this->user->id;
-        // $invoice->save();
-
-        // Mail::to($this->user)->send(new InvoicePaid($invoice));
-
-        // collect($cart['items'])->each(function ($product) use ($invoice) {
-        //     $item = new Item();
-        //     $item->invoice_id = $invoice->id;
-        //     $item->item_name = $product['name'];
-        //     $item->item_price = $product['price'];
-        //     $item->item_qty = $product['qty'];
-
-        //     $item->save();
-        // });
-
-        // Cart::destroy();
-
-
-
-
-
-
-        //MOVED TO SHOPCONTROLLER
-        // dispatch(new StoreSelfEnrolment($this->user));
-
-        // $invoice = Invoice::find(session('invoice_id'));
-        // $invoice->payment_method = 'paypal';
-        // $invoice->save();
-
-        // return redirect()->route('invoice.show', $invoice->id);
-
         ShopController::checkout($this->user, 'paypal');
     }
 

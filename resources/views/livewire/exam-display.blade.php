@@ -1,4 +1,4 @@
-<div class="max-w-7xl mx-auto sm:px-6 lg:px-8 h-full flex flex-col space-y-36" x-data="{ startAttempt: @entangle('startAttempt'), examContent: @entangle('examContent') }" x-cloak>
+<div class="max-w-7xl mx-auto sm:px-6 lg:px-8 h-full flex flex-col space-y-36" x-data="{ startAttempt: @entangle('startAttempt'), examContent: @entangle('examContent'), loadingState: @entangle('loadingState') }" x-cloak>
     <!-- Display the countdown timer in an element -->
     <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 h-screen flex flex-col justify-center items-center"
         x-show="startAttempt">
@@ -148,12 +148,15 @@
                 class="bg-blue-500 rounded-md p-3 text-white text-lg w-1/6">Submit</button>
         </div>
     </div>
+    <div x-show="loadingState">
+        @include('components.loading-state')
+    </div>
     @if (!empty($this->attempt))
         <script>
             function startTimer() {
 
                 // Get attempt's starting date and time
-                var examStartedOn = @json((new Carbon\Carbon($this->attempt->created_at))->toDateTimeString());
+                var examStartedOn = @json((new Carbon\Carbon($this->attempt->created_at))->timezone(auth()->user()->timezone)->toDateTimeString());
 
                 // Set attempt's starting date and time
                 var now = new Date(examStartedOn).getTime();
@@ -161,6 +164,8 @@
                 // Set the date we're counting down to
                 var countDownDate = new Date();
                 countDownDate.setTime(now + (@json($exam->duration) * 60 * 1000));
+
+                console.log(countDownDate);
 
                 // Update the count down every 1 second
                 var x = setInterval(function() {
@@ -177,7 +182,8 @@
                     var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
                     var seconds = Math.floor((distance % (1000 * 60)) / 1000);
 
-                    var format = (minutes < 10 ? '0' : '') + minutes + ':' + (seconds < 10 ? '0' : '') +
+                    var format = (hours < 10 ? '0' : '') + hours + ':' + (minutes < 10 ? '0' : '') + minutes + ':' + (
+                            seconds < 10 ? '0' : '') +
                         seconds;
 
                     // Display the result in the element with id="timer"

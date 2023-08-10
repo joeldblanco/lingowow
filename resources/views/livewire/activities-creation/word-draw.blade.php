@@ -2,8 +2,7 @@
     <form action="" class="form_contact activity-create-form" id="miForm" name="">
         <h2>WORD-DRAGTHEWORD</h2>
         <input id="type" name="type" type="text" value="words" style="display: none;">
-        <input id="mode" name="mode" type="text" value="drag-the-words"
-            style="display: none;">
+        <input id="mode" name="mode" type="text" value="drag-the-words" style="display: none;">
         <div class="user_info">
             <label for="nombreyapellido">Name</label>
             <td><input type="text" name="activity_name" value="nombre de la actividad" /></td>

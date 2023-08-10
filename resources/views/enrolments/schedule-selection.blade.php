@@ -63,9 +63,17 @@
                 @livewire('teachers-carousel', ['available_teachers' => $selected_teacher])
 
                 {{-- @livewire('schedule', ['plan' => $plan, 'user_id' => $student_id, 'mode' => 'edit']) --}}
-                
-                @livewire('new-schedule', ['limit' => (int)$plan, 'users' => $selected_teacher, 'mode' => 'select', 'action' => 'manualEnrolment'])
-
+                @if ($action == 'examSelection')
+                    @livewire('schedule-controller', [
+                        'limit' => 2,
+                        'users' => $selected_teacher,
+                        'action' => 'examSelection',
+                        'data' => ['manualEnrolment' => true],
+                        'week' => App\Http\Controllers\ApportionmentController::getWeekOfPeriod(now()),
+                    ])
+                @else
+                    @livewire('schedule-controller', ['limit' => (int) $plan, 'users' => $selected_teacher, 'action' => $action, 'data' => $data])
+                @endif
             </div>
         </div>
     </div>

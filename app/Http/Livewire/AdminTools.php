@@ -17,6 +17,10 @@ class AdminTools extends Component
     public $message;
     public $unitUsersModal = false;
 
+    protected $rules = [
+        'studentToAssociate' => 'required',
+    ];
+
     public function mount()
     {
         $this->adminTools = [

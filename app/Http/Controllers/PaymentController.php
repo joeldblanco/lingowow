@@ -93,16 +93,15 @@ class PaymentController extends Controller
     public function checkout(Request $request)
     {
         $transactionToken = $request->transactionToken;
+        $approved = false;
 
         if ($transactionToken) {
             $approved = self::requestTransactionAuthorization($transactionToken);
-            // return $approved;
         } else {
             return redirect()->route('cart.index')->with('error', 'No se pudo procesar el pago');
         }
 
         if ($approved) {
-
             $user = auth()->user();
             ShopController::checkout($user, 'niubiz');
         } else {
@@ -134,17 +133,17 @@ class PaymentController extends Controller
         ];
 
         $response = Http::withHeaders($headers)->post($path, $body);
-        return $response;
-        // if ($response->getStatusCode() === 200) {
-        //     return true;
-        //     // $student = auth()->user();
+        // return $response;
+        if ($response->getStatusCode() === 200) {
+            return true;
+            // $student = auth()->user();
 
-        //     // dd(dispatch(new StoreSelfEnrolment($student)));
+            // dd(dispatch(new StoreSelfEnrolment($student)));
 
-        //     // return redirect()->route('invoice.show', ['id' => session('invoice_id')]);
-        // } else {
-        //     return false;
-        // }
+            // return redirect()->route('invoices.show', ['id' => session('invoice_id')]);
+        } else {
+            return false;
+        }
 
         // return redirect()->route('dashboard');
     }
@@ -161,7 +160,7 @@ class PaymentController extends Controller
     {
         $purchaseNumber = session('purchaseNumber');
         $invoice = new Invoice();
-        $invoice->title = "Invoice #" . $purchaseNumber;
+        $invoice->title = "Lingowow Invoice " . Carbon::now()->format('Y F') . " (" . auth()->id() . "-" . $purchaseNumber . ")";
         $invoice->price = Cart::total();
         if ($status == 200) {
             $invoice->paid = 1;

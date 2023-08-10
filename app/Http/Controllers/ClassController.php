@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 // use App\Jobs\StudentClassCheck;
 // use App\Jobs\TeacherClassCheck;
+
+use App\Http\Livewire\ScheduleController;
 use App\Models\Classes;
 use App\Models\Enrolment;
 use App\Models\Schedule;
@@ -232,7 +234,7 @@ class ClassController extends Controller
             $data[0] = (int)$date_local->copy()->subHours($timezone->offsetHours)->hour;
             $data[1] = (int)$date_local->copy()->subHours($timezone->offsetHours)->dayOfWeek;
 
-            $schedules_reserves = ScheduleReserve::schedulesReserves($class->teacher()->id); // Posicion 0 para los horarios normales, Posicion 1 para los horarios de un solo dia.
+            $schedules_reserves = ScheduleController::schedulesReserves($class->teacher()->id); // Posicion 0 para los horarios normales, Posicion 1 para los horarios de un solo dia.
             $teacher = User::find($class->teacher()->id);
             // dd(in_array($data, $schedules_reserves[1]),in_array($data, $schedules_reserves[0]), $schedules_reserves[1], $data);
             if (in_array([$data[0], $data[1]], $teacher->studentsSchedules()) || !in_array([$data[0], $data[1]], $teacher->schedules->first()->selected_schedule) || in_array([$data[0], $data[1]], $schedules_reserves[0]) || in_array($data, $schedules_reserves[1])) {
@@ -384,7 +386,7 @@ class ClassController extends Controller
         foreach ($classDates as $date) {
             $startDateTime = Carbon::parse($date)->toDateTimeString();
             $endDateTime = Carbon::parse($date)->addMinutes(40)->toDateTimeString();
-            Classes::create([
+            $class = Classes::create([
                 'start_date' => $startDateTime,
                 'end_date' => $endDateTime,
                 'enrolment_id' => $enrolment->id,

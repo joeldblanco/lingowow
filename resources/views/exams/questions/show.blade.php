@@ -45,7 +45,7 @@
                                         value="{{ $question->marks }}" required>
                                 </div>
                                 <select id="type" class="w-full px-2 py-2 text-gray-700 bg-gray-200 rounded"
-                                    name="type" disabled>
+                                    name="type">
                                     <option disabled hidden required>Type</option>
                                     <option value="info" @if ($question->type == 'info') selected @endif>Info
                                     </option>
@@ -53,15 +53,19 @@
                                         Multiple choice</option>
                                     <option value="essay" @if ($question->type == 'essay') selected @endif>Essay
                                     </option>
+                                    <option value="speaking" @if ($question->type == 'speaking') selected @endif>Speaking
+                                    </option>
                                 </select>
-                                <select id="type" class="hidden" name="type">
+                                {{-- <select id="type" class="hidden" name="type">
                                     <option value="info" @if ($question->type == 'info') selected @endif>Info
                                     </option>
                                     <option value="multiple-choice" @if ($question->type == 'multiple-choice') selected @endif>
                                         Multiple choice</option>
                                     <option value="essay" @if ($question->type == 'essay') selected @endif>Essay
                                     </option>
-                                </select>
+                                    <option value="speaking" @if ($question->type == 'speaking') selected @endif>Speaking
+                                    </option>
+                                </select> --}}
                                 <textarea id="description" class="w-full px-2 py-2 text-gray-700 bg-gray-200 rounded" placeholder="Description"
                                     style="resize: none" rows="4" name="description" required>{{ $question->description }}</textarea>
                                 @if ($question->type == 'multiple-choice')

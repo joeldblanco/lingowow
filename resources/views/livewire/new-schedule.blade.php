@@ -48,7 +48,6 @@
         </div>
     @endif
 
-
     @if (!empty($week))
         <div class="flex w-full justify-end space-x-4">
             <button wire:click="previousWeek"
@@ -87,7 +86,8 @@
                         @foreach ($days as $key => $day)
                             <td id="{{ $hour }}-{{ $key }}"
                                 @if (!empty($date)) data-date="{{ $date[$key] }}" @endif
-                                class="border h-8 bg-gray-100 selectee @if (in_array([$hour, $key], $schedules)) {{ $classForSelected }} @endif" style="width: 12.5%">
+                                class="border h-8 bg-gray-100 selectee @if (in_array([$hour, $key], $schedules)) {{ $classForSelected }} @endif"
+                                style="width: 12.5%">
 
                                 @php
                                     $count = 0;

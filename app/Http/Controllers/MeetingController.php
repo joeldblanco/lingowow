@@ -249,64 +249,76 @@ class MeetingController extends Controller
 
     public function getRecordings($link = false)
     {
-        // Retrieve the meeting associated with the user's class
-        $meeting = Meeting::find(auth()->user()->studentClasses->pluck('meeting_id'))->first();
 
-        // Generate the URL to retrieve the meeting instances
-        $path = 'past_meetings/' . $meeting->zoom_id() . '/instances';
-        $url = $this->retrieveZoomUrl();
+        $studentMeetings = auth()->user()->studentClasses->whereBetween('start_date', [Carbon::now()->subDays(7), Carbon::now()])->pluck('meeting_id')->unique();
 
-        // Send an HTTP GET request to retrieve the meeting instances
-        $response = Http::withHeaders([
-            'Authorization' => 'Bearer ' . $this->jwt,
-            'Content-Type'  => 'application/json',
-        ])->get($url . $path);
+        foreach ($studentMeetings as $meeting) {
 
-        // Decode the response into an array and extract each meeting instance's UUID
-        $meetingInstances = json_decode($response->getBody(), true);
+            // Retrieve the meeting associated with the user's class
+            $meeting = Meeting::find($meeting);
 
-        // Initialize an array to store all the recordings
-        $allRecordings = [];
+            // Generate the URL to retrieve the meeting instances
+            $path = 'past_meetings/' . $meeting->zoom_id() . '/instances';
+            $url = $this->retrieveZoomUrl();
 
-        // Retrieve the recording details for each meeting instance
-        if (!empty($meetingInstances)) {
-            foreach ($meetingInstances['meetings'] as $meetingInstanceUUID) {
-                // Generate the URL to retrieve the recording details
-                $path = 'meetings/' . $meetingInstanceUUID['uuid'] . '/recordings';
-                $url = $this->retrieveZoomUrl();
+            // Send an HTTP GET request to retrieve the meeting instances
+            $response = Http::withHeaders([
+                'Authorization' => 'Bearer ' . $this->jwt,
+                'Content-Type'  => 'application/json',
+            ])->get($url . $path);
 
-                // Send an HTTP GET request to retrieve the recording details
-                $response = Http::withHeaders([
-                    'Authorization' => 'Bearer ' . $this->jwt,
-                    'Content-Type'  => 'application/json',
-                ])->get($url . $path);
+            // Decode the response into an array and extract each meeting instance's UUID
+            $meetingInstances = json_decode($response->getBody(), true);
 
-                // Decode the response into an array
-                $recordings = json_decode($response->getBody(), true);
-                // If the response is OK (200), extract the necessary information and filter based on the date
-                if (!empty($recordings) && $response->getStatusCode() == 200) {
-                    $password = $recordings["password"];
-                    $recordings = array_filter($recordings["recording_files"], function ($value) {
-                        return Carbon::now()->diffInDays(new Carbon($value["recording_start"])) <= 7;
-                    });
+            // Initialize an array to store all the recordings
+            $allRecordings = [];
 
-                    foreach ($recordings as $key => $value) {
-                        $recordings[$key] = [
-                            "recording_start" => (new Carbon($value["recording_start"]))->toDateTimeString(),
-                            "duration" => (new Carbon($value["recording_start"]))->diffInMinutes($value["recording_end"]),
-                            "play_url" => $value["play_url"],
-                            "download_url" => $value["download_url"],
-                            'password' => $password,
-                            'recording_type' => $value['recording_type'],
-                        ];
+            // Retrieve the recording details for each meeting instance
+            if (!empty($meetingInstances)) {
+
+                foreach ($meetingInstances['meetings'] as $meetingInstanceUUID) {
+                    // Generate the URL to retrieve the recording details
+                    $path = 'meetings/' . urlencode(urlencode($meetingInstanceUUID['uuid'])) . '/recordings';
+                    $url = $this->retrieveZoomUrl();
+
+                    // Send an HTTP GET request to retrieve the recording details
+                    $response = Http::withHeaders([
+                        'Authorization' => 'Bearer ' . $this->jwt,
+                        'Content-Type'  => 'application/json',
+                    ])->get($url . $path);
+
+                    // if ($meetingInstanceUUID['uuid'] == "/1RW4NkCRJqV3T0nSqlxlw==") {
+                    //     dd($response, $url, $path, $meetingInstances, $response->getStatusCode());
+                    // }
+
+                    // Decode the response into an array
+                    $recordings = json_decode($response->getBody(), true);
+
+                    // If the response is OK (200), extract the necessary information and filter based on the date
+                    if (!empty($recordings) && $response->getStatusCode() == 200) {
+                        $password = $recordings["password"];
+                        $recordings = array_filter($recordings["recording_files"], function ($value) {
+                            return Carbon::now()->diffInDays(new Carbon($value["recording_start"])) <= 7;
+                        });
+
+                        foreach ($recordings as $key => $value) {
+                            $recordings[$key] = [
+                                "recording_start" => (new Carbon($value["recording_start"]))->toDateTimeString(),
+                                "duration" => (new Carbon($value["recording_start"]))->diffInMinutes($value["recording_end"]),
+                                "play_url" => $value["play_url"],
+                                "download_url" => $value["download_url"],
+                                'password' => $password,
+                                'recording_type' => $value['recording_type'],
+                            ];
+                        }
+                    } else {
+                        // If the response is not OK, initialize the recordings as an empty array
+                        $recordings = [];
                     }
-                } else {
-                    // If the response is not OK, initialize the recordings as an empty array
-                    $recordings = [];
-                }
 
-                // Add the recordings to the array of all recordings using the recording start date as the key
-                if (!empty($value)) $allRecordings[$value["recording_start"]] = $recordings;
+                    // Add the recordings to the array of all recordings using the recording start date as the key
+                    if (!empty($value) && !empty($recordings)) $allRecordings[$value["recording_end"]] = $recordings;
+                }
             }
         }
 

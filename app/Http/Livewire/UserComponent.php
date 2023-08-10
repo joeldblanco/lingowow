@@ -12,11 +12,12 @@ class UserComponent extends Component
 {
     public $user, $role;
     public $students = [];
+    public $current_user;
+    public $username, $password, $password_confirm, $first_name, $last_name, $email, $user_role;
 
-    public function mount($user, int $role)
+    public function mount($user)
     {
         $this->user = $user;
-        $this->role = $role;
     }
 
     public function editUser($id)
@@ -77,7 +78,7 @@ class UserComponent extends Component
     {
         $user->delete();
 
-        return redirect()->route('users', $this->role);
+        return redirect()->route('users.index');
     }
 
     public function unhide($user)
@@ -85,7 +86,23 @@ class UserComponent extends Component
         $user = User::withTrashed()->find($user);
         $user->restore();
 
-        return redirect()->route('users', $this->role);
+        return redirect()->route('users.index');
+    }
+
+    public function saveUser()
+    {
+        dd($this->user_role);
+        $user = new User();
+        $user->username = $this->username;
+        $user->password = Hash::make($this->password);
+        $user->first_name = $this->first_name;
+        $user->last_name = $this->last_name;
+        $user->email = $this->email;
+        $user->save();
+        $user->assignRole($this->user_role);
+
+        if ($this->user_role == 2 || $this->user_role == 3)
+            GatherController::setGuestsList();
     }
 
     public function render()

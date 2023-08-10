@@ -5,7 +5,6 @@ use App\Http\Controllers\AnalyticsController;
 use App\Http\Controllers\AttemptController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ChatController;
-use App\Http\Controllers\ChatwootController;
 use App\Http\Controllers\ClassController;
 use App\Http\Controllers\ClassroomController;
 use App\Http\Controllers\ContentController;
@@ -15,8 +14,6 @@ use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\SchedulingCalendarController;
-use App\Http\Livewire\CartComponent;
-use App\Invoice;
 use App\Http\Controllers\CourseController;
 use App\Http\Controllers\EnrolmentController;
 use App\Http\Controllers\ExamController;
@@ -32,33 +29,18 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\QuestionController;
 use App\Http\Controllers\UnitController;
 use App\Http\Controllers\UsersController;
-use App\Http\Livewire\Admin\Users\UsersTable;
 use App\Models\User;
-use App\Notifications\BookedClass;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Notification;
 use App\Http\Controllers\MeetingController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\PlanController;
-// use App\Http\Controllers\PaypalController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ShopController;
-use App\Models\Attempt;
-use App\Http\Controllers\UploadImages;
 use App\Http\Controllers\WhatsAppController;
 use App\Http\Livewire\ClassesComponent;
-use App\Http\Livewire\NewSchedule;
-use App\Mail\InvoicePaid;
+use App\Http\Livewire\ScheduleController;
 use App\Models\Classes;
-use App\Models\Enrolment;
-use App\Models\Meeting;
-use App\Models\Post;
-use App\Models\Unit;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Mail;
 use Laravel\Jetstream\Jetstream;
-// use Inertia\Inertia;
 use Illuminate\Support\Str;
 
 
@@ -125,10 +107,6 @@ Route::middleware(['web', 'auth', 'verified', 'impersonate'])->group(function ()
 
         return view('class_recovery', compact('classRecovery'));
     })->name('guidelines-for-class-recovery');
-
-    // Route::get('chatwoot/createContact', [ChatwootController::class, 'createContact']);
-
-
 
     Route::post('/complete-tour', function (Request $request) {
         $query = DB::table('shepherd_users')->insertOrIgnore([
@@ -230,10 +208,10 @@ Route::middleware(['web', 'auth', 'verified', 'impersonate'])->group(function ()
 
     //ROUTES FOR INVOICES//
     Route::middleware(['role:guest|student|admin'])->get('/shop/invoices', [InvoiceController::class, 'index'])->name("invoices");
-    Route::middleware(['role:guest|student|admin'])->get('/shop/invoice/{id}', [InvoiceController::class, 'show'])->name('invoice.show');
-    Route::middleware(['role:admin'])->get('/shop/invoice/{id}/edit', [InvoiceController::class, 'edit'])->name('invoice.edit');
-    Route::middleware(['role:admin'])->patch('/shop/invoice/{id}', [InvoiceController::class, 'update'])->name('invoice.update');
-    Route::middleware(['role:admin'])->delete('/shop/invoice/{id}', [InvoiceController::class, 'destroy'])->name('invoice.destroy');
+    Route::middleware(['role:guest|student|admin'])->get('/shop/invoices/{id}', [InvoiceController::class, 'show'])->name('invoices.show');
+    Route::middleware(['role:admin'])->get('/admin/invoices/{id}/edit', [InvoiceController::class, 'edit'])->name('invoices.edit');
+    Route::middleware(['role:admin'])->patch('/admin/invoices/{id}', [InvoiceController::class, 'update'])->name('invoices.update');
+    Route::middleware(['role:admin'])->delete('/admin/invoices/{id}', [InvoiceController::class, 'destroy'])->name('invoices.destroy');
 
 
 
@@ -310,6 +288,13 @@ Route::middleware(['web', 'auth', 'verified', 'impersonate'])->group(function ()
     Route::middleware(['role:admin'])->group(function () {
 
 
+        Route::get('/analytics/earnings', [AnalyticsController::class, 'earnings2'])->name('analytics.earnings');
+
+
+
+
+        Route::get('/schedule/{enrolmentId}/edit', [ScheduleController::class, 'edit'])->name("schedules.edit");
+
 
 
 
@@ -340,7 +325,7 @@ Route::middleware(['web', 'auth', 'verified', 'impersonate'])->group(function ()
 
 
         //USERS//
-        Route::get('/admin/users/{role}', [UsersController::class, 'index'])->name('users');
+        Route::middleware(['role:admin'])->get('/admin/users', [UsersController::class, 'index'])->name('users.index');
         Route::post('/admin/getUser/', [UsersController::class, 'getUser'])->name('getUser');
 
 
@@ -462,7 +447,7 @@ Route::middleware(['web', 'auth', 'verified', 'impersonate'])->group(function ()
                     $user->assignRole('guest');
                 }
             }
-            return redirect()->route('users', $role_id);
+            return redirect()->route('users.index');
         })->name('reset.user');
 
         //ROUTES FOR GLOBALS//

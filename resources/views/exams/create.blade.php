@@ -37,10 +37,17 @@
                                         @foreach ($modules->where('course_id', $course->id) as $module)
                                             <option class="font-bold text-gray-400" disabled>-{{ $module->name }}
                                             </option>
-                                            @foreach ($module->units->nth(2, 1) as $unit)
-                                                <option value="{{ $unit->id }}">--{{ $unit->name }}
-                                                </option>
-                                            @endforeach
+                                            @if (str_contains($course->name, 'Test') || $course->modality == 'asynchronous')
+                                                @foreach ($module->units as $unit)
+                                                    <option value="{{ $unit->id }}">--{{ $unit->name }}
+                                                    </option>
+                                                @endforeach
+                                            @else
+                                                @foreach ($module->units->nth(2, 1) as $unit)
+                                                    <option value="{{ $unit->id }}">--{{ $unit->name }}
+                                                    </option>
+                                                @endforeach
+                                            @endif
                                         @endforeach
                                         <option disabled></option>
                                     @endforeach

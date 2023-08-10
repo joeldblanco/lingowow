@@ -8,9 +8,9 @@
     @endphp --}}
 
     {{-- STUDENT SELECT --}}
-    @livewire('new-schedule', ['users' => auth()->id(), 'action' => 'studentShow'])
+    @livewire('schedule-controller', ['users' => auth()->id(), 'action' => 'studentShow'])
     
     {{-- TEACHERS SHOW --}}
-    {{-- @livewire('new-schedule', ['users' => auth()->id(), 'mode' => 'show']) --}}
+    {{-- @livewire('schedule-controller', ['users' => auth()->id(), 'mode' => 'show']) --}}
 
 </x-app-layout>

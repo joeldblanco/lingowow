@@ -70,10 +70,12 @@
 
                 @if (App\Models\Course::find($course_id)->categories()->pluck('name')->contains('Test'))
                     @php
-                        $available_teachers = [7];
+                        $available_teachers = App\Models\User::role('teacher')
+                            ->pluck('id')
+                            ->toArray();
                     @endphp
                     @livewire('teachers-carousel', ['available_teachers' => $available_teachers])
-                    @livewire('new-schedule', [
+                    @livewire('schedule-controller', [
                         'limit' => 2,
                         'users' => $available_teachers,
                         'action' => 'examSelection',
@@ -81,9 +83,9 @@
                     ])
                 @else
                     @if (!empty($preselection))
-                        @livewire('new-schedule', ['week' => null, 'users' => auth()->id(), 'action' => 'schedulePreselection', 'limit' => $plan, 'data' => ['product_id' => $product_id]])
+                        @livewire('schedule-controller', ['week' => null, 'users' => auth()->id(), 'action' => 'schedulePreselection', 'limit' => $plan, 'data' => ['product_id' => $product_id]])
                     @else
-                        @livewire('new-schedule', ['week' => null, 'users' => auth()->id(), 'action' => 'scheduleSelection', 'limit' => $plan, 'data' => ['product_id' => $product_id]])
+                        @livewire('schedule-controller', ['week' => null, 'users' => auth()->id(), 'action' => 'scheduleSelection', 'limit' => $plan, 'data' => ['product_id' => $product_id]])
                     @endif
                 @endif
 

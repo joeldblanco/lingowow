@@ -2,7 +2,7 @@
     <div class="bg-white font-sans">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="p-6 sm:px-20 bg-white border-b border-gray-200">
-
+                {{-- {{ dd(App\Models\User::find($attempt->user->id), $attempt->score) }} --}}
                 <table class="text-left w-full border-collapse">
                     <thead>
                         <tr>
@@ -87,7 +87,9 @@
                                             {{ json_decode($question->options, true)['option-text-' . strval($question->answer)] }}
                                         @endif
                                     @endif
-                                    @if (($question->type == 'essay' || $question->type == 'speaking') && !empty($answers->where('question_id', $question->id)->first()))
+                                    @if (
+                                        ($question->type == 'essay' || $question->type == 'speaking') &&
+                                            !empty($answers->where('question_id', $question->id)->first()))
                                         {{ $answers->where('question_id', $question->id)->first()->score }}
                                         @hasanyrole('teacher|admin')
                                             <a
@@ -106,7 +108,7 @@
 
                     </tbody>
                 </table>
-                <p class="pt-4 text-gray-600 uppercase font-bold">Score: {{ $result }}</p>
+                <p class="pt-4 text-gray-600 uppercase font-bold">Score: {{ $attempt->score }}</p>
             </div>
         </div>
     </div>

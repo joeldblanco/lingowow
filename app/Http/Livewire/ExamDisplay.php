@@ -14,6 +14,7 @@ class ExamDisplay extends Component
 {
     public $exam, $question, $total_questions, $index, $answer, $attempt, $startAttempt, $examContent, $essay = [];
     public $answers = [];
+    public $loadingState = false;
     protected $listeners = ['timerExpired' => 'submitExam'];
 
     public function mount($exam, $attempt)
@@ -141,6 +142,8 @@ class ExamDisplay extends Component
     public function submitExam()
     {
         // $this->answers = array_values($this->answers);
+        $this->examContent = false;
+        $this->loadingState = true;
 
         if (!auth()->user()->hasRole('student')) {
             $answersIds = Answer::where('attempt_id', $this->attempt->id)->get()->pluck('id')->toArray();
@@ -148,7 +151,7 @@ class ExamDisplay extends Component
                 $answer->delete();
             });
             $this->attempt->delete();
-            return redirect()->route('exams.show', $this->exam->id);
+            redirect()->route('exams.show', $this->exam->id);
         }
 
         $this->correct();

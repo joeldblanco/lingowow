@@ -40,7 +40,7 @@
                                 </td>
                                 <td class="justify-center md:justify-end md:flex mt-6">
                                     <div class="w-20 h-10">
-                                        <div class="relative flex flex-row w-full h-8">
+                                        <div class="relative flex flex-row w-full h-8 space-x-2">
                                             @if (!$item->options->editable)
                                                 <input type="text" value="{{ $item->qty }}"
                                                     class="w-full font-semibold text-center text-gray-700 bg-gray-200 outline-none focus:outline-none hover:text-black focus:text-black"
@@ -311,7 +311,8 @@
                                     </x-modal>
 
                                 </div>
-                                <div wire:loading wire:target="saveBillingAddress,applyCoupon,removeItem">
+                                <div wire:loading
+                                    wire:target="saveBillingAddress,applyCoupon,removeItem,incrementQtyItem,decrementQtyItem">
                                     @include('components.loading-state')
                                 </div>
                             @else
@@ -322,7 +323,7 @@
                                 <x-niubiz-checkout-button />
 
                                 <x-paypal-checkout-button />
-                                
+
                             @endif
                         </div>
                     </div>

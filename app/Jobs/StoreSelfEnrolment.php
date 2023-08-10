@@ -91,7 +91,7 @@ class StoreSelfEnrolment implements ShouldQueue
             $product = Product::find(session('selected_product'));
             if (!empty($product) && !$product->categories->pluck('name')->contains('Course')) {
                 session()->forget('selected_product');
-                return redirect()->route('invoice.show', ['id' => session('invoice_id')]);
+                return redirect()->route('invoices.show', ['id' => session('invoice_id')]);
             }
         }
 
@@ -131,7 +131,7 @@ class StoreSelfEnrolment implements ShouldQueue
                         $scheduleReservation->delete();
                     }
 
-                    return redirect()->route('invoice.show', $invoice->id);
+                    return redirect()->route('invoices.show', $invoice->id);
                 } else {
                     dd("User has an active enrolment in this course.");
                 }

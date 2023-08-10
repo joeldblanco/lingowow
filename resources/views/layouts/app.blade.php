@@ -115,7 +115,7 @@
         <!-- Page Content -->
         @livewireScripts
 
-        <main class="pb-10 w-full min-h-screen">
+        <main class="max-w-full min-h-screen bg-gray-100 rounded-lg mx-4 my-4 px-20 py-5">
             {{ $slot }}
         </main>
 

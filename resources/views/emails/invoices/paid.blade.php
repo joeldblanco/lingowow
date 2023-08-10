@@ -1,13 +1,9 @@
-@php
-    $title = 'Lingowow Invoice ' . (new Carbon\Carbon($invoice->created_at))->isoFormat('MMM Y') . ' (' . str_pad($invoice->user->id, 6, '0', STR_PAD_LEFT) . ' - ' . str_pad($invoice->id, 9, '0', STR_PAD_LEFT) . ')';
-@endphp
-
 <!DOCTYPE html>
 <html>
 
 <head>
     <meta charset="utf-8" />
-    <title>{{ $title }}</title>
+    <title>{{ $invoice->title }}</title>
 
     <style>
         .invoice-box {
@@ -117,7 +113,7 @@
                             </td>
 
                             <td>
-                                Invoice #: {{ str_pad($invoice->id, 7, '0', STR_PAD_LEFT) }}<br />
+                                Invoice Number: {{ str_pad($invoice->id, 7, '0', STR_PAD_LEFT) }}<br />
                                 Created: {{ (new Carbon\Carbon($invoice->created_at))->isoFormat('LL') }}<br />
                                 Due: {{ (new Carbon\Carbon($invoice->created_at))->isoFormat('LL') }}
                             </td>

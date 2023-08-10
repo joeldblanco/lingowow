@@ -38,7 +38,7 @@
         ],
         [
             'name' => 'Users',
-            'route' => route('users', 4),
+            'route' => route('users.index'),
             'status' => request()->routeIs('users'),
             'parent_link' => request()->is('admin', 'admin/*'),
         ],
@@ -141,10 +141,10 @@
 
 @if ($second_nav)
 
-    <nav x-data="{ open: false }" class="bg-white border-b border-gray-100 shadow">
+    <nav x-data="{ open: false }" class="bg-white border-b border-gray-100 shadow max-w-full">
         <!-- Primary Navigation Menu -->
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
-            <div class="flex justify-between h-16">
+            <div class="flex justify-between h-16 overflow-x-auto overflow-y-hidden shadow-inner">
                 <div class="flex">
                     <!-- Logo -->
                     {{-- <div class="flex-shrink-0 flex items-center">

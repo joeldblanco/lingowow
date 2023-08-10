@@ -85,6 +85,11 @@ class InvoiceController extends Controller
      */
     public function update(Request $request, $id)
     {
+        $request->validate([
+            'invoice_paid' => 'nullable',
+            'payment_method' => 'required|string|in:paypal,niubiz',
+        ]);
+
         if ($request->invoice_paid == 'on') {
             $invoice_paid = 1;
         } elseif ($request->invoice_paid == null) {
@@ -95,6 +100,7 @@ class InvoiceController extends Controller
 
         $invoice = Invoice::find($id);
         $invoice->paid = $invoice_paid;
+        $invoice->payment_method = $request->payment_method;
         $invoice->save();
 
         return redirect()->route('admin.invoices')->with('success', 'Invoice updated successfully.');

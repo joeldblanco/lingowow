@@ -71,7 +71,7 @@ class AttemptController extends Controller
 
         if ($attempt == null) abort(404);
 
-        if (empty($attempt->score)) {
+        if ($attempt->score == null) {
             $request = new Request(['attempt_id' => $attempt->id]);
             $this->correct($request);
         }
@@ -154,6 +154,11 @@ class AttemptController extends Controller
         if (empty($attempt)) abort(404);
 
         $answers = $request->except('_token', 'attempt_id');
+        if (empty($answers)) {
+            foreach ($attempt->answers as $answer) {
+                $answers[$answer->question_id] = $answer->answer;
+            }
+        }
 
         if ($attempt->user_id == auth()->id() || auth()->user()->hasRole('admin') || auth()->user()->hasRole('teacher')) {
 
@@ -168,27 +173,39 @@ class AttemptController extends Controller
                     if ($question->answer == $answers[$question->id]) {
                         $result += $question->marks;
 
-                        Answer::create([
-                            'answer' => $answers[$question->id],
-                            'score' => $question->marks,
-                            'attempt_id' => $attempt->id,
-                            'question_id' => $question->id,
-                        ]);
+                        Answer::updateOrCreate(
+                            [
+                                'attempt_id' => $attempt->id,
+                                'question_id' => $question->id,
+                            ],
+                            [
+                                'answer' => $answers[$question->id],
+                                'score' => $question->marks,
+                            ]
+                        );
                     } else {
-                        Answer::create([
-                            'answer' => $answers[$question->id],
-                            'score' => 0,
-                            'attempt_id' => $attempt->id,
-                            'question_id' => $question->id,
-                        ]);
+                        Answer::updateOrCreate(
+                            [
+                                'attempt_id' => $attempt->id,
+                                'question_id' => $question->id,
+                            ],
+                            [
+                                'answer' => $answers[$question->id],
+                                'score' => 0,
+                            ]
+                        );
                     }
                 } else {
-                    Answer::create([
-                        'answer' => null,
-                        'score' => 0,
-                        'attempt_id' => $attempt->id,
-                        'question_id' => $question->id,
-                    ]);
+                    Answer::updateOrCreate(
+                        [
+                            'attempt_id' => $attempt->id,
+                            'question_id' => $question->id,
+                        ],
+                        [
+                            'answer' => null,
+                            'score' => 0,
+                        ]
+                    );
                 }
             }
 
