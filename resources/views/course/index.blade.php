@@ -17,7 +17,7 @@
                     <div
                         class="flex items-center justify-between mb-10 @if ($loop->first) course-div @endif">
                         <div onclick="location.href='{{ route('courses.show', $course->id) }}';"
-                            class="group flex flex-col bg-gray-100 rounded-lg w-full justify-between shadow-md hover:shadow-xl cursor-pointer items-center pl-5 pt-5 @hasanyrole('guest|teacher|admin') pb-5 pr-5 @endrole">
+                            class="group flex flex-col bg-gray-100 rounded-lg w-full justify-between shadow-md hover:shadow-xl cursor-pointer items-center pl-5 pt-5 @if ($course->categories->pluck('name')->contains('Regular')) @role('student') pb-0 pr-0 @else pb-5 pr-5 @endrole @else pb-5 pr-5 @endif">
                             <div class="flex w-full items-center">
                                 <div class="w-3/12 mr-5">
                                     <div class="rounded-lg h-36"
@@ -45,98 +45,114 @@
                                     <i class="fas fa-chevron-right"></i>
                                 </div>
                             </div>
-                            
-                            @role('student')
-                            @if (!$course->categories->pluck('name')->contains('Conversational'))
-                                <div class="flex w-full" id="chart"></div>
-                                @php
-                                    $user_units = auth()->user()->units;
-                                    if (count($user_units) <= 0) {
-                                        $user_units = 0;
-                                    } else {
-                                        $user_units = auth()
-                                            ->user()
-                                            ->units->last();
-                                    
-                                        $user_units = $user_units
-                                            ->course()
-                                            ->modules->sortBy('order')
-                                            ->where('order', '<=', $user_units->module->order)
-                                            ->pluck('units')
-                                            ->flatten();
-                                    
-                                        $user_units = $user_units->count() - $user_units->where('module_id',auth()->user()->units->last()->module->id)->where('order','>',auth()->user()->units->last()->order)->count();
-                                    }
-                                @endphp
-                                <script>
-                                    var options = {
-                                        series: [{
-                                                name: 'Progress (Units)',
-                                                data: [{{ $user_units }}]
-                                            },
-                                            {
-                                                name: 'Remaining (Units)',
-                                                data: [{{ count($course->units()) - $user_units }}]
-                                            },
-                                        ],
-                                        grid: {
-                                            padding: {
-                                                left: -10,
-                                                right: 80,
-                                                top: 0,
-                                                bottom: 0
-                                            },
-                                        },
-                                        chart: {
-                                            toolbar: {
-                                                show: false
-                                            },
-                                            type: 'bar',
-                                            height: 70,
-                                            stacked: true,
-                                            stackType: "100%",
-                                        },
-                                        plotOptions: {
-                                            bar: {
-                                                borderRadius: 4,
-                                                horizontal: true,
-                                            }
-                                        },
-                                        dataLabels: {
-                                            enabled: false
-                                        },
-                                        legend: {
-                                            show: false,
-                                            position: 'top'
-                                        },
-                                        xaxis: {
-                                            show: false,
-                                            labels: {
-                                                show: false
-                                            },
-                                            categories: ['{{ $course->name }}'],
-                                        },
-                                        yaxis: {
-                                            show: false,
-                                            labels: {
-                                                show: false
-                                            }
-                                        },
-                                    };
 
-                                    var chart = new ApexCharts(document.querySelector("#chart"), options);
-                                    chart.render();
-                                </script>
-                            @endif
+                            @role('student')
+                                @if (!$course->categories->pluck('name')->contains('Conversational'))
+                                    <div class="flex w-full" id="chart"></div>
+                                    @php
+                                        $user_units = auth()->user()->units;
+                                        if (count($user_units) <= 0) {
+                                            $user_units = 0;
+                                        } else {
+                                            $user_units = auth()
+                                                ->user()
+                                                ->units->last();
+                                        
+                                            $user_units = $user_units
+                                                ->course()
+                                                ->modules->sortBy('order')
+                                                ->where('order', '<=', $user_units->module->order)
+                                                ->pluck('units')
+                                                ->flatten();
+                                        
+                                            $user_units =
+                                                $user_units->count() -
+                                                $user_units
+                                                    ->where(
+                                                        'module_id',
+                                                        auth()
+                                                            ->user()
+                                                            ->units->last()->module->id,
+                                                    )
+                                                    ->where(
+                                                        'order',
+                                                        '>',
+                                                        auth()
+                                                            ->user()
+                                                            ->units->last()->order,
+                                                    )
+                                                    ->count();
+                                        }
+                                    @endphp
+                                    <script>
+                                        var options = {
+                                            series: [{
+                                                    name: 'Progress (Units)',
+                                                    data: [{{ $user_units }}]
+                                                },
+                                                {
+                                                    name: 'Remaining (Units)',
+                                                    data: [{{ count($course->units()) - $user_units }}]
+                                                },
+                                            ],
+                                            grid: {
+                                                padding: {
+                                                    left: -10,
+                                                    right: 80,
+                                                    top: 0,
+                                                    bottom: 0
+                                                },
+                                            },
+                                            chart: {
+                                                toolbar: {
+                                                    show: false
+                                                },
+                                                type: 'bar',
+                                                height: 70,
+                                                stacked: true,
+                                                stackType: "100%",
+                                            },
+                                            plotOptions: {
+                                                bar: {
+                                                    borderRadius: 4,
+                                                    horizontal: true,
+                                                }
+                                            },
+                                            dataLabels: {
+                                                enabled: false
+                                            },
+                                            legend: {
+                                                show: false,
+                                                position: 'top'
+                                            },
+                                            xaxis: {
+                                                show: false,
+                                                labels: {
+                                                    show: false
+                                                },
+                                                categories: ['{{ $course->name }}'],
+                                            },
+                                            yaxis: {
+                                                show: false,
+                                                labels: {
+                                                    show: false
+                                                }
+                                            },
+                                        };
+
+                                        var chart = new ApexCharts(document.querySelector("#chart"), options);
+                                        chart.render();
+                                    </script>
+                                @endif
                             @endrole
                         </div>
                         @role('admin')
-                        <div onclick="location.href='{{ route('courses.details', $course->id) }}';"
-                            class="flex justify-center text-3xl text-gray-400 hover:text-gray-600 cursor-pointer mx-6">
-                            <i class="fas fa-info-circle mx-auto"></i>
-                        </div>
-                    @endrole
-                </div>
+                            <div onclick="location.href='{{ route('courses.details', $course->id) }}';"
+                                class="flex justify-center text-3xl text-gray-400 hover:text-gray-600 cursor-pointer mx-6">
+                                <i class="fas fa-info-circle mx-auto"></i>
+                            </div>
+                        @endrole
+                    </div>
                 @empty
                     <div class="flex justify-center items-center">
                         <h1 class="text-2xl text-gray-500">You are not enroled in any course.</h1>

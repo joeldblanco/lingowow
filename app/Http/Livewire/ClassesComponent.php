@@ -94,6 +94,12 @@ class ClassesComponent extends Component
     //     }
     // }
 
+    public function gotoPage($page)
+    {
+        $this->page = $page;
+        $this->render();
+    }
+
     public function updatingSearch()
     {
         $this->resetPage();

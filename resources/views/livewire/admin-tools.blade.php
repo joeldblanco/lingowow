@@ -115,7 +115,8 @@
                         {{-- <option value="" class="text-gray-500 font-bold uppercase" disabled selected>
                             Select a Student</option> --}}
                         @foreach ($students as $student)
-                            <option value="{{ $student->id }}" selected>{{ $student->first_name }} {{ $student->last_name }}
+                            <option value="{{ $student->id }}" selected>{{ $student->first_name }}
+                                {{ $student->last_name }}
                             </option>
                         @endforeach
                     </select>
@@ -132,7 +133,10 @@
                                 <option value="" class="text-gray-400 uppercase" disabled>-
                                     {{ $module->name }}</option>
                                 @forelse($module->units->sortBy('order') as $unit)
-                                    @if ($loop->even)
+                                    @if (
+                                        $loop->even ||
+                                            $course->categories()->pluck('name')->contains('Test') ||
+                                            $course->modality == 'asynchronous')
                                         <option value="{{ $unit->id }}" selected>--- {{ $unit->name }}</option>
                                     @endif
                                 @empty

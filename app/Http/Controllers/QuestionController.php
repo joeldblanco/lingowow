@@ -42,12 +42,11 @@ class QuestionController extends Controller
             $request->validate([
                 'exam_id' => 'required|numeric|exists:App\Models\Exam,id',
                 'title' => 'string|max:255',
-                'description' => 'string',
+                'description' => 'string|required',
                 // 'type' => 'required',
                 'marks' => 'required|min:0|max:100',
                 'options' => 'array',
                 'file' => 'file|mimes:mp3,jpg,png|max:10000',
-                'description' => 'required',
             ]);
 
             if ($request->input('type') == "multiple-choice") {
@@ -218,7 +217,7 @@ class QuestionController extends Controller
             $request->validate([
                 'title' => 'string|max:255',
                 'description' => 'string|max:255',
-                // 'type' => 'required',
+                'type' => 'required',
                 'marks' => 'required|min:0|max:100',
                 'options' => 'array',
                 'file' => 'file|mimes:mp3,jpg,png|max:10000',

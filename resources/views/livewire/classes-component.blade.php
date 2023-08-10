@@ -1,185 +1,120 @@
-<div x-data="{ showCommentsModal: false, classDetails: @entangle('classDetails') }" id="classes_main" class="px-20 pt-10">
-    <div class="flex justify-between w-full my-4">
-        {{-- <form action="{{ route('classes.index') }}"> --}}
-        <div class="flex space-x-4 range-date-tour">
-            <div>
-                <label class="block text-gray-700 text-sm font-bold mb-2" for="start_date">
-                    Start Date
-                </label>
+<div class="bg-white rounded-lg" x-data="{ showCommentsModal: false, classDetails: @entangle('classDetails') }" id="classes_main">
+
+    <div class="flex flex-col justify-center w-full items-left border-b border-gray-300 space-y-4 p-6">
+        <p class="text-xl font-bold w-full text-left">Classes</p>
+        <div class="flex justify-between w-full">
+            <div class="flex space-x-4 range-date-tour text-sm w-full">
                 <input autocomplete="off" wire:model.lazy="start_date" type="text" id="start_date" name="start_date"
-                    class="text-gray-500 border-gray-300 rounded-lg hover:border-gray-400">
-            </div>
-            <div>
-                <label class="block text-gray-700 text-sm font-bold mb-2" for="end_date">
-                    End Date
-                </label>
+                    class="w-1/6 text-gray-500 border-gray-300 rounded-lg hover:border-gray-400 text-sm w-auto">
                 <input autocomplete="off" wire:model.lazy="end_date" type="text" id="end_date" name="end_date"
-                    class="text-gray-500 border-gray-300 rounded-lg hover:border-gray-400">
-            </div>
-            @role('admin')
-                {{-- <div>
-                    <label class="block text-gray-700 text-sm font-bold mb-2" for="end_date">
-                        Enrolment ID
-                    </label>
-                    <input autocomplete="off" wire:model.lazy="enrolment_id" type="number"
-                        class="text-gray-500 border-gray-300 rounded-lg hover:border-gray-400">
-                </div> --}}
-                <div class="search-container">
-                    <label class="block text-gray-700 text-sm font-bold mb-2" for="">
-                        Search by name
-                    </label>
-                    <input wire:model="search" placeholder="Search..." type="text"
-                        class="input-search-name text-gray-500 border-gray-300 rounded-lg hover:border-gray-400">
+                    class="w-1/6 text-gray-500 border-gray-300 rounded-lg hover:border-gray-400 text-sm w-auto">
+                @role('admin')
+                    <input wire:model="search" placeholder="Search by user..." type="text"
+                        class="w-1/6 input-search-name text-gray-500 border-gray-300 rounded-lg hover:border-gray-400 text-sm">
                     @if ($search)
                         <button class="reset-btn" wire:click="$set('search', '')">
                             <i class="fas fa-times"></i>
                         </button>
                     @endif
-                </div>
-                <div class="search-container">
-                    <label class="block text-gray-700 text-sm font-bold mb-2" for="">
-                        Search by course
-                    </label>
-                    <input wire:model="searchCourse" placeholder="Search..." type="text"
-                        class="input-search-name text-gray-500 border-gray-300 rounded-lg hover:border-gray-400">
+                    <input wire:model="searchCourse" placeholder="Search by course..." type="text"
+                        class="w-1/6 input-search-name text-gray-500 border-gray-300 rounded-lg hover:border-gray-400 text-sm">
                     @if ($search)
                         <button class="reset-btn" wire:click="$set('searchCourse', '')">
                             <i class="fas fa-times"></i>
                         </button>
                     @endif
-                </div>
-            @endrole
-        </div>
-        @role('admin')
-            <div class="flex items-end">
-                <a class="bg-blue-700 rounded-md text-white py-2 px-4 hover:bg-blue-800 cursor-pointer"
-                    href="{{ route('classes.create') }}">Create</a>
-            </div>
-        @endrole
-
-        {{-- </form> --}}
-
-    </div>
-    @if (count($classes) > 0)
-        <div class="flex justify-center w-full items-center my-8">
-            <div class="flex flex-col">
-                <p class="text-2xl font-bold w-full text-center">Classes</p>
-                @role('admin')
-                    <p class="text-xl w-full text-center text-gray-600">Classes pending review:
-                        {{ count($to_review_classes) }}/{{ count($total_to_review_classes) }}</p>
                 @endrole
             </div>
-        </div>
-        {{ $classes->links() }}
-        {{-- <form action="{{ route('classes.check') }}" method="POST">
-            @csrf
-            @method('POST') --}}
-        <table class="flex flex-col w-full space-y-5 border border-gray-200 p-5 my-5 rounded-lg">
-            <thead>
-                <tr class="flex text-md justify-around">
-                    @hasanyrole('student|admin')
-                        <th {{-- wire:click="sort('teacher')" --}} class="flex justify-center w-full">Teacher</th>
-                    @endhasanyrole
-                    @hasanyrole('teacher|admin')
-                        <th {{-- wire:click="sort('teacher')" --}} class="flex justify-center w-full">Student</th>
-                    @endhasanyrole
-                    <th class="flex justify-center w-full">Course</th>
-                    <th class="flex justify-center w-full">Class Datetime (Local)</th>
-                    @hasanyrole('teacher|admin')
-                        <th {{-- wire:click="sort('start_date')" --}} class="flex justify-center w-full">Comments</th>
-                    @endhasanyrole
-                    {{-- @hasanyrole('teacher|admin')
-                        <th class="flex items-center w-full flex-col space-y-5">
-                            <p>Teacher check</p>
-                            <input type="checkbox" onchange="selectAllTeacherCheckboxes(this)" />
-                        </th>
-                    @endhasanyrole
-                    @hasanyrole('student|admin')
-                        <th class="flex items-center w-full flex-col space-y-5">
-                            <p>Student check</p>
-                            <input type="checkbox" onchange="selectAllStudentCheckboxes(this)" />
-                        </th>
-                    @endhasanyrole --}}
-                </tr>
-            </thead>
-            <tbody class="space-y-4">
+            @role('admin')
+                <div class="flex items-end">
+                    <a class="bg-blue-800 rounded-md text-white py-2 px-4 hover:bg-blue-900 cursor-pointer"
+                        href="{{ route('classes.create') }}">Create</a>
+                </div>
+            @endrole
 
-                @foreach ($classes as $key => $value)
-                    <tr class="flex justify-around @if (auth()->user()->getRoleNames()[0] == 'admin' && empty($value->rating)) bg-yellow-100 @endif">
-                        @hasanyrole('student|admin')
-                            <td class="flex w-full justify-center">
-                                
-                                @if ($value->teacher() == null)
-                                    {{ dd($value) }}
-                                @endif
-                                
-                                <a href="{{ route('profile.show', $value->teacher()->id) }}"
-                                    class="hover:underline hover:text-blue-500 teacher-tour">{{ $value->teacher()->first_name }}
-                                    {{ $value->teacher()->last_name }}</a>
-                            </td>
-                        @endhasanyrole
-                        @hasanyrole('teacher|admin')
-                            <td class="flex w-full justify-center">
-                                <a href="{{ route('profile.show', $value->student()->id) }}"
-                                    class="hover:underline hover:text-blue-500">{{ $value->student()->first_name }}
-                                    {{ $value->student()->last_name }}</a>
-                            </td>
-                        @endhasanyrole
-                        <td class="flex w-full justify-center text-center">
-                            <a href="{{ route('courses.show', $value->enrolment->course->id) }}"
-                                class="hover:underline hover:text-blue-500">
-                                {{ $value->enrolment->course->name }}</a>
+        </div>
+    </div>
+    <table class="flex flex-col w-full">
+        <thead>
+            <tr class="text-md py-3 px-6 flex justify-between">
+                @hasanyrole('student|admin')
+                    <th class="text-left w-full">Teacher</th>
+                @endhasanyrole
+                @hasanyrole('teacher|admin')
+                    <th class="text-left w-full">Student</th>
+                @endhasanyrole
+                <th class="text-left w-full">Course</th>
+                <th class="text-left w-full">Class Datetime (Local)</th>
+                @hasanyrole('teacher|admin')
+                    <th class="text-right w-1/3 justify-center">Comments</th>
+                @endhasanyrole
+            </tr>
+        </thead>
+        <tbody>
+            @forelse ($classes as $key => $value)
+                <tr
+                    class="flex justify-between py-3 border-t @if ($loop->last) border-b @endif border-gray-200 py-3 px-6">
+                    @hasanyrole('student|admin')
+                        <td class="flex w-full text-left">
+
+                            @if ($value->teacher() == null)
+                                {{ dd($value) }}
+                            @endif
+
+                            <a href="{{ route('profile.show', $value->teacher()->id) }}"
+                                class="hover:underline hover:text-blue-500 teacher-tour capitalize">{{ $value->teacher()->first_name }}
+                                {{ $value->teacher()->last_name }}</a>
                         </td>
-                        @php
-                            $lesson_date = (new Carbon\Carbon($value->start_date))->setTimezone(auth()->user()->timezone);
-                        @endphp
-                        @if ($lesson_date->lt(Carbon\Carbon::now(auth()->user()->timezone)))
-                            <td class="flex w-full justify-center text-red-500 cursor-pointer hover:underline class-tour"
-                                wire:click="showClass({{ $value->id }})">
-                                {{ $lesson_date->format('d/m/Y - h:00 a') }}
-                            </td>
-                        @else
-                            <td class="flex w-full justify-center text-green-500 cursor-pointer hover:underline class-tour"
-                                wire:click="showClass({{ $value->id }})">
-                                {{ $lesson_date->format('d/m/Y - h:00 a') }}
-                            </td>
-                        @endif
-                        @hasanyrole('teacher|admin')
-                            <td class="flex w-full justify-center">
-                                <button type="button" wire:click="loadComment({{ $value->id }})"
-                                    @click="showCommentsModal = true">
-                                    <i class="fas fa-edit text-gray-600"></i>
-                                </button>
-                            </td>
-                        @endhasanyrole
-                        {{-- @hasanyrole('teacher|admin')
-                            <td class="flex w-full justify-center">
-                                <input type='hidden' value='0' name='teacher_{{ $value->id }}'>
-                                <input type="checkbox" class="teacher_checkbox" name="teacher_{{ $value->id }}"
-                                    @if ($value->teacher_check) checked @endif />
-                            </td>
-                        @endhasanyrole
-                        @hasanyrole('student|admin')
-                            <td class="flex w-full justify-center">
-                                <input type='hidden' value='0' name='student_{{ $value->id }}'>
-                                <input type="checkbox" class="student_checkbox" name="student_{{ $value->id }}"
-                                    @if ($value->student_check) checked @endif />
-                            </td>
-                        @endhasanyrole --}}
-                    </tr>
-                @endforeach
-            </tbody>
-        </table>
-        {{-- <div class="flex justify-end">
-                <button type="submit" class="bg-lw-blue py-2 px-4 text-white rounded-md hover:bg-blue-800">
-                    Check/Uncheck
-                </button>
-            </div> --}}
-        {{-- </form> --}}
-    @else
-        <p class="text-2xl font-bold w-full text-center">There are no classes</p>
-    @endif
-    <div wire:loading wire:target="clearComment,saveComment,showClass,loadComment">
+                    @endhasanyrole
+                    @hasanyrole('teacher|admin')
+                        <td class="flex w-full text-left">
+                            <a href="{{ route('profile.show', $value->student()->id) }}"
+                                class="hover:underline hover:text-blue-500 capitalize">{{ $value->student()->first_name }}
+                                {{ $value->student()->last_name }}</a>
+                        </td>
+                    @endhasanyrole
+                    <td class="flex w-full text-left">
+                        <a href="{{ route('courses.show', $value->enrolment->course->id) }}"
+                            class="hover:underline hover:text-blue-500 capitalize">
+                            {{ $value->enrolment->course->name }}</a>
+                    </td>
+                    @php
+                        $lesson_date = (new Carbon\Carbon($value->start_date))->setTimezone(auth()->user()->timezone);
+                    @endphp
+                    @if ($lesson_date->lt(Carbon\Carbon::now(auth()->user()->timezone)))
+                        <td class="flex w-full text-left text-red-500 cursor-pointer hover:underline class-tour"
+                            wire:click="showClass({{ $value->id }})">
+                            {{ $lesson_date->format('d/m/Y - h:00 a') }}
+                        </td>
+                    @else
+                        <td class="flex w-full text-left text-green-500 cursor-pointer hover:underline class-tour"
+                            wire:click="showClass({{ $value->id }})">
+                            {{ $lesson_date->format('d/m/Y - h:00 a') }}
+                        </td>
+                    @endif
+                    @hasanyrole('teacher|admin')
+                        <td class="flex w-1/3 justify-center">
+                            <button type="button" wire:click="loadComment({{ $value->id }})"
+                                @click="showCommentsModal = true">
+                                <i class="fas fa-edit text-gray-600"></i>
+                            </button>
+                        </td>
+                    @endhasanyrole
+                </tr>
+            @empty
+                <tr class="flex justify-center p-6 border-t border-gray-200 w-full text-gray-600">
+                    <td colspan="5">
+                        <p class="text-3xl font-bold w-full text-center">There are no classes</p>
+                    </td>
+                </tr>
+            @endforelse
+        </tbody>
+    </table>
+    <div class="px-4 py-8">
+        {{ $classes->links('vendor.pagination.berrydashboard-livewire') }}
+    </div>
+
+    <div wire:loading wire:target="clearComment,saveComment,showClass,loadComment,nextPage,previousPage,setPage">
         @include('components.loading-state')
     </div>
 
@@ -201,21 +136,6 @@
                 <p><span class="font-bold">Student:</span> {{ $current_class_student->first_name }}
                     {{ $current_class_student->last_name }}</p>
                 <p><span class="font-bold">Class Date:</span> {{ $current_class->start_date }}</p>
-                {{-- <p><span class="font-bold">Did the professor teach the class?</span>
-                    @if ($current_class->teacher_check == 0)
-                        No
-                    @else
-                        Yes
-                    @endif
-                </p> --}}
-                {{-- <p><span class="font-bold">Did the student receive the class?</span>
-                    @if (empty($current_class->rating))
-                        No
-                    @else
-                        Yes
-                    @endif
-                </p> --}}
-                {{-- <p><span class="font-bold">Recording:</span> {{App\Http\Controllers\ClassController::getRecordingUrl($current_class)}}</p> --}}
             @endif
         </x-slot>
 
@@ -260,7 +180,7 @@
         </x-slot>
     </x-modal>
 
-    <x-modal type="info" name="showCommentsModal">
+    <x-modal type="info" name="showCommentsModal" class="w-1/2 mx-auto p-4">
         <x-slot name="title">
             Comment
         </x-slot>
@@ -285,7 +205,7 @@
             <div>
                 @foreach ($comments as $comment)
                     <div class="flex space-x-3 p-4">
-                        <img class="rounded-full w-10 h-10"
+                        <img class="rounded-full w-10 h-10 object-cover"
                             src="{{ Storage::url($comment->author->profile_photo_path) }}" alt="profile_picture">
                         <div class="flex flex-col items-start w-full">
                             <p class="font-bold text-sm mb-2">{{ $comment->author->first_name }}
@@ -301,52 +221,8 @@
         </x-slot>
     </x-modal>
 
-    {{-- @if (!Auth::user()->isImpersonated()) --}}
-    {{-- @role('student')
-            <livewire:rating-form />
-        @endrole --}}
-    {{-- @endif --}}
     @role('student')
         <x-shepherd-tour tourName="students/classes-tour" role="student" />
     @endrole
-    {{-- <script>
-        function selectAllTeacherCheckboxes(source) {
-            checkboxes = document.getElementsByClassName('teacher_checkbox');
-            for (var i in checkboxes)
-                checkboxes[i].checked = source.checked;
-        }
-
-        function selectAllStudentCheckboxes(source) {
-            checkboxes = document.getElementsByClassName('student_checkbox');
-            for (var i in checkboxes)
-                checkboxes[i].checked = source.checked;
-        }
-        
-        // $(function() {
-        //     $("#start_date").datepicker({
-        //         altField: "#start_date",
-        //         altFormat: "yy-mm-dd"
-        //     });
-        //     $("#end_date").datepicker({
-        //         altField: "#end_date",
-        //         altFormat: "yy-mm-dd"
-        //     });
-        // });
-    </script>
-
-    {{-- <script src="{{ asset('js/jquery.datetimepicker.full.min.js') }}"></script> --}}
-
-    {{-- @php
-        $tourReschedulingButton = DB::table('shepherd_users')
-            ->where('user_id', auth()->id())
-            ->where('tour_name', 'students/rescheduling-button')
-            ->first();
-        // dd($tourRescheduling);
-    @endphp
-    @if ($tourReschedulingButton == null)
-        @role('student')
-            <x-shepherd-tour tourName="students/rescheduling-button" role="student" />
-        @endrole
-    @endif --}}
 
 </div>

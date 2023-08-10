@@ -14,10 +14,10 @@ class UsersController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index($role)
+    public function index()
     {
-        $users = User::withTrashed()->role($role)->orderBy('first_name')->paginate(20);
-        return view('admin.users.index', compact('users', 'role'));
+        $users = User::withTrashed()->orderBy('first_name')->paginate(20);
+        return view('admin.users.index', compact('users'));
     }
 
     /**
@@ -27,7 +27,7 @@ class UsersController extends Controller
      */
     public function create()
     {
-        //
+        return view('admin.users.create');
     }
 
     /**

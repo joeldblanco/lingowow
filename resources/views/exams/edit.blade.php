@@ -38,21 +38,40 @@
                                         <label for="passing_marks" class="text-sm">Min Score</label>
                                         <input type="number" name="passing_marks" id="passing_marks"
                                             value="{{ $exam->passing_marks }}"
-                                            class="w-1/4 px-2 py-2 text-gray-700 bg-gray-200 rounded" placeholder="0"
-                                            min="0" max="100" required>
+                                            class="w-1/4 px-2 py-2 text-gray-700 bg-gray-200 rounded @if ($errors->has('passing_marks')) border-red-600 @else border-gray-300 @endif"
+                                            placeholder="0" min="0" max="100" required>
+                                        @if ($errors->has('passing_marks'))
+                                            <p class="text-xs font-light text-red-600">
+                                                {{ $errors->get('passing_marks')[0] }}</p>
+                                        @endif
                                     </div>
                                     <div class="flex flex-col">
                                         <label for="total_marks" class="text-sm">Max Score</label>
                                         <input type="number" name="total_marks" id="total_marks"
                                             value="{{ $exam->total_marks }}"
-                                            class="w-1/4 px-2 py-2 text-gray-700 bg-gray-200 rounded" placeholder="0"
-                                            min="0" max="100" required>
+                                            class="w-1/4 px-2 py-2 text-gray-700 bg-gray-200 rounded @if ($errors->has('total_marks')) border-red-600 @else border-gray-300 @endif"
+                                            placeholder="0" min="0" max="100" required>
+                                        @if ($errors->has('total_marks'))
+                                            <p class="text-xs font-light text-red-600">
+                                                {{ $errors->get('total_marks')[0] }}</p>
+                                        @endif
                                     </div>
-                                    <input type="text" class="w-full px-2 py-2 text-gray-700 bg-gray-200 rounded"
+                                    <input type="text"
+                                        class="w-full px-2 py-2 text-gray-700 bg-gray-200 rounded @if ($errors->has('title')) border-red-600 @else border-gray-300 @endif"
                                         value="{{ $exam->title }}" name="title" placeholder="Title">
-                                    <textarea name="description" class="w-full px-2 py-2 text-gray-700 bg-gray-200 rounded" id="" cols="30"
-                                        rows="10" placeholder="Description">{{ $exam->description }}</textarea>
-                                    <select id="unit_id" class="w-3/4 px-2 py-2 text-gray-700 bg-gray-200 rounded"
+                                    @if ($errors->has('title'))
+                                        <p class="text-xs font-light text-red-600">
+                                            {{ $errors->get('title')[0] }}</p>
+                                    @endif
+                                    <textarea name="description"
+                                        class="w-full px-2 py-2 text-gray-700 bg-gray-200 rounded @if ($errors->has('description')) border-red-600 @else border-gray-300 @endif"
+                                        id="" cols="30" rows="10" placeholder="Description">{{ $exam->description }}</textarea>
+                                    @if ($errors->has('description'))
+                                        <p class="text-xs font-light text-red-600">
+                                            {{ $errors->get('description')[0] }}</p>
+                                    @endif
+                                    <select id="unit_id"
+                                        class="w-3/4 px-2 py-2 text-gray-700 bg-gray-200 rounded @if ($errors->has('unit_id')) border-red-600 @else border-gray-300 @endif"
                                         name="unit_id">
                                         <option selected disabled hidden required>Unit</option>
                                         @foreach ($courses as $course)
@@ -72,12 +91,20 @@
                                             <option disabled></option>
                                         @endforeach
                                     </select>
+                                    @if ($errors->has('unit_id'))
+                                        <p class="text-xs font-light text-red-600">
+                                            {{ $errors->get('unit_id')[0] }}</p>
+                                    @endif
                                     <div class="flex flex-col">
                                         <label for="duration" class="text-sm">Duration (min)</label>
                                         <input type="number" name="duration" id="duration"
                                             value="{{ $exam->duration }}"
-                                            class="w-1/4 px-2 py-2 text-gray-700 bg-gray-200 rounded" placeholder="0"
-                                            min="0" max="100" required>
+                                            class="w-1/4 px-2 py-2 text-gray-700 bg-gray-200 rounded @if ($errors->has('duration')) border-red-600 @else border-gray-300 @endif"
+                                            placeholder="0" min="0" max="100" required>
+                                        @if ($errors->has('duration'))
+                                            <p class="text-xs font-light text-red-600">
+                                                {{ $errors->get('duration')[0] }}</p>
+                                        @endif
                                     </div>
                                     <select id="status" class="w-3/4 px-2 py-2 text-gray-700 bg-gray-200 rounded"
                                         name="status">
@@ -104,7 +131,8 @@
                 <div class="fixed inset-0 w-full h-full z-20 bg-black bg-opacity-50 duration-300 overflow-y-auto"
                     x-transition:enter="transition duration-300" x-transition:enter-start="opacity-0"
                     x-transition:enter-end="opacity-100" x-transition:leave="transition duration-300"
-                    x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0" x-show="create_question">
+                    x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
+                    x-show="create_question">
                     <form action="{{ route('questions.store', ['exam_id' => $exam->id]) }}"
                         enctype="multipart/form-data" method="POST" id="exam-form">
                         <div class="w-full h-full flex items-center justify-center">
@@ -120,8 +148,12 @@
                                     <div class="flex flex-col">
                                         <label for="marks" class="text-sm">Question Value</label>
                                         <input type="number" name="marks" id="marks" value="marks"
-                                            class="w-3/12 px-2 py-2 text-gray-700 bg-gray-200 rounded" placeholder="0"
-                                            min="0" max="100" required>
+                                            class="w-3/12 px-2 py-2 text-gray-700 bg-gray-200 rounded @if ($errors->has('marks')) border-red-600 @else border-gray-300 @endif"
+                                            placeholder="0" min="0" max="100" required>
+                                        @if ($errors->has('marks'))
+                                            <p class="text-xs font-light text-red-600">
+                                                {{ $errors->get('marks')[0] }}</p>
+                                        @endif
                                     </div>
                                     <select id="type" class="w-full px-2 py-2 text-gray-700 bg-gray-200 rounded"
                                         name="type">
@@ -167,11 +199,20 @@
                                     <div class="flex flex-col">
                                         <label for="import-file" class="text-sm">File to import</label>
                                         <input type="file" name="import-file" id="import-file"
-                                            class="px-2 py-2 text-gray-700 bg-gray-200 rounded" required
-                                            accept=".txt">
+                                            class="px-2 py-2 text-gray-700 bg-gray-200 rounded @if ($errors->has('import-file')) border-red-600 @else border-gray-300 @endif"
+                                            required accept=".txt">
+                                        @if ($errors->has('import-file'))
+                                            <p class="text-xs font-light text-red-600">
+                                                {{ $errors->get('import-file')[0] }}</p>
+                                        @endif
                                     </div>
-                                    <input type="text" name="exam_id" id="exam_id" class="hidden"
+                                    <input type="text" name="exam_id" id="exam_id"
+                                        class="hidden @if ($errors->has('exam_id')) border-red-600 @else border-gray-300 @endif"
                                         value="{{ $exam->id }}">
+                                    @if ($errors->has('exam_id'))
+                                        <p class="text-xs font-light text-red-600">
+                                            {{ $errors->get('exam_id')[0] }}</p>
+                                    @endif
                                     <div class="flex pt-4 justify-end">
                                         <button
                                             class="px-4 py-1 text-white font-light tracking-wider bg-gray-900 rounded">Create</button>
@@ -324,7 +365,7 @@
                     option.appendTo('#options')
                 }
 
-            } else if(option == "Info") {
+            } else if (option == "Info") {
                 $('<input>').attr({
                     type: 'file',
                     class: 'w-full px-2 py-2 text-gray-700 bg-gray-200 rounded',

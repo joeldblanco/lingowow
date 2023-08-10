@@ -3,17 +3,21 @@
 namespace App\Console;
 
 use App\Http\Controllers\ApportionmentController;
+use App\Http\Controllers\EnrolmentController;
 use App\Http\Controllers\GatherController;
 use App\Http\Controllers\MeetingController;
 use App\Jobs\CreateClasses;
 use App\Models\Attempt;
 use App\Models\Classes;
+use App\Models\Course;
 use App\Models\Enrolment;
 use App\Models\Schedule as ModelsSchedule;
 use App\Models\ScheduleReserve;
 use App\Models\User;
 use App\Notifications\UpcomingClassForStudent;
 use App\Notifications\UpcomingClassForTeacher;
+use App\Notifications\UpcomingTestForStudent;
+use App\Notifications\UpcomingTestForTeacher;
 use Carbon\Carbon;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
@@ -140,11 +144,19 @@ class Kernel extends ConsoleKernel
 
             foreach ($classes as $class) {
                 if (!$notified_teachers->contains($class->teacher())) {
-                    Notification::sendNow($class->teacher(), new UpcomingClassForTeacher($class));
+                    if (str_contains($class->enrolment->course->name, 'Test')) {
+                        Notification::sendNow($class->teacher(), new UpcomingTestForTeacher($class));
+                    } else {
+                        Notification::sendNow($class->teacher(), new UpcomingClassForTeacher($class));
+                    }
                 }
 
                 if (!$notified_students->contains($class->student())) {
-                    Notification::sendNow($class->student(), new UpcomingClassForStudent($class));
+                    if (str_contains($class->enrolment->course->name, 'Test')) {
+                        Notification::sendNow($class->student(), new UpcomingTestForStudent($class));
+                    } else {
+                        Notification::sendNow($class->student(), new UpcomingClassForStudent($class));
+                    }
                 }
             }
 
@@ -154,18 +166,36 @@ class Kernel extends ConsoleKernel
                 $reserve->delete();
             }
 
-        })->everyMinute();
+            $tests = Course::where('name', 'like', '%test%')->get();
+            foreach ($tests as $test) {
+                $testEnrolments = Enrolment::where('course_id', $test->id)->get();
+                foreach ($testEnrolments as $enrolment) {
+                    $pendingTests = 0;
+                    foreach ($enrolment->classes->pluck('end_date') as $class) {
+                        $carbonDate = Carbon::parse($class);
 
-        $schedule->call(function () {
-            $attempts = Attempt::whereNull('completed_at')->get();
+                        if (now()->lessThan($carbonDate)) {
+                            $pendingTests++;
+                        }
+                    }
 
-            foreach ($attempts as $attempt) {
-                if (now() >= $attempt->created_at->copy()->addMinutes($attempt->duration())) {
-                    $attempt->completed_at = now()->toDateTimeString();
-                    $attempt->save();
+                    if ($pendingTests <= 0) {
+                        (new EnrolmentController)->destroy($enrolment);
+                    }
                 }
             }
         })->everyMinute();
+
+        // $schedule->call(function () {
+        //     $attempts = Attempt::whereNull('completed_at')->get();
+
+        //     foreach ($attempts as $attempt) {
+        //         if (now() >= $attempt->created_at->copy()->addMinutes($attempt->duration())) {
+        //             $attempt->completed_at = now()->toDateTimeString();
+        //             $attempt->save();
+        //         }
+        //     }
+        // })->everyMinute();
     }
 
     /**

@@ -72,7 +72,7 @@ class TeachersCarousel extends Component
         $this->loadingState = true;
         $this->selectedTeacher = $teacher_id;
         session(['teacher_id' => $teacher_id]);
-        session(['user_schedule' => []]); //Para hacer la precarga del scheduling vacia cada vez que se recarga
+        session(['user_schedule' => json_encode([])]); //Para hacer la precarga del scheduling vacia cada vez que se recarga
         $this->emit('loadSelectingSchedule', $teacher_id);
         // }
         // dd($this->emit('loadSchedule', $teacher_id));
@@ -109,6 +109,7 @@ class TeachersCarousel extends Component
 
 
         $this->available_teachers = $this->available_teachers->shuffle();
+
         if (count($this->available_teachers) > 0) {
             session(['first_teacher' => $this->available_teachers[0]->id]);
         } else {

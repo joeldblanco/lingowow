@@ -19,6 +19,29 @@
   --WhidthCardMenu: 100%;
 }
 
+/* width */
+::-webkit-scrollbar {
+  width: 7px;
+  height: 7px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background: transparent;
+  border-radius: 5px;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: rgb(189, 189, 189);
+  border-radius: 5px;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
 
 .selection-areaa {
   background: rgba(46, 115, 252, 0.11);
@@ -153,7 +176,7 @@
 
 /*CLASES PARA EL TOUR EN EL SCHEDULE*/
 
-.border-block-tour{
+.border-block-tour {
   border: 2px solid black;
 }
 
@@ -464,8 +487,9 @@
   transition: 0.5s
 }
 
-.card-menu-selected:hover, .btn-assign-student-selected:hover {
-  cursor:default;
+.card-menu-selected:hover,
+.btn-assign-student-selected:hover {
+  cursor: default;
 }
 
 .card-menu:hover {
@@ -582,6 +606,7 @@
 .author-info a {
   color: white;
 }
+
 /* 
 img {
   object-fit: cover;
@@ -786,7 +811,7 @@ html {
   background: #fc4a1e;
 }
 
-.homeHeigth{
+.homeHeigth {
   /* border: 2px solid black; */
   height: 1000px;
 }
@@ -803,7 +828,7 @@ html {
   position: absolute;
   right: 10px;
   top: 53%;
-  /* transform: translateY(-50%); */
+  transform: translateY(-50%);
   background-color: transparent;
   border: none;
   font-size: 16px;

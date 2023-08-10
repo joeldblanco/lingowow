@@ -218,7 +218,7 @@
                             {{-- @php
                                     dd(now()->dayOfWeek);
                                 @endphp --}}
-                            @livewire('new-schedule', ['limit' => null, 'week' => null, 'users' => auth()->id(), 'action' => 'studentShow'])
+                            @livewire('schedule-controller', ['limit' => null, 'week' => null, 'users' => auth()->id(), 'action' => 'studentShow'])
                             {{-- @livewire('schedule', ['user_id' => auth()->id(), 'mode' => 'show', 'course_id' => $course_id]) --}}
                             {{-- @else --}}
                             {{-- @livewire('schedule', ['user_id' => auth()->id(), 'mode' => 'show', 'course_id' => $course_id]) --}}
@@ -227,7 +227,7 @@
                     @endrole
                     @hasanyrole('teacher')
                         {{-- @if (auth()->id() == 7) --}}
-                        @livewire('new-schedule', ['limit' => null, 'week' => null, 'users' => auth()->id(), 'action' => 'teacherShow'])
+                        @livewire('schedule-controller', ['limit' => null, 'week' => null, 'users' => auth()->id(), 'action' => 'teacherShow'])
                         {{-- @livewire('schedule', ['user_id' => auth()->id(), 'mode' => 'show', 'course_id' => $course_id]) --}}
                         {{-- @endif --}}
                     @endrole
@@ -271,7 +271,7 @@
                                     <tr class="flex">
                                         <td class="flex w-10/12 items-start">
                                             <div class="flex space-x-3">
-                                                <img class="rounded-full w-10 h-10"
+                                                <img class="rounded-full w-10 h-10 object-cover"
                                                     src="{{ Storage::url($student->profile_photo_path) }}"
                                                     alt="profile_picture">
                                                 <div class="flex flex-col items-start text-sm">

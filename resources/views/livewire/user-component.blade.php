@@ -133,9 +133,10 @@
                         $course_id = $course_id->course->id;
                     }
                 @endphp
-                
+
                 {{-- @livewire('schedule', ['user_id' => $user->id, 'mode' => 'show', 'course_id' => $course_id]) --}}
-                <livewire:new-schedule :limit=null :week=null :users="$user->id" :action="'adminShow'" :wire:key="$user->id" />
+                <livewire:schedule-controller :limit=null :week=null :users="$user->id" :action="'adminShow'"
+                    :wire:key="$user->id" />
             </div>
             @if (count($students) > 0)
                 <table class="flex flex-col w-1/2 space-y-5 border border-gray-200 p-5">
@@ -153,7 +154,7 @@
                             <tr class="flex">
                                 <td class="flex w-10/12 items-start">
                                     <div class="flex space-x-3">
-                                        <img class="rounded-full w-10 h-10"
+                                        <img class="rounded-full w-10 h-10 object-cover"
                                             src="{{ Storage::url($student->profile_photo_path) }}"
                                             alt="profile_picture">
                                         <div class="flex flex-col items-start text-sm">

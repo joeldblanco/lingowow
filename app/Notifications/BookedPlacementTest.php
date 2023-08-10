@@ -25,7 +25,7 @@ class BookedPlacementTest extends Notification implements ShouldQueue
     public function __construct($student_id)
     {
         $this->student = User::find($student_id);
-        $examDate = Carbon::parse(session('examDate')[0]);
+        $examDate = Carbon::parse(session('examDate1')[0]);
         $this->schedule_string = 'Placement test booked on ' . $examDate->format('Y/d/m') . ' at ' . $examDate->format('g:i a') . ' UTC.';
     }
 

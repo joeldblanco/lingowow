@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Livewire\NewSchedule;
+use App\Http\Livewire\ScheduleController;
 use App\Jobs\StoreSelfEnrolment;
 use App\Models\Classes;
 use App\Models\Course;
@@ -362,7 +362,7 @@ class SchedulingCalendarController extends Controller
     public function checkForTeachers(Request $request)
     {
         $cells = json_decode($request->data);
-        $cells = NewSchedule::localToUtc($cells);
+        $cells = ScheduleController::localToUtc($cells);
 
         session(['user_schedule' => json_encode($cells)]);
         session(['schedule_reserve' => json_encode($cells)]);
@@ -377,16 +377,16 @@ class SchedulingCalendarController extends Controller
 
         // if ($modality == "exam") {
 
-            //Get all teachers in an array
-            // $teachers = User::role('teacher')->get()->toArray(); //EL ARRAY $teachers DEBERÍA LLENARSE SOLO CON LOS PROFESORES QUE ESTÉN DISPUESTOS A DAR EXÁMENES DE CLASIFICACIÓN
+        //Get all teachers in an array
+        // $teachers = User::role('teacher')->get()->toArray(); //EL ARRAY $teachers DEBERÍA LLENARSE SOLO CON LOS PROFESORES QUE ESTÉN DISPUESTOS A DAR EXÁMENES DE CLASIFICACIÓN
 
-            // $model_roles = DB::table('model_has_roles')->select('role_id', 'model_id')->get();
-            // foreach ($model_roles as $model_role) {
+        // $model_roles = DB::table('model_has_roles')->select('role_id', 'model_id')->get();
+        // foreach ($model_roles as $model_role) {
 
-            //     if ($model_role->role_id == 3) {
-            //         $teachers[] = $model_role->model_id; 
-            //     }
-            // }
+        //     if ($model_role->role_id == 3) {
+        //         $teachers[] = $model_role->model_id; 
+        //     }
+        // }
         // } else {
         //     $teachers[] = session('teacher_id');
         // }
@@ -415,7 +415,7 @@ class SchedulingCalendarController extends Controller
             $scheduleReservation->delete();
         }
 
-        $schedules_reserves = ScheduleReserve::schedulesReserves($teacher->id); // Posicion 0 para los horarios normales, Posicion 1 para los horarios de un solo dia.
+        $schedules_reserves = ScheduleController::schedulesReserves($teacher->id); // Posicion 0 para los horarios normales, Posicion 1 para los horarios de un solo dia.
         $schedule_teacher = $teacher->schedules->first()->selected_schedule;
 
         foreach ($cells as $cell) {
@@ -457,7 +457,7 @@ class SchedulingCalendarController extends Controller
                 $product = $course_product;
                 break;
             }
-            
+
             if (!in_array($student->id, $old_customers) && !str_contains($course_product->slug, 'old')) {
                 $product = $course_product;
                 break;

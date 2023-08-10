@@ -91,10 +91,9 @@ class Schedule extends Component
         $this->user = User::withTrashed()->find($user_id);
         $this->role = $this->user->roles->first()->name;
         $this->plan = $plan;
-        if(auth()->user()->hasRole('admin'))
-        {
+        if (auth()->user()->hasRole('admin')) {
             $this->timezone = auth()->user()->timezone;
-        }else{
+        } else {
             $this->timezone = $this->user->timezone;
         }
 
@@ -153,7 +152,7 @@ class Schedule extends Component
         $this->university_schedule_end = $university_schedule[1];
         $this->university_schedule_hours = $university_schedule[2];
 
-        session(['user_schedule' => []]);
+        session(['user_schedule' => json_encode([])]);
 
         $current_period = DB::table("metadata")->where("key", "current_period")->first()->value;
         $current_period = array_values(json_decode($current_period, 1));

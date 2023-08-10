@@ -10,6 +10,16 @@
         integrity="sha384-B0vP5xmATw1+K9KRQjQERJvTumQW0nPEzvF6L/Z6nronJ3oUOFUFpCjEUQouq2+l" crossorigin="anonymous">
     <link rel="stylesheet" href="{{ asset('css/invoice.css') }}">
 
+    <style>
+        .p-5 {
+            padding: 1.25rem !important;
+        }
+
+        p {
+            margin-bottom: 0 !important;
+        }
+    </style>
+
     <!-- Container -->
     <div class="container-fluid invoice-container">
         <!-- Header -->

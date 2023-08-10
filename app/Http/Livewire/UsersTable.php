@@ -52,7 +52,7 @@ class UsersTable extends Component
     public function selectRole($role)
     {
         // $this->role = $role;
-        redirect()->route('users', $role);
+        redirect()->route('users.index');
     }
 
     public function saveUser()

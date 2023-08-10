@@ -60,6 +60,8 @@ class ProductsCarousel extends Component
             return str_contains($model->slug, 'old');
         });
 
+        // dd($this->course_products->pluck('name'));
+
         return view('livewire.products-carousel');
     }
 }

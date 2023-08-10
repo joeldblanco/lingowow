@@ -22,7 +22,7 @@ class AnalyticsController extends Controller
     public function index()
     {
         $current_period = ApportionmentController::currentPeriod();
-        // $current_period = ApportionmentController::getPeriod('2023-05-04', true); //UNCOMMENT THIS TO CALCULATE THE PAYMENT FOR A SPECIFIC PERIOD 1/3
+        // $current_period = ApportionmentController::getPeriod('2023-06-15', true); //UNCOMMENT THIS TO CALCULATE THE PAYMENT FOR A SPECIFIC PERIOD 1/3
         $invoices = Invoice::where('created_at', '>=', Carbon::parse($current_period[0])->startOfMonth())->where('created_at', '<=', Carbon::parse($current_period[0])->endOfMonth())->get();
         $payment = [];
         $classes = [];
@@ -43,9 +43,8 @@ class AnalyticsController extends Controller
             // $enrolments = Enrolment::withTrashed()->where('teacher_id', $value->id)->get(); //UNCOMMENT THIS TO CALCULATE THE PAYMENT FOR A SPECIFIC PERIOD 2/3
 
             foreach ($enrolments as $enrolment) {
-                $monthly_classes = Classes::where('enrolment_id', $enrolment->id)->whereDate('start_date', '>=', $current_period[0])->whereDate('end_date', '<=', now())->count();
-                // $monthly_classes = Classes::where('enrolment_id', $enrolment->id)->whereDate('start_date', '>=', $current_period[0])->whereDate('end_date', '<=', $current_period[1])->count(); //UNCOMMENT THIS TO CALCULATE THE PAYMENT FOR A SPECIFIC PERIOD 3/3
-
+                $monthly_classes = Classes::where('enrolment_id', $enrolment->id)->where('start_date', '>=', $current_period[0])->where('end_date', '<=', now())->count();
+                // $monthly_classes = Classes::where('enrolment_id', $enrolment->id)->where('start_date', '>=', $current_period[0])->where('end_date', '<=', $current_period[1])->count(); //UNCOMMENT THIS TO CALCULATE THE PAYMENT FOR A SPECIFIC PERIOD 3/3
 
                 $product = Course::find($enrolment->course_id)->products->first();
                 if ($product->sale_price == NULL) {
@@ -66,8 +65,6 @@ class AnalyticsController extends Controller
                     $teacher_payment = $paymentForPlacementTest;
                 }
 
-                // dd($enrolment->id, Classes::where('enrolment_id', $enrolment->id)->whereDate('start_date', '>=', $current_period[0])->whereDate('end_date', '<=', now())->count());
-
                 if ($product->plans->pluck('slug')->contains(function ($slug) {
                     return str_contains($slug, 'single-payment');
                 })) {
@@ -79,8 +76,6 @@ class AnalyticsController extends Controller
                 }
             }
         }
-
-        // dd($current_period[0]);
 
         $total_payment = 0;
         foreach ($classes as $key => $value) {
@@ -161,7 +156,7 @@ class AnalyticsController extends Controller
             'total_exams' => $total_exams,
         ];
 
-        return view('admin.dashboard', compact('data'));
+        return view('admin.dashboard', compact('data',));
     }
 
     /**
@@ -262,6 +257,34 @@ class AnalyticsController extends Controller
         }
 
         return view('admin.analytics.earnings', compact('teachers', 'synchronousCourses', 'courses', 'enrolments', 'allPeriods', 'periodClasses', 'period'));
+    }
+
+    /**
+     * Show the earnings.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function earnings2(Request $request)
+    {
+        $period = $request->period;
+
+        $teachers = User::role('teacher')->orderBy('first_name')->get();
+
+        if (empty($period)) {
+            $period = ApportionmentController::getPeriod(Carbon::now(), true);
+        } else {
+            $period = ApportionmentController::getPeriod($period, true);
+        }
+
+        $classes = [];
+        foreach ($teachers as $teacher)
+            foreach ($teacher->teacherClassesWithTrashedParents->whereBetween('start_date', $period) as $class) {
+                $classes[$class->enrolment_id][] = $class;
+            }
+
+        $groupedClasses = collect($classes);
+
+        return view('admin.analytics.earnings2', compact('groupedClasses', 'period'));
     }
 
     /**

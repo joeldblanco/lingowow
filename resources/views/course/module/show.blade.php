@@ -97,7 +97,7 @@
                                     </div>
                                 @endrole
                             @endif
-                        </div> 
+                        </div>
                         {{-- ->where('status', 1) --}}
                         @if ($unit->exams->where('status', 1)->count() > 0 && $role != 'guest')
                             @php
@@ -126,9 +126,8 @@
                                 </div>
 
 
-                                @if (auth()->user()->hasRole('student'))
-                                    <x-modal type="info" name="examModal_{{ $exam->id }}"
-                                        class="w-6/12 mx-auto">
+                                @hasanyrole('student|teacher')
+                                    <x-modal type="info" name="examModal_{{ $exam->id }}" class="w-6/12 mx-auto">
                                         <x-slot name="title">
                                             @php
                                                 $attempt = $exam->attempts
@@ -180,7 +179,13 @@
                                                     @if (!empty($attempt))
                                                         Continue attempt
                                                     @else
-                                                        Start attempt
+                                                        @role('student')
+                                                            Start attempt
+                                                        @endrole
+
+                                                        @role('teacher')
+                                                            Preview attempt
+                                                        @endrole
                                                     @endif
                                                 </a>
                                                 <button
@@ -190,9 +195,10 @@
                                             </div>
                                         </x-slot>
                                         <x-slot name="footer">
+                                            {{-- <p class="px-5 py-3 italic text-red-500 text-sm">Click "Start Attempt" to preview the exam.</p> --}}
                                         </x-slot>
                                     </x-modal>
-                                @endif
+                                @endhasanyrole
 
                                 @role('admin')
                                     <div onclick="location.href='{{ route('exams.edit', $exam->id) }}';"
@@ -264,7 +270,7 @@
                     </div>
                 @endforelse
 
-                @php
+                {{-- @php
                     $tourReschedulingButton = DB::table('shepherd_users')
                         ->where('user_id', auth()->id())
                         ->where('tour_name', 'teachers/unit_created')
@@ -274,7 +280,7 @@
                     @role('teacher')
                         <x-shepherd-tour tourName="teachers/unit_created" role="teacher" />
                     @endrole
-                @endif
+                @endif --}}
 
             </div>
         </div>

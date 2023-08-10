@@ -30,7 +30,7 @@ class EnrolmentController extends Controller
      */
     public function index()
     {
-        $enrolments = Enrolment::orderBy('updated_at', 'desc')->paginate(50);
+        $enrolments = Enrolment::orderBy('updated_at', 'desc')->paginate(10);
 
         return view('enrolments.index', compact('enrolments'));
     }
@@ -66,6 +66,12 @@ class EnrolmentController extends Controller
         ]);
 
         $course = Course::find($request->course_id);
+        $action = 'manualEnrolment';
+        $data = ['manualEnrolment' =>  true];
+
+        if ($course->categories->pluck('name')->contains("Test")) {
+            $action = 'examSelection';
+        }
 
         if ($course->categories->pluck('name')->contains("Synchronous")) {
 
@@ -82,6 +88,26 @@ class EnrolmentController extends Controller
                 'student_id',
             ]);
 
+            //GETTING IF STUDENT IS ALREADY ENROLLED//
+            $enrolment = Enrolment::where('student_id', $request->student_id)
+                ->where('course_id', $request->course_id)
+                ->first();
+
+            //IF STUDENT IS ALREADY ENROLLED BUT PREENROLMENT IS AVAILABLE CREATE STUDENT'S PREENROLMENT//
+            if ($enrolment && EnrolmentController::isPreenrolmentAvailable($enrolment)) {
+                $action = 'schedulePreselection';
+            }
+
+            //IF STUDENT IS ALREADY ENROLLED BUT PREENROLMENT IS NOT AVAILABLE REDIRECT BACK//
+            if ($enrolment && !EnrolmentController::isPreenrolmentAvailable($enrolment)) {
+                return redirect()->back()->with('error', 'Student is already preenroled in this course.');
+            }
+
+            //IF STUDENT IS ALREADY ENROLLED BUT PREENROLMENT IS AVAILABLE CREATE STUDENT'S PREENROLMENT//
+            if (empty($enrolment)) {
+                $action = 'scheduleSelection';
+            }
+
             if ($request->student_id == null) {
                 EnrolmentController::store($request);
                 return redirect()->route('enrolments.index');
@@ -97,7 +123,7 @@ class EnrolmentController extends Controller
                     'student_id' => $request->student_id,
                 ]);
 
-                return view('enrolments.schedule-selection', compact('student_id', 'selected_teacher', 'plan'));
+                return view('enrolments.schedule-selection', compact('student_id', 'selected_teacher', 'plan', 'action', 'data'));
             }
         }
 
@@ -121,7 +147,7 @@ class EnrolmentController extends Controller
      */
     public function store(Request $request)
     {
-        dd($request);
+        // dd($request);
 
         if (empty($request->get('student_id')) && !empty($request->get('teacher_id'))) {
             Enrolment::withTrashed()->updateOrCreate(
@@ -137,7 +163,7 @@ class EnrolmentController extends Controller
             );
         }
 
-        dd((empty($request->get('student_id')) && !empty($request->get('teacher_id'))), (empty($request->get('teacher_id')) && !empty($request->get('student_id'))));
+        // dd((empty($request->get('student_id')) && !empty($request->get('teacher_id'))), (empty($request->get('teacher_id')) && !empty($request->get('student_id'))));
 
         if (Course::find($request->get('course_id'))->categories->pluck('name')->contains('Conversational') && empty($request->get('student_id')) && !empty($request->get('teacher_id'))) {
             User::find($request->get('teacher_id'))->givePermissionTo('edit conversational courses');
@@ -278,7 +304,7 @@ class EnrolmentController extends Controller
                         $scheduleReservation->delete();
                     }
 
-                    return redirect()->route('invoice.show', $invoice->id);
+                    return redirect()->route('invoices.show', $invoice->id);
                 } else {
                     dd("User has an active enrolment in this course.");
                 }
@@ -381,13 +407,9 @@ class EnrolmentController extends Controller
         if ($course_id == null) {
             $course_id = session("selected_course");
         }
-        // $product = Course::find($course_id)->products->first();
 
         $today = Carbon::now()->setTimezone('UTC');
         $today->addDays(1);
-        // if (auth()->user()->roles[0]->name == 'student' || auth()->user()->roles[0]->name == 'guest') {
-        //     $today->addDays(1);
-        // }
 
         $current_period = ApportionmentController::currentPeriod();
         $next_period = ApportionmentController::nextPeriod();
@@ -397,19 +419,6 @@ class EnrolmentController extends Controller
 
         $next_period_start = new Carbon($next_period[0]);
         $next_period_end = new Carbon($next_period[1]);
-
-
-
-        // $timezone = Carbon::now()->setTimezone($user->timezone);
-        // $schedule_utc = [];
-        // foreach ($schedule as $key => $value) {
-        //     $date = Carbon::now();
-        //     $date_local = Carbon::parse('Next ' . Carbon::now()->setISODate($date->year, $date->weekOfYear, $value[1])->format('l') . ' at ' . $value[0] . ':00');
-        //     $schedule_utc[$key][0] = (int)$date_local->copy()->subHours($timezone->offsetHours)->hour;
-        //     $schedule_utc[$key][1] = (int)$date_local->copy()->subHours($timezone->offsetHours)->dayOfWeek;
-        // }        
-
-
 
         if (empty($preselection)) {
             $qty = 0;
@@ -444,27 +453,15 @@ class EnrolmentController extends Controller
                             $date->second = 0;
                             array_push($days, $date->toDateTimeString());
                         }
-                        // if($date->isDayOfWeek($day)) array_push($days,get_class_methods($date));
                         return $date->isDayOfWeek($day);
                     }, $next_period_end->copy()->addDay()); //It's necessary to add a day '->addDay()' to the end date to include the last day of the period
                 }
             }
 
-            // $teacher_id == null ? session("teacher_id") : $teacher_id;
-            // $teacher_classes = User::find($teacher_id)->teacherClasses;
-
-            //CONSULTA DE CLASES REAGENDADAS EN EL PERIODO ACTUAL PARA RESTAR AL COBRO
-
-
             $period_start_c = new Carbon($current_period[0]);
             $period_end_c = new Carbon($current_period[1]);
 
             $absence = User::find(session('teacher_id'))->teacherClasses()->where('status', 1)->whereBetween('start_date', [$today->toDateTimeString(), ApportionmentController::currentPeriod()[1]])->orderBy('start_date', 'asc')->get()->pluck('start_date');
-
-            // $absence = Classes::select("start_date")
-            //     ->where("status", "1")
-            //     ->whereBetween("start_date", [$period_start_c->subDay()->toDateTimeString(), $period_end_c->toDateTimeString()])
-            //     ->get();
 
             if ($absence != null) {
                 foreach ($absence as $key => $start_date) {
@@ -496,7 +493,6 @@ class EnrolmentController extends Controller
                         $date->second = 0;
                         array_push($days, $date->toDateTimeString());
                     }
-                    // if($date->isDayOfWeek($day)) array_push($days,get_class_methods($date));
                     return $date->isDayOfWeek($day);
                 }, $next_period_end->copy()->addDay()); //It's necessary to add a day '->addDay()' to the end date to include the last day of the period
             }
@@ -531,19 +527,6 @@ class EnrolmentController extends Controller
         $student->removeRole('guest');
         $student->assignRole('student');
 
-        //GETTING IF STUDENT IS ALREADY ENROLLED//
-        $enrolment = Enrolment::where('student_id', $studentId)
-            ->where('course_id', $courseId)
-            ->first();
-
-        //IF STUDENT IS ALREADY ENROLLED BUT PREENROLMENT IS NOT AVAILABLE RETURN BACK WITH ERROR//
-        if ($enrolment && !EnrolmentController::isPreenrolmentAvailable()) return false;
-
-        //IF STUDENT IS ALREADY ENROLLED BUT PREENROLMENT IS AVAILABLE CREATE STUDENT'S PREENROLMENT//
-        if ($enrolment && EnrolmentController::isPreenrolmentAvailable()) {
-            $enrolment->restore();
-            return redirect()->back()->with('success', 'Student preselected in this course.');
-        }
 
         //CREATING STUDENT'S ENROLMENT//
         $enrolment = Enrolment::create([
@@ -636,13 +619,52 @@ class EnrolmentController extends Controller
         return $enrolment->id;
     }
 
-    public static function isPreenrolmentAvailable()
+    public static function preEnrolStudent($studentId, $courseId)
+    {
+        //GETTING IF STUDENT IS ALREADY ENROLLED//
+        $enrolment = Enrolment::where('student_id', $studentId)
+            ->where('course_id', $courseId)
+            ->first();
+
+        //IF STUDENT IS ALREADY ENROLLED AND PREENROLMENT IS AVAILABLE CREATE STUDENT'S PREENROLMENT//
+        if ($enrolment && EnrolmentController::isPreenrolmentAvailable($enrolment)) {
+
+            Preselection::withTrashed()->updateOrCreate(
+                ['enrolment_id' => $enrolment->id],
+                ['teacher_id' => $enrolment->teacher->id, 'schedule' => json_decode(session('user_schedule')), 'deleted_at' => NULL]
+            );
+
+            $invoice_id = ShopController::createInvoice($enrolment->student);
+            $invoice = Invoice::find($invoice_id);
+            $invoice->payment_method = session('paymentMethod');
+            $invoice->paid = 1;
+            $invoice->save();
+
+            Cart::destroy();
+            session()->forget('paymentMethod');
+
+            return $invoice->id;
+        }
+
+        return false;
+    }
+
+    public static function isPreenrolmentAvailable($enrolment = null)
     {
         $current_period = DB::table('metadata')->where('key', 'current_period')->value('value');
 
         $current_period_end = Carbon::parse(json_decode($current_period)->end_date);
 
-        if (Carbon::now()->greaterThan($current_period_end->copy()->subDays(7))) return true;
+        if (Carbon::now()->greaterThan($current_period_end->copy()->subDays(7))) {
+
+            if (!empty($enrolment)) {
+                $preselection = Preselection::where('enrolment_id', $enrolment->id)->first();
+
+                if ($preselection) return false;
+            }
+
+            return true;
+        }
 
         return false;
     }
@@ -653,13 +675,22 @@ class EnrolmentController extends Controller
         $enrolment = Enrolment::find($enrolmentId);
 
         // UPDATING OR CREATING A SCHEDULE ON THE DATABASE FOR THE GIVEN USER AND ENROLMENT
-        Schedule::withTrashed()->updateOrCreate(
-            ['user_id' => $enrolment->student->id, 'enrolment_id' => $enrolmentId],
-            ['selected_schedule' => $userSchedule, 'deleted_at' => NULL]
-        );
+        // $schedule = Schedule::withTrashed()->updateOrCreate(
+        //     ['user_id' => $enrolment->student_id, 'enrolment_id' => $enrolmentId],
+        //     ['selected_schedule' => $userSchedule, 'deleted_at' => NULL]
+        // );
 
-        $classDates = EnrolmentController::calculateApportionment($userSchedule);
+        $schedule = Schedule::create([
+            'user_id' => $enrolment->student_id,
+            'enrolment_id' => $enrolmentId,
+            'selected_schedule' => $userSchedule
+        ]);
 
-        return $classDates[1];
+        if (!$enrolment->course->categories->pluck('name')->contains('Test')) {
+            $classDates = EnrolmentController::calculateApportionment($userSchedule);
+            return $classDates[1];
+        }
+
+        return true;
     }
 }

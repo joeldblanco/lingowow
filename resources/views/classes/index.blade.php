@@ -31,20 +31,20 @@
                         {{-- <form action="{{ route('classes.check') }}" method="POST">
                             @csrf
                             @method('POST') --}}
-                            <table class="flex flex-col w-full space-y-5 border border-gray-200 p-5 my-5 rounded-lg">
-                                <thead>
-                                    <tr class="flex text-md justify-around">
-                                        @hasanyrole('student|admin')
-                                            <th class="flex justify-center w-full">Teacher</th>
-                                        @endhasanyrole
-                                        @hasanyrole('teacher|admin')
-                                            <th class="flex justify-center w-full">Student</th>
-                                        @endhasanyrole
-                                        <th class="flex justify-center w-full">Class Date</th>
-                                        @hasanyrole('teacher|admin')
-                                            <th class="flex justify-center w-full">Comments</th>
-                                        @endhasanyrole
-                                        {{-- @hasanyrole('teacher|admin')
+                        <table class="flex flex-col w-full space-y-5 border border-gray-200 p-5 my-5 rounded-lg">
+                            <thead>
+                                <tr class="flex text-md justify-around">
+                                    @hasanyrole('student|admin')
+                                        <th class="flex justify-center w-full">Teacher</th>
+                                    @endhasanyrole
+                                    @hasanyrole('teacher|admin')
+                                        <th class="flex justify-center w-full">Student</th>
+                                    @endhasanyrole
+                                    <th class="flex justify-center w-full">Class Date</th>
+                                    @hasanyrole('teacher|admin')
+                                        <th class="flex justify-center w-full">Comments</th>
+                                    @endhasanyrole
+                                    {{-- @hasanyrole('teacher|admin')
                                             <th class="flex justify-center w-full">
                                                 <input type="checkbox" onchange="selectAllTeacherCheckboxes(this)" />
                                             </th>
@@ -54,51 +54,51 @@
                                                 <input type="checkbox" onchange="selectAllStudentCheckboxes(this)" />
                                             </th>
                                         @endhasanyrole --}}
-                                    </tr>
-                                </thead>
-                                <tbody class="space-y-4">
-                                    {{ $classes->links() }}
-                                    @foreach ($classes as $key => $value)
-                                        <tr
-                                            class="flex justify-around @if (auth()->user()->getRoleNames()[0] == 'student' && empty($value->rating)) bg-yellow-100 @endif">
-                                            @hasanyrole('student|admin')
-                                                <td class="flex w-full justify-center">
-                                                    <a href="{{ route('profile.show', $value->teacher()->id) }}"
-                                                        class="hover:underline hover:text-blue-500">{{ $value->teacher()->first_name }}
-                                                        {{ $value->teacher()->last_name }}</a>
-                                                </td>
-                                            @endhasanyrole
-                                            @hasanyrole('teacher|admin')
-                                                <td class="flex w-full justify-center">
-                                                    <a href="{{ route('profile.show', $value->student()->id) }}"
-                                                        class="hover:underline hover:text-blue-500">{{ $value->student()->first_name }}
-                                                        {{ $value->student()->last_name }}</a>
-                                                </td>
-                                            @endhasanyrole
-                                            @php
-                                                $lesson_date = new Carbon\Carbon($value->start_date);
-                                            @endphp
-                                            @if ($lesson_date->lt(Carbon\Carbon::now()))
-                                                <td class="flex w-full justify-center text-red-500 cursor-pointer hover:underline"
-                                                    @click="classDetails = true"
-                                                    wire:click="showClass({{ $value->id }})">
-                                                    {{ $lesson_date->format('d/m/Y - h:00 a') }}
-                                                </td>
-                                            @else
-                                                <td class="flex w-full justify-center text-green-500 cursor-pointer hover:underline"
-                                                    @click="classDetails = true"
-                                                    wire:click="showClass({{ $value->id }})">
-                                                    {{ $lesson_date->format('d/m/Y - h:00 a') }}
-                                                </td>
-                                            @endif
-                                            @hasanyrole('teacher|admin')
-                                                <td class="flex w-full justify-center">
-                                                    <a href="{{ route('classes.details', $value->id) }}">
-                                                        <i class="fas fa-edit text-gray-600"></i>
-                                                    </a>
-                                                </td>
-                                            @endhasanyrole
-                                            {{-- @hasanyrole('teacher|admin')
+                                </tr>
+                            </thead>
+                            <tbody class="space-y-4">
+                                {{ $classes->links() }}
+                                @foreach ($classes as $key => $value)
+                                    <tr
+                                        class="flex justify-around @if (auth()->user()->getRoleNames()[0] == 'student' && empty($value->rating)) bg-yellow-100 @endif">
+                                        @hasanyrole('student|admin')
+                                            <td class="flex w-full justify-center">
+                                                <a href="{{ route('profile.show', $value->teacher()->id) }}"
+                                                    class="hover:underline hover:text-blue-500">{{ $value->teacher()->first_name }}
+                                                    {{ $value->teacher()->last_name }}</a>
+                                            </td>
+                                        @endhasanyrole
+                                        @hasanyrole('teacher|admin')
+                                            <td class="flex w-full justify-center">
+                                                <a href="{{ route('profile.show', $value->student()->id) }}"
+                                                    class="hover:underline hover:text-blue-500">{{ $value->student()->first_name }}
+                                                    {{ $value->student()->last_name }}</a>
+                                            </td>
+                                        @endhasanyrole
+                                        @php
+                                            $lesson_date = new Carbon\Carbon($value->start_date);
+                                        @endphp
+                                        @if ($lesson_date->lt(Carbon\Carbon::now()))
+                                            <td class="flex w-full justify-center text-red-500 cursor-pointer hover:underline"
+                                                @click="classDetails = true"
+                                                wire:click="showClass({{ $value->id }})">
+                                                {{ $lesson_date->format('d/m/Y - h:00 a') }}
+                                            </td>
+                                        @else
+                                            <td class="flex w-full justify-center text-green-500 cursor-pointer hover:underline"
+                                                @click="classDetails = true"
+                                                wire:click="showClass({{ $value->id }})">
+                                                {{ $lesson_date->format('d/m/Y - h:00 a') }}
+                                            </td>
+                                        @endif
+                                        @hasanyrole('teacher|admin')
+                                            <td class="flex w-full justify-center">
+                                                <a href="{{ route('classes.details', $value->id) }}">
+                                                    <i class="fas fa-edit text-gray-600"></i>
+                                                </a>
+                                            </td>
+                                        @endhasanyrole
+                                        {{-- @hasanyrole('teacher|admin')
                                                 <td class="flex w-full justify-center">
                                                     <input type='hidden' value='0'
                                                         name='teacher_{{ $value->id }}'>
@@ -116,12 +116,12 @@
                                                         @if ($value->student_check) checked @endif />
                                                 </td>
                                             @endhasanyrole --}}
-                                        </tr>
-                                    @endforeach
-                                    {{-- {{ $classes->links() }} --}}
-                                </tbody>
-                            </table>
-                            {{-- <div class="flex justify-end">
+                                    </tr>
+                                @endforeach
+                                {{-- {{ $classes->links() }} --}}
+                            </tbody>
+                        </table>
+                        {{-- <div class="flex justify-end">
                                 <button type="submit"
                                     class="bg-lw-blue py-2 px-4 text-white rounded-md hover:bg-blue-800">
                                     Check/Uncheck
@@ -197,7 +197,7 @@
                             <div>
                                 @foreach ($comments as $comment)
                                     <div class="flex space-x-3 p-4">
-                                        <img class="rounded-full w-10 h-10"
+                                        <img class="rounded-full w-10 h-10 object-cover"
                                             src="{{ Storage::url($comment->author->profile_photo_path) }}"
                                             alt="profile_picture">
                                         <div class="flex flex-col items-start w-full">
@@ -238,7 +238,7 @@
                             <div>
                                 @foreach ($comments as $comment)
                                     <div class="flex space-x-3 p-4">
-                                        <img class="rounded-full w-10 h-10"
+                                        <img class="rounded-full w-10 h-10 object-cover"
                                             src="{{ Storage::url($comment->author->profile_photo_path) }}"
                                             alt="profile_picture">
                                         <div class="flex flex-col items-start w-full">

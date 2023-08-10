@@ -72,7 +72,7 @@
                             <div class="pt-6 pb-2 space-y-1">
                                 <p class="font-bold text-gray-600 mb-1">Date & Time (UTC)</p>
                                 <input type="datetime-local" name="date_time" id="date_time"
-                                    placeholder="Enter meeting date" step="3600" {{-- min="{{ now() }}" --}}
+                                    placeholder="Enter meeting date" step="60" {{-- min="{{ now() }}" --}}
                                     {{-- value="0000-00-00T00:00" --}} required
                                     class="w-full rounded-md p-3 text-gray-600 hover:border-gray-600 @if ($errors->has('date_time')) border-red-600 @else border-gray-300 @endif ">
                                 @if ($errors->has('student_id'))

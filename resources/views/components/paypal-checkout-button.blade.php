@@ -1,4 +1,6 @@
 <div>
+    <!-- PAYPAL CHECKOUT BUTTON COMPONENT -->
+
     <!-- Set up a container element for the button -->
     <div id="paypal-button-container" class="mt-3"></div>
 

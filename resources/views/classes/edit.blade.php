@@ -93,7 +93,7 @@
                     <div class="wrapper bg-white rounded  w-full schedule-tour">
 
                         {{-- @livewire('schedule', ['plan' => '1', 'user_id' => auth()->id(), 'mode' => 'absence', 'course_id' => $course_id, 'id_class' => $id]) --}}
-                        @livewire('new-schedule', ['limit' => 1, 'users' => session('teacher_id'), 'action' => 'classRescheduling', 'week' => 1, 'data' => $id])
+                        @livewire('schedule-controller', ['limit' => 1, 'users' => session('teacher_id'), 'action' => 'classRescheduling', 'week' => 1, 'data' => $id])
 
                         {{-- <div class="mt-10 grid grid-rows-2 grid-flow-col gap-4 justify-center ...">
                             <div class="flex space-x-3 items-center terms-tour">

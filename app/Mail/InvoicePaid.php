@@ -31,7 +31,7 @@ class InvoicePaid extends Mailable
     {
         $this->invoice = $invoice;
     }
-    
+
     /**
      * Build the message.
      *
@@ -42,7 +42,7 @@ class InvoicePaid extends Mailable
         $pdf = Pdf::loadView('emails.invoices.paid', ['invoice' => $this->invoice]);
         $pdf_data = $pdf->output();
 
-        return $this->view('emails.invoices.paid')->attachData($pdf_data, 'Lingowow Invoice ' . (new Carbon($this->invoice->created_at))->isoFormat('MMM Y') . ' (' . str_pad($this->invoice->user->id, 6, '0', STR_PAD_LEFT) . ' - ' . str_pad($this->invoice->id, 7, '0', STR_PAD_LEFT) . ').pdf', [
+        return $this->view('emails.invoices.paid')->attachData($pdf_data, $this->invoice->title . '.pdf', [
             'mime' => 'application/pdf',
         ]);
     }

@@ -33,7 +33,7 @@
                                 <p class="text-gray-500 text-sm font-light">Please select a teacher</p>
                             </div>
                             @if ($enrolment->student)
-                                <div class="py-6 space-y-1">
+                                <div class="pb-6 space-y-1">
                                     <p class="font-bold text-gray-600 mb-1">Student</p>
                                     <select name="student_id" id="student_id" required
                                         class="w-full rounded-md p-3 text-gray-600 @if ($errors->has('student_id')) border-red-600 @else border-gray-300 @endif">
@@ -64,7 +64,7 @@
                                 <p class="text-gray-500 text-sm font-light">Please select a course</p>
                             </div>
                             {{-- NEED TO BE ABLE TO SELECT UNIT FOR STUDENTS --}}
-                            <div class="py-2 space-y-1">
+                            <div class="pb-6 space-y-1">
                                 <p class="font-bold text-gray-600 mb-1">Unit</p>
                                 <select name="unit_id" id="unit_id"
                                     class="w-full rounded-md hover:border-gray-600 p-3 text-gray-600 @if ($errors->has('unit_id')) border-red-600 @else border-gray-300 @endif">
@@ -82,9 +82,23 @@
                                     @endforeach
                                 </select>
                                 @if ($errors->has('unit_id'))
-                                    <p class="text-xs font-light text-red-600">{{$errors->get('unit_id')[0]}}</p>
+                                    <p class="text-xs font-light text-red-600">{{ $errors->get('unit_id')[0] }}</p>
                                 @endif
                                 <p class="text-gray-500 text-sm font-light">Please select a unit</p>
+                            </div>
+                            @php
+                                $scheduleStringArray = App\Http\Livewire\ScheduleController::schedulesFormatToDateString($enrolment->schedule->selected_schedule);
+                            @endphp
+                            <div class="pb-6 space-y-1">
+                                <p class="font-bold text-gray-600 mb-1">Schedule</p>
+                                <div class="w-full rounded-md bg-gray-100 p-3">
+                                    @foreach ($scheduleStringArray as $string)
+                                        <p class="text-sm text-gray-500 italic">- {{ $string }}</p>
+                                    @endforeach
+                                </div>
+                                <a href="{{ route('schedules.edit', $enrolment->id) }}"
+                                    class="italic text-blue-500 text-sm hover:text-blue-700 hover:underline">Edit
+                                    Schedule</a>
                             </div>
                         </div>
                     </div>

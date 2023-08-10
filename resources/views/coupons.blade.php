@@ -29,7 +29,7 @@
                             </td>
                             <td class="py-4 px-6 border-b border-gray-400 text-center">{{$coupon->updated_at->isoFormat('L')}}</td>
                             <td class="py-4 px-6 border-b border-gray-400 text-center">
-                                <a href="{{route('invoice.show',$coupon->id)}}" class="text-gray-600 font-bold py-1 px-3 rounded text-xs bg-blue-100 hover:bg-blue-500 hover:text-white">View</a>
+                                <a href="{{route('invoices.show',$coupon->id)}}" class="text-gray-600 font-bold py-1 px-3 rounded text-xs bg-blue-100 hover:bg-blue-500 hover:text-white">View</a>
                             </td>
                         </tr>
                     @endforeach

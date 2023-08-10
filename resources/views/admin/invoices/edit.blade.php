@@ -4,7 +4,7 @@
             <div class="p-6 sm:px-20 bg-white border-b border-gray-200">
 
                 <div class="bg-white rounded-md w-1/2 p-6 my-4 mx-auto border border-gray-400">
-                    <form method="POST" action="{{ route('invoice.update', $invoice->id) }}" id="invoice_update">
+                    <form method="POST" action="{{ route('invoices.update', $invoice->id) }}" id="invoice_update">
                         @csrf
                         @method('PATCH')
                         <div class="divide-y">
@@ -17,14 +17,24 @@
                                     <input type="text" name="customer_name" id="customer_name"
                                         placeholder="{{ $invoice->user->first_name }} {{ $invoice->user->last_name }}"
                                         value="{{ $invoice->user->first_name }} {{ $invoice->user->last_name }}"
-                                        disabled class="w-full rounded-md p-3 text-gray-400 border-gray-400">
+                                        disabled
+                                        class="w-full rounded-md p-3 text-gray-400 @if ($errors->has('customer_name')) border-red-600 @else border-gray-300 @endif">
+                                    @if ($errors->has('customer_name'))
+                                        <p class="text-xs font-light text-red-600">
+                                            {{ $errors->get('customer_name')[0] }}</p>
+                                    @endif
                                     {{-- <p class="text-gray-500 text-sm font-light">Please enter course name</p> --}}
                                 </div>
                                 <div class="pt-6 space-y-1">
                                     <p class="font-bold text-gray-600 mb-1">Date</p>
                                     <input type="text" name="invoice_date" id="invoice_date"
                                         placeholder="{{ $invoice->created_at }}" value="{{ $invoice->created_at }}"
-                                        disabled class="w-full rounded-md p-3 text-gray-400 border-gray-400">
+                                        disabled
+                                        class="w-full rounded-md p-3 text-gray-400 @if ($errors->has('invoice_date')) border-red-600 @else border-gray-300 @endif">
+                                    @if ($errors->has('invoice_date'))
+                                        <p class="text-xs font-light text-red-600">{{ $errors->get('invoice_date')[0] }}
+                                        </p>
+                                    @endif
                                     {{-- <p class="text-gray-500 text-sm font-light">Please enter course name</p> --}}
                                 </div>
                                 <div class="py-4 space-y-1">
@@ -56,18 +66,34 @@
                                         </table>
                                     </div>
                                 </div>
+                                <div class="py-4 space-y-1">
+                                    <p class="font-bold text-gray-600 mb-1">Payment Mehtod</p>
+                                    <select name="payment_method" id="payment_method"
+                                        class="w-full rounded-md p-3 text-gray-600 border-gray-400">
+                                        <option selected disabled hidden required>Select a payment method</option>
+                                        <option value="niubiz" @if ($invoice->payment_method == 'niubiz') selected @endif>Niubiz
+                                        </option>
+                                        <option value="paypal" @if ($invoice->payment_method == 'paypal') selected @endif>PayPal
+                                        </option>
+                                    </select>
+                                </div>
                                 <div class="py-4 pt-3 space-y-1">
                                     <p class="font-bold text-gray-600 mb-1">Paid</p>
                                     <input type="checkbox" name="invoice_paid" id="invoice_paid"
-                                        class="text-gray-500 border-gray-500"
+                                        class="text-gray-500 @if ($errors->has('invoice_paid')) border-red-600 @else border-gray-300 @endif"
                                         @if ($invoice->paid) checked @endif>
+                                    @if ($errors->has('invoice_paid'))
+                                        <p class="text-xs font-light text-red-600">
+                                            {{ $errors->get('invoice_paid')[0] }}
+                                        </p>
+                                    @endif
                                 </div>
                             </div>
                         </div>
                     </form>
 
                     <div class="w-full flex justify-end space-x-3">
-                        <form action="{{ route('invoice.destroy', $invoice->id) }}" method="POST" id="invoice_delete"
+                        <form action="{{ route('invoices.destroy', $invoice->id) }}" method="POST" id="invoice_delete"
                             x-data="{ deleteButton: true, deleteConfirmation: false }" x-cloak>
                             @csrf
                             @method('DELETE')

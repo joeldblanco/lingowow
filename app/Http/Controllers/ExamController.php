@@ -22,17 +22,15 @@ class ExamController extends Controller
      */
     public function index()
     {
-
-
         if (auth()->user()->hasRole('admin')) {
             $exams = Exam::all();
         }
 
         if (auth()->user()->hasRole('teacher')) {
             $exams = Exam::all();
-            
+
             $modules = auth()->user()->modules->intersect($exams->pluck('unit')->pluck('module'));
-            
+
             $exams = $modules->flatMap(function ($module) {
                 return $module->exams();
             });
@@ -52,7 +50,8 @@ class ExamController extends Controller
      */
     public function create(Request $request)
     {
-        if (!empty($request->module_id)) {
+        // dd($request);
+        // if (!empty($request->module_id)) {
             if (auth()->user()->hasRole('admin')) {
                 $courses = Course::all();
                 $modules = $courses->pluck('modules')->flatten();
@@ -64,7 +63,7 @@ class ExamController extends Controller
             }
 
             return view('exams.create', compact('courses', 'modules'));
-        }
+        // }
 
         return abort(404);
     }

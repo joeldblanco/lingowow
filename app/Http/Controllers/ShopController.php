@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Livewire\NewSchedule;
+use App\Http\Livewire\ScheduleController;
 use App\Invoice;
 use App\Jobs\CreateSchedule;
 use App\Jobs\StoreSelfEnrolment;
@@ -70,9 +70,15 @@ class ShopController extends Controller
         $product = Product::findOrFail($product_id);
         $options = [];
 
-        if ($product->categories->pluck('name')->contains('Course') || $product->categories->pluck('name')->contains('Test')) {
+        if ($product->categories->pluck('name')->contains('Course')) {
             $options['enrollable'] = true;
             $options['bookable'] = true;
+        }
+
+        if ($product->categories->pluck('name')->contains('Test')) {
+            $options['enrollable'] = true;
+            $options['bookable'] = true;
+            $options['editable'] = true;
         }
 
         $product = ShopController::checkCustomerReward($product->id);
@@ -94,6 +100,8 @@ class ShopController extends Controller
         $enrollable = [];
         $bookable = [];
 
+        session(['paymentMethod' => $paymentMethod]);
+
         foreach (Cart::content() as $item) {
             $itemOptions = $item->options;
             foreach ($itemOptions as $option => $value) {
@@ -110,7 +118,14 @@ class ShopController extends Controller
         if (count($enrollable) > 0) {
             foreach ($enrollable as $product_id) {
                 $course_id = Product::find($product_id)->courses->first()->id;
-                $enrolmentId = EnrolmentController::enrolStudent($user->id, $course_id, session('teacher_id'));
+
+                $invoiceId = EnrolmentController::preEnrolStudent($user->id, $course_id, session('teacher_id'));
+
+                if ($invoiceId) {
+                    return redirect()->route('invoices.show', $invoiceId);
+                } else {
+                    $enrolmentId = EnrolmentController::enrolStudent($user->id, $course_id, session('teacher_id'));
+                }
             }
         }
 
@@ -119,12 +134,22 @@ class ShopController extends Controller
                 $product = Product::find($product_id);
 
                 if ($product->categories->pluck('name')->contains('Course')) {
-                    $classDates = EnrolmentController::createSchedule($enrolmentId, json_decode(session('user_schedule'), 1));
+
+                    $enrolment = Enrolment::find($enrolmentId);
+
+                    $reservedSchedule = ScheduleReserve::where('user_id', $enrolment->student_id)->where('teacher_id', $enrolment->teacher_id)->where('type', 'schedule')->first();
+
+                    $classDates = EnrolmentController::createSchedule($enrolmentId, json_decode($reservedSchedule->selected_schedule, 1));
+                    
                     ClassController::bookClasses($classDates, $enrolmentId);
+                    
+                    $reservedSchedule->delete();
                 }
 
                 if ($product->categories->pluck('name')->contains('Test')) {
-                    ClassController::bookClasses(session('examDate'), $enrolmentId);
+                    EnrolmentController::createSchedule($enrolmentId, []);
+                    ClassController::bookClasses(session('examDate1'), $enrolmentId);
+                    ClassController::bookClasses(session('examDate2'), $enrolmentId);
                 }
             }
         }
@@ -136,8 +161,9 @@ class ShopController extends Controller
         $invoice->save();
 
         Cart::destroy();
+        session()->forget('paymentMethod');
 
-        return redirect()->route('invoice.show', $invoice->id);
+        return redirect()->route('invoices.show', $invoice->id);
     }
 
 
@@ -159,12 +185,12 @@ class ShopController extends Controller
         //CREATE CART ARRAY AND ADD ITEMS AND INVOICE DETAILS
         $cart = [];
         $cart['items'] = $items;
-        $cart['invoice_id'] = config('paypal.invoice_prefix') . '_' . $order_id;
-        $cart['invoice_description'] = "Invoice #$order_id";
+        // $cart['invoice_id'] = config('paypal.invoice_prefix') . '_' . $order_id;
+        $cart['invoice_description'] = "Lingowow Invoice " . Carbon::now()->format('Y F') . " (" . $user->id . "-" . $order_id . ")";
 
         //CALCULATE TOTAL PRICE AND ADD TO ARRAY
         $cart['total'] = 0;
-        foreach ($cart['items'] as $item) {
+        foreach ($items as $item) {
             $cart['total'] += $item['price'] * $item['qty'];
         }
 
@@ -195,13 +221,20 @@ class ShopController extends Controller
         return $invoice->id;
     }
 
-    public static function checkScheduleIntegrity($users, $data)
+    public static function checkScheduleIntegrity($users, $data, $preselection = false)
     {
         $course_id = session('selected_course');
         session(['course_id' => $course_id]);
 
-        $schedule = new NewSchedule;
-        $approved = boolval(count($schedule->schedulesIntersect($schedule->getTeachersAvailability($users), $data)));
+        $schedule = new ScheduleController;
+        $approved = false;
+
+        if (!empty($data))
+            if ($preselection) {
+                $approved = boolval(count($schedule->schedulesIntersect($schedule->getTeachersPreselectionAvailability($users), $data)));
+            } else {
+                $approved = boolval(count($schedule->schedulesIntersect($schedule->getTeachersAvailability($users), $data)));
+            }
 
         return $approved;
     }

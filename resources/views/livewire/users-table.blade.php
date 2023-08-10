@@ -113,7 +113,7 @@
                                 <tr class="flex">
                                     <td class="flex w-10/12 items-start">
                                         <div class="flex space-x-3">
-                                            <img class="rounded-full w-10 h-10"
+                                            <img class="rounded-full w-10 h-10 object-cover"
                                                 src="{{ Storage::url($student->profile_photo_path) }}"
                                                 alt="profile_picture">
                                             <div class="flex flex-col items-start text-sm">
@@ -155,45 +155,6 @@
     <div wire:loading>
         @include('components.loading-state')
     </div>
-
-    {{-- <div class="bg-black bg-opacity-50 z-10 fixed top-0 left-0 w-full h-full flex items-center justify-center"
-        x-show="createUser" x-transition x-cloak>
-        <div class="leading-loose">
-            <div class="max-w-xl m-4 p-10 bg-white rounded shadow-2xl space-y-1" @click.outside="createUser = false">
-                <div class="flex justify-between border-b mb-5 py-4 text-3xl">
-                    <h1 class="">Create User</h1>
-                    <i class="fas fa-times cursor-pointer text-xl" @click="createUser = false"></i>
-                </div>
-                <input class="w-full px-2 py-2 text-gray-700 bg-gray-200 rounded" name="user_username" type="text"
-                    required placeholder="Username" aria-label="Username" wire:model="username">
-                <input class="w-full px-2 py-2 text-gray-700 bg-gray-200 rounded" name="user_password" type="password"
-                    required placeholder="Password" aria-label="Password" wire:model="password">
-                <input class="w-full px-2 py-2 text-gray-700 bg-gray-200 rounded" name="user_password_confirm"
-                    type="password" required placeholder="Password Confirmation" aria-label="Password"
-                    wire:model="password_confirm">
-                <div class="flex mt-2 w-full space-x-1">
-                    <input class="w-full px-2 py-2 text-gray-700 bg-gray-200 rounded" name="user_name" type="text"
-                        required placeholder="Name" aria-label="Name" wire:model="first_name">
-                    <input class="w-full px-2 py-2 text-gray-700 bg-gray-200 rounded" name="user_lastname"
-                        type="text" required placeholder="Last Name" aria-label="Lastname"
-                        wire:model="last_name">
-                </div>
-                <input class="w-full px-2 py-2 text-gray-700 bg-gray-200 rounded" name="user_email" type="email"
-                    required placeholder="Email" aria-label="Email" wire:model="email">
-                <select class="w-full px-2 py-2 text-gray-700 bg-gray-200 rounded" name="roles" required
-                    wire:model="user_role">
-                    <option value="1">Guest</option>
-                    <option value="2">Student</option>
-                    <option value="3">Teacher</option>
-                    <option value="4">Admin</option>
-                </select>
-                <div class="flex pt-4 justify-end">
-                    <button class="px-4 py-1 text-white font-light tracking-wider bg-gray-900 rounded"
-                        @click="createUser = false" wire:click="createUser">Create</button>
-                </div>
-            </div>
-        </div>
-    </div> --}}
 
     <x-modal type="info" name="createUser">
         <x-slot name="title">
