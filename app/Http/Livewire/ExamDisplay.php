@@ -2,8 +2,6 @@
 
 namespace App\Http\Livewire;
 
-use App\Http\Controllers\AttemptController;
-use App\Http\Controllers\ExamController;
 use App\Http\Controllers\UnitController;
 use App\Models\Answer;
 use App\Models\Attempt;
@@ -33,18 +31,6 @@ class ExamDisplay extends Component
     {
         $this->startAttempt = false;
         $this->examContent = true;
-        // if (auth()->user()->roles[0]->name == "student") {
-        // $this->attempt = new Attempt;
-        // $this->attempt->user_id = auth()->id();
-        // $this->attempt->exam_id = $this->exam->id;
-        // $this->attempt->data = json_encode(["answers" => json_encode([])]);
-        // $this->attempt->save();
-        // // }
-
-        // // $this->dispatchBrowserEvent('question-changed', [
-        // //     'questionIndex' => $this->index,
-        // //     'totalQuestions' => $this->total_questions,
-        // // ]);
 
         $this->attempt = Attempt::where('user_id', auth()->id())->where('exam_id', $this->exam->id)->whereNull('completed_at')->first();
         if (empty($this->attempt)) {
@@ -74,59 +60,11 @@ class ExamDisplay extends Component
         }
     }
 
-    // public function nextQuestion()
-    // {
-    //     if ($this->index < ($this->total_questions - 1)) {
-    //         $this->index++;
-    //         $this->question = $this->exam->questions[$this->index];
-    //         $this->dispatchBrowserEvent('question-changed', [
-    //             'questionIndex' => $this->index,
-    //             'totalQuestions' => $this->total_questions,
-    //         ]);
-    //     } else {
-    //         $this->submitExam();
-    //     }
-    // }
-
-    // public function prevQuestion()
-    // {
-    //     if ($this->index > 0) $this->index--;
-    //     $this->question = $this->exam->questions[$this->index];
-    //     $this->dispatchBrowserEvent('question-changed', [
-    //         'questionIndex' => $this->index,
-    //         'totalQuestions' => $this->total_questions,
-    //     ]);
-    // }
-
     public function saveAnswer($answer)
     {
         $answer = explode("-", $answer);
         $question = $this->exam->questions->where('id', $answer[1])->first();
-        // $this->answers[$question->id] = $answer[0];
 
-        // $indexes = [];
-        // $essay_index = null;
-
-        // foreach ($this->exam->questions as $question) {
-        //     if ($question->type == "essay") {
-        //         $essay_index = $question->id;
-        //     } else {
-        //         $indexes[] = $question->id;
-        //     }
-        // }
-
-        // foreach ($indexes as $index) {
-        //     if (!isset($this->answers[$index])) {
-        //         $this->answers[$index] = -1;
-        //     }
-        // }
-
-        // if (!empty($essay_index))
-        //     $this->answers[$essay_index] = $this->essay;
-
-        // ksort($this->answers);
-
-        // // $this->attempt->data = json_encode(["answers" => json_encode($this->answers)]);
         Answer::updateOrCreate([
             'attempt_id' => $this->attempt->id,
             'question_id' => $question->id,
@@ -134,14 +72,10 @@ class ExamDisplay extends Component
         ], [
             'answer' => $answer[0],
         ]);
-
-        // dd($this->answers);
-        // $this->attempt->save();
     }
 
     public function submitExam()
     {
-        // $this->answers = array_values($this->answers);
         $this->examContent = false;
         $this->loadingState = true;
 

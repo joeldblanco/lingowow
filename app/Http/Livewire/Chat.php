@@ -14,7 +14,6 @@ class Chat extends Component
 
     public $conversations = [];
     public $last_messages = [];
-    // public $participants = [];
     public $conversation_id = 0;
     public $participant;
     public $text_message;
@@ -123,7 +122,6 @@ class Chat extends Component
             ]);
 
             //SENDS NEW MESSAGE NOTIFICATION TO PARTICIPANT//
-            // dd($this->users_notifications);
             Notification::send($this->users_notifications, new \App\Notifications\NewMessage($this->text_message, $this->conversation_id));
             $this->text_message = "";
 
@@ -146,19 +144,11 @@ class Chat extends Component
         $this->participant = User::find($participant_id);
     }
 
-    // public function updatedTextMessage($value)
-    // {
-    //     if ($value && $this->conversation) {
-    // Notification::send($this->users_notifications, new \App\Notifications\UserTyping($this->conversation->id));
-    //     }
-    // }
-
     public function render()
     {
         $user = User::find(auth()->id());
         $this->friends = $user->friends();
         $this->conversations = $user->conversations;
-        // $this->conversations_id = [];
 
         return view('livewire.chat');
     }

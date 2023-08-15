@@ -13,7 +13,7 @@ class Meeting extends Model
 
     protected $fillable = [
         'host_id',
-        'atendee_id',
+        'attendee_id',
         'start_date',
         'join_url',
         'topic',
@@ -26,9 +26,9 @@ class Meeting extends Model
         return $this->belongsTo(User::class, 'host_id');
     }
 
-    public function atendee()
+    public function attendee()
     {
-        return $this->belongsTo(User::class, 'atendee_id');
+        return $this->belongsTo(User::class, 'attendee_id');
     }
 
     public function zoom_id()

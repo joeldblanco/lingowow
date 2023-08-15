@@ -87,7 +87,7 @@ class InvoiceController extends Controller
     {
         $request->validate([
             'invoice_paid' => 'nullable',
-            'payment_method' => 'required|string|in:paypal,niubiz',
+            'payment_method' => 'string|in:paypal,niubiz',
         ]);
 
         if ($request->invoice_paid == 'on') {

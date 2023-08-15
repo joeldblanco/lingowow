@@ -1,21 +1,6 @@
 @php
     $last_conn = new Carbon\Carbon('first day of this month');
     $last_conn = $last_conn->diffForHumans();
-    
-    // $now = new DateTime('now');
-    // dd($now);
-    
-    // $now = Carbon\Carbon::now();
-    
-    // $utc = Carbon\Carbon::now(new DateTimeZone('UTC'));
-    
-    // dd($now,$utc);
-    
-    // dd(timezone_name_from_abbr("",-300*60,false));
-    // var_dump($now);
-    
-    // dd($show_id,$this->conversation_id);
-    
 @endphp
 
 <div class="bg-gray-300 font-sans p-5 mx-5 rounded-xl flex" x-data="data()">
@@ -44,7 +29,6 @@
             <div class="flex flex-col overflow-y-auto" style="max-height: calc(100vh - 245px)">
                 @foreach ($conversations as $key => $value)
                     @if ($value->users->count() >= 2)
-                        {{-- <a href="{{ route('chat.show', $value) }}"> --}}
                         <button class="flex items-center space-x-3 cursor-pointer hover:bg-gray-200 py-3 pl-2 pr-1"
                             wire:click="showConversation({{ $value->id }})">
 
@@ -60,7 +44,6 @@
                                     class="w-1/6 rounded-full">
                             @endif
 
-                            {{-- <img src="https://picsum.photos/200?random={{auth()->id()}}" alt="profile_pic" class="w-1/6 rounded-full"> --}}
                             <div class="w-3/4 items-start flex flex-col">
                                 @if (!$value->group_conversation)
                                     <p>{{ $participant->first_name }} {{ $participant->last_name }}
@@ -84,7 +67,6 @@
                                 @endif
                             </div>
                         </button>
-                        {{-- </a> --}}
                     @endif
                 @endforeach
             </div>
@@ -108,25 +90,12 @@
                             <div class="flex space-x-1 items-center">
                                 <p class="font-bold">{{ $participant->first_name }} {{ $participant->last_name }}
                                 </p>
-                                {{-- <span class="bg-green-400 w-2 h-2 rounded-full"></span> --}}
                             </div>
                             <p class="text-sm text-gray-600" x-show="conversation_id == typingConversationId">Typing...
                             </p>
-                            {{-- <p class="text-sm text-green-500" x-show="conversation_id != typingConversationId">Online
-                            </p> --}}
-                            {{-- <p class="text-sm text-gray-400">Last seen {{ $last_conn }}</p> --}}
                         </div>
                     </div>
                     <div class="flex">
-                        {{-- <div class="w-10 flex justify-center cursor-pointer p-3 rounded-full" @click="conversations = ! conversations">
-                            <i class="fas fa-bars w-1/12"></i>
-                        </div>
-                        <div class="w-10 flex justify-center cursor-pointer p-3 rounded-full" @click="conversations = ! conversations">
-                            <i class="fas fa-bars w-1/12"></i>
-                        </div>
-                        <div class="w-10 flex justify-center cursor-pointer p-3 rounded-full" @click="conversations = ! conversations">
-                            <i class="fas fa-bars w-1/12"></i>
-                        </div> --}}
                         <div class="w-10 flex justify-center cursor-pointer p-3 rounded-full"
                             @click="profileDetail = ! profileDetail">
                             <i class="fas fa-info-circle w-1/12 mx-auto"></i>
@@ -139,10 +108,6 @@
                             <div class="@if ($message->user_id == auth()->id()) bg-blue-100 float-right @else bg-gray-200 float-left @endif p-4 rounded-lg text-gray-700"
                                 style="max-width: 75%">
                                 <p class="mr-16 mb-2">{{ $message->message_content }}</p>
-                                @php
-                                    // $message->created_at = new Carbon\Carbon($message->created_at);
-                                    // $message->created_at = $message->created_at->diffForHumans();
-                                @endphp
                                 <p class="float-right text-xs text-gray-500 message-created-at-{{ $message->id }}">
                                     {{ $message->created_at }}
                                     @if ($message->user_id == auth()->id())
@@ -220,10 +185,6 @@
         </div>
         <div class="bg-black bg-opacity-50 z-10 fixed top-0 left-0 w-full h-full flex items-center justify-center p-5"
             x-show="newConversation">
-            {{-- <input type="search"
-                    class="w-full pl-10 pr-4 py-2 rounded-lg shadow focus:outline-none focus:shadow-outline text-gray-600 font-medium mr-3 hover:border-gray-700"
-                    placeholder="To..."
-                    wire:model="search"> --}}
             <div class="bg-white w-1/3 rounded-lg p-5" @click.outside="newConversation = false">
                 <div x-show="userList">
                     @if (isset($friends))
@@ -281,7 +242,6 @@
     <div wire:loading>
         @include('components.loading-state')
     </div>
-    {{-- @livewireScripts --}}
     <script>
         function data() {
             return {
@@ -290,12 +250,10 @@
                 typingConversationId: null,
 
                 init() {
-                    // alert("init");
                     Echo.private('App.Models.User.' + {{ auth()->id() }})
                         .notification((notification) => {
 
                             if (notification.type == "App\\Notifications\\UserTyping") {
-                                // console.log(notification.conversation_id);
                                 this.typingConversationId = notification.conversation_id;
 
                                 setTimeout(() => {
@@ -321,21 +279,5 @@
                 inline: 'start'
             });
         });
-
-        // var timezone_offset_minutes = new Date().getTimezoneOffset();
-        // timezone_offset_minutes = timezone_offset_minutes == 0 ? 0 : -timezone_offset_minutes;
-        // timezone_offset_hours = timezone_offset_minutes / 60;
-
-        // // Timezone difference in minutes such as 330 or -360 or 0
-        // // current_tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
-
-        // // let messagesCreatedAt = document.getElementsByClassName("message-created-at");
-        // // for (let i = 0; i < messagesCreatedAt.length; i++) {
-        // //     // console.log(messagesCreatedAt[i]);
-        // // }
-
-        // // console.log(messagesCreatedAtHour+(timezone_offset_minutes/60));
-        // console.log(messagesCreatedAtDay + "-" + messagesCreatedAtMonth + "-" + messagesCreatedAtYear + " " +
-        //     messagesCreatedAtHour + ":" + messagesCreatedAtMinute);
     </script>
 </div>

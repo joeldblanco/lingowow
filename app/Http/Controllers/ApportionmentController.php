@@ -24,7 +24,6 @@ class ApportionmentController extends Controller
             $user = User::find(session('student_id'));
         }
 
-        // $schedule == null ? session('user_schedule') : $schedule;
         if ($schedule == null) {
             $schedule = session("user_schedule");
         }
@@ -103,9 +102,6 @@ class ApportionmentController extends Controller
                 }
             }
 
-            // $teacher_id == null ? session("teacher_id") : $teacher_id;
-            // $teacher_classes = User::find($teacher_id)->teacherClasses;
-
             //CONSULTA DE CLASES REAGENDADAS EN EL PERIODO ACTUAL PARA RESTAR AL COBRO
 
 
@@ -113,11 +109,6 @@ class ApportionmentController extends Controller
             $period_end_c = new Carbon($current_period[1]);
 
             $absence = User::find(session('teacher_id'))->teacherClasses()->where('status', 1)->whereBetween('start_date', [$today->toDateTimeString(), ApportionmentController::currentPeriod()[1]])->orderBy('start_date', 'asc')->get()->pluck('start_date');
-
-            // $absence = Classes::select("start_date")
-            //     ->where("status", "1")
-            //     ->whereBetween("start_date", [$period_start_c->subDay()->toDateTimeString(), $period_end_c->toDateTimeString()])
-            //     ->get();
 
             if ($absence != null) {
                 foreach ($absence as $key => $start_date) {

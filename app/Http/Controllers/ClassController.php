@@ -64,7 +64,7 @@ class ClassController extends Controller
         ]);
         $date_time = Carbon::parse($request->date_time)->format('Y-m-d H:i:s');
         $enrolment = Enrolment::find($request->enrolment_id);
-        $meeting_id = Meeting::where('host_id', $enrolment->teacher->id)->where('atendee_id', $enrolment->student->id)->first()->id;
+        $meeting_id = Meeting::where('host_id', $enrolment->teacher->id)->where('attendee_id', $enrolment->student->id)->first()->id;
         Classes::create([
             'enrolment_id' => $enrolment->id,
             'start_date' => $date_time,
@@ -117,23 +117,6 @@ class ClassController extends Controller
             $teacher_schedule[$key] = $value["selected_schedule"];
         }
         $teacher_schedule = array_merge(...$teacher_schedule);
-        // dd($teacher_schedule);
-
-
-        // $students = [];
-
-        // $aux_students = Enrolment::select('student_id')->get()->toArray();
-        // foreach ($aux_students as $key => $value) {
-        //     $aux_students[$key] = $value["student_id"];
-        // }
-
-        // $aux_students = User::find($aux_students);
-        // $students_schedules = [];
-        // foreach ($aux_students as $key => $value) {
-        //     $students[$key][0] = $value;
-        //     $students[$key][1] = $students_schedules[] = json_decode($value->schedules->first()->selected_schedule, 1);
-        // }
-        // $students_schedules = array_merge(...$students_schedules);
 
         $user = auth()->user()->id;
         $scheduled_classes = [];
@@ -185,7 +168,6 @@ class ClassController extends Controller
         })->first()->id;
 
         $error_message = "";
-        // session(['message' => $messages]);
 
         try {
             $validate = $request->validate([
@@ -306,7 +288,7 @@ class ClassController extends Controller
 
     public static function getRecordingUrl($class)
     {
-        // $meeting = Meeting::where('atendee_id',$class->student()->id)->where('host_id',$class->teacher()->id)->first();
+        // $meeting = Meeting::where('attendee_id',$class->student()->id)->where('host_id',$class->teacher()->id)->first();
         $recordings = (new MeetingController)->getRecordings($class);
         // dd($recordings);
         // dump($recordings);
@@ -377,7 +359,7 @@ class ClassController extends Controller
         $meetingData = [
             'topic' => $meetingTopic,
             'host_id' => $enrolment->teacher->id,
-            'atendee_id' => $enrolment->student->id,
+            'attendee_id' => $enrolment->student->id,
         ];
         $request = new Request($meetingData);
         $meetingId = (new MeetingController)->store($request, true);

@@ -278,9 +278,9 @@ class User extends Authenticatable implements MustVerifyEmail
     public function personalMeeting($user_id)
     {
         if (auth()->user()->getRoleNames()->first() == "admin") {
-            return Meeting::where('atendee_id', $user_id)->first() == null ? "#" : (Meeting::where('atendee_id', $user_id)->first())->join_url;
+            return Meeting::where('attendee_id', $user_id)->first() == null ? "#" : (Meeting::where('attendee_id', $user_id)->first())->join_url;
         } else {
-            return Meeting::where('atendee_id', $user_id)->first() == null ? "#" : (Meeting::where('atendee_id', $user_id)->first())->join_url;
+            return Meeting::where('attendee_id', $user_id)->first() == null ? "#" : (Meeting::where('attendee_id', $user_id)->first())->join_url;
         }
     }
 }

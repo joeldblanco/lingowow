@@ -23,7 +23,7 @@ class AnalyticsController extends Controller
     {
         $current_period = ApportionmentController::currentPeriod();
         // $current_period = ApportionmentController::getPeriod('2023-06-15', true); //UNCOMMENT THIS TO CALCULATE THE PAYMENT FOR A SPECIFIC PERIOD 1/3
-        $invoices = Invoice::where('created_at', '>=', Carbon::parse($current_period[0])->startOfMonth())->where('created_at', '<=', Carbon::parse($current_period[0])->endOfMonth())->get();
+        $invoices = Invoice::where('paid', 1)->where('created_at', '>=', Carbon::parse($current_period[0])->startOfMonth())->where('created_at', '<=', Carbon::parse($current_period[0])->endOfMonth())->get();
         $payment = [];
         $classes = [];
         $profit = [];
@@ -112,7 +112,7 @@ class AnalyticsController extends Controller
             $total_profit += round($aux_profit[$key], 2);
         }
 
-        $earningsByMonth = Invoice::all()->groupBy(function ($invoice) {
+        $earningsByMonth = Invoice::where('paid', 1)->get()->groupBy(function ($invoice) {
             return $invoice->created_at->format('M');
         });
 

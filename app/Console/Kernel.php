@@ -90,10 +90,6 @@ class Kernel extends ConsoleKernel
                                 $preselection->delete();
 
                                 $classes_dates = ApportionmentController::calculateApportionment(count($user_schedule->selected_schedule), json_encode($user_schedule->selected_schedule), $enrolment->course->id, true)[2];
-                                // dump();
-                                // URGENT SCHEDULE NEW CLASSES
-                                //ADDING CLASS DURATION (40 MIN) TO CLASS START DATETIME AND STORING IT IN ANOTHER VARIABLE (TO CREATE CLASS END DATETIME)//
-                                // $classes_dates = session('classes_dates');
                                 foreach ($classes_dates as $key => $value) {
                                     $classes_dates[$key] = [];
 
@@ -109,7 +105,7 @@ class Kernel extends ConsoleKernel
                                 $data = [
                                     'topic' => $enrolment->student->first_name . ' ' . $enrolment->student->last_name . ' - Lesson Room',
                                     'host_id' => $enrolment->teacher->id,
-                                    'atendee_id' => $enrolment->student->id,
+                                    'attendee_id' => $enrolment->student->id,
                                 ];
 
                                 $request = new Request($data);

@@ -44,17 +44,17 @@
                                 <p class="text-gray-500 text-sm font-light">Please select a host for the meeting</p>
                             </div>
                             <div class="py-2 space-y-1">
-                                <p class="font-bold text-gray-600 mb-1">Atendee</p>
-                                <select name="atendee_id" id="atendee_id" disabled
-                                    class="w-full rounded-md p-3 text-gray-400 @if ($errors->has('atendee_id')) border-red-600 @else border-gray-300 @endif">
-                                    <option value="{{ $meeting->atendee->id }}" selected disabled hidden>
-                                        {{ $meeting->atendee->first_name . ' ' . $meeting->atendee->last_name }}
+                                <p class="font-bold text-gray-600 mb-1">Attendee</p>
+                                <select name="attendee_id" id="attendee_id" disabled
+                                    class="w-full rounded-md p-3 text-gray-400 @if ($errors->has('attendee_id')) border-red-600 @else border-gray-300 @endif">
+                                    <option value="{{ $meeting->attendee->id }}" selected disabled hidden>
+                                        {{ $meeting->attendee->first_name . ' ' . $meeting->attendee->last_name }}
                                     </option>
                                 </select>
-                                @if ($errors->has('atendee_id'))
-                                    <p class="text-xs font-light text-red-600">{{ $errors->get('atendee_id')[0] }}</p>
+                                @if ($errors->has('attendee_id'))
+                                    <p class="text-xs font-light text-red-600">{{ $errors->get('attendee_id')[0] }}</p>
                                 @endif
-                                <p class="text-gray-500 text-sm font-light">Please select a atendee for the meeting</p>
+                                <p class="text-gray-500 text-sm font-light">Please select a attendee for the meeting</p>
                             </div> --}}
                         </div>
                     </div>

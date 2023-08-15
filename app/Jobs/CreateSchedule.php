@@ -63,7 +63,7 @@ class CreateSchedule implements ShouldQueue
         $data = [
             'topic' => $enrolment->student->first_name . ' ' . $enrolment->student->last_name . ' - Lesson Room',
             'host_id' => $enrolment->teacher->id,
-            'atendee_id' => $enrolment->student->id,
+            'attendee_id' => $enrolment->student->id,
         ];
 
         $request = new Request($data);

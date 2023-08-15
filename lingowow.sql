@@ -1769,7 +1769,7 @@ insert  into `items`(`id`,`invoice_id`,`item_name`,`item_price`,`item_qty`,`crea
 
 /*Data for the table `meetings` */
 
-insert  into `meetings`(`id`,`topic`,`host_id`,`atendee_id`,`start_date`,`join_url`,`created_at`,`updated_at`,`deleted_at`) values 
+insert  into `meetings`(`id`,`topic`,`host_id`,`attendee_id`,`start_date`,`join_url`,`created_at`,`updated_at`,`deleted_at`) values 
 (206,'Joel Blanco - Lesson Room',7,5,NULL,'https://us02web.zoom.us/j/87621767446','2023-01-09 23:10:27','2023-01-10 22:34:15','2023-01-10 22:34:15'),
 (211,'Guest User - Lesson Room',7,183,NULL,'https://us02web.zoom.us/j/87316116667','2023-01-14 19:32:29','2023-01-14 19:39:34','2023-01-14 19:39:34'),
 (212,'Guest User - Lesson Room',7,183,NULL,'https://us02web.zoom.us/j/84591186058','2023-01-15 22:43:41','2023-01-16 20:35:01','2023-01-16 20:35:01'),

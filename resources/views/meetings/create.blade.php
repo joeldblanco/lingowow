@@ -45,27 +45,27 @@
                                 <p class="text-gray-500 text-sm font-light">Please select a host for the meeting</p>
                             </div>
                             <div class="py-2 space-y-1">
-                                <p class="font-bold text-gray-600 mb-1">Atendee</p>
-                                <select name="atendee_id" id="atendee_id" required
-                                    class="w-full rounded-md hover:border-gray-600 p-3 text-gray-600 @if ($errors->has('atendee_id')) border-red-600 @else border-gray-300 @endif">
-                                    <option value="none" selected disabled hidden>Select an atendee</option>
-                                    @foreach ($atendees as $atendee)
-                                        <option value="{{ $atendee->id }}">
-                                            {{ $atendee->first_name . ' ' . $atendee->last_name }}
+                                <p class="font-bold text-gray-600 mb-1">Attendee</p>
+                                <select name="attendee_id" id="attendee_id" required
+                                    class="w-full rounded-md hover:border-gray-600 p-3 text-gray-600 @if ($errors->has('attendee_id')) border-red-600 @else border-gray-300 @endif">
+                                    <option value="none" selected disabled hidden>Select an attendee</option>
+                                    @foreach ($attendees as $attendee)
+                                        <option value="{{ $attendee->id }}">
+                                            {{ $attendee->first_name . ' ' . $attendee->last_name }}
                                         </option>
                                     @endforeach
                                 </select>
-                                @if ($errors->has('atendee_id'))
-                                    <p class="text-xs font-light text-red-600">{{$errors->get('atendee_id')[0]}}</p>
+                                @if ($errors->has('attendee_id'))
+                                    <p class="text-xs font-light text-red-600">{{$errors->get('attendee_id')[0]}}</p>
                                 @endif
-                                <p class="text-gray-500 text-sm font-light">Please select an atendee for the meeting</p>
+                                <p class="text-gray-500 text-sm font-light">Please select an attendee for the meeting</p>
                             </div>
                             <div class="pt-6 pb-2 space-y-1">
                                 <p class="font-bold text-gray-600 mb-1">Date & Time (UTC)</p>
                                 <input type="datetime-local" name="date" id="date" placeholder="Enter meeting date" step="3600" min="{{$now}}" value="0000-00-00T00:00" required
                                     class="w-full rounded-md p-3 text-gray-600 hover:border-gray-600 @if ($errors->has('date')) border-red-600 @else border-gray-300 @endif ">
-                                @if ($errors->has('atendee_id'))
-                                    <p class="text-xs font-light text-red-600">{{$errors->get('atendee_id')[0]}}</p>
+                                @if ($errors->has('attendee_id'))
+                                    <p class="text-xs font-light text-red-600">{{$errors->get('attendee_id')[0]}}</p>
                                 @endif
                                 <p class="text-gray-500 text-sm font-light">Please select a meeting date and time <a>(UTC)</a></p>
                             </div>

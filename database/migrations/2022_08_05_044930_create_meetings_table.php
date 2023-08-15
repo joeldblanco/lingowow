@@ -17,7 +17,7 @@ class CreateMeetingsTable extends Migration
             $table->id();
             $table->string('topic');
             $table->bigInteger('host_id')->unsigned();
-            $table->bigInteger('atendee_id')->unsigned()->nullable();
+            $table->bigInteger('attendee_id')->unsigned()->nullable();
             $table->string('start_date')->nullable();
             $table->string('join_url', 40)->nullable();
             $table->timestamps();

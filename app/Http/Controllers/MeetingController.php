@@ -34,9 +34,9 @@ class MeetingController extends Controller
     public function create()
     {
         $hosts = User::role('teacher')->select('id', 'first_name', 'last_name')->orderBy('first_name', 'ASC')->get();
-        $atendees = User::role('student')->select('id', 'first_name', 'last_name')->orderBy('first_name', 'ASC')->get();
+        $attendees = User::role('student')->select('id', 'first_name', 'last_name')->orderBy('first_name', 'ASC')->get();
 
-        return view('meetings.create', compact('hosts', 'atendees'));
+        return view('meetings.create', compact('hosts', 'attendees'));
     }
 
     public function store(Request $request, $return = false, $class = null)
@@ -51,14 +51,14 @@ class MeetingController extends Controller
         $data = $request->all();
 
         $host = User::where('id', $data['host_id'])->select('id', 'email')->first();
-        if (array_key_exists('atendee_id', $data)) {
-            $atendee = User::where('id', $data['atendee_id'])->select('id')->first();
+        if (array_key_exists('attendee_id', $data)) {
+            $attendee = User::where('id', $data['attendee_id'])->select('id')->first();
         } else {
-            $atendee = null;
+            $attendee = null;
         }
         // $data['date'] = Carbon::parse($data['date'])->toIso8601ZuluString();
 
-        // if (!$this->meetingExists($host, $atendee)) {
+        // if (!$this->meetingExists($host, $attendee)) {
 
         $path = 'users/' . $host['email'] . '/meetings';
         $url = $this->retrieveZoomUrl();
@@ -81,11 +81,11 @@ class MeetingController extends Controller
         if ($success) {
             $data = json_decode($response->getBody(), true);
 
-            if ($atendee != null) {
+            if ($attendee != null) {
                 // $meeting = Meeting::create(
                 //     [
                 //         'host_id' => $host['id'],
-                //         'atendee_id' => $atendee['id'],
+                //         'attendee_id' => $attendee['id'],
                 //         'start_date' => $data['start_time'],
                 //         'join_url' => $data['join_url'],
                 //         'topic' => $data['topic'],
@@ -93,7 +93,7 @@ class MeetingController extends Controller
                 // );
 
                 $meeting = Meeting::updateOrCreate(
-                    ['host_id' => $host['id'], 'atendee_id' => $atendee['id']],
+                    ['host_id' => $host['id'], 'attendee_id' => $attendee['id']],
                     ['join_url' => $data['join_url'], 'topic' => $data['topic'], 'deleted_at' => NULL]
                 );
 
@@ -169,7 +169,7 @@ class MeetingController extends Controller
             if ($success) {
                 $data = json_decode($response->getBody(), true);
                 Meeting::updateOrInsert(
-                    ['host_id' => $meeting->host->id, 'atendee_id' => $meeting->atendee->id],
+                    ['host_id' => $meeting->host->id, 'attendee_id' => $meeting->attendee->id],
                     ['host_id' => $host['id'], 'join_url' => $data['join_url'], 'deleted_at' => NULL]
                 );
 
@@ -217,7 +217,7 @@ class MeetingController extends Controller
         }
     }
 
-    public function meetingExists($host, $atendee = null)
+    public function meetingExists($host, $attendee = null)
     {
         // $path = 'users/' . $host['email'] . '/meetings';
         // $url = $this->retrieveZoomUrl();
@@ -234,8 +234,8 @@ class MeetingController extends Controller
         // }
 
         // return false;
-        if ($atendee != null) {
-            $meeting = Meeting::where('host_id', $host->id)->where('atendee_id', $atendee->id)->first();
+        if ($attendee != null) {
+            $meeting = Meeting::where('host_id', $host->id)->where('attendee_id', $attendee->id)->first();
         } else {
             $meeting = Meeting::where('host_id', $host->id)->first();
         }
@@ -251,6 +251,9 @@ class MeetingController extends Controller
     {
 
         $studentMeetings = auth()->user()->studentClasses->whereBetween('start_date', [Carbon::now()->subDays(7), Carbon::now()])->pluck('meeting_id')->unique();
+
+        // Initialize an array to store all the recordings
+        $allRecordings = [];
 
         foreach ($studentMeetings as $meeting) {
 
@@ -269,9 +272,6 @@ class MeetingController extends Controller
 
             // Decode the response into an array and extract each meeting instance's UUID
             $meetingInstances = json_decode($response->getBody(), true);
-
-            // Initialize an array to store all the recordings
-            $allRecordings = [];
 
             // Retrieve the recording details for each meeting instance
             if (!empty($meetingInstances)) {

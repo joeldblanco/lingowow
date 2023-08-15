@@ -189,7 +189,7 @@
                                             Host</th>
                                         <th
                                             class="py-4 px-6 bg-gray-100 font-bold uppercase text-sm text-gray-600 border-b border-gray-400 text-center">
-                                            Atendee</th>
+                                            Attendee</th>
                                         <th
                                             class="py-4 px-6 bg-gray-100 font-bold uppercase text-sm text-gray-600 border-b border-gray-400 text-center">
                                             Join Url</th>

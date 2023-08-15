@@ -12,6 +12,7 @@ class Invoice extends Model
         'price',
         'paid',
         'user_id',
+        'payment_method',
     ];
 
     //

@@ -46,7 +46,7 @@
                                         Host</th>
                                     <th
                                         class="py-4 px-6 bg-gray-100 font-bold uppercase text-sm text-gray-600 border-b border-gray-400 text-center">
-                                        Atendee</th>
+                                        Attendee</th>
                                     <th
                                         class="py-4 px-6 bg-gray-100 font-bold uppercase text-sm text-gray-600 border-b border-gray-400 text-center">
                                         Join Url</th> --}}
@@ -73,7 +73,7 @@
                                         {{-- <td class="py-4 px-6 border-b border-gray-400 text-center">
                                             {{ $meeting->host->first_name }} {{ $meeting->host->last_name }}</td>
                                         <td class="py-4 px-6 border-b border-gray-400 text-center">
-                                            {{ $meeting->atendee->first_name }} {{ $meeting->atendee->last_name }}
+                                            {{ $meeting->attendee->first_name }} {{ $meeting->attendee->last_name }}
                                         </td>
                                         <td class="py-4 px-6 border-b border-gray-400 text-center">
                                             <a href="{{ $meeting->join_url }}"
