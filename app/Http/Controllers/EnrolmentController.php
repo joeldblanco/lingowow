@@ -61,6 +61,7 @@ class EnrolmentController extends Controller
      */
     public function isScheduleNeeded(Request $request)
     {
+        // dump($request);
         $request->validate([
             'course_id' => 'required|numeric|exists:App\Models\Course,id',
         ]);
@@ -71,71 +72,84 @@ class EnrolmentController extends Controller
 
         if ($course->categories->pluck('name')->contains("Test")) {
             $action = 'examSelection';
-        }
 
-        if ($course->categories->pluck('name')->contains("Synchronous")) {
+            $selected_teacher = $request->teacher_id;
+            $student_id = $request->student_id;
+            $plan = $request->plan;
 
-            $request->validate([
-                'teacher_id' => 'required|numeric|exists:App\Models\User,id',
-                'student_id' => 'numeric|exists:App\Models\User,id',
-                'plan' => 'numeric',
+            session([
+                'enrolment_type' => 'manual_enrolment',
+                'selected_course' => $request->course_id,
+                'selected_teacher' => $request->teacher_id,
+                'student_id' => $request->student_id,
             ]);
 
-            session()->forget([
-                'enrolment_type',
-                'selected_course',
-                'selected_teacher',
-                'student_id',
-            ]);
+            return view('enrolments.schedule-selection', compact('student_id', 'selected_teacher', 'plan', 'action', 'data'));
+        } else {
+            if ($course->categories->pluck('name')->contains("Synchronous")) {
 
-            //GETTING IF STUDENT IS ALREADY ENROLLED//
-            $enrolment = Enrolment::where('student_id', $request->student_id)
-                ->where('course_id', $request->course_id)
-                ->first();
-
-            //IF STUDENT IS ALREADY ENROLLED BUT PREENROLMENT IS AVAILABLE CREATE STUDENT'S PREENROLMENT//
-            if ($enrolment && EnrolmentController::isPreenrolmentAvailable($enrolment)) {
-                $action = 'schedulePreselection';
-            }
-
-            //IF STUDENT IS ALREADY ENROLLED BUT PREENROLMENT IS NOT AVAILABLE REDIRECT BACK//
-            if ($enrolment && !EnrolmentController::isPreenrolmentAvailable($enrolment)) {
-                return redirect()->back()->with('error', 'Student is already preenroled in this course.');
-            }
-
-            //IF STUDENT IS ALREADY ENROLLED BUT PREENROLMENT IS AVAILABLE CREATE STUDENT'S PREENROLMENT//
-            if (empty($enrolment)) {
-                $action = 'scheduleSelection';
-            }
-
-            if ($request->student_id == null) {
-                EnrolmentController::store($request);
-                return redirect()->route('enrolments.index');
-            } else {
-                $selected_teacher = $request->teacher_id;
-                $student_id = $request->student_id;
-                $plan = $request->plan;
-
-                session([
-                    'enrolment_type' => 'manual_enrolment',
-                    'selected_course' => $request->course_id,
-                    'selected_teacher' => $request->teacher_id,
-                    'student_id' => $request->student_id,
+                $request->validate([
+                    'teacher_id' => 'required|numeric|exists:App\Models\User,id',
+                    'student_id' => 'numeric|exists:App\Models\User,id',
+                    'plan' => 'numeric',
                 ]);
 
-                return view('enrolments.schedule-selection', compact('student_id', 'selected_teacher', 'plan', 'action', 'data'));
+                session()->forget([
+                    'enrolment_type',
+                    'selected_course',
+                    'selected_teacher',
+                    'student_id',
+                ]);
+
+                //GETTING IF STUDENT IS ALREADY ENROLLED//
+                $enrolment = Enrolment::where('student_id', $request->student_id)
+                    ->where('course_id', $request->course_id)
+                    ->first();
+
+                //IF STUDENT IS ALREADY ENROLLED BUT PREENROLMENT IS AVAILABLE CREATE STUDENT'S PREENROLMENT//
+                if ($enrolment && EnrolmentController::isPreenrolmentAvailable($enrolment)) {
+                    $action = 'schedulePreselection';
+                }
+
+                //IF STUDENT IS ALREADY ENROLLED BUT PREENROLMENT IS NOT AVAILABLE REDIRECT BACK//
+                if ($enrolment && !EnrolmentController::isPreenrolmentAvailable($enrolment)) {
+                    return redirect()->back()->with('error', 'Student is already preenroled in this course.');
+                }
+
+                //IF STUDENT IS ALREADY ENROLLED BUT PREENROLMENT IS AVAILABLE CREATE STUDENT'S PREENROLMENT//
+                if (empty($enrolment)) {
+                    $action = 'scheduleSelection';
+                }
+
+                if ($request->student_id == null) {
+                    EnrolmentController::store($request);
+                    return redirect()->route('enrolments.index');
+                } else {
+                    $selected_teacher = $request->teacher_id;
+                    $student_id = $request->student_id;
+                    $plan = $request->plan;
+
+                    session([
+                        'enrolment_type' => 'manual_enrolment',
+                        'selected_course' => $request->course_id,
+                        'selected_teacher' => $request->teacher_id,
+                        'student_id' => $request->student_id,
+                    ]);
+
+                    return view('enrolments.schedule-selection', compact('student_id', 'selected_teacher', 'plan', 'action', 'data'));
+                }
             }
-        }
 
-        if ($course->categories->pluck('name')->contains("Asynchronous")) {
-            $request->validate([
-                'student_id' => 'required|numeric|exists:App\Models\User,id',
-            ]);
+            if ($course->categories->pluck('name')->contains("Asynchronous")) {
+                $request->validate([
+                    'student_id' => 'required|numeric|exists:App\Models\User,id',
+                ]);
 
-            GatherController::editGuestsList([$request->student_id]);
-            $this->store($request);
+                GatherController::editGuestsList([$request->student_id]);
+                $this->store($request);
 
-            return redirect()->route('enrolments.index');
+                return redirect()->route('enrolments.index');
+            }
         }
     }
 
@@ -390,12 +404,16 @@ class EnrolmentController extends Controller
         return $enrolment->id;
     }
 
-    public static function calculateApportionment($plan = null, $schedule = null, $course_id = null, $preselection = null)
+    public static function calculateApportionment($plan = null, $schedule = null, $course_id = null, $preselection = null, $teacher_id = null)
     {
         if (empty(session('student_id'))) {
             $user = auth()->user();
         } else {
             $user = User::find(session('student_id'));
+        }
+
+        if ($teacher_id == null) {
+            $teacher_id = session('teacher_id');
         }
 
         if ($schedule == null) {
@@ -408,8 +426,7 @@ class EnrolmentController extends Controller
             $course_id = session("selected_course");
         }
 
-        $today = Carbon::now()->setTimezone('UTC');
-        $today->addDays(1);
+        $nowUTC = Carbon::now()->setTimezone('UTC');
 
         $current_period = ApportionmentController::currentPeriod();
         $next_period = ApportionmentController::nextPeriod();
@@ -426,8 +443,11 @@ class EnrolmentController extends Controller
             foreach ($schedule as $key => $value) {
                 $day = $value[1];
                 $time = $value[0];
-                $qty += $today->diffInDaysFiltered(function (Carbon $date) use (&$day, &$time, &$days, &$current_period_start) {
-                    if ($date->isDayOfWeek($day) && $date->greaterThanOrEqualTo($current_period_start)) {
+
+                $nowUTC->hour = $time;
+
+                $qty += $nowUTC->diffInDaysFiltered(function (Carbon $date) use (&$day, &$time, &$days, &$current_period_start) {
+                    if ($date->isDayOfWeek($day) && $date->greaterThanOrEqualTo($current_period_start) && $date->greaterThanOrEqualTo(now()->copy()->addHours(12))) {
                         $date->hour = $time;
                         $date->minute = 0;
                         $date->second = 0;
@@ -458,10 +478,7 @@ class EnrolmentController extends Controller
                 }
             }
 
-            $period_start_c = new Carbon($current_period[0]);
-            $period_end_c = new Carbon($current_period[1]);
-
-            $absence = User::find(session('teacher_id'))->teacherClasses()->where('status', 1)->whereBetween('start_date', [$today->toDateTimeString(), ApportionmentController::currentPeriod()[1]])->orderBy('start_date', 'asc')->get()->pluck('start_date');
+            $absence = User::find($teacher_id)->teacherClasses()->where('status', 1)->whereBetween('start_date', [$nowUTC->toDateTimeString(), ApportionmentController::currentPeriod()[1]])->orderBy('start_date', 'asc')->get()->pluck('start_date');
 
             if ($absence != null) {
                 foreach ($absence as $key => $start_date) {
@@ -476,7 +493,9 @@ class EnrolmentController extends Controller
             $days_diff = array_values($days_diff);
 
             $qty_diff = sizeof($days_diff);
-        } else {
+        }
+
+        if (!empty($preselection)) {
 
             $qty = 0;
             $days = [];
@@ -502,6 +521,8 @@ class EnrolmentController extends Controller
 
             $qty_diff = sizeof($days_diff);
         }
+
+        // dd($days);
 
         return [$qty_diff, $days_diff, $days, $absence];
     }
@@ -687,7 +708,7 @@ class EnrolmentController extends Controller
         ]);
 
         if (!$enrolment->course->categories->pluck('name')->contains('Test')) {
-            $classDates = EnrolmentController::calculateApportionment($userSchedule);
+            $classDates = EnrolmentController::calculateApportionment(schedule: json_encode($userSchedule));
             return $classDates[1];
         }
 

@@ -64,7 +64,7 @@ class ExamDisplay extends Component
     {
         $answer = explode("-", $answer);
         $question = $this->exam->questions->where('id', $answer[1])->first();
-
+        
         Answer::updateOrCreate([
             'attempt_id' => $this->attempt->id,
             'question_id' => $question->id,

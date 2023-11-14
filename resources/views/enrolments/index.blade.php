@@ -15,7 +15,7 @@
                     <th class="text-left w-full">Teacher</th>
                     <th class="text-left w-full">Student</th>
                     <th class="text-left w-full">Course</th>
-                    <th class="text-left w-full">Enrolment Date</th>
+                    <th class="text-left w-full">Enrolment Date (Local)</th>
                     <th class="text-right w-1/3 justify-center"></th>
                 </tr>
             </thead>
@@ -52,7 +52,7 @@
                                 {{ $enrolment->course->name }}</a>
                         </td>
                         <td class="flex w-full text-left cursor-pointer hover:underline">
-                            {{ $enrolment->updated_at->format('d/m/Y - h:00 a') }}
+                            {{ $enrolment->updated_at->setTimezone(auth()->user()->timezone)->format('d/m/Y - h:00 a') }}
                         </td>
                         <td class="flex w-1/3 text-left space-x-5" x-data="{ trash: true, deleteConfirmation: false }" x-cloak>
                             <a href="{{ route('enrolments.edit', $enrolment->id) }}">

@@ -93,11 +93,6 @@ class ScheduleController extends Component
 
                     $this->studentClasses = $this->utcToLocal($this->datesToScheduleFormat($this->studentClasses->where('start_date', '>', now())->pluck('start_date')));
 
-
-                    // if ($this->users == 5) {
-                    //     dd($this->getUserSchedule($users));
-                    // }
-
                     // Get student schedule
                     $this->schedules = $this->utcToLocal($this->getUserSchedule($users));
 
@@ -219,6 +214,33 @@ class ScheduleController extends Component
                         // Emit event of schedule updated and send schedule to parent component
                         // $this->dispatchBrowserEvent('scheduleLoaded', ['schedule' => $this->schedules]);
                     }
+
+                    break;
+
+                case 'adminEdit':
+                    $this->classForSelectees = "available";
+                    $this->classForSelected = "available";
+
+                    if (!User::withTrashed()->find($users)->trashed()) {
+
+                        $enrolment = Enrolment::find($this->data['enrolment_id']);
+
+                        $this->users = $enrolment->teacher_id;
+
+                        // Get teacher schedule
+                        // $this->schedules = $this->utcToLocal($this->schedulesIntersect($this->getTeachersAvailability($this->users), $this->getTeachersPreselectionAvailability($this->users)));
+
+                        $reserve = ScheduleReserve::withTrashed()->where('user_id', $this->users)->first();
+                        if (!empty($reserve)) $reserve->delete();
+                        // if (User::find($users)->hasRole('student')) {
+                        //     // Get student schedule
+                        //     $this->schedules = $this->utcToLocal($this->getUserSchedule($users));
+                        // }
+
+                        // Emit event of schedule updated and send schedule to parent component
+                        // $this->dispatchBrowserEvent('scheduleLoaded', ['schedule' => $this->schedules]);
+                    }
+                    break;
             }
     }
 
@@ -326,6 +348,11 @@ class ScheduleController extends Component
             if ($this->action == 'schedulePreselection') {
                 $this->users = $teacherId;
                 $this->schedules = $this->utcToLocal($this->getTeachersPreselectionAvailability($this->users));
+            }
+
+            if ($this->action == 'adminEdit') {
+                $this->users = $teacherId;
+                $this->schedules = $this->utcToLocal($this->schedulesIntersect($this->getTeachersAvailability($this->users), $this->getTeachersPreselectionAvailability($this->users)));
             }
         }
 
@@ -473,6 +500,7 @@ class ScheduleController extends Component
     {
         // Verify if $teachers is an array and transform it into a collection if it's not
         is_array($teachers) == true ? $teachers = User::find($teachers) : $teachers = User::find([$teachers]);
+        $teachersPreselectionAvailability = [];
 
         foreach ($teachers as $key => $teacher) {
 
@@ -490,6 +518,7 @@ class ScheduleController extends Component
                 $ocassionalClasses[$teacher->id] = $this->getOcassionalClasses($teacher->id, $week);
             }
         }
+
         $teachersPreselectionAvailability = array_merge(...$teachersPreselectionAvailability);
 
         // Remove duplicate schedules
@@ -553,7 +582,7 @@ class ScheduleController extends Component
         $studentsSchedules = [];
         $studentsInfo = [];
         foreach ($teacherEnrolments as $enrolment) {
-            if ($enrolment->schedule == null) dd($enrolment);
+            if (empty($enrolment->schedule)) dd($enrolment->schedule);
             if ($getStudentsInfo == true) {
                 $studentsInfo[] = [
                     'student' => $enrolment->student,
@@ -723,24 +752,19 @@ class ScheduleController extends Component
         $this->dispatchBrowserEvent('scheduleUpdated', ['schedule' => $schedule]);
     }
 
-    public function updateStudentSchedule($schedule)
+    public function updateStudentSchedule($enrolment, $schedule)
     {
         // Update schedule
-        $user = User::find($this->users);
-        if (!empty($user->schedules->first())) {
-            $user->schedules->first()->selected_schedule = $this->localToUtc($schedule);
-            $user->schedules->first()->save();
-        } else {
-            $user->schedules()->create([
-                'selected_schedule' => $this->localToUtc($schedule),
-            ]);
+        if (!empty($enrolment->schedule)) {
+            $enrolment->schedule->selected_schedule = $schedule;
+            $enrolment->schedule->save();
         }
 
-        // Convert schedule to local time
-        $schedule = $this->utcToLocal($this->getUserSchedule($user->id));
+        // // Convert schedule to local time
+        // $schedule = $this->utcToLocal($this->getUserSchedule($user->id));
 
-        // Emit event of schedule updated and send schedule to parent component
-        $this->dispatchBrowserEvent('scheduleUpdated', ['schedule' => $schedule]);
+        // // Emit event of schedule updated and send schedule to parent component
+        // $this->dispatchBrowserEvent('scheduleUpdated', ['schedule' => $schedule]);
     }
 
     public function previousWeek()
@@ -1079,6 +1103,36 @@ class ScheduleController extends Component
                         }
                     } else {
                         return redirect()->route("schedule.create")->with('error', session('error'));
+                    }
+                }
+
+                break;
+
+            case 'adminEdit':
+
+                if ($this->limit == count($data[1])) {
+
+                    $schedule = $this->localToUtc($data[1]);
+
+                    $scheduleApproved = ShopController::checkScheduleIntegrity($this->users, $schedule);
+
+                    if ($scheduleApproved) {
+
+                        $apportionment = EnrolmentController::calculateApportionment(schedule: json_encode($schedule));
+
+                        $enrolment = Enrolment::find($this->data['enrolment_id']);
+
+                        foreach ($enrolment->classes as $class) {
+                            $class->delete();
+                        }
+
+                        $classes = ClassController::bookClasses($apportionment[1], $enrolment->id);
+
+                        $this->updateStudentSchedule($enrolment, $schedule);
+
+                        redirect()->route("enrolments.index")->with('success', 'Schedule succesfully updated!');
+                    } else {
+                        redirect()->route("schedule.create")->with('error', session('error'));
                     }
                 }
 

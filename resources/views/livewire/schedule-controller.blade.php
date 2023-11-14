@@ -1,24 +1,26 @@
 <div class="my-8 mb-8" x-data="{ editSchedule: true, cancelEdition: false, saveEdition: false }" x-cloak>
 
     @role('teacher|admin')
-        <div class="flex w-full justify-end space-x-4">
-            <button onclick="startEdition()" x-show="editSchedule"
-                x-on:click="editSchedule = false, cancelEdition = true, saveEdition = true"
-                class="bg-lw-blue px-4 py-2 rounded-md text-white font-bold hover:bg-blue-800 mb-5 teachers-clear-schedule-button">
-                Clear Schedule
-                <i class="fas fa-eraser"></i>
-            </button>
-            <button onclick="cancelEdition()" x-show="cancelEdition"
-                x-on:click="editSchedule = true, cancelEdition = false, saveEdition = false"
-                class="bg-red-600 px-4 py-2 rounded-md text-white font-bold hover:bg-red-700 mb-5">
-                Cancel
-            </button>
-            <button onclick="saveEdition()" x-show="saveEdition"
-                x-on:click="editSchedule = true, cancelEdition = false, saveEdition = false"
-                class="bg-green-600 px-4 py-2 rounded-md text-white font-bold hover:bg-green-700 mb-5">
-                Save
-            </button>
-        </div>
+        @if ($action != 'adminEdit')
+            <div class="flex w-full justify-end space-x-4">
+                <button onclick="startEdition()" x-show="editSchedule"
+                    x-on:click="editSchedule = false, cancelEdition = true, saveEdition = true"
+                    class="bg-lw-blue px-4 py-2 rounded-md text-white font-bold hover:bg-blue-800 mb-5 teachers-clear-schedule-button">
+                    Clear Schedule
+                    <i class="fas fa-eraser"></i>
+                </button>
+                <button onclick="cancelEdition()" x-show="cancelEdition"
+                    x-on:click="editSchedule = true, cancelEdition = false, saveEdition = false"
+                    class="bg-red-600 px-4 py-2 rounded-md text-white font-bold hover:bg-red-700 mb-5">
+                    Cancel
+                </button>
+                <button onclick="saveEdition()" x-show="saveEdition"
+                    x-on:click="editSchedule = true, cancelEdition = false, saveEdition = false"
+                    class="bg-green-600 px-4 py-2 rounded-md text-white font-bold hover:bg-green-700 mb-5">
+                    Save
+                </button>
+            </div>
+        @endif
     @endrole
     @if ($action == 'classRescheduling')
         <div class="dateReason-tour mb-10">
@@ -99,7 +101,8 @@
                                 @endphp
 
                                 @for ($i = 0; $i < $count; $i++)
-                                    <button class="tooltip button_tooltip"></button>
+                                    <button
+                                        class="tooltip @if (in_array([$hour, $key], $schedules)) button_tooltip @else button_tooltip_green @endif"></button>
                                 @endfor
 
                             </td>
@@ -114,7 +117,8 @@
             $action == 'classRescheduling' ||
             $action == 'manualEnrolment' ||
             $action == 'scheduleSelection' ||
-            $action == 'examSelection')
+            $action == 'examSelection' ||
+            $action == 'adminEdit')
         @hasanyrole('guest|student|admin')
             <div class="py-5 w-full flex justify-end">
                 <button onclick="saveSchedule()"

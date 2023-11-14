@@ -468,9 +468,6 @@ Route::middleware(['web', 'auth', 'verified', 'impersonate'])->group(function ()
         // Route::get('/admin/exam/result/{id}', [ExamController::class, 'correct'])->name('exam.result');
     });
 
-    //ROUTES FOR NEW PAYPAL API//
-    // Route::resource('api/paypal', PaypalController::class);
-
     Route::get('activities', [ActivityController::class, 'index'])->name('activities.index');
     Route::get('activities/{id}', [ActivityController::class, 'show'])->name('admin.activities.show');
 

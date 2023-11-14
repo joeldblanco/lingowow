@@ -32,13 +32,19 @@ class TeachersCarousel extends Component
             $this->teachers_ids = $this->available_teachers->pluck('id');
         } else {
             $this->teachers_ids = $available_teachers;
-            if (!is_array($available_teachers)) {
+
+            if (!is_iterable($available_teachers)) {
                 $available_teachers = [$available_teachers];
             }
+
             $this->available_teachers = User::role('teacher')->whereIn('id', $available_teachers)->get()->pluck('schedules')->flatten()->whereNotNull('selected_schedule')->pluck('user');
+
+            // $this->available_teachers = User::role('teacher')->whereIn('id', $available_teachers)->get()->pluck('schedules')->flatten()->where(function ($schedule) {
+            //     return !empty($schedule['selected_schedule']);
+            // })->pluck('user');
         }
 
-        $this->available_teachers = $this->available_teachers->shuffle();
+        // $this->available_teachers = $this->available_teachers->shuffle();
         if (count($this->available_teachers) > 0) {
             session(['first_teacher' => $this->available_teachers[0]->id]);
         } else {
@@ -88,11 +94,18 @@ class TeachersCarousel extends Component
         if (!is_iterable($this->teachers_ids)) {
             $this->teachers_ids = [$this->teachers_ids];
         }
+
         $this->available_teachers = new Collection([]);
-        if ((auth()->user()->hasRole('guest') || auth()->user()->hasRole('student')) && auth()->id() != 5) {
-            $this->available_teachers = User::role('teacher')->whereIn('id', $this->teachers_ids)->where('id', '!=', 7)->get()->pluck('schedules')->flatten()->whereNotNull('selected_schedule')->pluck('user');
-        } else {
-            $this->available_teachers = User::role('teacher')->whereIn('id', $this->teachers_ids)->get()->pluck('schedules')->flatten()->whereNotNull('selected_schedule')->pluck('user');
+        $teachersSchedules = User::role('teacher')->whereIn('id', $this->teachers_ids)->get()->pluck('schedules')->flatten();
+
+        foreach ($teachersSchedules as $schedule) {
+            if (!empty($schedule->selected_schedule)) {
+                if (auth()->id() != 6 && $schedule->user->id == 7) {
+                    continue;
+                } else {
+                    $this->available_teachers->push($schedule->user);
+                }
+            }
         }
 
         foreach ($this->available_teachers as $key => $teacher) {
@@ -106,7 +119,6 @@ class TeachersCarousel extends Component
                 $this->available_teachers->forget($key);
             }
         }
-
 
         $this->available_teachers = $this->available_teachers->shuffle();
 

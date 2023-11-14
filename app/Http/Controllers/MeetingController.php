@@ -72,7 +72,7 @@ class MeetingController extends Controller
         ];
 
         $response = Http::withHeaders([
-            'Authorization' => 'Bearer ' . $this->jwt,
+            'Authorization' => 'Bearer ' . $this->OAuth,
             'Content-Type'  => 'application/json',
         ])->post($url . $path, $body);
 
@@ -144,7 +144,7 @@ class MeetingController extends Controller
 
         $body = [];
         $response = Http::withHeaders([
-            'Authorization' => 'Bearer ' . $this->jwt,
+            'Authorization' => 'Bearer ' . $this->OAuth,
             'Content-Type'  => 'application/json',
         ])->delete($url . $path, $body);
         $success = $response->getStatusCode() === 204;
@@ -160,7 +160,7 @@ class MeetingController extends Controller
             ];
 
             $response = Http::withHeaders([
-                'Authorization' => 'Bearer ' . $this->jwt,
+                'Authorization' => 'Bearer ' . $this->OAuth,
                 'Content-Type'  => 'application/json',
             ])->post($url . $path, $body);
 
@@ -199,7 +199,7 @@ class MeetingController extends Controller
         $body = [];
 
         $response = Http::withHeaders([
-            'Authorization' => 'Bearer ' . $this->jwt,
+            'Authorization' => 'Bearer ' . $this->OAuth,
             'Content-Type'  => 'application/json',
         ])->delete($url . $path, $body);
 
@@ -223,7 +223,7 @@ class MeetingController extends Controller
         // $url = $this->retrieveZoomUrl();
 
         // $response = Http::withHeaders([
-        //     'Authorization' => 'Bearer ' . $this->jwt,
+        //     'Authorization' => 'Bearer ' . $this->OAuth,
         //     'Content-Type'  => 'application/json',
         // ])->get($url . $path);
 
@@ -266,7 +266,7 @@ class MeetingController extends Controller
 
             // Send an HTTP GET request to retrieve the meeting instances
             $response = Http::withHeaders([
-                'Authorization' => 'Bearer ' . $this->jwt,
+                'Authorization' => 'Bearer ' . $this->OAuth,
                 'Content-Type'  => 'application/json',
             ])->get($url . $path);
 
@@ -283,7 +283,7 @@ class MeetingController extends Controller
 
                     // Send an HTTP GET request to retrieve the recording details
                     $response = Http::withHeaders([
-                        'Authorization' => 'Bearer ' . $this->jwt,
+                        'Authorization' => 'Bearer ' . $this->OAuth,
                         'Content-Type'  => 'application/json',
                     ])->get($url . $path);
 
@@ -345,7 +345,7 @@ class MeetingController extends Controller
         $url = $this->retrieveZoomUrl();
 
         $response = Http::withHeaders([
-            'Authorization' => 'Bearer ' . $this->jwt,
+            'Authorization' => 'Bearer ' . $this->OAuth,
             'Content-Type'  => 'application/json',
         ])->get($url . $path);
 

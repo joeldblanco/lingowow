@@ -340,7 +340,7 @@ class UnitController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function userAssociate(Request $request)
+    public function userAssociate(Request $request, $redirect = true)
     {
         // Validate the request data
         $request->validate([
@@ -357,10 +357,94 @@ class UnitController extends Controller
         // Attach the user to the unit
         $user->units()->attach($request->unit);
 
-        // Set a success message
-        // session(['success' => 'User associated with unit successfully']);
+        if ($redirect) {
+            // Set a success message
+            session(['success' => 'User associated with unit successfully']);
 
-        // Redirect to the unit association page
-        return redirect()->route('units.association')->with('success', 'User associated with unit successfully');
+            // Redirect to the unit association page
+            return redirect()->route('units.association')->with('success', 'User associated with unit successfully');
+        }
+    }
+
+    public static function checkUnitUser($module, $user)
+    {
+        
+        if ($user->units->first()->module->order < $module->order) {
+            $attempts = $user->attempts;
+            $exams = $module->exams()->flatten()->filter(function ($exam) use ($attempts) {
+                return $attempts->pluck('exam_id')->contains($exam->id);
+            });
+
+            if (count($exams) > 0) {
+
+                $lastExam = $exams->sortBy('id')->last();
+                $highestScoredAttempt = $attempts->where('exam_id', $lastExam->id)->sortByDesc('score')->first();
+
+                if ($highestScoredAttempt->score >= $lastExam->passing_marks) {
+
+                    //Get this module's units that are greater than this exam's unit
+                    $nextUnits = $lastExam->unit->course()->units()->where('order', '>', $lastExam->unit->order)->where('module_id', $lastExam->unit->module_id)->sortBy('order');
+
+                    //Check if there are other units in the same module
+                    if (!empty($nextUnits) && $nextUnits->count() > 0) {
+
+                        //Check if those units have exams
+                        $nextExams = $nextUnits->pluck('exams')->flatten();
+                        if ($nextExams->count() > 0) {
+
+                            //Get the first exam's unit
+                            $unit = $nextExams->first()->unit;
+                        } else {
+
+                            //Get the last unit of the module
+                            $unit = $nextUnits->last();
+                        }
+
+                        //Associate the unit to the user.
+                        $request = new Request([
+                            'user' => $user->id,
+                            'unit' => $unit->id,
+                        ]);
+                        (new UnitController)->userAssociate($request, redirect: false);
+                    } else {
+
+                        //Get all course's modules that are greater than this exam's unit's module
+                        $nextModules = $lastExam->unit->course()->modules->where('order', '>', $lastExam->unit->module->order)->sortBy('order');
+                        if (!empty($nextModules) && $nextModules->count() > 0) {
+
+                            //Get all exams in the next modules
+                            $nextExams = $nextModules->pluck('units')->flatten()->pluck('exams')->flatten();
+                        }
+
+                        //Check if there are exams in the next modules
+                        if ($nextExams->count() > 0) {
+
+                            //Get the first exam's unit
+                            $unit = $nextExams->first()->unit;
+                        } else {
+
+                            //If there are no exams in the next modules, get the last unit of the course
+                            $unit = $lastExam->unit->course()->units()->last();
+                        }
+
+                        //Associate the unit to the user.
+                        $request = new Request([
+                            'user' => $user->id,
+                            'unit' => $unit->id,
+                        ]);
+                        (new UnitController)->userAssociate($request, redirect: false);
+                    }
+                }
+            } else {
+                $unit = $module->units->sortBy('order')->last();
+
+                //Associate the unit to the user.
+                $request = new Request([
+                    'user' => $user->id,
+                    'unit' => $unit->id,
+                ]);
+                (new UnitController)->userAssociate($request, redirect: false);
+            }
+        }
     }
 }

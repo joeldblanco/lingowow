@@ -279,10 +279,9 @@ class AnalyticsController extends Controller
         $classes = [];
         foreach ($teachers as $teacher)
             foreach ($teacher->teacherClassesWithTrashedParents->whereBetween('start_date', $period) as $class) {
-                $classes[$class->enrolment_id][] = $class;
+                $classes[ucwords($class->student()->first_name)][] = $class;
             }
-
-        $groupedClasses = collect($classes);
+        $groupedClasses = collect($classes)->sortKeys();
 
         return view('admin.analytics.earnings2', compact('groupedClasses', 'period'));
     }

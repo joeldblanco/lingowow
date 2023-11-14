@@ -41,14 +41,14 @@
             'name' => 'Teachers',
             'route' => route('teacherEarnings'),
             'status' => false,
-            'roles' => ['teacher', 'admin'],
+            'roles' => ['teacher']//, 'admin'],
         ],
-        [
-            'name' => 'Earnings',
-            'route' => route('analytics.earnings'),
-            'status' => false,
-            'roles' => ['admin'],
-        ],
+        // [
+        //     'name' => 'Earnings',
+        //     'route' => route('analytics.earnings'),
+        //     'status' => false,
+        //     'roles' => ['admin'],
+        // ],
     ];
     
 @endphp

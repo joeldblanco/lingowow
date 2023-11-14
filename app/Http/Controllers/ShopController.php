@@ -70,9 +70,13 @@ class ShopController extends Controller
         $product = Product::findOrFail($product_id);
         $options = [];
 
-        if ($product->categories->pluck('name')->contains('Course')) {
+        if ($product->categories->pluck('name')->contains('Synchronous')) {
             $options['enrollable'] = true;
             $options['bookable'] = true;
+        }
+
+        if ($product->categories->pluck('name')->contains('Asynchronous')) {
+            $options['enrollable'] = true;
         }
 
         if ($product->categories->pluck('name')->contains('Test')) {
@@ -140,9 +144,9 @@ class ShopController extends Controller
                     $reservedSchedule = ScheduleReserve::where('user_id', $enrolment->student_id)->where('teacher_id', $enrolment->teacher_id)->where('type', 'schedule')->first();
 
                     $classDates = EnrolmentController::createSchedule($enrolmentId, json_decode($reservedSchedule->selected_schedule, 1));
-                    
+
                     ClassController::bookClasses($classDates, $enrolmentId);
-                    
+
                     $reservedSchedule->delete();
                 }
 
@@ -343,9 +347,9 @@ class ShopController extends Controller
             if ($isSynchronous) {
                 return redirect()->route("shop.scheduleSelection", ['plan' => $plan, 'product_id' => $product->id]);
             } else {
-                Cart::destroy();
+                // Cart::destroy();
                 ShopController::addToCart($product->id, 1);
-                return redirect()->route('cart');
+                // return redirect()->route('cart');
             }
         }
     }

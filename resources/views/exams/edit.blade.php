@@ -80,7 +80,7 @@
                                             @foreach ($course->modules as $module)
                                                 <option class="font-bold text-gray-400" disabled>-{{ $module->name }}
                                                 </option>
-                                                @foreach ($module->units->nth(2, 1) as $unit)
+                                                @foreach ($module->units as $unit)
                                                     <option value="{{ $unit->id }}"
                                                         @if ($unit->id == $exam->unit_id) selected @endif>
                                                         --{{ $unit->name }}

@@ -9,20 +9,25 @@
                 <input autocomplete="off" wire:model.lazy="end_date" type="text" id="end_date" name="end_date"
                     class="w-1/6 text-gray-500 border-gray-300 rounded-lg hover:border-gray-400 text-sm w-auto">
                 @role('admin')
-                    <input wire:model="search" placeholder="Search by user..." type="text"
-                        class="w-1/6 input-search-name text-gray-500 border-gray-300 rounded-lg hover:border-gray-400 text-sm">
-                    @if ($search)
-                        <button class="reset-btn" wire:click="$set('search', '')">
-                            <i class="fas fa-times"></i>
-                        </button>
-                    @endif
-                    <input wire:model="searchCourse" placeholder="Search by course..." type="text"
-                        class="w-1/6 input-search-name text-gray-500 border-gray-300 rounded-lg hover:border-gray-400 text-sm">
-                    @if ($search)
-                        <button class="reset-btn" wire:click="$set('searchCourse', '')">
-                            <i class="fas fa-times"></i>
-                        </button>
-                    @endif
+                    <div class="w-1/6 flex border border-gray-300 rounded-lg hover:border-gray-400">
+                        <input wire:model.lazy="search" placeholder="Search by user..." type="text"
+                            class="w-full input-search-name border-transparent rounded-lg text-gray-500 text-sm">
+                        @if ($search)
+                            <button class="reset-btn" wire:click="$set('search', '')">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        @endif
+                    </div>
+
+                    <div class="w-1/6 flex border border-gray-300 rounded-lg hover:border-gray-400">
+                        <input wire:model.lazy="searchCourse" placeholder="Search by course..." type="text"
+                            class="w-full input-search-name border-transparent rounded-lg text-gray-500 text-sm">
+                        @if ($searchCourse)
+                            <button class="reset-btn" wire:click="$set('searchCourse', '')">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        @endif
+                    </div>
                 @endrole
             </div>
             @role('admin')
@@ -114,7 +119,7 @@
         {{ $classes->links('vendor.pagination.berrydashboard-livewire') }}
     </div>
 
-    <div wire:loading wire:target="clearComment,saveComment,showClass,loadComment,nextPage,previousPage,setPage">
+    <div wire:loading>
         @include('components.loading-state')
     </div>
 

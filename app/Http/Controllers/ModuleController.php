@@ -87,10 +87,15 @@ class ModuleController extends Controller
                 $user_units = $module_units;
             }
         } else if ($role == "student") {
-            $module_units  = $module->units->where('status', 1)->sortBy('order');
-            if ($module->course->categories->pluck('name')->contains('Conversational')) {
-                $user_units = $module_units;
-            } else {
+
+            if ($user->enrolments->pluck('course')->contains($module->course)) {
+                $module_units  = $module->units->where('status', 1)->sortBy('order');
+
+                UnitController::checkUnitUser($module, $user);
+
+                // if ($module->course->categories->pluck('name')->contains('Conversational')) {
+                // $user_units = $module_units;
+                // } else {
                 if ($user->units->count() > 0) {
                     if ($module->order < $user->units->first()->module->order) {
                         $user_units = $module_units;
@@ -100,6 +105,9 @@ class ModuleController extends Controller
                 } else {
                     $user_units = new Collection([$module_units->first()]);
                 }
+                // }
+            } else {
+                abort(403, "Unauthorized access");
             }
         } else if ($role == "guest") {
 

@@ -825,7 +825,7 @@ html {
 }
 
 .reset-btn {
-  position: absolute;
+  position: relative;
   right: 10px;
   top: 53%;
   transform: translateY(-50%);
@@ -835,6 +835,7 @@ html {
   color: #999;
   cursor: pointer;
   transition: color 0.2s;
+  margin-left: 20px;
 }
 
 .reset-btn:hover {

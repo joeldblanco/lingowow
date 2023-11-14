@@ -94,13 +94,14 @@
                                         src="{{ Storage::url($question->file_path) }}"
                                         alt="{{ Auth::user()->name }}" />
                                 @elseif ($isAudio)
-                                    <audio id="player">
+                                    <audio id="audio_{{ $question->id }}">
                                         <source src="{{ asset(Storage::url($question->file_path)) }}"
                                             type="audio/mpeg">
                                         Your browser does not support the audio tag.
                                     </audio>
                                     <div class="flex items-center space-x-5">
-                                        <i class="play cursor-pointer text-blue-500 text-2xl fas fa-play my-5 ml-5"></i>
+                                        <i class="play cursor-pointer text-blue-500 text-2xl fas fa-play my-5 ml-5"
+                                            data-id="{{ $question->id }}"></i>
                                         <progress id="seekbar" value="0" max="1"
                                             class="w-full"></progress>
                                     </div>
@@ -110,12 +111,13 @@
                             @endif
                         @elseif($question->type == 'essay')
                             @if ($question->file_path != null)
-                                <audio id="player">
+                                <audio id="audio_{{ $question->id }}">
                                     <source src="{{ asset(Storage::url($question->file_path)) }}" type="audio/mpeg">
                                     Your browser does not support the audio tag.
                                 </audio>
                                 <div class="flex items-center space-x-5">
-                                    <i class="play cursor-pointer text-blue-500 text-2xl fas fa-play my-5 ml-5"></i>
+                                    <i class="play cursor-pointer text-blue-500 text-2xl fas fa-play my-5 ml-5"
+                                        data-id="{{ $question->id }}"></i>
                                     <progress id="seekbar" value="0" max="1" class="w-full"></progress>
                                 </div>
                             @endif
@@ -210,54 +212,47 @@
                 //     plugins: 'wordcount',
                 // });
 
+                let playButtons = document.querySelectorAll('.play');
+                let tries = [];
+                for (let i = 0; i < playButtons.length; i++) {
+                    tries[playButtons[i].dataset.id] = 3;
+                }
 
+                for (let i = 0; i < playButtons.length; i++) {
+                    playButtons[i].addEventListener('click', function() {
+                        let current_id = this.dataset.id;
 
-                let tries = 3;
-
-                $('.play').on('click', function() {
-                    console.log(tries);
-                    if (tries > 0) {
-                        document.getElementById('player').play();
-                        $('.play').css({
-                            'cursor': "default",
-                            'opacity': 0.7,
-                        });
-                    }
-                });
-
-                $('#player').on('timeupdate', function() {
-                    // $('#seekbar').attr("value", this.currentTime / this.duration);  
-                    setProgress((this.currentTime / this.duration) * 100);
-                    if (this.currentTime >= this.duration) {
-                        setProgress(0);
-                        tries--;
-                        if (tries > 0) {
+                        if (tries[current_id] > 0) {
+                            var id = 'audio_' + current_id;
+                            document.getElementById(id).play();
                             $('.play').css({
-                                'cursor': "pointer",
-                                'opacity': 1,
+                                'cursor': "default",
+                                'opacity': 0.7,
                             });
                         }
-                    }
-                });
+
+                        $('#audio_' + current_id).off('timeupdate');
+                        $('#audio_' + current_id).on('timeupdate', function() {
+
+                            setProgress((this.currentTime / this.duration) * 100);
+                            if (this.currentTime >= this.duration) {
+                                setProgress(0);
+                                tries[current_id]--;
+
+                                if (tries[current_id] > 0) {
+                                    $('.play').css({
+                                        'cursor': "pointer",
+                                        'opacity': 1,
+                                    });
+                                }
+                            }
+                        });
+                    });
+                }
 
                 function setProgress(percent) {
                     $('#seekbar').attr("value", percent / 100);
                 }
-
-                // var circle = document.querySelector('circle');
-                // if(circle != null){
-                //     var radius = circle.r.baseVal.value;
-                //     var circumference = radius * 2 * Math.PI;
-
-                //     circle.style.strokeDasharray = `${circumference} ${circumference}`;
-                //     circle.style.strokeDashoffset = `${circumference}`;
-
-                //     function setProgress(percent) {
-                //         const offset = circumference - percent / 100 * circumference;
-                //         circle.style.strokeDashoffset = offset;
-                //     }
-                // }
-                // })
             });
         </script>
     @endif

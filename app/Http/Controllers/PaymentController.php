@@ -98,14 +98,14 @@ class PaymentController extends Controller
         if ($transactionToken) {
             $approved = self::requestTransactionAuthorization($transactionToken);
         } else {
-            return redirect()->route('cart.index')->with('error', 'No se pudo procesar el pago');
+            return redirect()->route('cart.index')->with('error', 'No se pudo procesar el pago. Error code: PAY-201');
         }
 
         if ($approved) {
             $user = auth()->user();
             ShopController::checkout($user, 'niubiz');
         } else {
-            return redirect()->route('cart')->with('error', 'No se pudo procesar el pago');
+            return redirect()->route('cart')->with('error', 'No se pudo procesar el pago. Error code: PAY-202');
         }
     }
 

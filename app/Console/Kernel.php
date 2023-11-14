@@ -134,8 +134,14 @@ class Kernel extends ConsoleKernel
                 GatherController::setGuestsList();
             }
 
-            $notified_students = User::find(DB::table('notifications')->where('created_at', '>=', Carbon::now()->subHours(1))->where('notifiable_type', 'App\Models\User')->where('type', 'App\Notifications\UpcomingClassForStudent')->get('notifiable_id')->pluck('notifiable_id')->unique());
-            $notified_teachers = User::find(DB::table('notifications')->where('created_at', '>=', Carbon::now()->subHours(1))->where('notifiable_type', 'App\Models\User')->where('type', 'App\Notifications\UpcomingClassForTeacher')->get('notifiable_id')->pluck('notifiable_id')->unique());
+            $class_notified_students = User::find(DB::table('notifications')->where('created_at', '>=', Carbon::now()->subHours(1))->where('notifiable_type', 'App\Models\User')->where('type', 'App\Notifications\UpcomingClassForStudent')->get('notifiable_id')->pluck('notifiable_id')->unique());
+            $class_notified_teachers = User::find(DB::table('notifications')->where('created_at', '>=', Carbon::now()->subHours(1))->where('notifiable_type', 'App\Models\User')->where('type', 'App\Notifications\UpcomingClassForTeacher')->get('notifiable_id')->pluck('notifiable_id')->unique());
+            $test_notified_students = User::find(DB::table('notifications')->where('created_at', '>=', Carbon::now()->subHours(1))->where('notifiable_type', 'App\Models\User')->where('type', 'App\Notifications\UpcomingTestForStudent')->get('notifiable_id')->pluck('notifiable_id')->unique());
+            $test_notified_teachers = User::find(DB::table('notifications')->where('created_at', '>=', Carbon::now()->subHours(1))->where('notifiable_type', 'App\Models\User')->where('type', 'App\Notifications\UpcomingTestForTeacher')->get('notifiable_id')->pluck('notifiable_id')->unique());
+
+            $notified_students = ($class_notified_students->concat($test_notified_students))->unique();
+            $notified_teachers = ($class_notified_teachers->concat($test_notified_teachers))->unique();
+
             $classes = Classes::where('start_date', '<=', Carbon::now()->addHour())->where('start_date', '>', Carbon::now())->get();
 
             foreach ($classes as $class) {

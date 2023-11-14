@@ -3,7 +3,7 @@
     @php
         $session_info = json_decode((new Illuminate\Http\Client\PendingRequest())->get('http://ip-api.com/json/' . $_SERVER['REMOTE_ADDR'])->getBody(), true);
         // dump($session_info['timezone']);
-        if ($session_info['status'] == "fail") {
+        if ($session_info['status'] == 'fail') {
             session()->forget('session_info');
         } else {
             if (!Auth::user()->isImpersonated()) {
@@ -19,6 +19,10 @@
             }
         }
     @endphp
+
+    <script>
+        console.log(Intl.DateTimeFormat().resolvedOptions().timezone == @json(auth()->user()->timezone));
+    </script>
 
     <div style="width: 100%" class="bg-white font-sans">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
