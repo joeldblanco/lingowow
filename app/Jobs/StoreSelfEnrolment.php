@@ -143,13 +143,9 @@ class StoreSelfEnrolment implements ShouldQueue
                     'teacher_id' => $teacher->id
                 ]);
 
-                // dd($enrolment);
             }
 
-            // SchedulingCalendarController::store($student->id, $enrolment);
-            // dispatch(new CreateSchedule($student->id, $enrolment->id)); //MOVED TO SHOPCONTROLLER
             session(['enrolment_id' => $enrolment->id]);
-
             GatherController::editGuestsList([$student->id, $teacher->id]);
         } else {
 

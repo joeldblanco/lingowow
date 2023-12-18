@@ -138,17 +138,6 @@
             </x-slot>
 
             <x-slot name="footer" class="justify-center">
-                {{-- <button
-                    onclick="saveSchedule({{ isset($plan) ? $plan : 0 }},'schedule.check',{{ Auth::user()->roles->pluck('id')[0] }});toggleCellBlock()"
-                    class="bg-green-600 font-semibold text-white p-2 w-32 mr-1 rounded-full hover:bg-green-700 focus:outline-none focus:ring shadow-lg hover:shadow-none transition-all duration-300"
-                    @click=" showUserInfo = false ">
-                    Save
-                </button>
-                <button
-                    class="bg-red-600 font-semibold text-white p-2 ml-1 w-32 rounded-full hover:bg-red-700 focus:outline-none focus:ring shadow-lg hover:shadow-none transition-all duration-300"
-                    @click=" showUserInfo = false ">
-                    Cancel
-                </button> --}}
             </x-slot>
         </x-modal>
     @endif

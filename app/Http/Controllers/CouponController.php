@@ -15,8 +15,8 @@ class CouponController extends Controller
      */
     public function index()
     {
-        $coupons = Coupon::all();
-        return view('coupons', compact('coupons'));
+        $coupons = Coupon::orderBy('updated_at', 'desc')->paginate(10);
+        return view('coupons.index', compact('coupons'));
     }
 
     /**
@@ -26,7 +26,9 @@ class CouponController extends Controller
      */
     public function create()
     {
-        //
+        $couponTypes = ['amount', 'percentage'];
+        $products = Product::all();
+        return view('coupons.create', compact('couponTypes', 'products'));
     }
 
     /**
@@ -37,12 +39,31 @@ class CouponController extends Controller
      */
     public function store(Request $request)
     {
-        $amount = $request->coupon_amount;
-        $product = $request->product_id;
-        $product = Product::find($product);
-        $coupon = $product->createCoupon(['amount' => $amount]);
+        $request->validate([
+            'coupon_value' => 'required|numeric|min:0',
+            'coupon_type' => 'required|in:amount,percentage',
+            'product_id' => 'required|exists:products,id',
+        ]);
 
-        return $coupon;
+        $couponType = $request->input('coupon_type');
+        $couponValue = $request->input('coupon_value');
+        $productId = $request->input('product_id');
+
+        $product = Product::find($productId);
+
+        if ($product) {
+            if ($couponType === 'amount') {
+                $coupon = $product->createCoupon(data: ['type' => 'amount', 'value' => $couponValue], is_disposable: true);
+            } elseif ($couponType === 'percentage') {
+                $coupon = $product->createCoupon(data: ['type' => 'percentage', 'value' => $couponValue], is_disposable: true);
+            }
+
+            $successString = "Coupon {$coupon->code} created successfully.";
+
+            return redirect()->route('coupons.index')->with('success', $successString);
+        } else {
+            return redirect()->back()->with('error', "Product doesn't exist.");
+        }
     }
 
     /**
@@ -53,7 +74,7 @@ class CouponController extends Controller
      */
     public function show($id)
     {
-        //
+        return view('coupons.show', ['coupon' => Coupon::find($id)]);
     }
 
     /**
@@ -87,6 +108,7 @@ class CouponController extends Controller
      */
     public function destroy($id)
     {
-        //
+        Coupon::find($id)->delete();
+        return redirect()->route('coupons.index');
     }
 }

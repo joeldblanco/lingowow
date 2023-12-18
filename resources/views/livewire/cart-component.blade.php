@@ -1,7 +1,18 @@
 <div class="flex justify-center my-6">
     <div class="flex flex-col w-full p-8 text-gray-800 bg-white shadow-lg pin-r pin-y md:w-4/5 lg:w-4/5 cart-general">
-        @if (Cart::count() > 0)
+        @php
+            $coupon = false;
 
+            if (Cart::count() == 1) {
+                foreach (Cart::content() as $item) {
+                    if (Arr::has($item->options, 'coupon_code')) {
+                        $coupon = true;
+                    }
+                }
+            }
+
+        @endphp
+        @if (Cart::count() > 0 && !$coupon)
             <div class="flex-1">
                 <table class="w-full text-sm lg:text-base cart-info-buy" cellspacing="0">
                     <thead>
@@ -17,64 +28,67 @@
                         </tr>
                     </thead>
                     <tbody>
-                        {{-- {{dd(Cart::content())}} --}}
                         @foreach (Cart::content() as $item)
-                            @php
-                                $product = App\Models\Product::find($item->id);
-                            @endphp
-                            <tr>
-                                <td class="hidden pb-4 md:table-cell">
-                                    <a href="#">
-                                        <img src="{{ Storage::url($product->image) }}" class="w-20 rounded"
-                                            alt="Thumbnail">
-                                    </a>
-                                </td>
-                                <td>
-                                    <a href="#">
-                                        <p class="mb-2 md:ml-4">{{ $item->name }}</p>
-                                        <button wire:click.prevent="removeItem('{{ $item->rowId }}')"
-                                            class="text-gray-700 md:ml-4">
-                                            <small>(Remove item)</small>
-                                        </button>
-                                    </a>
-                                </td>
-                                <td class="justify-center md:justify-end md:flex mt-6">
-                                    <div class="w-20 h-10">
-                                        <div class="relative flex flex-row w-full h-8 space-x-2">
-                                            @if (!$item->options->editable)
-                                                <input type="text" value="{{ $item->qty }}"
-                                                    class="w-full font-semibold text-center text-gray-700 bg-gray-200 outline-none focus:outline-none hover:text-black focus:text-black"
-                                                    disabled />
-                                            @else
-                                                <button wire:click.prevent="decrementQtyItem('{{ $item->rowId }}')"><i
-                                                        class="fas fa-minus"></i></button>
-                                                <input type="text" value="{{ $item->qty }}"
-                                                    class="w-full font-semibold text-center text-gray-700 bg-gray-200 outline-none focus:outline-none hover:text-black focus:text-black"
-                                                    disabled />
-                                                <button wire:click.prevent="incrementQtyItem('{{ $item->rowId }}')"><i
-                                                        class="fas fa-plus"></i></button>
-                                            @endif
+                            @if (!Arr::has($item->options, 'coupon_code'))
+                                @php
+                                    $product = App\Models\Product::find($item->id);
+                                @endphp
+                                <tr>
+                                    <td class="hidden pb-4 md:table-cell">
+                                        <a href="#">
+                                            <img src="{{ Storage::url($product->image) }}" class="w-20 rounded"
+                                                alt="Thumbnail">
+                                        </a>
+                                    </td>
+                                    <td>
+                                        <a href="#">
+                                            <p class="mb-2 md:ml-4">{{ $item->name }}</p>
+                                            <button wire:click.prevent="removeItem('{{ $item->rowId }}')"
+                                                class="text-gray-700 md:ml-4">
+                                                <small>(Remove item)</small>
+                                            </button>
+                                        </a>
+                                    </td>
+                                    <td class="justify-center md:justify-end md:flex mt-6">
+                                        <div class="w-20 h-10">
+                                            <div class="relative flex flex-row w-full h-8 space-x-2">
+                                                @if (!$item->options->editable)
+                                                    <input type="text" value="{{ $item->qty }}"
+                                                        class="w-full font-semibold text-center text-gray-700 bg-gray-200 outline-none focus:outline-none hover:text-black focus:text-black"
+                                                        disabled />
+                                                @else
+                                                    <button
+                                                        wire:click.prevent="decrementQtyItem('{{ $item->rowId }}')"><i
+                                                            class="fas fa-minus"></i></button>
+                                                    <input type="text" value="{{ $item->qty }}"
+                                                        class="w-full font-semibold text-center text-gray-700 bg-gray-200 outline-none focus:outline-none hover:text-black focus:text-black"
+                                                        disabled />
+                                                    <button
+                                                        wire:click.prevent="incrementQtyItem('{{ $item->rowId }}')"><i
+                                                            class="fas fa-plus"></i></button>
+                                                @endif
 
+                                            </div>
                                         </div>
-                                    </div>
-                                </td>
-                                <td class="hidden text-right md:table-cell">
-                                    <span class="text-sm lg:text-base font-medium">
-                                        ${{ $item->price }}
-                                    </span>
-                                </td>
-                                <td class="text-right">
-                                    <span class="text-sm lg:text-base font-medium">
-                                        ${{ $item->price * $item->qty }}
-                                    </span>
-                                </td>
-                            </tr>
+                                    </td>
+                                    <td class="hidden text-right md:table-cell">
+                                        <span class="text-sm lg:text-base font-medium">
+                                            ${{ $item->price }}
+                                        </span>
+                                    </td>
+                                    <td class="text-right">
+                                        <span class="text-sm lg:text-base font-medium">
+                                            ${{ $item->price * $item->qty }}
+                                        </span>
+                                    </td>
+                                </tr>
+                            @endif
                         @endforeach
 
                     </tbody>
                 </table>
                 <hr class="pb-6 mt-6">
-                <div class="my-4 mt-6 -mx-2 lg:flex">
+                <div class="my-4 mt-6 -mx-2 lg:flex" x-data="{ continueButton: true, hidePaymentButtons: @entangle('hidePaymentButtons'), loadingPaymentButtons: @entangle('loadingPaymentButtons') }">
                     <div class="lg:px-2 lg:w-1/2">
                         <div class="cart-coupon">
                             <div class="p-4 bg-gray-100 rounded-full">
@@ -89,6 +103,7 @@
                                             class="w-full bg-gray-100 outline-none appearance-none focus:outline-none active:outline-none"
                                             wire:model="coupon_code" />
                                         <button
+                                            @click="continueButton = true, hidePaymentButtons = true, loadingPaymentButtons = false"
                                             class="text-sm flex items-center px-3 py-1 text-white bg-gray-800 rounded-full outline-none md:px-4 hover:bg-gray-700 focus:outline-none active:outline-none"
                                             wire:click="applyCoupon">
                                             <svg aria-hidden="true" data-prefix="fas" data-icon="gift" class="w-8"
@@ -103,14 +118,14 @@
                                 <p class="text-red-600 font-semibold">{{ $coupon_error_message }}</p>
                             </div>
                         </div>
-                        <div class="p-4 mt-6 bg-gray-100 rounded-full">
+                        {{-- <div class="p-4 mt-6 bg-gray-100 rounded-full">
                             <h1 class="ml-2 font-bold uppercase">Instruction for seller</h1>
                         </div>
                         <div class="p-4">
                             <p class="mb-4 italic">If you have some information for the seller you can leave them in the
                                 box below</p>
                             <textarea class="w-full h-24 p-2 bg-gray-100 rounded"></textarea>
-                        </div>
+                        </div> --}}
                     </div>
                     <div class="lg:px-2 lg:w-1/2">
                         <div class="p-4 bg-gray-100 rounded-full">
@@ -316,13 +331,38 @@
                                     @include('components.loading-state')
                                 </div>
                             @else
-                                <div id="loading_state" class="hidden" style="z-index: 150; position: absolute">
-                                    @include('components.loading-state')
+                                <div>
+                                    <div id="loading_state" class="hidden" style="z-index: 150; position: absolute">
+                                        @include('components.loading-state')
+                                    </div>
+
+                                    <div class="w-full flex justify-end">
+                                        <button @click="continueButton = false" x-show="continueButton"
+                                            x-transition.opacity.duration.500ms wire:click="continueToCheckout"
+                                            class="p-2 px-4 bg-gray-700 text-white font-bold rounded-lg mt-5 ml-auto hover:bg-gray-600">
+                                            <p>Continue to checkout</p>
+                                        </button>
+                                    </div>
+                                    <div class="h-40 relative">
+                                        <div class="bg-white h-40 absolute text-center"
+                                            style="width: 100%; z-index: 201" x-show="hidePaymentButtons"
+                                            x-transition.opacity.duration.500ms>
+                                            <p class="text-4xl leading-loose font-bold text-gray-700"
+                                                x-show="loadingPaymentButtons" x-transition.opacity.duration.500ms>
+                                                <i class="fas fa-circle-notch animate-spin"></i>
+                                            </p>
+                                        </div>
+                                        <div>
+                                            <div>
+                                                @livewire('niubiz-checkout-button')
+                                            </div>
+                                            <div>
+                                                @livewire('paypal-checkout-button')
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
 
-                                <x-niubiz-checkout-button />
-
-                                <x-paypal-checkout-button />
 
                             @endif
                         </div>
@@ -330,6 +370,9 @@
                 </div>
             </div>
         @else
+            @php
+                Cart::destroy();
+            @endphp
             <p class="px-10 py-3 font-medium mb-2 md:ml-4 text-2xl">No Items in Cart</p>
             <a href="{{ route('shop') }}">
                 <button

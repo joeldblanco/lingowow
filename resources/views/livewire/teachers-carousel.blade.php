@@ -1,6 +1,6 @@
 <div class="bg-white font-sans" wire:ignore x-data="{ loadingState: @entangle('loadingState') }">
 
-    @if (count($available_teachers) > 0)
+    @if (count($availableTeachers) > 0)
 
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden">
@@ -8,7 +8,7 @@
                     <h3 class="text-4xl font-bold text-gray-800">Available Teachers</h3>
                     <h4 class="text-2xl font-bold text-gray-400">Please, select one to continue</h4>
                     <div class="gallery js-flickity teachers-carousel" data-flickity-options='{ "wrapAround": true }'>
-                        @foreach ($available_teachers as $key => $teacher)
+                        @foreach ($availableTeachers as $key => $teacher)
                             <div class="gallery-cell">
                                 <div
                                     class="relative bg-white py-6 px-6 rounded-3xl w-64 my-4 shadow-xl mt-7 mb-2 mx-10">

@@ -46,7 +46,7 @@ class QuestionController extends Controller
                 // 'type' => 'required',
                 'marks' => 'required|min:0|max:100',
                 'options' => 'array',
-                'file' => 'file|mimes:mp3,jpg,png|max:10000',
+                'file' => 'file|mimes:mp3,jpg,png|max:50000',
             ]);
 
             if ($request->input('type') == "multiple-choice") {
@@ -61,6 +61,7 @@ class QuestionController extends Controller
                 ]));
             }
         } catch (\Throwable $th) {
+            dd($th);
             $request->session()->flash('error', $th->getMessage());
             return redirect()->route('exams.edit', $exam_id);
         }

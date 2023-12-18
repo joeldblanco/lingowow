@@ -132,6 +132,13 @@ class Kernel extends ConsoleKernel
                 // }
 
                 GatherController::setGuestsList();
+
+                // $teachers = User::role('teacher')->get();
+                // foreach ($teachers as $teacher) {
+                //     if($teacher->students->count() <= 0){
+                        
+                //     }
+                // }
             }
 
             $class_notified_students = User::find(DB::table('notifications')->where('created_at', '>=', Carbon::now()->subHours(1))->where('notifiable_type', 'App\Models\User')->where('type', 'App\Notifications\UpcomingClassForStudent')->get('notifiable_id')->pluck('notifiable_id')->unique());

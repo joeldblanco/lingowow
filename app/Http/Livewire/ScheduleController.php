@@ -4,7 +4,6 @@ namespace App\Http\Livewire;
 
 use App\Http\Controllers\ClassController;
 use App\Http\Controllers\EnrolmentController;
-use App\Http\Controllers\SchedulingCalendarController;
 use App\Http\Controllers\ShopController;
 use App\Invoice;
 use App\Models\Classes;
@@ -12,7 +11,6 @@ use App\Models\Comment;
 use App\Models\Course;
 use App\Models\Enrolment;
 use App\Models\Product;
-use App\Models\Schedule;
 use App\Models\ScheduleReserve;
 use App\Models\User;
 use App\Notifications\ClassRescheduledToStudent;
@@ -21,7 +19,6 @@ use Carbon\Carbon;
 use Gloudemans\Shoppingcart\Facades\Cart;
 use Illuminate\Support\Facades\DB;
 use Livewire\Component;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Notification;
 
 class ScheduleController extends Component
@@ -49,6 +46,9 @@ class ScheduleController extends Component
     public $classForSelectees = "";
     public $studentClasses = [];
     public $data;
+    public $studentSchedule;
+    public $showStudentsInfo = false;
+    public $lastWeek;
 
     protected $listeners = [
         'updateTeacherSchedule',
@@ -65,181 +65,63 @@ class ScheduleController extends Component
         $this->week = $week;
         $this->action = $action;
 
+        //Count the numbers of week between the start and end of the academic period
+        $this->lastWeek = Carbon::parse(json_decode(DB::table('metadata')->where('key', 'current_period')->first()->value)->end_date)->diffInWeeks(Carbon::parse(json_decode(DB::table('metadata')->where('key', 'current_period')->first()->value)->start_date)) + 1;
+
         if (!empty($users))
             switch ($action) {
                 case 'teacherShow':
 
-                    $this->classForSelected = "selected";
-                    $this->classForSelectees = "selectee";
-
-                    if (User::find($users)->hasRole('teacher')) {
-
-                        // Get teacher schedule
-                        $this->schedules = $this->utcToLocal($this->getUserSchedule($users));
-
-                        // Get students' schedules and data
-                        $this->studentsInfo = array_map(function ($arr) {
-                            return ['student' => $arr['student'], 'schedule' => $this->utcToLocal($arr['schedule'])];
-                        }, $this->getStudentsInfo($users));
-                    }
+                    $this->handleTeacherShow($users);
 
                     break;
 
                 case 'studentShow':
 
-                    $this->classForSelected = "selected";
-
-                    $this->studentClasses = User::find($users)->studentClasses;
-
-                    $this->studentClasses = $this->utcToLocal($this->datesToScheduleFormat($this->studentClasses->where('start_date', '>', now())->pluck('start_date')));
-
-                    // Get student schedule
-                    $this->schedules = $this->utcToLocal($this->getUserSchedule($users));
-
-                    $reserve = ScheduleReserve::withTrashed()->where('user_id', $this->users)->first();
-                    if (!empty($reserve)) $reserve->delete();
-
+                    $this->handleStudentShow($users);
 
                     break;
 
 
                 case 'scheduleSelection':
-                    $this->classForSelectees = "available";
-                    $this->classForSelected = "available";
 
-                    // Get teacher schedule
-                    $this->users = session('first_teacher');
-
-                    // Get teacher schedule
-                    $this->utcToLocal($this->schedulesIntersect($this->getTeachersAvailability($this->users), $this->getTeachersPreselectionAvailability($this->users)));
-
-                    $reserve = ScheduleReserve::withTrashed()->where('user_id', $this->users)->first();
-                    if (!empty($reserve)) $reserve->delete();
+                    $this->handleScheduleSelection($users);
 
                     break;
 
                 case 'schedulePreselection':
 
-                    $scheduleReservation = ScheduleReserve::where('user_id', auth()->id())->first();
-                    if (!empty($scheduleReservation)) {
-                        $scheduleReservation->delete();
-                    }
-
-                    $this->classForSelectees = "available";
-                    $this->classForSelected = "available";
-
-                    // Get teacher schedule
-                    $this->users = session('first_teacher');
-
-                    // Get teacher schedule
-                    $this->schedules = $this->utcToLocal($this->getTeachersPreselectionAvailability($this->users));
-
-                    $reserve = ScheduleReserve::withTrashed()->where('user_id', $this->users)->first();
-                    if (!empty($reserve)) $reserve->delete();
+                    $this->handleSchedulePreselection($users);
 
                     break;
                 case 'manualEnrolment':
 
-                    $this->classForSelectees = "available";
-                    $this->classForSelected = "available";
-
-                    if (!empty($week)) {
-                        // Get teacher's free blocks
-                        $this->schedules = $this->utcToLocal($this->getTeachersAvailability($users, $week));
-                    } else {
-                        // Get teacher schedule
-                        $this->schedules = $this->utcToLocal($this->schedulesIntersect($this->getTeachersAvailability($this->users), $this->getTeachersPreselectionAvailability($this->users)));
-                    }
-
-                    $reserve = ScheduleReserve::withTrashed()->where('user_id', $this->users)->first();
-                    if (!empty($reserve)) $reserve->delete();
+                    $this->handleManualEnrolment($users);
 
                     break;
 
                 case 'classRescheduling':
 
-                    $this->classForSelectees = "available";
-                    $this->classForSelected = "available";
-
-                    // Get teacher's free blocks
-                    $this->schedules = $this->utcToLocal($this->getTeachersAvailability($users, $week));
-
-                    // dd($this->schedules);
-                    // // Get students' schedules and data
-                    // $this->studentsInfo = array_map(function ($arr) {
-                    //     return ['student' => $arr['student'], 'schedule' => $this->utcToLocal($arr['schedule'])];
-                    // }, $this->getStudentsInfo($users));
+                    $this->handleClassRescheduling($users, $week);
 
                     break;
 
                 case 'examSelection':
-                    $this->classForSelectees = "available";
-                    $this->classForSelected = "available";
 
-                    // Get teacher schedule
-                    $this->users = session('first_teacher');
-
-                    // Get teacher's free blocks
-                    $this->schedules = $this->utcToLocal($this->getTeachersAvailability($users, $week));
-
-                    $reserve = ScheduleReserve::withTrashed()->where('user_id', $this->users)->first();
-                    if (!empty($reserve)) $reserve->delete();
+                    $this->handleExamSelection($users, $week);
 
                     break;
 
                 case 'adminShow':
 
-                    $this->classForSelectees = "selectee";
-                    $this->classForSelected = "selected";
-
-                    if (!User::withTrashed()->find($users)->trashed()) {
-
-                        if (User::find($users)->hasRole('teacher')) {
-
-                            // Get teacher schedule
-                            $this->schedules = $this->utcToLocal($this->getUserSchedule($users));
-
-                            // Get students' schedules and data
-                            $this->studentsInfo = array_map(function ($arr) {
-                                return ['student' => $arr['student'], 'schedule' => $this->utcToLocal($arr['schedule'])];
-                            }, $this->getStudentsInfo($users));
-                        }
-
-                        if (User::find($users)->hasRole('student')) {
-
-                            // Get student schedule
-                            $this->schedules = $this->utcToLocal($this->getUserSchedule($users));
-                        }
-
-                        // Emit event of schedule updated and send schedule to parent component
-                        // $this->dispatchBrowserEvent('scheduleLoaded', ['schedule' => $this->schedules]);
-                    }
+                    $this->handleAdminShow($users);
 
                     break;
 
                 case 'adminEdit':
-                    $this->classForSelectees = "available";
-                    $this->classForSelected = "available";
 
-                    if (!User::withTrashed()->find($users)->trashed()) {
+                    $this->handleAdminEdit($users);
 
-                        $enrolment = Enrolment::find($this->data['enrolment_id']);
-
-                        $this->users = $enrolment->teacher_id;
-
-                        // Get teacher schedule
-                        // $this->schedules = $this->utcToLocal($this->schedulesIntersect($this->getTeachersAvailability($this->users), $this->getTeachersPreselectionAvailability($this->users)));
-
-                        $reserve = ScheduleReserve::withTrashed()->where('user_id', $this->users)->first();
-                        if (!empty($reserve)) $reserve->delete();
-                        // if (User::find($users)->hasRole('student')) {
-                        //     // Get student schedule
-                        //     $this->schedules = $this->utcToLocal($this->getUserSchedule($users));
-                        // }
-
-                        // Emit event of schedule updated and send schedule to parent component
-                        // $this->dispatchBrowserEvent('scheduleLoaded', ['schedule' => $this->schedules]);
-                    }
                     break;
             }
     }
@@ -305,6 +187,172 @@ class ScheduleController extends Component
     //     Schedule::where('user_id', $userId)->where('type', 'reservation')->delete();
     // }
 
+    private function handleTeacherShow($users)
+    {
+        $this->classForSelected = "selected";
+        $this->classForSelectees = "selectee";
+
+        if (User::find($users)->hasRole('teacher')) {
+
+            // Get teacher schedule
+            $this->schedules = $this->utcToLocal($this->getUserSchedule($users));
+
+            // Get students' schedules and data
+            $this->studentsInfo = array_map(function ($arr) {
+                return ['student' => $arr['student'], 'schedule' => $this->utcToLocal($arr['schedule'])];
+            }, $this->getStudentsInfo($users));
+        }
+    }
+
+    private function handleStudentShow($users)
+    {
+        $this->classForSelected = "selected";
+
+        $this->studentClasses = User::find($users)->studentClasses;
+
+        $this->studentClasses = $this->utcToLocal($this->datesToScheduleFormat($this->studentClasses->where('start_date', '>', now())->pluck('start_date')));
+
+        // Get student schedule
+        $this->schedules = $this->utcToLocal($this->getUserSchedule($users));
+
+        $reserve = ScheduleReserve::withTrashed()->where('user_id', $this->users)->first();
+        if (!empty($reserve)) $reserve->delete();
+    }
+
+    private function handleScheduleSelection($users)
+    {
+        $this->classForSelectees = "available";
+        $this->classForSelected = "available";
+
+        // Get teacher schedule
+        $this->users = session('first_teacher');
+
+        // Get teacher schedule
+        $this->utcToLocal($this->schedulesIntersect($this->getTeachersAvailability($this->users), $this->getTeachersPreselectionAvailability($this->users)));
+
+        $reserve = ScheduleReserve::withTrashed()->where('user_id', $this->users)->first();
+        if (!empty($reserve)) $reserve->delete();
+    }
+
+    private function handleSchedulePreselection($users)
+    {
+        $scheduleReservation = ScheduleReserve::where('user_id', auth()->id())->first();
+        if (!empty($scheduleReservation)) {
+            $scheduleReservation->delete();
+        }
+
+        $this->classForSelectees = "available";
+        $this->classForSelected = "available";
+
+        // Get teacher schedule
+        $this->users = session('first_teacher');
+
+        // Get teacher schedule
+        $this->schedules = $this->utcToLocal($this->getTeachersPreselectionAvailability($this->users));
+
+        $reserve = ScheduleReserve::withTrashed()->where('user_id', $this->users)->first();
+        if (!empty($reserve)) $reserve->delete();
+    }
+
+    private function handleManualEnrolment($users)
+    {
+        $this->classForSelectees = "available";
+        $this->classForSelected = "available";
+
+        if (!empty($week)) {
+            // Get teacher's free blocks
+            $this->schedules = $this->utcToLocal($this->getTeachersAvailability($users, $week));
+        } else {
+            // Get teacher schedule
+            $this->schedules = $this->utcToLocal($this->schedulesIntersect($this->getTeachersAvailability($this->users), $this->getTeachersPreselectionAvailability($this->users)));
+        }
+
+        $reserve = ScheduleReserve::withTrashed()->where('user_id', $this->users)->first();
+        if (!empty($reserve)) $reserve->delete();
+    }
+
+    private function handleClassRescheduling($users, $week)
+    {
+        $this->classForSelectees = "available";
+        $this->classForSelected = "available";
+
+        // Get teacher's free blocks
+        $this->schedules = $this->utcToLocal($this->getTeachersAvailability($users, $week));
+
+        // dd($this->schedules);
+        // // Get students' schedules and data
+        // $this->studentsInfo = array_map(function ($arr) {
+        //     return ['student' => $arr['student'], 'schedule' => $this->utcToLocal($arr['schedule'])];
+        // }, $this->getStudentsInfo($users));
+    }
+
+    private function handleExamSelection($users, $week)
+    {
+        $this->classForSelectees = "available";
+        $this->classForSelected = "available";
+
+        // Get teacher schedule
+        $this->users = session('first_teacher');
+
+        // Get teacher's free blocks
+        $this->schedules = $this->utcToLocal($this->getTeachersAvailability($users, $week));
+
+        $reserve = ScheduleReserve::withTrashed()->where('user_id', $this->users)->first();
+        if (!empty($reserve)) $reserve->delete();
+    }
+
+    private function handleAdminShow($users)
+    {
+        $this->classForSelectees = "selectee";
+        $this->classForSelected = "selected";
+
+        if (!User::withTrashed()->find($users)->trashed()) {
+
+            if (User::find($users)->hasRole('teacher')) {
+
+                // Get teacher schedule
+                $this->schedules = $this->utcToLocal($this->getUserSchedule($users));
+
+                // Get students' schedules and data
+                $this->studentsInfo = array_map(function ($arr) {
+                    return ['student' => $arr['student'], 'schedule' => $this->utcToLocal($arr['schedule'])];
+                }, $this->getStudentsInfo($users));
+            }
+
+            if (User::find($users)->hasRole('student')) {
+
+                // Get student schedule
+                $this->schedules = $this->utcToLocal($this->getUserSchedule($users));
+            }
+
+            // Emit event of schedule updated and send schedule to parent component
+            // $this->dispatchBrowserEvent('scheduleLoaded', ['schedule' => $this->schedules]);
+        }
+    }
+
+    private function handleAdminEdit($users)
+    {
+        $this->classForSelectees = "available";
+        $this->classForSelected = "available";
+
+        if (!User::withTrashed()->find($users)->trashed()) {
+
+            $enrolment = Enrolment::find($this->data['enrolment_id']);
+
+            $this->users = $enrolment->teacher_id;
+
+            // Get student schedule
+            $this->studentSchedule = $this->getUserSchedule($enrolment->student_id);
+
+            // Get teacher schedule
+            $this->schedules = $this->utcToLocal($this->schedulesUnion($this->getTeachersAvailability($enrolment->teacher_id), $this->studentSchedule));
+
+            $this->showStudentsInfo = true;
+
+            $reserve = ScheduleReserve::withTrashed()->where('user_id', $enrolment->teacher_id)->first();
+            if (!empty($reserve)) $reserve->delete();
+        }
+    }
 
 
     public static function schedulesReserves($teacher_id)
@@ -329,9 +377,6 @@ class ScheduleController extends Component
         return [$schedules, $schedules_exam];
     }
 
-
-
-
     public function loadSelectingSchedule($teacherId = null)
     {
         if (!empty($teacherId)) {
@@ -352,7 +397,7 @@ class ScheduleController extends Component
 
             if ($this->action == 'adminEdit') {
                 $this->users = $teacherId;
-                $this->schedules = $this->utcToLocal($this->schedulesIntersect($this->getTeachersAvailability($this->users), $this->getTeachersPreselectionAvailability($this->users)));
+                $this->schedules = $this->utcToLocal($this->schedulesUnion($this->getTeachersAvailability($teacherId), $this->studentSchedule));
             }
         }
 
@@ -418,6 +463,7 @@ class ScheduleController extends Component
     {
         $academicPeriod = json_decode(DB::table('metadata')->where('key', 'current_period')->first()->value);
         $periodStart = new Carbon($academicPeriod->start_date);
+        $periodEnd = new Carbon($academicPeriod->end_date);
 
         // $now = Carbon::now('UTC');
         // $timezone = new DateTimeZone(auth()->user()->timezone);
@@ -641,6 +687,15 @@ class ScheduleController extends Component
         return $getStudentsInfo == true ? $studentsInfo : $studentsSchedules;
     }
 
+    public function schedulesUnion($scheduleA, $scheduleB)
+    {
+        // Combina los dos arreglos y elimina duplicados
+        $schedulesUnion = array_values(array_map("unserialize", array_merge(array_map("serialize", $scheduleA), array_map("serialize", $scheduleB))));
+
+        return $schedulesUnion;
+    }
+
+
     public function schedulesDiff($scheduleA, $scheduleB)
     {
         $scheduleA = array_map(function ($arr) {
@@ -778,7 +833,7 @@ class ScheduleController extends Component
 
     public function nextWeek()
     {
-        $this->week < 4 ? $this->week += 1 : $this->week = 4;
+        $this->week < $this->lastWeek ? $this->week += 1 : $this->week = $this->lastWeek;
         $this->schedules = $this->utcToLocal($this->getTeachersAvailability($this->users, $this->week));
 
         // Emit event of schedule updated and send schedule to parent component
@@ -872,9 +927,15 @@ class ScheduleController extends Component
                         $datetime1 = $examDate[2] . " " . $examDate[0] . ":00:00";
                         $datetime2 = $examDate[5] . " " . $examDate[3] . ":00:00";
 
+                        if (isset($this->data['manualEnrolment']) && $this->data['manualEnrolment'] == true) {
+                            $examDate1 = Carbon::createFromFormat('m/d H:i:s', $datetime1, auth()->user()->timezone)->timezone('UTC');
+                            $examDate2 = Carbon::createFromFormat('m/d H:i:s', $datetime2, auth()->user()->timezone)->timezone('UTC');
+                        }else{
+                            $examDate1 = Carbon::createFromFormat('m/d H:i:s', $datetime1, $user->timezone)->timezone('UTC');
+                            $examDate2 = Carbon::createFromFormat('m/d H:i:s', $datetime2, $user->timezone)->timezone('UTC');
+                        }
                         // Get exam date & time in UTC
-                        $examDate1 = Carbon::createFromFormat('m/d H:i:s', $datetime1, $user->timezone)->timezone('UTC');
-                        $examDate2 = Carbon::createFromFormat('m/d H:i:s', $datetime2, $user->timezone)->timezone('UTC');
+                        
                         session(['examDate1' => [$examDate1->toDateTimeString()]]);
                         session(['examDate2' => [$examDate2->toDateTimeString()]]);
 
@@ -884,6 +945,8 @@ class ScheduleController extends Component
                         $scheduleApproved1 = count($this->schedulesIntersect($this->getTeachersAvailability($this->users, $this->week), $examDate1));
                         $scheduleApproved2 = count($this->schedulesIntersect($this->getTeachersAvailability($this->users, $this->week), $examDate2));
 
+                        // dd($this->getTeachersAvailability($this->users, $this->week), $examDate1, $examDate2);
+
                         if ($scheduleApproved1 && $scheduleApproved2) {
 
                             ShopController::saveScheduleReserve($examDate1, "exam");
@@ -891,6 +954,7 @@ class ScheduleController extends Component
 
                             if (isset($this->data['manualEnrolment']) && $this->data['manualEnrolment'] == true) {
                                 $enrolmentId = EnrolmentController::enrolStudent($user->id, session('selected_course'), session('selected_teacher'));
+                                dd($enrolmentId);
                                 EnrolmentController::createSchedule($enrolmentId, []);
                                 ClassController::bookClasses(session('examDate1'), $enrolmentId);
                                 ClassController::bookClasses(session('examDate2'), $enrolmentId);
@@ -1126,7 +1190,7 @@ class ScheduleController extends Component
                             $class->delete();
                         }
 
-                        $classes = ClassController::bookClasses($apportionment[1], $enrolment->id);
+                        $classes = ClassController::bookClasses($apportionment[1], $enrolment->id, true);
 
                         $this->updateStudentSchedule($enrolment, $schedule);
 

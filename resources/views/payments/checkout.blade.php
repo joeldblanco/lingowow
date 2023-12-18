@@ -16,7 +16,7 @@
                 channel: 'web',
                 merchantid: @json(env('NIUBIZ_MERCHANT_ID')),
                 purchasenumber: @json($purchaseNumber),
-                amount: @json($ammount),
+                amount: @json($amount),
                 expirationminutes: 20,
                 // expirationminutes: {{ $expirationTimeInMinutes }},
                 timeouturl: 'about:blank',

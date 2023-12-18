@@ -15,10 +15,8 @@ use Carbon\Carbon;
 use App\Models\Comment;
 use App\Models\Complaint;
 use App\Models\Meeting;
-use App\Models\ScheduleReserve;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Pagination\LengthAwarePaginator;
 use App\Notifications\BookedClass;
+use App\Notifications\ScheduleUpdate;
 use App\Notifications\BookedPlacementTest;
 use Illuminate\Support\Facades\Notification;
 
@@ -56,24 +54,54 @@ class ClassController extends Controller
      */
     public function store(Request $request)
     {
-        $request->validate([
-            // 'teacher_id' => 'required|numeric|exists:App\Models\User,id',
-            // 'student_id' => 'required|numeric|exists:App\Models\User,id',
+        // Validación de datos
+        $validatedData = $request->validate([
             'enrolment_id' => 'required|numeric|exists:App\Models\Enrolment,id',
             'date_time' => 'required|date_format:Y-m-d\TH:i',
         ]);
-        $date_time = Carbon::parse($request->date_time)->format('Y-m-d H:i:s');
-        $enrolment = Enrolment::find($request->enrolment_id);
-        $meeting_id = Meeting::where('host_id', $enrolment->teacher->id)->where('attendee_id', $enrolment->student->id)->first()->id;
-        Classes::create([
-            'enrolment_id' => $enrolment->id,
-            'start_date' => $date_time,
-            'end_date' => Carbon::parse($date_time)->addMinutes(40)->format('Y-m-d H:i:s'),
-            'meeting_id' => $meeting_id,
-        ]);
+
+        // Conversión de fecha y hora a UTC
+        $date_time = $this->convertToUtc($request->date_time);
+
+        // Búsqueda de enrolment y manejo de errores
+        $enrolment = Enrolment::find($validatedData['enrolment_id']);
+        if (!$enrolment) {
+            return redirect()->back()->withErrors(['enrolment_id' => 'Enrolment not found']);
+        }
+
+        // Búsqueda de meeting y manejo de errores
+        $meeting = Meeting::where('host_id', $enrolment->teacher->id)
+            ->where('attendee_id', $enrolment->student->id)
+            ->first();
+        if (!$meeting) {
+            return redirect()->back()->withErrors(['meeting_id' => 'Meeting not found']);
+        }
+
+        // Creación de la clase
+        $this->createClass($enrolment, $date_time, $meeting->id);
 
         return redirect()->route('admin.classes.index');
     }
+
+    // Función auxiliar para convertir a UTC
+    private function convertToUtc($dateTime)
+    {
+        return Carbon::parse($dateTime, auth()->user()->timezone)
+            ->timezone('UTC')
+            ->format('Y-m-d H:i:s');
+    }
+
+    // Función auxiliar para crear una clase
+    private function createClass($enrolment, $startDateTime, $meetingId)
+    {
+        Classes::create([
+            'enrolment_id' => $enrolment->id,
+            'start_date' => $startDateTime,
+            'end_date' => Carbon::parse($startDateTime)->addMinutes(40)->format('Y-m-d H:i:s'),
+            'meeting_id' => $meetingId,
+        ]);
+    }
+
 
     /**
      * Display the specified resource.
@@ -345,7 +373,7 @@ class ClassController extends Controller
         return ApportionmentController::getPeriod($period, true);
     }
 
-    public static function bookClasses($classDates, $enrolmentId)
+    public static function bookClasses($classDates, $enrolmentId, $scheduleUptade = false)
     {
         $enrolment = Enrolment::find($enrolmentId);
 
@@ -380,7 +408,11 @@ class ClassController extends Controller
         if ($enrolment->course->categories()->pluck('name')->contains('Test')) {
             Notification::sendNow($enrolment->teacher, new BookedPlacementTest($enrolment->student->id));
         } else {
-            Notification::sendNow($enrolment->teacher, new BookedClass($enrolment->student->id));
+            if ($scheduleUptade) {
+                Notification::sendNow($enrolment->teacher, new ScheduleUpdate($enrolment->student->id));
+            } else {
+                Notification::sendNow($enrolment->teacher, new BookedClass($enrolment->student->id));
+            }
         }
 
         return $classDates;

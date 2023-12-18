@@ -347,8 +347,7 @@ Route::middleware(['web', 'auth', 'verified', 'impersonate'])->group(function ()
 
 
         //COUPONS//
-        Route::get('/admin/coupons', [CouponController::class, 'index'])->name("coupons.index");
-        Route::get('/admin/coupons/create/{product_id}/{coupon_amount}', [CouponController::class, 'store'])->name("coupons.create");
+        Route::resource('/coupons', CouponController::class);
         // Route::get('/admin/marketing', [CouponController::class,'index'])->name('admin.marketing');
 
 

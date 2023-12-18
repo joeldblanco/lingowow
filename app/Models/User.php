@@ -3,7 +3,6 @@
 namespace App\Models;
 
 use Illuminate\Contracts\Auth\MustVerifyEmail;
-use Illuminate\Contracts\Session\Session;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -13,10 +12,8 @@ use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use aberkanidev\Coupons\Traits\CanRedeemCoupons;
-use App\Http\Livewire\Chat;
 use Illuminate\Support\Facades\DB;
 use Lab404\Impersonate\Models\Impersonate;
-use Lab404\Impersonate\Services\ImpersonateManager;
 
 class User extends Authenticatable implements MustVerifyEmail
 {
@@ -164,6 +161,14 @@ class User extends Authenticatable implements MustVerifyEmail
         }
         // dd($enrolments, $schedules, $Students_schedules);
         return $Students_schedules;
+    }
+
+    /**
+     * Get all the teacher's students.
+     */
+    public function students()
+    {
+        return $this->hasManyThrough(User::class, Enrolment::class, 'teacher_id', 'id', 'id', 'student_id');
     }
 
     /**

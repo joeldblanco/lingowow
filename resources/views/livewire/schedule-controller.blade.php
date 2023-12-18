@@ -58,7 +58,7 @@
                 Previous Week
             </button>
             <button wire:click="nextWeek"
-                class="@if ($week < 4) bg-lw-blue hover:bg-blue-800 @else bg-gray-300 cursor-not-allowed @endif select-none px-4 py-2 rounded-md text-white font-bold mb-5">
+                class="@if ($week < $lastWeek) bg-lw-blue hover:bg-blue-800 @else bg-gray-300 cursor-not-allowed @endif select-none px-4 py-2 rounded-md text-white font-bold mb-5">
                 Next Week
                 <i class="fas fa-chevron-right"></i>
             </button>

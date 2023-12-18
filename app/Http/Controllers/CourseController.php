@@ -227,7 +227,7 @@ class CourseController extends Controller
         $course->update([
             'name' => $request->name,
             'description' => $request->description,
-            'course_image' => $course_image,
+            'image_url' => $course_image,
             'modality' => $request->modality,
         ]);
 

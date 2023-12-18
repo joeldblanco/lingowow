@@ -1,6 +1,5 @@
 <div>
     <!-- PAYPAL CHECKOUT BUTTON COMPONENT -->
-
     <!-- Set up a container element for the button -->
     <div id="paypal-button-container" class="mt-3"></div>
 
@@ -30,7 +29,6 @@
 
             runPaypalButtonFunction(amount).then(() => {
                 // Render the PayPal button into #paypal-button-container
-                // console.log(amount);
                 paypal.Buttons({
 
                         style: {
@@ -64,9 +62,9 @@
                         Livewire.emit('paypalButtonRendered');
                     });
             });
-        }
+        };
 
-        window.addEventListener('renderPaymentButtons', event => {
+        window.addEventListener('load-payment-buttons', event => {
             inicializarBotonPayPal(event.detail.amount);
         });
     </script>

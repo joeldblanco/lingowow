@@ -23,7 +23,7 @@ return [
      * Example: foo
      * Generated Code: foo-AGXF-1NH8
      */
-    'prefix' => "TUC",
+    'prefix' => "LW",
 
     /*
      * Coupon code suffix.

@@ -33,7 +33,7 @@
         x-transition:enter-start="opacity-0 scale-90" x-transition:enter-end="opacity-100 scale-100"
         x-transition:leave="transition ease-in duration-300" x-transition:leave-start="opacity-100 scale-100"
         x-transition:leave-end="opacity-0 scale-90">
-        
+
         <div class="fixed inset-0 bg-gray-500 bg-opacity-25 transition-opacity"></div>
 
         <div class="fixed inset-0 overflow-hidden">
@@ -74,44 +74,46 @@
                                     <div class="flow-root">
                                         <ul role="list" class="-my-6 divide-y divide-gray-200">
                                             @forelse ($items as $item)
-                                                <li class="flex py-6">
-                                                    <div
-                                                        class="h-24 w-24 flex-shrink-0 overflow-hidden rounded-md border border-gray-200">
-                                                        @php
-                                                            $product = App\Models\Product::find($item->id);
-                                                        @endphp
-                                                        <img src="{{ Storage::url($product->image) }}"
-                                                            class="h-full w-full object-cover object-center">
-                                                    </div>
-
-                                                    <div class="ml-4 flex flex-1 flex-col">
-                                                        <div>
-                                                            <div
-                                                                class="flex justify-between text-base font-medium text-gray-900">
-                                                                <h3>
-                                                                    <p>{{ $product->name }}</p>
-                                                                </h3>
-                                                                <p class="ml-4">${{ $item->price }}</p>
-                                                            </div>
-                                                            @if ($product->categories()->count() > 0)
-                                                                <p class="mt-1 text-sm text-gray-500">
-                                                                    {{ $product->categories()->pluck('name')->random() }}
-                                                                </p>
-                                                            @endif
+                                                @if (!Arr::has($item->options, 'coupon_code'))
+                                                    <li class="flex py-6">
+                                                        <div
+                                                            class="h-24 w-24 flex-shrink-0 overflow-hidden rounded-md border border-gray-200">
+                                                            @php
+                                                                $product = App\Models\Product::find($item->id);
+                                                            @endphp
+                                                            <img src="{{ Storage::url($product->image) }}"
+                                                                class="h-full w-full object-cover object-center">
                                                         </div>
-                                                        <div class="flex flex-1 items-end justify-between text-sm">
-                                                            <p class="text-gray-500">Qty {{ $item->qty }}</p>
 
-                                                            <div class="flex">
-                                                                <button type="button"
-                                                                    wire:click="removeItem('{{ $item->rowId }}')"
-                                                                    class="font-medium text-indigo-600 hover:text-indigo-500">Remove
-                                                                    {{-- @if ($item->options->keys()->contains('enrollable')) <span class="text-xs text-gray-400">(Auto-remove in < 20 min.)</span> @endif --}}
-                                                                </button>
+                                                        <div class="ml-4 flex flex-1 flex-col">
+                                                            <div>
+                                                                <div
+                                                                    class="flex justify-between text-base font-medium text-gray-900">
+                                                                    <h3>
+                                                                        <p>{{ $product->name }}</p>
+                                                                    </h3>
+                                                                    <p class="ml-4">${{ $item->price }}</p>
+                                                                </div>
+                                                                @if ($product->categories()->count() > 0)
+                                                                    <p class="mt-1 text-sm text-gray-500">
+                                                                        {{ $product->categories()->pluck('name')->random() }}
+                                                                    </p>
+                                                                @endif
+                                                            </div>
+                                                            <div class="flex flex-1 items-end justify-between text-sm">
+                                                                <p class="text-gray-500">Qty {{ $item->qty }}</p>
+
+                                                                <div class="flex">
+                                                                    <button type="button"
+                                                                        wire:click="removeItem('{{ $item->rowId }}')"
+                                                                        class="font-medium text-indigo-600 hover:text-indigo-500">Remove
+                                                                        {{-- @if ($item->options->keys()->contains('enrollable')) <span class="text-xs text-gray-400">(Auto-remove in < 20 min.)</span> @endif --}}
+                                                                    </button>
+                                                                </div>
                                                             </div>
                                                         </div>
-                                                    </div>
-                                                </li>
+                                                    </li>
+                                                @endif
                                             @empty
                                                 <p class="text-xl text-gray-400">No items in cart</p>
                                             @endforelse
@@ -123,7 +125,7 @@
                             <div class="border-t border-gray-200 px-4 py-6 sm:px-6">
                                 <div class="flex justify-between text-base font-medium text-gray-900">
                                     <p>Subtotal</p>
-                                    <p>{{ $subTotal }}</p>
+                                    <p>${{ $subTotal }}</p>
                                 </div>
                                 <p class="mt-0.5 text-sm text-gray-500">Shipping and taxes calculated at checkout.</p>
                                 <div class="mt-6">

@@ -4,8 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Http\Livewire\ScheduleController;
 use App\Invoice;
-use App\Jobs\CreateSchedule;
-use App\Jobs\StoreSelfEnrolment;
 use App\Models\Product;
 use Gloudemans\Shoppingcart\Facades\Cart;
 use Illuminate\Http\Request;
@@ -15,8 +13,8 @@ use App\Models\Course;
 use App\Models\Enrolment;
 use App\Models\Plan;
 use App\Models\ScheduleReserve;
-use App\Models\User;
 use Carbon\Carbon;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 
@@ -163,6 +161,12 @@ class ShopController extends Controller
         $invoice->payment_method = $paymentMethod;
         $invoice->paid = 1;
         $invoice->save();
+
+        foreach (Cart::content() as $item) {
+            if (Arr::has($item->options, 'coupon_code')) {
+                DB::table('voucherables')->where('coupon_id', $item->options->coupon_id)->update(['redemption_confirmation' => 1]);
+            }
+        }
 
         Cart::destroy();
         session()->forget('paymentMethod');

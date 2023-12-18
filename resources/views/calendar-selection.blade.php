@@ -67,7 +67,6 @@
                         $modality_course = App\Models\Course::find($course_id)->modality;
                     }
                 @endphp
-
                 @if (App\Models\Course::find($course_id)->categories()->pluck('name')->contains('Test'))
                     @php
                         $available_teachers = App\Models\User::role('teacher')

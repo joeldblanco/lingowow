@@ -100,7 +100,7 @@
                     <div class="flex flex-col justify-end">
                         <div class="flex items-center space-x-2">
                             <input type="checkbox" name="agreement_checkbox" id="agreement_checkbox" required>
-                            <p>I agree with the total ammount <span
+                            <p>I agree with the total amount <span
                                     class="text-sm font-bold italic text-gray-500">(${{ $totalPayment }}).</span></p>
                         </div>
                         <button type="submit"

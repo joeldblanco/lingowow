@@ -70,7 +70,7 @@
                                 <p class="text-gray-500 text-sm font-light">Please select an student for the meeting</p>
                             </div> --}}
                             <div class="pt-6 pb-2 space-y-1">
-                                <p class="font-bold text-gray-600 mb-1">Date & Time (UTC)</p>
+                                <p class="font-bold text-gray-600 mb-1">Date & Time ({{auth()->user()->timezone}})</p>
                                 <input type="datetime-local" name="date_time" id="date_time"
                                     placeholder="Enter meeting date" step="60" {{-- min="{{ now() }}" --}}
                                     {{-- value="0000-00-00T00:00" --}} required
@@ -78,9 +78,7 @@
                                 @if ($errors->has('student_id'))
                                     <p class="text-xs font-light text-red-600">{{ $errors->get('student_id')[0] }}</p>
                                 @endif
-                                <p class="text-gray-500 text-sm font-light">Please select a meeting date and time
-                                    <a>(UTC)</a>
-                                </p>
+                                <p class="text-gray-500 text-sm font-light">Please select a meeting date and time ({{auth()->user()->timezone}})</p>
                             </div>
                         </div>
                     </div>

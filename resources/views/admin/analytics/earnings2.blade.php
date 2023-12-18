@@ -48,6 +48,7 @@
                 @endphp
                 @foreach ($groupedClasses as $classes)
                     @php
+                        // dd(collect($groupedClasses->get("Rosa"))->pluck('enrolment.course'));
                         $student = $classes[0]->student();
                         $course = $classes[0]->enrolment->course;
                         
@@ -101,8 +102,8 @@
                     </td>
                     <td class="px-6 py-4 font-bold text-right"></td>
                     <td class="px-6 py-4 font-bold text-right">$ {{ $totalIncome }}</td>
-                    <td class="px-6 py-4 font-bold text-right">-$ {{ $totalPayment }}</td>
                     <td class="px-6 py-4 font-bold text-right">-$ {{ $totalFee }}</td>
+                    <td class="px-6 py-4 font-bold text-right">-$ {{ $totalPayment }}</td>
                     <td class="px-6 py-4 font-bold text-right">$ {{ $totalIncome - $totalFee - $totalPayment }}</td>
                 </tr>
             </tfoot>

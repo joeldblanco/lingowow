@@ -72,7 +72,7 @@ class InvoiceController extends Controller
      */
     public function edit($id)
     {
-        $invoice = Invoice::find($id);
+        $invoice = Invoice::findOrFail($id);
         return view('admin.invoices.edit', compact('invoice'));
     }
 
