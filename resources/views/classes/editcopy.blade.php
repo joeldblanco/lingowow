@@ -26,8 +26,8 @@
         // $current_period = DB::table("metadata")->where("key", "current_period")->first()->value;
         //$current_period = array_values(json_decode($current_period,1));
         $current_period = App\Http\Controllers\ApportionmentController::currentPeriod();
-        $period_start_c = new Carbon\Carbon($current_period[0]);
-        $period_end_c = new Carbon\Carbon($current_period[1]);
+        $period_start_c = new Carbon\Carbon($current_period["start_date"]);
+        $period_end_c = new Carbon\Carbon($current_period["end_date"]);
         $period_start = $period_start_c->format('Y/m/d');
         $period_end = $period_end_c->format('Y/m/d');
         

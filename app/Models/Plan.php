@@ -16,6 +16,7 @@ class Plan extends Model
         'slug',
         'monthly_classes',
         'product_id',
+        'price',
     ];
 
     /**

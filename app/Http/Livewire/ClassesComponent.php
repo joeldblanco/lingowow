@@ -43,8 +43,8 @@ class ClassesComponent extends Component
 
     public function mount()
     {
-        $this->start_date = ApportionmentController::currentPeriod(true)[0];
-        $this->end_date = ApportionmentController::currentPeriod(true)[1];
+        $this->start_date = ApportionmentController::currentPeriod(true)["start_date"];
+        $this->end_date = ApportionmentController::currentPeriod(true)["end_date"];
         $this->enrolment_id = 0;
         $this->resetPage();
     }

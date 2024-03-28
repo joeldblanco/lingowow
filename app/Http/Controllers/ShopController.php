@@ -23,7 +23,7 @@ class ShopController extends Controller
     public function index(Request $request)
     {
         // if (auth()->id() != 5 && auth()->id() != 6)
-        //     return view('maintenance'); //MAINTEANCE MODE
+        // return view('maintenance'); //MAINTENANCE MODE
 
         $response = [];
         if (session()->has('code')) {
@@ -83,9 +83,65 @@ class ShopController extends Controller
             $options['editable'] = true;
         }
 
-        $product = ShopController::checkCustomerReward($product->id);
+        // $product = ShopController::checkCustomerReward($product->id);
 
-        Cart::add($product->id, $product->name, $quantity, ($product->sale_price == null ? $product->regular_price : $product->sale_price), $options)->associate('App\Models\Product');
+        // $productPlans = $product->plans;
+
+        // if (count($productPlans) == 1) {
+        //     $price = $product->sale_price == null ? $product->regular_price : $product->sale_price;
+        // } else {
+        //     foreach ($productPlans as $plan) {
+        //         if ($quantity >= $plan->monthly_classes) {
+        //             $price = $plan->price / $plan->monthly_classes;
+        //         }
+        //     }
+        // }
+
+        $groupPrice = false;
+        // $price = 0;
+        $price_groups = json_decode(
+            DB::table('metadata')
+                ->where('key', 'price_groups')
+                ->first()->value,
+            1,
+        )[0];
+
+        $price_students = json_decode(
+            DB::table('metadata')
+                ->where('key', 'price_students')
+                ->first()->value,
+            1,
+        );
+
+        $default_group_price = json_decode(
+            DB::table('metadata')
+                ->where('key', 'default_group_price')
+                ->first()->value,
+            1,
+        );
+        $student = auth()->user();
+
+        foreach ($price_students as $group => $students_ids) {
+            if (in_array($student->id, $students_ids)) {
+                $groupPrice = $price_groups[$group];
+            }
+        }
+
+        if (!$groupPrice) {
+            $groupPrice = $default_group_price;
+        }
+
+        if ($quantity < 8) {
+            $price = $groupPrice[$product->id][0]['sale_price'] == null ? $groupPrice[$product->id][0]['regular_price'] : $groupPrice[$product->id][0]['sale_price'];
+        } elseif ($quantity < 12) {
+            $price = $groupPrice[$product->id][1]['sale_price'] == null ? $groupPrice[$product->id][1]['regular_price'] : $groupPrice[$product->id][1]['sale_price'];
+        } elseif ($quantity < 16) {
+            $price = $groupPrice[$product->id][2]['sale_price'] == null ? $groupPrice[$product->id][2]['regular_price'] : $groupPrice[$product->id][2]['sale_price'];
+        } elseif ($quantity >= 16) {
+            $price = $groupPrice[$product->id][3]['sale_price'] == null ? $groupPrice[$product->id][3]['regular_price'] : $groupPrice[$product->id][3]['sale_price'];
+        }
+
+        Cart::add($product->id, $product->name, $quantity, $price, $options)->associate('App\Models\Product');
 
         return redirect()->route('shop')->with('success', 'Product succesfully added to cart!');
     }

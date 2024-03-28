@@ -57,14 +57,14 @@
                                             $user_units = auth()
                                                 ->user()
                                                 ->units->last();
-                                        
+
                                             $user_units = $user_units
                                                 ->course()
                                                 ->modules->sortBy('order')
                                                 ->where('order', '<=', $user_units->module->order)
                                                 ->pluck('units')
                                                 ->flatten();
-                                        
+
                                             $user_units =
                                                 $user_units->count() -
                                                 $user_units
@@ -84,6 +84,9 @@
                                                     ->count();
                                         }
                                     @endphp
+                                    @push('header-scripts')
+                                        <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+                                    @endpush
                                     <script>
                                         var options = {
                                             series: [{

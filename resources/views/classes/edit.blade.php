@@ -9,7 +9,7 @@
         $hoy = (new Carbon\Carbon())->toCookieString();
         
         $current_period = App\Http\Controllers\ApportionmentController::currentPeriod();
-        $period_end_c = new Carbon\Carbon($current_period[1]);
+        $period_end_c = new Carbon\Carbon($current_period["start_date"]);
         $period_end = $period_end_c->format('Y/m/d');
         
         $enrolment = auth()

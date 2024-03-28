@@ -52,7 +52,7 @@
                                     </td>
                                     <td class="py-4 px-6 border-b border-gray-400 text-gray-500 bg-white text-center">
                                         <div class="w-full text-gray-600">
-                                            @if (!empty($plan->product))
+                                            {{-- @if (!empty($plan->product))
                                                 @if ($plan->product->categories->pluck('name')->contains('Synchronous'))
                                                     @if ($plan->sale_price == null)
                                                         <p class="text-sm">
@@ -76,7 +76,8 @@
                                                 @endif
                                             @else
                                                 <p class="text-sm">NULL</p>
-                                            @endif
+                                            @endif --}}
+                                            ${{ $plan->price }}
                                         </div>
                                     </td>
                                     <td class="py-4 px-6 border-b border-gray-400 text-gray-500 bg-white">

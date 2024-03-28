@@ -23,7 +23,7 @@ class AnalyticsController extends Controller
     {
         $current_period = ApportionmentController::currentPeriod();
         // $current_period = ApportionmentController::getPeriod('2023-06-15', true); //UNCOMMENT THIS TO CALCULATE THE PAYMENT FOR A SPECIFIC PERIOD 1/3
-        $invoices = Invoice::where('paid', 1)->where('created_at', '>=', Carbon::parse($current_period[0])->startOfMonth())->where('created_at', '<=', Carbon::parse($current_period[0])->endOfMonth())->get();
+        $invoices = Invoice::where('paid', 1)->where('created_at', '>=', Carbon::parse($current_period["start_date"])->startOfMonth())->where('created_at', '<=', Carbon::parse($current_period["start_date"])->endOfMonth())->get();
         $payment = [];
         $classes = [];
         $profit = [];
@@ -43,7 +43,7 @@ class AnalyticsController extends Controller
             // $enrolments = Enrolment::withTrashed()->where('teacher_id', $value->id)->get(); //UNCOMMENT THIS TO CALCULATE THE PAYMENT FOR A SPECIFIC PERIOD 2/3
 
             foreach ($enrolments as $enrolment) {
-                $monthly_classes = Classes::where('enrolment_id', $enrolment->id)->where('start_date', '>=', $current_period[0])->where('end_date', '<=', now())->count();
+                $monthly_classes = Classes::where('enrolment_id', $enrolment->id)->where('start_date', '>=', $current_period["start_date"])->where('end_date', '<=', now())->count();
                 // $monthly_classes = Classes::where('enrolment_id', $enrolment->id)->where('start_date', '>=', $current_period[0])->where('end_date', '<=', $current_period[1])->count(); //UNCOMMENT THIS TO CALCULATE THE PAYMENT FOR A SPECIFIC PERIOD 3/3
 
                 $product = Course::find($enrolment->course_id)->products->first();
@@ -271,10 +271,19 @@ class AnalyticsController extends Controller
         $teachers = User::role('teacher')->orderBy('first_name')->get();
 
         if (empty($period)) {
-            $period = ApportionmentController::getPeriod(Carbon::now(), true);
+            $period["start_date"] = ApportionmentController::currentPeriod()["start_date"];
+            $period["end_date"] = ApportionmentController::currentPeriod()["end_date"];
         } else {
-            $period = ApportionmentController::getPeriod($period, true);
+            $periodAux = [];
+            $periodAux["start_date"] = ApportionmentController::getPeriod($period, true)[0];
+            $periodAux["end_date"] = ApportionmentController::getPeriod($period, true)[1];
+            $period = $periodAux;
         }
+
+        // $period = [
+        //     "start_date" => "2024-01-08 00:00:00",
+        //     "end_date" => "2024-02-04 00:00:00"
+        // ];
 
         $classes = [];
         foreach ($teachers as $teacher)
@@ -319,7 +328,8 @@ class AnalyticsController extends Controller
         $teachers = User::role('teacher')->orderBy('first_name')->get();
 
         if (empty($period)) {
-            $period = ApportionmentController::getPeriod(Carbon::now(), true);
+            $period[0] = ApportionmentController::currentPeriod()["start_date"];
+            $period[1] = ApportionmentController::currentPeriod()["end_date"];
         } else {
             $period = ApportionmentController::getPeriod($period, true);
         }

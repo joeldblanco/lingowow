@@ -44,11 +44,11 @@ class ApportionmentController extends Controller
         $next_period = ApportionmentController::nextPeriod();
 
         // dd($current_period,$next_period);
-        $current_period_start = new Carbon($current_period[0]);
-        $current_period_end = new Carbon($current_period[1]);
+        $current_period_start = new Carbon($current_period["start_date"]);
+        $current_period_end = new Carbon($current_period["end_date"]);
 
-        $next_period_start = new Carbon($next_period[0]);
-        $next_period_end = new Carbon($next_period[1]);
+        $next_period_start = new Carbon($next_period["start_date"]);
+        $next_period_end = new Carbon($next_period["end_date"]);
 
 
 
@@ -108,7 +108,7 @@ class ApportionmentController extends Controller
             $period_start_c = new Carbon($current_period[0]);
             $period_end_c = new Carbon($current_period[1]);
 
-            $absence = User::find(session('teacher_id'))->teacherClasses()->where('status', 1)->whereBetween('start_date', [$today->toDateTimeString(), ApportionmentController::currentPeriod()[1]])->orderBy('start_date', 'asc')->get()->pluck('start_date');
+            $absence = User::find(session('teacher_id'))->teacherClasses()->where('status', 1)->whereBetween('start_date', [$today->toDateTimeString(), ApportionmentController::currentPeriod()["end_date"]])->orderBy('start_date', 'asc')->get()->pluck('start_date');
 
             if ($absence != null) {
                 foreach ($absence as $key => $start_date) {
@@ -174,18 +174,17 @@ class ApportionmentController extends Controller
         // return [$current_period_start->toDateTimeString(), $current_period_end->toDateTimeString()];
 
         $current_period = DB::table("metadata")->where("key", "current_period")->first()->value;
-        $current_period = array_values(json_decode($current_period, 1));
-        // dd($current_period);
+        $current_period = json_decode($current_period, 1);
         return $current_period;
     }
 
     public static function nextPeriod($onlyDate = false)
     {
         $current_period = DB::table("metadata")->where("key", "current_period")->first()->value;
-        $current_period = array_values(json_decode($current_period, 1));
+        $current_period = json_decode($current_period, 1);
 
-        $start_period = new Carbon($current_period[0]);
-        $end_period = new Carbon($current_period[1]);
+        $start_period = new Carbon($current_period["start_date"]);
+        $end_period = new Carbon($current_period["end_date"]);
 
         if ($start_period->month == $end_period->month) {
             $next_period_start = $start_period->copy()->addMonth()->firstOfMonth(Carbon::MONDAY);
@@ -200,7 +199,7 @@ class ApportionmentController extends Controller
         }
         // dd($next_period_start,$next_period_end, $start_period, $end_period);
         if ($onlyDate) return [$next_period_start->toDateString(), $next_period_end->toDateString()];
-        return [$next_period_start->toDateTimeString(), $next_period_end->toDateTimeString()];
+        return ["start_date" => $next_period_start->toDateTimeString(), "end_date" => $next_period_end->toDateTimeString()];
     }
 
     public static function previousPeriod($onlyDate = false)
@@ -233,17 +232,23 @@ class ApportionmentController extends Controller
         if ($extended) {
             $today = new Carbon($class);
             $month = $today->isoFormat('MMMM G');
-            $first_monday = new Carbon('first monday of ' . $month);
-            if ($first_monday < Carbon::now()) {
-                $period_start_date = new Carbon('first monday of ' . $month);
-                $period_end_date = (new Carbon('first monday of ' . $month))->addDays(5);
-                $period_end_date->addWeeks(3);
-                $period_end_date->addDays(1);
-            } else {
-                $period_start_date = new Carbon('first monday of ' . $month);
-                $period_end_date = (new Carbon('first monday of ' . $month))->addDays(5);
-                $period_end_date->addWeeks(3);
-                $period_end_date->addDays(1);
+            $now = Carbon::now();
+            // $first_monday = new Carbon('first monday of ' . $month);
+            // if ($first_monday < Carbon::now()) {
+            // $period_start_date = new Carbon('first monday of ' . $month);
+            // $period_end_date = (new Carbon('first monday of ' . $month))->addDays(5);
+            // $period_end_date->addWeeks(3);
+            // $period_end_date->addDays(1);
+            // } else {
+            $period_start_date = new Carbon('first monday of ' . $month);
+            $period_end_date = (new Carbon('first monday of ' . $month))->addDays(5);
+            $period_end_date->addWeeks(3);
+            $period_end_date->addDays(1);
+            // }
+
+            if ($now->isAfter($period_start_date) && $now->isBefore($period_end_date)) {
+                $period_start_date = Carbon::create(ApportionmentController::currentPeriod()["start_date"]);
+                $period_end_date = Carbon::create(ApportionmentController::currentPeriod()["end_date"]);
             }
 
             return [$period_start_date->toDateTimeString(), $period_end_date->toDateTimeString()];

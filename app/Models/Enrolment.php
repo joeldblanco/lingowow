@@ -29,6 +29,14 @@ class Enrolment extends Model
     }
 
     /**
+     * Get the classes associated with the enrolment.
+     */
+    public function trashedClasses()
+    {
+        return $this->hasMany(Classes::class)->withTrashed();
+    }
+
+    /**
      * Get the schedule associated with the enrolment.
      */
     public function schedule()

@@ -1,7 +1,12 @@
 <x-app-layout>
 
     @php
-        $session_info = json_decode((new Illuminate\Http\Client\PendingRequest())->get('http://ip-api.com/json/' . $_SERVER['REMOTE_ADDR'])->getBody(), true);
+        $session_info = json_decode(
+            (new Illuminate\Http\Client\PendingRequest())
+                ->get('http://ip-api.com/json/' . $_SERVER['REMOTE_ADDR'])
+                ->getBody(),
+            true,
+        );
         // dump($session_info['timezone']);
         if ($session_info['status'] == 'fail') {
             session()->forget('session_info');
@@ -11,7 +16,7 @@
                 // auth()
                 //     ->user()
                 //     ->update(['timezone' => session('session_info')['timezone']['id']]);
-        
+
                 $user = auth()->user();
                 $user->timezone = session('session_info')['timezone'];
                 $user->ip = session('session_info')['query'];
@@ -102,12 +107,10 @@
                 @endphp --}}
 
                 @php
-                    $enrolment = auth()
-                        ->user()
-                        ->enrolments->first();
+                    $enrolment = auth()->user()->enrolments->first();
                     $course_id = null;
                     $course_modality = null;
-                    
+
                     if ($enrolment != null) {
                         $course_id = $enrolment->course->id;
                         $course_modality = $enrolment->course->modality;
@@ -123,7 +126,7 @@
                             @endrole
 
                             @hasanyrole('student|teacher')
-                                <a href="{{ route('classes.index', ['start_date' => App\Http\Controllers\ApportionmentController::currentPeriod(true)[0], 'end_date' => App\Http\Controllers\ApportionmentController::currentPeriod(true)[1]]) }}"
+                                <a href="{{ route('classes.index', ['start_date' => App\Http\Controllers\ApportionmentController::currentPeriod(true)['start_date'], 'end_date' => App\Http\Controllers\ApportionmentController::currentPeriod(true)['end_date']]) }}"
                                     class="inline-block bg-lw-light_blue text-white px-4 py-2 rounded hover:bg-lw-light_blue hover:text-white hover:no-underline">Classes</a>
                             @endhasanyrole
                         </div>
@@ -138,36 +141,26 @@
                                     if (count($user_units) <= 0) {
                                         $user_units = 0;
                                     } else {
-                                        $user_units = auth()
-                                            ->user()
-                                            ->units->last();
-                                    
+                                        $user_units = auth()->user()->units->last();
+
                                         $user_units = $user_units
                                             ->course()
                                             ->modules->sortBy('order')
                                             ->where('order', '<=', $user_units->module->order)
                                             ->pluck('units')
                                             ->flatten();
-                                    
+
                                         $user_units =
                                             $user_units->count() -
                                             $user_units
-                                                ->where(
-                                                    'module_id',
-                                                    auth()
-                                                        ->user()
-                                                        ->units->last()->module->id,
-                                                )
-                                                ->where(
-                                                    'order',
-                                                    '>',
-                                                    auth()
-                                                        ->user()
-                                                        ->units->last()->order,
-                                                )
+                                                ->where('module_id', auth()->user()->units->last()->module->id)
+                                                ->where('order', '>', auth()->user()->units->last()->order)
                                                 ->count();
                                     }
                                 @endphp
+                                @push('header-scripts')
+                                    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+                                @endpush
                                 <script>
                                     var options = {
                                         series: [{
@@ -249,10 +242,8 @@
 
                 @role('teacher')
                     @php
-                        $classes = App\Models\Enrolment::select('student_id')
-                            ->where('teacher_id', auth()->id())
-                            ->get();
-                        
+                        $classes = App\Models\Enrolment::select('student_id')->where('teacher_id', auth()->id())->get();
+
                         $students = [];
                         foreach ($classes as $key => $value) {
                             $students[$key] = $value->student_id;

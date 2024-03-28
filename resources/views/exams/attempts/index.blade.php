@@ -11,7 +11,7 @@
                         <tr>
                             <th
                                 class="py-4 px-6 bg-gray-100 font-bold uppercase text-sm text-gray-600 border-b border-gray-400">
-                                Username</th>
+                                Student</th>
                             <th
                                 class="py-4 px-6 bg-gray-100 font-bold uppercase text-sm text-gray-600 border-b border-gray-400 text-center">
                                 Exam</th>
@@ -33,7 +33,7 @@
                         @if (count($attempts))
                             @foreach ($attempts as $attempt)
                                 <tr class="hover:bg-gray-200">
-                                    <td class="py-4 px-6 border-b border-gray-400">{{ $attempt->user->username }}</td>
+                                    <td class="py-4 px-6 border-b border-gray-400">{{ $attempt->user->first_name }} {{ $attempt->user->last_name }}</td>
                                     <td class="py-4 px-6 border-b border-gray-400 text-center">
                                         {{ $attempt->exam->title }}
                                     </td>

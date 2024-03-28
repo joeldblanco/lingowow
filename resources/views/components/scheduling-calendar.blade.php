@@ -57,8 +57,8 @@
         
         //Consulta de las clases reagendadas en el periodo vigente.
         $current_period = App\Http\Controllers\ApportionmentController::currentPeriod();
-        $period_start_c = new Carbon\Carbon($current_period[0]);
-        $period_end_c = new Carbon\Carbon($current_period[1]);
+        $period_start_c = new Carbon\Carbon($current_period["start_date"]);
+        $period_end_c = new Carbon\Carbon($current_period["end_date"]);
         $now = new Carbon\Carbon();
         $date_range = new Carbon\CarbonPeriod($now, $period_end_c);
         $days_rest = 0;

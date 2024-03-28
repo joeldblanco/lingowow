@@ -60,7 +60,7 @@
                             @endforeach
                         </div>
                         <div class="w-full text-center px-8 pt-8 text-xl mt-auto flex-col flex">
-                            @if ($product->categories->pluck('name')->contains('Synchronous'))
+                            {{-- @if ($product->categories->pluck('name')->contains('Synchronous'))
                                 @if ($product->sale_price == null)
                                     <div>
                                         <span
@@ -87,10 +87,62 @@
                                     </span>
                                     <span class="font-bold text-2xl">{{ $product->sale_price }}</span>
                                 @endif
-                            @endif
+                            @endif --}}
+                            @php
+                                $groupPrice = false;
+                                $plan_price = 0;
+                                $price_groups = json_decode(
+                                    DB::table('metadata')
+                                        ->where('key', 'price_groups')
+                                        ->first()->value,
+                                    1,
+                                )[0];
+
+                                $price_students = json_decode(
+                                    DB::table('metadata')
+                                        ->where('key', 'price_students')
+                                        ->first()->value,
+                                    1,
+                                );
+
+                                $default_group_price = json_decode(
+                                    DB::table('metadata')
+                                        ->where('key', 'default_group_price')
+                                        ->first()->value,
+                                    1,
+                                );
+                                $student = auth()->user();
+
+                                foreach ($price_students as $group => $students_ids) {
+                                    if (in_array($student->id, $students_ids)) {
+                                        $groupPrice = $price_groups[$group];
+                                    }
+                                }
+
+                                if (!$groupPrice) {
+                                    $groupPrice = $default_group_price;
+                                }
+
+                                if ($plan->monthly_classes < 8) {
+                                    $plan_price = $groupPrice[$product->id][0]['sale_price'] == null ? $groupPrice[$product->id][0]['regular_price'] : $groupPrice[$product->id][0]['sale_price'];
+                                } elseif ($plan->monthly_classes < 12) {
+                                    $plan_price = $groupPrice[$product->id][1]['sale_price'] == null ? $groupPrice[$product->id][1]['regular_price'] : $groupPrice[$product->id][1]['sale_price'];
+                                } elseif ($plan->monthly_classes < 16) {
+                                    $plan_price = $groupPrice[$product->id][2]['sale_price'] == null ? $groupPrice[$product->id][2]['regular_price'] : $groupPrice[$product->id][2]['sale_price'];
+                                } elseif ($plan->monthly_classes >= 16) {
+                                    $plan_price = $groupPrice[$product->id][3]['sale_price'] == null ? $groupPrice[$product->id][3]['regular_price'] : $groupPrice[$product->id][3]['sale_price'];
+                                }
+
+                                $plan_price *= $plan->monthly_classes;
+
+                            @endphp
+                            <span class="text-gray-400 italic line-through">
+                                ${{ $product->regular_price * $plan->monthly_classes }}
+                            </span>
+                            {{-- <span class="font-bold text-2xl">${{ $plan->price }}</span> --}}
+                            <span class="font-bold text-2xl">${{ $plan_price }}</span>
                         </div>
-                        <div class="text-center
-                                                mb-8 mt-4">
+                        <div class="text-center mb-8 mt-4">
                             {{-- @if ($product->categories->pluck('name')->contains('Synchronous'))
                                 <button wire:click="store('{{ $plan->monthly_classes / 4 }}', true)"
                                     class=" @if ($loop->index == 1) select-button @endif inline-block bg-blue-800 text-white px-4 py-2 rounded-lg hover:bg-blue-900 hover:text-white hover:no-underline">Select</button>

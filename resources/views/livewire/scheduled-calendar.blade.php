@@ -20,8 +20,8 @@
         $hoy = (new Carbon\Carbon())->toCookieString();
         // dd();
         $current_period = App\Http\Controllers\ApportionmentController::currentPeriod();
-        $period_start_c = new Carbon\Carbon($current_period[0]);
-        $period_end_c = new Carbon\Carbon($current_period[1]);
+        $period_start_c = new Carbon\Carbon($current_period["start_date"]);
+        $period_end_c = new Carbon\Carbon($current_period["end_date"]);
         //if ($this->teacher_id != null) {
         if ($role == 'student') {
             $scheduled_classes = App\Models\Enrolment::select('student_id')

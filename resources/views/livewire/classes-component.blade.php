@@ -150,7 +150,7 @@
                     @if (
                         !empty($current_class) &&
                             App\Http\Controllers\ApportionmentController::getPeriod($current_class->start_date) ==
-                                (new Carbon\Carbon(App\Http\Controllers\ApportionmentController::currentPeriod()[0]))->format('F Y'))
+                                (new Carbon\Carbon(App\Http\Controllers\ApportionmentController::currentPeriod()["start_date"]))->format('F Y'))
                         @if ($current_class->start_date > Carbon\Carbon::now()->addHours(1) && $current_class->status != 1)
                             <a href="{{ route('classes.edit', $current_class->id) }}"
                                 class="bg-green-600 font-semibold text-white p-4 mr-1 rounded-full hover:bg-green-700 focus:outline-none focus:ring shadow-lg hover:shadow-none transition-all duration-300 rescheduling-button"

@@ -167,8 +167,6 @@
                 var countDownDate = new Date();
                 countDownDate.setTime(now + (@json($exam->duration) * 60 * 1000));
 
-                console.log(countDownDate);
-
                 // Update the count down every 1 second
                 var x = setInterval(function() {
 

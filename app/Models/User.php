@@ -76,6 +76,26 @@ class User extends Authenticatable implements MustVerifyEmail
         'profile_photo_url',
     ];
 
+    public function setFirstNameAttribute($value)
+    {
+        $this->attributes['first_name'] = ucwords($value);
+    }
+
+    public function setLastNameAttribute($value)
+    {
+        $this->attributes['last_name'] = ucwords($value);
+    }
+
+    public function getFirstNameAttribute($value)
+    {
+        return ucwords($value);
+    }
+
+    public function getLastNameAttribute($value)
+    {
+        return ucwords($value);
+    }
+
     /**
      * Route notifications for the mail channel.
      *

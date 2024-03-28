@@ -75,6 +75,12 @@ class Kernel extends ConsoleKernel
                         if ($enrolment && $enrolment->course->modality == 'synchronous') {
                             $user_schedule = ModelsSchedule::where('user_id', $student->id)->where('enrolment_id', $enrolment->id)->first();
                             $preselection = $enrolment->preselection;
+
+                            $meeting = $enrolment->classes->first()->meeting;
+                            if ($meeting) {
+                                (new MeetingController)->destroy($meeting, false);
+                            }
+
                             if (empty($preselection)) {
                                 $enrolment->delete();
                                 $user_schedule->delete();
@@ -133,12 +139,13 @@ class Kernel extends ConsoleKernel
 
                 GatherController::setGuestsList();
 
-                // $teachers = User::role('teacher')->get();
-                // foreach ($teachers as $teacher) {
-                //     if($teacher->students->count() <= 0){
-                        
-                //     }
-                // }
+                //CHANGES TEACHERS ZOOM USER TYPE TO BASIC WHEN ACADEMIC PERIOD ENDS//
+                //This avoids paying zoom licenses for teachers that are not teaching in the next period
+                $teachersWithoutStudents = User::role('teacher')->whereDoesntHave('students')->get();
+
+                foreach ($teachersWithoutStudents as $teacher) {
+                    (new MeetingController)->changeZoomUserType($teacher->id, 1);
+                }
             }
 
             $class_notified_students = User::find(DB::table('notifications')->where('created_at', '>=', Carbon::now()->subHours(1))->where('notifiable_type', 'App\Models\User')->where('type', 'App\Notifications\UpcomingClassForStudent')->get('notifiable_id')->pluck('notifiable_id')->unique());
@@ -175,6 +182,17 @@ class Kernel extends ConsoleKernel
                 $reserve->delete();
             }
 
+            $unfinishedExamAttempts = Attempt::whereNull('completed_at')->get();
+            foreach ($unfinishedExamAttempts as $attempt) {
+                $attemptExamDuration = $attempt->exam->duration;
+                if ($attempt->created_at->addMinutes($attemptExamDuration)->lessThan(now())) {
+                    $attempt->completed_at = now();
+                    $attempt->save();
+                }
+            }
+        })->everyMinute();
+
+        $schedule->call(function () {
             $tests = Course::where('name', 'like', '%test%')->get();
             foreach ($tests as $test) {
                 $testEnrolments = Enrolment::where('course_id', $test->id)->get();
@@ -189,22 +207,25 @@ class Kernel extends ConsoleKernel
                     }
 
                     if ($pendingTests <= 0) {
-                        (new EnrolmentController)->destroy($enrolment);
+                        (new EnrolmentController)->softDeletes($enrolment);
                     }
                 }
             }
-        })->everyMinute();
 
-        // $schedule->call(function () {
-        //     $attempts = Attempt::whereNull('completed_at')->get();
+            //CHANGES TEACHERS ZOOM USER TYPE TO LICENSED WHEN A STUDENT IS ASSIGNED TO THEM//
+            $teachersWithStudents = User::role('teacher')->whereHas('students')->get();
 
-        //     foreach ($attempts as $attempt) {
-        //         if (now() >= $attempt->created_at->copy()->addMinutes($attempt->duration())) {
-        //             $attempt->completed_at = now()->toDateTimeString();
-        //             $attempt->save();
-        //         }
-        //     }
-        // })->everyMinute();
+            foreach ($teachersWithStudents as $teacher) {
+                if ((new MeetingController)->checkUserType($teacher->id) == 1) {
+                    $succesfullyChanged = (new MeetingController)->changeZoomUserType($teacher->id, 2);
+                    if ($succesfullyChanged) {
+                        Log::info('Teacher ' . $teacher->first_name . ' ' . $teacher->last_name . '\'s Zoom type changed from basic to licensed');
+                    } else {
+                        Log::info('Teacher ' . $teacher->first_name . ' ' . $teacher->last_name . '\'s Zoom type could not be changed');
+                    }
+                }
+            }
+        })->hourly();
     }
 
     /**

@@ -36,22 +36,6 @@ class NiubizCheckoutButton extends Component
         $this->expirationTimeInMinutes = $timestamp->diffInMinutes($now);
     }
 
-    // public function loadPaymentButtons($amount)
-    // {
-    //     $this->loadNiubizButton = true;
-    //     $securityToken = PaymentController::getSecurityToken();
-    //     $this->sessionToken = json_decode(PaymentController::getSessionToken($securityToken));
-    //     $this->purchaseNumber = Invoice::all()->last()->id + 1;
-    //     session(['purchaseNumber' => $this->purchaseNumber]);
-    //     $timestamp = Carbon::createFromTimestampMs(($this->sessionToken)->expirationTime); //This code creates a Carbon object from the expirationTime property in miliseconds of the sessionToken. It then converts the Carbon object to a DateTime string.
-    //     $now = Carbon::now('UTC');
-    //     $this->expirationTimeInMinutes = $timestamp->diffInMinutes($now);
-    //     $this->sessionKey = $this->sessionToken->sessionKey;
-
-    //     $this->amount = $amount;
-    //     $this->dispatchBrowserEvent('load-payment-buttons');
-    // }
-
     public function render()
     {
         $securityToken = PaymentController::getSecurityToken();

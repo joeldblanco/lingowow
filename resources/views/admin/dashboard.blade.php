@@ -246,13 +246,14 @@
     </div>
 
 
+    @push('header-scripts')
+        <script src="https://cdn.jsdelivr.net/npm/apexcharts" async></script>
+    @endpush
 
 
     {{-- SCRIPTS --}}
 
-    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
-
-    <script>
+    <script defer>
         var options = {
             chart: {
                 type: "area",

@@ -61,7 +61,7 @@ class EnrolmentController extends Controller
      */
     public function isScheduleNeeded(Request $request)
     {
-        // dump($request);
+        // dd($request);
         $request->validate([
             'course_id' => 'required|numeric|exists:App\Models\Course,id',
         ]);
@@ -246,6 +246,12 @@ class EnrolmentController extends Controller
         $enrolment->teacher_id = $request->get('teacher_id');
         $enrolment->student_id = $request->get('student_id');
         $enrolment->course_id = $request->get('course_id');
+
+        if (!$request->get('unit_id')) {
+            $enrolment->save();
+            return redirect()->route('enrolments.index');
+        }
+
         (new UsersController)->addUnit($request->get('student_id'), $request->get('unit_id'));
         $enrolment->save();
         return redirect()->route('enrolments.index');
@@ -265,6 +271,27 @@ class EnrolmentController extends Controller
             $enrolment->classes->each(function ($class) {
                 if ($class->meeting != null) (new MeetingController)->destroy($class->meeting);
                 $class->delete();
+            });
+            if (!empty($enrolment->schedule)) $enrolment->schedule->delete();
+            $enrolment->delete();
+        }
+
+        if (!empty($student)) {
+            $student->removeRole('student');
+            $student->assignRole('guest');
+        }
+
+        return redirect()->route('enrolments.index');
+    }
+
+    public function softDeletes(Enrolment $enrolment)
+    {
+        $student = User::find($enrolment->student_id);
+
+        if (!empty($enrolment)) {
+            $enrolment->classes->each(function ($class) {
+                if ($class->meeting != null) (new MeetingController)->destroy($class->meeting);
+                // $class->delete();
             });
             if (!empty($enrolment->schedule)) $enrolment->schedule->delete();
             $enrolment->delete();
@@ -357,7 +384,7 @@ class EnrolmentController extends Controller
                     $module = Module::create([
                         'name' => $student->first_name . ' ' . $student->last_name . ' - Lesson Room',
                         'course_id' => $course_id,
-                        'description' => 'Welcome to your Conversational Course. 
+                        'description' => 'Welcome to your Personalized Course. 
 
                         Most of the content set here is based on the information sent by our students. 
                         
@@ -404,7 +431,7 @@ class EnrolmentController extends Controller
         return $enrolment->id;
     }
 
-    public static function calculateApportionment($plan = null, $schedule = null, $course_id = null, $preselection = null, $teacher_id = null)
+    public static function calculateApportionment($plan = null, $schedule = null, $course_id = null, $preselection = null, $teacher_id = null, $adminEdition = false, $from = null)
     {
         if (empty(session('student_id'))) {
             $user = auth()->user();
@@ -426,16 +453,22 @@ class EnrolmentController extends Controller
             $course_id = session("selected_course");
         }
 
-        $nowUTC = Carbon::now()->setTimezone('UTC');
+
+        if ($adminEdition) {
+            $nowUTC = (new Carbon($from))->setTimezone('UTC');
+            // dd($nowUTC);
+        } else {
+            $nowUTC = Carbon::now()->setTimezone('UTC');
+        }
 
         $current_period = ApportionmentController::currentPeriod();
         $next_period = ApportionmentController::nextPeriod();
 
-        $current_period_start = new Carbon($current_period[0]);
-        $current_period_end = new Carbon($current_period[1]);
+        $current_period_start = new Carbon($current_period["start_date"]);
+        $current_period_end = new Carbon($current_period["end_date"]);
 
-        $next_period_start = new Carbon($next_period[0]);
-        $next_period_end = new Carbon($next_period[1]);
+        $next_period_start = new Carbon($next_period["start_date"]);
+        $next_period_end = new Carbon($next_period["end_date"]);
 
         if (empty($preselection)) {
             $qty = 0;
@@ -446,8 +479,8 @@ class EnrolmentController extends Controller
 
                 $nowUTC->hour = $time;
 
-                $qty += $nowUTC->diffInDaysFiltered(function (Carbon $date) use (&$day, &$time, &$days, &$current_period_start) {
-                    if ($date->isDayOfWeek($day) && $date->greaterThanOrEqualTo($current_period_start) && $date->greaterThanOrEqualTo(now()->copy()->addHours(12))) {
+                $qty += $nowUTC->diffInDaysFiltered(function (Carbon $date) use (&$day, &$time, &$days, &$current_period_start, &$nowUTC) {
+                    if ($date->isDayOfWeek($day) && $date->greaterThanOrEqualTo($current_period_start) && $date->greaterThanOrEqualTo($nowUTC->copy()->addHours(12))) {
                         $date->hour = $time;
                         $date->minute = 0;
                         $date->second = 0;
@@ -478,7 +511,7 @@ class EnrolmentController extends Controller
                 }
             }
 
-            $absence = User::find($teacher_id)->teacherClasses()->where('status', 1)->whereBetween('start_date', [$nowUTC->toDateTimeString(), ApportionmentController::currentPeriod()[1]])->orderBy('start_date', 'asc')->get()->pluck('start_date');
+            $absence = User::find($teacher_id)->teacherClasses()->where('status', 1)->whereBetween('start_date', [$nowUTC->toDateTimeString(), ApportionmentController::currentPeriod()["end_date"]])->orderBy('start_date', 'asc')->get()->pluck('start_date');
 
             if ($absence != null) {
                 foreach ($absence as $key => $start_date) {
@@ -522,8 +555,6 @@ class EnrolmentController extends Controller
             $qty_diff = sizeof($days_diff);
         }
 
-        // dd($days);
-
         return [$qty_diff, $days_diff, $days, $absence];
     }
 
@@ -562,17 +593,17 @@ class EnrolmentController extends Controller
         //GIVE STUDENT PERMISSION TO VIEW UNITS//
         $student->givePermissionTo('view units');
 
-        //CHECK IF COURSE IS CONVERSATIONAL COURSE//
+        //CHECK IF COURSE IS PERSONALIZED COURSE//
         if ($course->categories->pluck('name')->contains('Conversational')) {
 
             // GETTING STUDENT'S MODULES
             $moduleIds = DB::table('module_user')->where('user_id', $student->id)->pluck('module_id')->toArray();
             $modules = Module::whereIn('id', $moduleIds)->get();
 
-            // GETTING STUDENT'S MODULES IN THE CONVERSATIONAL COURSE
+            // GETTING STUDENT'S MODULES IN THE PERSONALIZED COURSE
             $module = $modules->where('course_id', $course->id)->first();
 
-            //IF STUDENT DOESN'T HAVE MODULES IN THE CONVERSATIONAL COURSE, CREATE THEM//
+            //IF STUDENT DOESN'T HAVE MODULES IN THE PERSONALIZED COURSE, CREATE THEM//
             if (empty($module)) {
 
                 // GETTING THE LAST MODULE'S ORDER
@@ -582,7 +613,7 @@ class EnrolmentController extends Controller
                 $module = Module::create([
                     'name' => "{$student->first_name} {$student->last_name} - Lesson Room",
                     'course_id' => $course->id,
-                    'description' => 'Welcome to your Conversational Course. 
+                    'description' => 'Welcome to your Personalized Course. 
                 
                         Most of the content set here is based on the information sent by our students. 
             
@@ -600,7 +631,7 @@ class EnrolmentController extends Controller
                 ]);
             } else {
 
-                //IF STUDENT ALREADY HAS MODULES IN THE CONVERSATIONAL COURSE, ASSIGN THEM//
+                //IF STUDENT ALREADY HAS MODULES IN THE PERSONALIZED COURSE, ASSIGN THEM//
                 $module = Module::find($module->id);
 
                 if ($module->course_id)

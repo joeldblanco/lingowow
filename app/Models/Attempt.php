@@ -45,6 +45,6 @@ class Attempt extends Model
      */
     public function answers()
     {
-        return $this->hasMany(Answer::class);
+        return $this->hasMany(Answer::class)->withTrashed();
     }
 }

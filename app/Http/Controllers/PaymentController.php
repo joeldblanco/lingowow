@@ -15,6 +15,7 @@ use App\Models\User;
 use App\View\Components\NiubizCheckoutButton;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 
 class PaymentController extends Controller
@@ -105,7 +106,7 @@ class PaymentController extends Controller
             $user = auth()->user();
             ShopController::checkout($user, 'niubiz');
         } else {
-            return redirect()->route('cart')->with('error', 'No se pudo procesar el pago. Error code: PAY-202');
+            return redirect()->route('cart')->with('error', 'No se pudo procesar el pago. Error: ' . session("payment_error"));
         }
     }
 
@@ -142,6 +143,20 @@ class PaymentController extends Controller
 
             // return redirect()->route('invoices.show', ['id' => session('invoice_id')]);
         } else {
+
+            $responseBody = $response->body();
+            $responseArray = json_decode($responseBody, true);
+
+            if (isset($responseArray['data']['ACTION_DESCRIPTION'])) {
+                $actionDescription = $responseArray['data']['ACTION_DESCRIPTION'];
+
+                session(["payment_error" => $actionDescription]);
+            } else {
+                session(["payment_error" => "Unknown error"]);
+            }
+
+            //Log error
+            Log::error('Error processing payment. User ID ' . auth()->id() . ': ' . $response->body());
             return false;
         }
 

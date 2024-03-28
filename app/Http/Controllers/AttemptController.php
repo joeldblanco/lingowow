@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Answer;
 use App\Models\Attempt;
+use App\Models\Classes;
+use App\Models\Enrolment;
 use App\Models\Exam;
 use App\Models\Question;
 use App\Models\Unit;
@@ -24,10 +26,14 @@ class AttemptController extends Controller
     {
         $role = Auth::user()->roles->pluck('name')[0];
         if (!empty($user)) {
-            if ($role == ("admin" || "teacher")) {
-                //     $attempts = Attempt::all()->sortDesc();
-                // } elseif ($role == "teacher") {
-                $attempts = Attempt::where('user_id', $user->id)->get()->sortDesc();
+            if ($role == "teacher") {
+                if ($user->id == auth()->id()) {
+                    $attempts = Attempt::all()->sortDesc();
+                } else {
+                    $attempts = Attempt::where('user_id', $user->id)->get()->sortDesc();
+                }
+            } else if ($role == "admin") {
+                $attempts = Attempt::all()->sortDesc();
             } else {
                 Attempt::where('user_id', auth()->id())->get();
             }
@@ -104,7 +110,7 @@ class AttemptController extends Controller
     {
         $question = Question::find($question_id);
         $attempt = Attempt::find($attempt_id);
-        $answer = Answer::where('question_id', $question_id)->where('attempt_id', $attempt->id)->first();
+        $answer = Answer::withTrashed()->where('question_id', $question_id)->where('attempt_id', $attempt->id)->first();
 
         return view('exams.attempts.show_question', compact('question', 'attempt_id', 'answer'));
     }
@@ -154,6 +160,7 @@ class AttemptController extends Controller
         if (empty($attempt)) abort(404);
 
         $answers = $request->except('_token', 'attempt_id');
+
         if (empty($answers)) {
             foreach ($attempt->answers as $answer) {
                 $answers[$answer->question_id] = $answer->answer;
@@ -167,13 +174,14 @@ class AttemptController extends Controller
             $questions = $exam->questions;
             $result = 0;
 
+
             foreach ($questions as $question) {
 
                 if (isset($answers[$question->id])) {
                     if ($question->answer == $answers[$question->id]) {
                         $result += $question->marks;
 
-                        Answer::updateOrCreate(
+                        Answer::withTrashed()->updateOrCreate(
                             [
                                 'attempt_id' => $attempt->id,
                                 'question_id' => $question->id,
@@ -184,7 +192,7 @@ class AttemptController extends Controller
                             ]
                         );
                     } else {
-                        Answer::updateOrCreate(
+                        Answer::withTrashed()->updateOrCreate(
                             [
                                 'attempt_id' => $attempt->id,
                                 'question_id' => $question->id,
@@ -196,7 +204,7 @@ class AttemptController extends Controller
                         );
                     }
                 } else {
-                    Answer::updateOrCreate(
+                    Answer::withTrashed()->updateOrCreate(
                         [
                             'attempt_id' => $attempt->id,
                             'question_id' => $question->id,

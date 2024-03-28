@@ -157,8 +157,8 @@ class Schedule extends Component
         $current_period = DB::table("metadata")->where("key", "current_period")->first()->value;
         $current_period = array_values(json_decode($current_period, 1));
         // $current_period = ApportionmentController::currentPeriod();
-        $period_start_c = new Carbon($current_period[0]);
-        $period_end_c = new Carbon($current_period[1]);
+        $period_start_c = new Carbon($current_period["start_date"]);
+        $period_end_c = new Carbon($current_period["end_date"]);
         $this->now = new Carbon();
         // dd(new CarbonPeriod($this->now, $period_end_c));
         foreach (new CarbonPeriod($this->now, $period_end_c) as $key => $date) {
@@ -417,12 +417,12 @@ class Schedule extends Component
             $abcense = Classes::select('start_date')
                 ->where('enrolment_id', $enrolment_id)
                 ->where('status', '1')
-                ->whereBetween('start_date', [$today->toDateTimeString(), ApportionmentController::currentPeriod()[1]])
+                ->whereBetween('start_date', [$today->toDateTimeString(), ApportionmentController::currentPeriod()["end_date"]])
                 ->get();
         } else {
             $abcense = Classes::select('start_date')
                 ->where('status', '1')
-                ->whereBetween('start_date', [$today->toDateTimeString(), ApportionmentController::currentPeriod()[1]])
+                ->whereBetween('start_date', [$today->toDateTimeString(), ApportionmentController::currentPeriod()["end_date"]])
                 ->get();
         }
 
@@ -477,7 +477,7 @@ class Schedule extends Component
             }
 
             $current_period = ApportionmentController::currentPeriod();
-            $period_start_c = new Carbon($current_period[0]);
+            $period_start_c = new Carbon($current_period["start_date"]);
             // $period_end_c = new Carbon($current_period[1]);
 
             $this->classes = Classes::select()

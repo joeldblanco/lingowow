@@ -42,76 +42,72 @@ class ClassroomController extends Controller
     //     return redirect('https://meet.theuttererscorner.com/'.auth()->user()->meeting_id.'?jwt='.$payload);
     // }
 
+    private function checkAccess($userId, $classId)
+    {
+        $class = Classes::find($classId);
+        $enrolment = Enrolment::find($class->enrolment_id);
+        $user = User::find($userId);
+        $classStartDate = Carbon::createFromTimeString($class->start_date);
+        $classEndDate = Carbon::createFromTimeString($class->end_date);
+
+        if ($user::role('teacher') && $enrolment->teacher->id == $userId)
+            if (now()->between($classStartDate->subMinutes(10), $classEndDate))
+                return true;
+
+        if ($user::role('teacher') && $enrolment->student->id == $userId)
+            if (now()->between($classStartDate->subSeconds(30), $classEndDate))
+                return true;
+
+        return false;
+    }
+
     public function openRoom($id)
     {
         // $current_period = ApportionmentController::getPeriod('2022-05-17'); //TO_DELETE
         $current_period = ApportionmentController::currentPeriod();
         $enrolments = Enrolment::where('student_id', $id)->get();
         if (count($enrolments) > 0) {
-            // $classes = Classes::where('enrolment_id', $enrolment->id)->whereDate('start_date', '>=', $current_period[0])->orderBy('start_date', 'asc')->get();
-            // dump($classes);
             $classes = collect([]);
-            foreach($enrolments as $enrolment){
-                $classes = $classes->merge(Classes::where('enrolment_id', $enrolment->id)->whereDate('start_date', '>=', $current_period[0])->get());
+            foreach ($enrolments as $enrolment) {
+                $classes = $classes->merge(Classes::where('enrolment_id', $enrolment->id)->where('end_date', '>=', now())->get());
             }
-            $classes = $classes->sortBy('start_date');
 
-            $student = User::find($id);
-            $enter_classroom = false;
-            $message = "Student doesn't have any class left.";
-            $user = User::find(auth()->id());
-            $user = $user->getRoleNames();
-            $user = $user[0];
-            $message1 = "";
-            $message2 = "";
-            $time = 0;
+            if (count($classes) > 0) {
 
-            foreach ($classes as $key => $value) {
-                $classes[$key] = Carbon::createFromTimeString($value->start_date);
-                $now = Carbon::now(auth()->user()->timezone);
+                $classes = $classes->sortBy('start_date');
+
+                $currentClass = $classes->sortBy('start_date')->filter(function ($class) {
+                    return Carbon::now()->between($class->start_date, $class->end_date);
+                })->first();
+
+                $nextClass = $classes->first();
+
+                $student = User::find($id);
                 $enter_classroom = false;
-                $message = "";
+                $message = "Student doesn't have any class left.";
+                $user = User::find(auth()->id());
+                $user = $user->getRoleNames();
+                $user = $user[0];
+                $message2 = "";
+                $time = 0;
 
-                if ($now->lessThanOrEqualTo($classes[$key])) {
-                    $diffInSeconds = $classes[$key]->diffInSeconds();
 
-                    if (($diffInSeconds < 600 && $user == 'teacher') || ($diffInSeconds < 20 && $user == 'student') || $user == 'admin') {
-
-                        return redirect($value->meeting->join_url);
-                        // return redirect($student->studentClasses->sortBy('start_date')->first()->meeting->join_url);
-
-                        break;
-                    } else {
-
-                        $message2 = "On " . $classes[$key]->format('l') . ' at ' . $classes[$key]->format('g:00 a') . " UTC " . "(" . $classes[$key]->setTimezone(auth()->user()->timezone)->format('l') . " at " . $classes[$key]->setTimezone(auth()->user()->timezone)->format('g:00 a') . " " . auth()->user()->timezone . ").";
-
-                        if ($user == 'teacher') {
-                            // $message1 = "This student's next class is in " . $classes[$key]->diffForHumans(['parts' => 2]) . ".";
-                            $message1 = "This student's next class is in ";
-                            $time = $classes[$key]->diffInSeconds();
-                            break;
-                        } else {
-                            // $message1 = "Your next class is in " . $classes[$key]->diffForHumans(['parts' => 2]) . ".";
-                            $message1 = "Your next class is in ";
-                            $time = $classes[$key]->diffInSeconds();
-                            break;
-                        }
-                    }
+                if ($currentClass) {
+                    if ($this->checkAccess(auth()->id(), $currentClass->id))
+                        return redirect($currentClass->meeting->join_url);
+                    else
+                        abort(403, 'USER DOES NOT HAVE THE RIGHT PERMISSIONS.');
                 } else {
-                    $diffInSeconds = $classes[$key]->diffInSeconds();
-                    if ($user == 'admin' || (($classes[$key]->copy()->addMinutes(40) > now() && $diffInSeconds < 4000) && ($user == 'student' || $user == 'teacher'))) {
-                        return redirect($value->meeting->join_url);
-
-                        break;
-                    }
+                    $time = now()->diffInSeconds($nextClass->start_date);
+                    $message1 = "Class not available yet.";
+                    $message2 = "Next class on ";
+                    return view('classroom.show', compact('message1', 'message2', 'student', 'user', 'time'));
                 }
+            } else {
+                abort(403, 'USER DOES NOT HAVE THE RIGHT PERMISSIONS.');
             }
-
-            return view('classroom.show', compact('enter_classroom', 'message1', 'message2', 'student', 'user', 'time'));
         } else {
             abort(403, 'USER DOES NOT HAVE THE RIGHT PERMISSIONS.');
-            // $message = "User is not enroled in any course.";
-            // return view('classroom.show', compact('message'));
         }
     }
 }

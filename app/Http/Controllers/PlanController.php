@@ -46,6 +46,7 @@ class PlanController extends Controller
             'name' => 'required',
             'classes' => 'required|numeric',
             'product_id' => 'nullable|numeric|exists:App\Models\Product,id',
+            'price' => 'required|numeric',
         ]);
 
         if (!empty($request->features)) {
@@ -69,6 +70,7 @@ class PlanController extends Controller
             'monthly_classes' => $request->classes,
             'slug' => $newSlug,
             'product_id' => $request->product_id,
+            'price' => $request->price,
         ]);
 
         if (!empty($request->features)) {
@@ -121,6 +123,7 @@ class PlanController extends Controller
             'name' => 'required',
             'classes' => 'required|numeric',
             'product_id' => 'nullable|numeric|exists:App\Models\Product,id',
+            'price' => 'required|numeric',
         ]);
 
         if (!empty($request->features)) {
@@ -135,6 +138,7 @@ class PlanController extends Controller
             'name' => $request->name,
             'monthly_classes' => $request->classes,
             'product_id' => $request->product_id,
+            'price' => $request->price,
         ]);
 
 

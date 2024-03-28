@@ -191,7 +191,7 @@ class MeetingController extends Controller
         return redirect()->route('meetings.index');
     }
 
-    public function destroy(Meeting $meeting)
+    public function destroy(Meeting $meeting, $redirect = true)
     {
         $path = 'meetings/' . $meeting->zoom_id();
         $url = $this->retrieveZoomUrl();
@@ -208,12 +208,19 @@ class MeetingController extends Controller
         if ($success) {
             Meeting::find($meeting->id)->delete();
             $meetings = Meeting::all();
-            return view('meetings.index', compact('meetings'))->with('success', 'Meeting deleted successfully');
+            if ($redirect) {
+                return view('meetings.index', compact('meetings'))->with('success', 'Meeting deleted successfully');
+            } else {
+                return true;
+            }
         } else {
-
             $meetings = Meeting::all();
             $error = json_decode($response->getBody(), true);
-            return view('meetings.index', compact('meetings'))->with('error', $error);
+            if ($redirect) {
+                return view('meetings.index', compact('meetings'))->with('error', $error);
+            } else {
+                return false;
+            }
         }
     }
 
@@ -353,6 +360,80 @@ class MeetingController extends Controller
             return true;
         } else {
             return false;
+        }
+    }
+
+    public function getZoomUserCategory($userId)
+    {
+        $user = User::find($userId);
+
+        $url = 'https://api.zoom.us/v2/users/' . $user->email;
+
+        $response = Http::withHeaders([
+            'Authorization' => 'Bearer ' . $this->OAuth,
+            'Content-Type'  => 'application/json',
+        ])->get($url);
+
+        if ($response->successful()) {
+            $userData = $response->json();
+            return $userData['type'];
+        } else {
+            return 'Error: ' . $response->status();
+        }
+    }
+
+    private function getZoomMasterAccountId()
+    {
+        $url = 'https://api.zoom.us/v2/users/me';
+
+        $response = Http::withHeaders([
+            'Authorization' => 'Bearer ' . $this->OAuth,
+            'Content-Type'  => 'application/json',
+        ])->get($url);
+
+        if ($response->successful()) {
+            $userData = $response->json();
+            return $userData['account_id'];
+        } else {
+            return 'Error: ' . $response->status();
+        }
+    }
+
+    public function changeZoomUserType($userId, $type)
+    {
+        $user = User::find($userId);
+        $url = 'https://api.zoom.us/v2/users/' . $user->email;
+
+        $data = ['type' => $type];
+
+        $response = Http::withHeaders([
+            'Authorization' => 'Bearer ' . $this->OAuth,
+            'Content-Type'  => 'application/json',
+        ])->patch($url, $data);
+
+        if ($response->successful()) {
+            return true;
+        } else {
+            return 'Error: ' . $response->status();
+        }
+    }
+
+    public function checkUserType($userId)
+    {
+        $user = User::find($userId);
+        $url = 'https://api.zoom.us/v2/users/' . $user->email;
+
+        $response = Http::withHeaders([
+            'Authorization' => 'Bearer ' . $this->OAuth,
+            'Content-Type' => 'application/json',
+        ])->get($url);
+
+        $userData = $response->json();
+
+        if ($response->successful()) {
+            return $userData['type'];
+        } else {
+            return response()->json(['error' => 'Failed to fetch user data'], $response->status());
         }
     }
 }

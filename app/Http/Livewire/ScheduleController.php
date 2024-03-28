@@ -628,7 +628,7 @@ class ScheduleController extends Component
         $studentsSchedules = [];
         $studentsInfo = [];
         foreach ($teacherEnrolments as $enrolment) {
-            if (empty($enrolment->schedule)) dd($enrolment->schedule);
+            if (empty($enrolment->schedule)) dd("ScheduleController (getStudentsSchedules):", $enrolment, $enrolment->student);
             if ($getStudentsInfo == true) {
                 $studentsInfo[] = [
                     'student' => $enrolment->student,
@@ -930,12 +930,12 @@ class ScheduleController extends Component
                         if (isset($this->data['manualEnrolment']) && $this->data['manualEnrolment'] == true) {
                             $examDate1 = Carbon::createFromFormat('m/d H:i:s', $datetime1, auth()->user()->timezone)->timezone('UTC');
                             $examDate2 = Carbon::createFromFormat('m/d H:i:s', $datetime2, auth()->user()->timezone)->timezone('UTC');
-                        }else{
+                        } else {
                             $examDate1 = Carbon::createFromFormat('m/d H:i:s', $datetime1, $user->timezone)->timezone('UTC');
                             $examDate2 = Carbon::createFromFormat('m/d H:i:s', $datetime2, $user->timezone)->timezone('UTC');
                         }
                         // Get exam date & time in UTC
-                        
+
                         session(['examDate1' => [$examDate1->toDateTimeString()]]);
                         session(['examDate2' => [$examDate2->toDateTimeString()]]);
 
@@ -952,9 +952,12 @@ class ScheduleController extends Component
                             ShopController::saveScheduleReserve($examDate1, "exam");
                             ShopController::saveScheduleReserve($examDate2, "exam");
 
+                            $product_id = Product::where('name', 'Placement Test')->first()->id;
+                            ShopController::addToCart($product_id);
+
                             if (isset($this->data['manualEnrolment']) && $this->data['manualEnrolment'] == true) {
                                 $enrolmentId = EnrolmentController::enrolStudent($user->id, session('selected_course'), session('selected_teacher'));
-                                dd($enrolmentId);
+                                // dd($enrolmentId);
                                 EnrolmentController::createSchedule($enrolmentId, []);
                                 ClassController::bookClasses(session('examDate1'), $enrolmentId);
                                 ClassController::bookClasses(session('examDate2'), $enrolmentId);
@@ -965,10 +968,9 @@ class ScheduleController extends Component
                                 $invoice->paid = 1;
                                 $invoice->save();
 
+                                Cart::destroy();
+
                                 return redirect()->route("enrolments.index")->with('success', 'User succesfully enroled!');
-                            } else {
-                                $product_id = Product::where('name', 'Placement Test')->first()->id;
-                                ShopController::addToCart($product_id);
                             }
                         } else {
                             return redirect()->route("shop")->with('error', 'Oops! One or more selected blocks are unavailable.');
@@ -1182,9 +1184,9 @@ class ScheduleController extends Component
 
                     if ($scheduleApproved) {
 
-                        $apportionment = EnrolmentController::calculateApportionment(schedule: json_encode($schedule));
-
                         $enrolment = Enrolment::find($this->data['enrolment_id']);
+
+                        $apportionment = EnrolmentController::calculateApportionment(schedule: json_encode($schedule), adminEdition: true, from: $enrolment->created_at);
 
                         foreach ($enrolment->classes as $class) {
                             $class->delete();

@@ -92,7 +92,9 @@
                                                                     <h3>
                                                                         <p>{{ $product->name }}</p>
                                                                     </h3>
-                                                                    <p class="ml-4">${{ $item->price }}</p>
+                                                                    <p class="ml-4">
+                                                                        ${{ substr(strval($item->price), 0, strpos(strval($item->price), '.') + 3) }}
+                                                                    </p>
                                                                 </div>
                                                                 @if ($product->categories()->count() > 0)
                                                                     <p class="mt-1 text-sm text-gray-500">

@@ -274,4 +274,11 @@ class CourseController extends Controller
         $course = Course::find($id);
         return view('course.details', compact('course'));
     }
+
+    public function getCourse(Request $request)
+    {
+        $id = $request->id;
+        $course = Course::find($id);
+        return response()->json($course);
+    }
 }

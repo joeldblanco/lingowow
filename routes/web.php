@@ -140,6 +140,7 @@ Route::middleware(['web', 'auth', 'verified', 'impersonate'])->group(function ()
     Route::get('/courses/{id}', [CourseController::class, 'show'])->name('courses.show');
 
     Route::get('courses/{id}/details', [CourseController::class, 'details'])->name('courses.details');
+    Route::post('/admin/getCourse/', [CourseController::class, 'getCourse'])->name('getCourse');
 
 
 
@@ -286,6 +287,9 @@ Route::middleware(['web', 'auth', 'verified', 'impersonate'])->group(function ()
 
     //ROUTES FOR ADMINISTRATION//
     Route::middleware(['role:admin'])->group(function () {
+
+
+        Route::get('/zoom/changeZoomUserType/{userId}/{type}', [MeetingController::class, 'changeZoomUserType'])->name('changeZoomUserType');
 
 
         Route::get('/analytics/earnings', [AnalyticsController::class, 'earnings2'])->name('analytics.earnings');

@@ -368,7 +368,7 @@ class UnitController extends Controller
 
     public static function checkUnitUser($module, $user)
     {
-        
+
         if ($user->units->first()->module->order < $module->order) {
             $attempts = $user->attempts;
             $exams = $module->exams()->flatten()->filter(function ($exam) use ($attempts) {
@@ -436,14 +436,16 @@ class UnitController extends Controller
                     }
                 }
             } else {
-                $unit = $module->units->sortBy('order')->last();
+                if (count($module->units) > 0) {
+                    $unit = $module->units->sortBy('order')->last();
 
-                //Associate the unit to the user.
-                $request = new Request([
-                    'user' => $user->id,
-                    'unit' => $unit->id,
-                ]);
-                (new UnitController)->userAssociate($request, redirect: false);
+                    //Associate the unit to the user.
+                    $request = new Request([
+                        'user' => $user->id,
+                        'unit' => $unit->id,
+                    ]);
+                    (new UnitController)->userAssociate($request, redirect: false);
+                }
             }
         }
     }

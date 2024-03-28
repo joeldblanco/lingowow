@@ -33,6 +33,18 @@
                                 <p class="text-gray-500 text-sm font-light">Please enter plan number of classes (Enter 0
                                     for Single-payment products)</p>
                             </div>
+                            <div class="pb-6 space-y-1">
+                                <p class="font-bold text-gray-600 mb-1">Price</p>
+                                <input type="number" name="price" id="price" placeholder="0.00" min="0"
+                                    step="0.01" required
+                                    class="w-full rounded-md p-3 text-gray-600 hover:border-gray-600 @if ($errors->has('price')) border-red-600 @else border-gray-300 @endif ">
+                                @if ($errors->has('price'))
+                                    <p class="text-xs font-light text-red-600">{{ $errors->get('price')[0] }}
+                                    </p>
+                                @endif
+                                <p class="text-gray-500 text-sm font-light">Please, enter the plan's monthly price.
+                                </p>
+                            </div>
                             <div class="pt-6 space-y-1">
                                 <p class="font-bold text-gray-600 mb-1">Product</p>
                                 <select id="product_id" name="product_id"

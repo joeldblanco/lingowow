@@ -88,7 +88,11 @@
     </div>
 
     <script>
+        var asynchronousCourse = true;
+        var nullBilling = false;
+
         $('#student_id').change(function() {
+
             $.ajax({
                 type: 'POST',
                 url: route('getUser'),
@@ -99,17 +103,52 @@
                 success: function(user) {
                     if (user.street == null || user.city == null || user.country == null || user
                         .zip_code == null) {
-                        $('#needsBillingAddress').show();
-                        $('#saveButton').hide();
+                        nullBilling = true;
                     } else {
-                        $('#needsBillingAddress').hide();
-                        $('#saveButton').show();
+                        nullBilling = false;
                     }
                 },
                 error: function(data) {
                     // console.log(data["responseText"]);
                 }
             });
+
+            if (nullBilling && asynchronousCourse) {
+                $('#needsBillingAddress').show();
+                $('#saveButton').hide();
+            } else {
+                $('#needsBillingAddress').hide();
+                $('#saveButton').show();
+            }
+
+            $('#plan_container').show();
+
+        });
+
+        $('#course_id').change(function() {
+            $.ajax({
+                type: 'POST',
+                url: route('getCourse'),
+                data: {
+                    id: this.value,
+                    '_token': $('meta[name="csrf-token"]').attr('content'),
+                },
+                success: function(course) {
+                    course.modality == "asynchronous" ? asynchronousCourse = true : asynchronousCourse =
+                        false;
+                },
+                error: function(data) {
+                    // console.log(data["responseText"]);
+                }
+            });
+
+            if (nullBilling && asynchronousCourse) {
+                $('#needsBillingAddress').show();
+                $('#saveButton').hide();
+            } else {
+                $('#needsBillingAddress').hide();
+                $('#saveButton').show();
+            }
 
             $('#plan_container').show();
 
